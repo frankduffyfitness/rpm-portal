@@ -82,14 +82,17 @@ const MI = {
   eccBrakingRFD: { title: "Braking Ability", desc: "How quickly your body decelerates and absorbs force. Critical for injury prevention \u2014 athletes who brake efficiently put less stress on joints and ligaments. Key for change of direction speed.", icon: "\uD83D\uDEE1" },
 };
 
-function cP(v, n) {
+function cP(v, n, invert) {
   if (!n) return 50;
-  if (v <= n.p10) return Math.max(1, Math.round((v / n.p10) * 10));
-  if (v <= n.p25) return 10 + Math.round(((v - n.p10) / (n.p25 - n.p10)) * 15);
-  if (v <= n.p50) return 25 + Math.round(((v - n.p25) / (n.p50 - n.p25)) * 25);
-  if (v <= n.p75) return 50 + Math.round(((v - n.p50) / (n.p75 - n.p50)) * 25);
-  if (v <= n.p90) return 75 + Math.round(((v - n.p75) / (n.p90 - n.p75)) * 15);
-  return Math.min(99, 90 + Math.round(((v - n.p90) / (n.p90 * 0.15)) * 9));
+  const raw = (() => {
+    if (v <= n.p10) return Math.max(1, Math.round((v / n.p10) * 10));
+    if (v <= n.p25) return 10 + Math.round(((v - n.p10) / (n.p25 - n.p10)) * 15);
+    if (v <= n.p50) return 25 + Math.round(((v - n.p25) / (n.p50 - n.p25)) * 25);
+    if (v <= n.p75) return 50 + Math.round(((v - n.p50) / (n.p75 - n.p50)) * 25);
+    if (v <= n.p90) return 75 + Math.round(((v - n.p75) / (n.p90 - n.p75)) * 15);
+    return Math.min(99, 90 + Math.round(((v - n.p90) / (n.p90 * 0.15)) * 9));
+  })();
+  return invert ? Math.max(1, Math.min(99, 100 - raw)) : raw;
 }
 function gC(p) { return p >= 85 ? "#4FFFB0" : p >= 70 ? "#60A5FA" : p >= 40 ? "#FFB020" : p >= 20 ? "#FF8C42" : "#FF4D4D"; }
 function gT(p) { return p >= 90 ? "Elite" : p >= 75 ? "Above Avg" : p >= 50 ? "Average" : p >= 25 ? "Developing" : "Building"; }
@@ -137,10 +140,10 @@ function SL({ data, color = "#4FFFB0", width = 140, height = 44 }) {
   );
 }
 
-function MC({ metricKey, value, unit, norms, sparkData, sparkColor, bestValue, overrideTitle, overrideIcon, overrideDesc }) {
-  const _info = MI[metricKey] || {}; const info = { title: overrideTitle || _info.title, icon: overrideIcon || _info.icon, desc: overrideDesc || _info.desc }; const pct = cP(value, norms); const c = gC(pct);
+function MC({ metricKey, value, unit, norms, sparkData, sparkColor, bestValue, overrideTitle, overrideIcon, overrideDesc, invert }) {
+  const _info = MI[metricKey] || {}; const info = { title: overrideTitle || _info.title, icon: overrideIcon || _info.icon, desc: overrideDesc || _info.desc }; const pct = cP(value, norms, invert); const c = gC(pct);
   let ct = null;
-  if (sparkData && sparkData.length >= 2) { const d = sparkData[sparkData.length - 1] - sparkData[0]; const p = ((d / sparkData[0]) * 100).toFixed(1); if (Math.abs(d) > 0.01) ct = { v: d > 0 ? `+${p}%` : `${p}%`, pos: d > 0 }; }
+  if (sparkData && sparkData.length >= 2) { const d = sparkData[sparkData.length - 1] - sparkData[0]; const p = ((d / sparkData[0]) * 100).toFixed(1); if (Math.abs(d) > 0.01) ct = { v: d > 0 ? `+${p}%` : `${p}%`, pos: invert ? d < 0 : d > 0 }; }
   return (
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "18px 16px", marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
@@ -186,7 +189,7 @@ function MC({ metricKey, value, unit, norms, sparkData, sparkColor, bestValue, o
 
 function PR({ metrics, gc }) {
   const s = 220, cx = 110, cy = 110, r = 80;
-  const pcts = metrics.map(m => cP(m.value, m.norms)); const n = metrics.length, st = 360 / n;
+  const pcts = metrics.map(m => cP(m.value, m.norms, m.invert)); const n = metrics.length, st = 360 / n;
   const p2 = (a, rd) => ({ x: cx + rd * Math.cos((a - 90) * Math.PI / 180), y: cy + rd * Math.sin((a - 90) * Math.PI / 180) });
   const pts = pcts.map((p, i) => p2(i * st, (Math.min(p, 100) / 100) * r));
   const path = pts.map((pt, i) => `${i === 0 ? "M" : "L"}${pt.x},${pt.y}`).join(" ") + " Z";
@@ -345,10 +348,10 @@ function StandingsTab({ filterGroup }) {
   const [period, setPeriod] = useState("all");
   const periods = { all: "All-Time", tm: "This Month", lm: "Last Month", tw: "This Week" };
   const cfgs = {
-    jumpHeight: { label: "Jump Height", unit: '"', key: "jumpHeight", icon: "\u26A1", color: "#4FFFB0" },
-    rsi: { label: "RSI-mod", unit: "", key: "rsi", icon: "\u23F1", color: "#FF6B6B" },
-    peakPowerBM: { label: "Power/BM", unit: " W/kg", key: "peakPowerBM", color: "#60A5FA" },
-    eccBrakingRFD: { label: "Braking RFD", unit: " N/s", key: "eccBrakingRFD", color: "#FFB020" },
+    jumpHeight: { label: "Jump Height", unit: '"', key: "jumpHeight", icon: "\u26A1", color: "#4FFFB0", desc: "How high the athlete jumps from a standing position. The #1 indicator of lower-body power and explosiveness." },
+    rsi: { label: "RSI-mod", unit: "", key: "rsi", icon: "\u23F1", color: "#FF6B6B", desc: "Jump height divided by time to produce it. Measures how quickly an athlete can be explosive." },
+    peakPowerBM: { label: "Power/BM", unit: " W/kg", key: "peakPowerBM", color: "#60A5FA", desc: "Peak power output divided by bodyweight. Lets us compare athletes of different sizes on the same scale." },
+    eccBrakingRFD: { label: "Braking RFD", unit: " N/s", key: "eccBrakingRFD", color: "#FFB020", desc: "How quickly the body decelerates and absorbs force. Critical for injury prevention and change of direction." },
   };
   const cfg = cfgs[metric];
   const sorted = useMemo(() => {
@@ -376,6 +379,7 @@ function StandingsTab({ filterGroup }) {
           <button key={k} onClick={() => setMetric(k)} style={{ padding: "7px 10px", border: `1px solid ${metric === k ? v.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: metric === k ? `${v.color}15` : "rgba(255,255,255,0.02)", color: metric === k ? v.color : "#6B7280" }}>{v.label}</button>
         ))}
       </div>
+      <div style={{ fontSize: 11, color: "#8A8F98", lineHeight: 1.5, marginBottom: 14, padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10, borderLeft: `3px solid ${cfg.color}` }}>{cfg.desc}</div>
       <div style={{ display: "flex", gap: 5, marginBottom: 16 }}>
         {Object.entries(periods).map(([k, v]) => (
           <button key={k} onClick={() => setPeriod(k)} style={{ padding: "7px 10px", border: `1px solid ${period === k ? "#C084FC" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: period === k ? "rgba(192,132,252,0.12)" : "rgba(255,255,255,0.02)", color: period === k ? "#C084FC" : "#6B7280" }}>{v}</button>
@@ -479,7 +483,7 @@ function HopProfile({ athlete, norms, groupInfo, compareGroup, setCompareGroup }
   const rm = [
     { sl: "RSI", value: hop.rsi, norms: n.rsi },
     { sl: "FT", value: hop.ft, norms: n.ft },
-    { sl: "CT", value: hop.ct, norms: n.ct },
+    { sl: "CT", value: hop.ct, norms: n.ct, invert: true },
   ];
 
   return (<>
@@ -511,7 +515,7 @@ function HopProfile({ athlete, norms, groupInfo, compareGroup, setCompareGroup }
     </div>
     <MC metricKey="rsiMod" value={hop.rsi} unit="" norms={n.rsi} sparkData={athlete.rsiHistory} sparkColor="#FF6B6B" bestValue={athlete.best.rsi} overrideTitle="Hop RSI" overrideIcon="⏱" overrideDesc="Flight time divided by contact time. The key measure of reactive ability during repeated hops." />
     <MC metricKey="eccBrakingRFD" value={hop.ft} unit="ms" norms={n.ft} sparkData={athlete.ftHistory} sparkColor="#60A5FA" bestValue={athlete.best.ft} overrideTitle="Flight Time" overrideIcon="🚀" overrideDesc="How long the athlete is airborne between hops. Longer flight time with short ground contact shows elite reactive power." />
-    <MC metricKey="peakPowerBM" value={hop.ct} unit="ms" norms={n.ct} sparkData={athlete.ctHistory} sparkColor="#4FFFB0" bestValue={athlete.best.ct} overrideTitle="Contact Time" overrideIcon="⚡" overrideDesc="Ground contact duration between hops. Shorter contact times with maintained height show better stiffness and reactive ability." />
+    <MC metricKey="peakPowerBM" value={hop.ct} unit="ms" norms={n.ct} sparkData={athlete.ctHistory} sparkColor="#4FFFB0" bestValue={athlete.best.ct} invert={true} overrideTitle="Contact Time" overrideIcon="⚡" overrideDesc="Ground contact duration between hops. Shorter contact times with maintained height show better stiffness and reactive ability." />
   </>);
 }
 
@@ -520,9 +524,9 @@ function HopStandingsTab({ filterGroup }) {
   const [period, setPeriod] = useState("all");
   const periods = { all: "All-Time", tm: "This Month", lm: "Last Month", tw: "This Week" };
   const cfgs = {
-    rsi: { label: "RSI", unit: "", key: "rsi", color: "#FF6B6B" },
-    ct: { label: "Contact Time", unit: "ms", key: "ct", color: "#4FFFB0", invert: true },
-    ft: { label: "Flight Time", unit: "ms", key: "ft", color: "#60A5FA" },
+    rsi: { label: "RSI", unit: "", key: "rsi", color: "#FF6B6B", desc: "Flight time divided by contact time. The key measure of how efficiently the athlete uses ground contact to produce explosive hops." },
+    ct: { label: "Contact Time", unit: "ms", key: "ct", color: "#4FFFB0", invert: true, desc: "How long the foot stays on the ground between hops. Shorter contact times with maintained height show better reactive ability." },
+    ft: { label: "Flight Time", unit: "ms", key: "ft", color: "#60A5FA", desc: "How long the athlete is airborne between hops. Longer flight time with short ground contact shows elite reactive power." },
   };
   const cfg = cfgs[metric];
   const sorted = useMemo(() => {
@@ -548,6 +552,7 @@ function HopStandingsTab({ filterGroup }) {
           <button key={k} onClick={() => setMetric(k)} style={{ padding: "7px 10px", border: `1px solid ${metric === k ? v.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: metric === k ? `${v.color}15` : "rgba(255,255,255,0.02)", color: metric === k ? v.color : "#6B7280" }}>{v.label}</button>
         ))}
       </div>
+      <div style={{ fontSize: 11, color: "#8A8F98", lineHeight: 1.5, marginBottom: 14, padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10, borderLeft: `3px solid ${cfg.color}` }}>{cfg.desc}</div>
       <div style={{ display: "flex", gap: 5, marginBottom: 16 }}>
         {Object.entries(periods).map(([k, v]) => (
           <button key={k} onClick={() => setPeriod(k)} style={{ padding: "7px 10px", border: `1px solid ${period === k ? "#C084FC" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: period === k ? "rgba(192,132,252,0.12)" : "rgba(255,255,255,0.02)", color: period === k ? "#C084FC" : "#6B7280" }}>{v}</button>
@@ -647,8 +652,74 @@ function HopTrendingTab({ filterGroup }) {
   );
 }
 
+
+function LandingPage({ onEnter }) {
+  const totalCMJ = ATHLETES.length;
+  const totalHop = HOP_ATHLETES.length;
+  const totalUnique = new Set([...ATHLETES.map(a => a.name), ...HOP_ATHLETES.map(a => a.name)]).size;
+  const totalCMJTests = ATHLETES.reduce((s, a) => s + a.testCount, 0);
+  const totalHopTests = HOP_ATHLETES.reduce((s, a) => s + a.testCount, 0);
+  
+  return (
+    <div style={{ padding: "0 20px", textAlign: "center" }}>
+      <div style={{ paddingTop: 40, marginBottom: 32 }}>
+        <img src={RPM_LOGO} alt="RPM Strength" style={{ height: 160, width: "auto", display: "block", margin: "0 auto 24px" }} />
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 8px", letterSpacing: -0.5 }}>Athlete Performance Portal</h1>
+        <p style={{ fontSize: 13, color: "#8A8F98", lineHeight: 1.6, margin: "0 auto", maxWidth: 320 }}>
+          Track progress, compare performance, and see where your athlete stands across RPM's testing database.
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 24 }}>
+        {[
+          { value: totalUnique, label: "Active Athletes", color: "#4FFFB0" },
+          { value: (totalCMJTests + totalHopTests).toLocaleString(), label: "Total Tests", color: "#60A5FA" },
+          { value: totalCMJ, label: "CMJ Profiles", color: "#FFB020" },
+          { value: totalHop, label: "Hop Profiles", color: "#FF6B6B" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "18px 12px" }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.value}</div>
+            <div style={{ fontSize: 9, color: "#8A8F98", textTransform: "uppercase", letterSpacing: 0.8, marginTop: 6 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "16px", marginBottom: 24, textAlign: "left" }}>
+        <div style={{ fontSize: 10, color: "#6B7280", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Powered by ForceDecks</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {[
+            { icon: "\u26A1", text: "Countermovement Jump (CMJ) testing" },
+            { icon: "\u23F1", text: "Repeated Hop Test analysis" },
+            { icon: "\uD83C\uDFC6", text: "Group-specific percentile rankings" },
+            { icon: "\uD83D\uDCC8", text: "Session-over-session trend tracking" },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 16 }}>{item.icon}</span>
+              <span style={{ fontSize: 12, color: "#B0B4BC" }}>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button onClick={onEnter} style={{
+        width: "100%", padding: "16px", border: "none", borderRadius: 14, cursor: "pointer",
+        fontSize: 15, fontWeight: 700, letterSpacing: 0.5,
+        background: "linear-gradient(135deg, #4FFFB0 0%, #00B4D8 100%)",
+        color: "#0A0C10",
+        boxShadow: "0 4px 24px rgba(79,255,176,0.25)",
+      }}>
+        Enter Portal
+      </button>
+
+      <div style={{ marginTop: 20, fontSize: 9, color: "#4a4f57", letterSpacing: 0.5 }}>
+        Updated {LAST_UPDATED}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
-  const [tab, setTab] = useState("profile");
+  const [tab, setTab] = useState("home");
   const [testType, setTestType] = useState("cmj");
   const [sel, setSel] = useState(ATHLETES[0]);
   const [menuOpen, setMO] = useState(false);
@@ -662,7 +733,8 @@ export default function App() {
   const norms = GROUP_NORMS[eG] || GROUP_NORMS.all;
   const gi = GROUPS[eG];
   const cmj = sel.cmj;
-  const filtered = search.length > 0 ? ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).slice(0, 25) : ATHLETES.slice(0, 25);
+  const sortByLast = (a, b) => a.name.split(" ").slice(-1)[0].localeCompare(b.name.split(" ").slice(-1)[0]);
+  const filtered = search.length > 0 ? ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).sort(sortByLast).slice(0, 25) : [...ATHLETES].sort(sortByLast).slice(0, 25);
   const rm = [{ sl: "Jump", value: cmj.jumpHeight, norms: norms.cmjHeight }, { sl: "RSI", value: cmj.rsi, norms: norms.rsiMod }, { sl: "Power", value: cmj.peakPowerBM, norms: norms.peakPowerBM }, { sl: "Braking", value: cmj.eccBrakingRFD, norms: norms.eccBrakingRFD }];
 
   return (
@@ -671,18 +743,18 @@ export default function App() {
       <div style={{ height: 44 }} />
       <div style={{ padding: "0 20px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src={RPM_LOGO} alt="RPM Strength" style={{ height: 32, width: "auto" }} />
+          <img src={RPM_LOGO} alt="RPM Strength" style={{ height: 32, width: "auto", cursor: "pointer" }} onClick={() => setTab("home")} />
           <div style={{ width: 1, height: 24, background: "rgba(255,255,255,0.12)" }} />
           <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Athlete Portal</div>
         </div>
-        {tab === "profile" && (
+        {tab !== "home" && tab === "profile" && (
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg, ${(testType === "cmj" ? gi : GROUPS[hopCmpG || hopSel.group]).color} 0%, #00B4D8 100%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#0A0C10", cursor: "pointer" }}
             onClick={() => { setMO(!menuOpen); setSrch(""); }}>{testType === "cmj" ? sel.initials : hopSel.initials}</div>
         )}
       </div>
-      <div style={{ display: "flex", margin: "0 20px 8px", gap: 8 }}>
+      {tab !== "home" && <div style={{ display: "flex", margin: "0 20px 8px", gap: 8 }}>
         {[{ key: "cmj", label: "CMJ" }, { key: "hop", label: "Hop Test" }].map(t => (
-          <button key={t.key} onClick={() => { setTestType(t.key); setTab("profile"); }} style={{
+          <button key={t.key} onClick={() => { setTestType(t.key); setTab("profile"); window.scrollTo(0, 0); }} style={{
             flex: 1, padding: "10px 0", border: "none", borderRadius: 10, cursor: "pointer",
             fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
             background: testType === t.key ? "linear-gradient(135deg, #4FFFB020, #00B4D820)" : "rgba(255,255,255,0.03)",
@@ -690,18 +762,18 @@ export default function App() {
             borderBottom: testType === t.key ? "2px solid #4FFFB0" : "2px solid transparent",
           }}>{t.label}</button>
         ))}
-      </div>
-      <div style={{ display: "flex", margin: "0 20px 16px", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3 }}>
+      </div>}
+      {tab !== "home" && <div style={{ display: "flex", margin: "0 20px 16px", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3 }}>
         {[{ key: "profile", label: "Profile", icon: "\uD83D\uDC64" }, { key: "standings", label: "Standings", icon: "\uD83C\uDFC6" }, { key: "trending", label: "Trending", icon: "\uD83D\uDCC8" }].map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600, background: tab === t.key ? "rgba(79,255,176,0.12)" : "transparent", color: tab === t.key ? "#4FFFB0" : "#6B7280" }}>{t.icon} {t.label}</button>
+          <button key={t.key} onClick={() => { setTab(t.key); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600, background: tab === t.key ? "rgba(79,255,176,0.12)" : "transparent", color: tab === t.key ? "#4FFFB0" : "#6B7280" }}>{t.icon} {t.label}</button>
         ))}
-      </div>
+      </div>}
       {menuOpen && tab === "profile" && (<>
         <div style={{ position: "fixed", inset: 0, zIndex: 90 }} onClick={() => setMO(false)} />
         <div style={{ position: "absolute", top: 120, right: 20, left: 20, zIndex: 100, background: "#1A1D24", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: 8, boxShadow: "0 16px 48px rgba(0,0,0,0.6)", maxHeight: 380, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           <input type="text" placeholder="Search athletes..." value={search} onChange={(e) => setSrch(e.target.value)} autoFocus style={{ width: "100%", padding: "10px 12px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, background: "rgba(255,255,255,0.04)", color: "#E0E0E0", fontSize: 13, outline: "none", marginBottom: 6, boxSizing: "border-box" }} />
           <div style={{ overflowY: "auto", flex: 1 }}>
-            {(testType === "cmj" ? filtered : (search.length > 0 ? HOP_ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).slice(0, 25) : HOP_ATHLETES.slice(0, 25))).map(a => { const ag = GROUPS[a.group]; return (
+            {(testType === "cmj" ? filtered : (search.length > 0 ? HOP_ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).sort(sortByLast).slice(0, 25) : [...HOP_ATHLETES].sort(sortByLast).slice(0, 25))).map(a => { const ag = GROUPS[a.group]; return (
               <div key={a.id} onClick={() => { if (testType === "cmj") { setSel(a); setCmpG(null); } else { setHopSel(a); setHopCmpG(null); } setMO(false); setSrch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 8, cursor: "pointer", background: a.id === sel.id ? "rgba(79,255,176,0.08)" : "transparent" }}>
                 <div style={{ width: 30, height: 30, borderRadius: "50%", flexShrink: 0, background: a.id === sel.id ? `linear-gradient(135deg, ${ag.color}, #00B4D8)` : "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: a.id === sel.id ? "#0A0C10" : "#8A8F98" }}>{a.initials}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -714,6 +786,7 @@ export default function App() {
         </div>
       </>)}
       <div style={{ padding: "0 20px 40px" }}>
+        {tab === "home" && <LandingPage onEnter={() => setTab("standings")} />}
         {tab === "profile" && testType === "cmj" && (<>
           <div style={{ marginBottom: 16, padding: 16, background: `linear-gradient(135deg, ${gi.color}0A 0%, rgba(0,180,216,0.04) 100%)`, border: `1px solid ${gi.color}20`, borderRadius: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
@@ -753,7 +826,7 @@ export default function App() {
         {tab === "profile" && testType === "hop" && (
           <HopProfile athlete={hopSel} norms={HOP_NORMS} groupInfo={GROUPS[hopCmpG || hopSel.group]} compareGroup={hopCmpG} setCompareGroup={setHopCmpG} />
         )}
-        {(tab === "standings" || tab === "trending") && (
+        {tab !== "home" && (tab === "standings" || tab === "trending") && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Filter by group</div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
