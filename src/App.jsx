@@ -1034,8 +1034,8 @@ function LandingPage({ onEnter, onSelectAthlete }) {
   
   return (
     <div style={{ padding: "0 20px", textAlign: "center" }}>
-      <div style={{ paddingTop: 40, marginBottom: 32 }}>
-        <img src={RPM_LOGO} alt="RPM Strength" style={{ height: 160, width: "auto", display: "block", margin: "0 auto 24px" }} />
+      <div style={{ paddingTop: 16, marginBottom: 24 }}>
+        <div style={{ fontSize: 42, fontWeight: 800, letterSpacing: 4, color: "#fff", textAlign: "center", marginBottom: 2, fontFamily: "'Anton', sans-serif" }}>RPM <span style={{ color: "#fff" }}>STRENGTH</span></div>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 8px", letterSpacing: -0.5 }}>Athlete Performance Portal</h1>
         <p style={{ fontSize: 13, color: "#8A8F98", lineHeight: 1.6, margin: "0 auto", maxWidth: 320 }}>
           Track progress, compare performance, and see where your athlete stands across RPM's testing database. A minimum of 5 sessions is required to appear in the portal.
@@ -1477,7 +1477,7 @@ export default function App() {
   const rm = [{ sl: "Jump", value: cmj.jumpHeight, norms: norms.cmjHeight, unit: '"' }, { sl: "RSI", value: cmj.rsi, norms: norms.rsiMod }, { sl: "Power", value: cmj.peakPowerBM, norms: norms.peakPowerBM, unit: " W/kg" }, { sl: "Braking", value: cmj.eccBrakingRFD, norms: norms.eccBrakingRFD, unit: " N/s" }];
 
   return (<>
-    <style>{"@media print { body * { visibility: hidden; } #report-content, #report-content * { visibility: visible; } #report-content { position: absolute; left: 0; top: 0; width: 100%; } }"}</style>
+    <style>{"@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap'); @media print { body * { visibility: hidden; } #report-content, #report-content * { visibility: visible; } #report-content { position: absolute; left: 0; top: 0; width: 100%; } }"}</style>
     <div style={{ minHeight: "100vh", background: "#0A0C10", fontFamily: "'DM Sans','Helvetica Neue',sans-serif", color: "#E0E0E0", maxWidth: 420, margin: "0 auto", position: "relative" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
       <div style={{ height: 44 }} />
