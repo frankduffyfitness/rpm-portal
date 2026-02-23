@@ -1706,25 +1706,15 @@ function VeloProfile({ athlete, onBack }) {
         const total = gAthletes.length;
         const gi = GROUPS[a.group] || {};
         return (
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 8 }}>
-            <span style={{ fontSize: 11, color: "#8A8F98" }}>Group Ranking</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: gi.color || "#fff" }}>{rank} <span style={{ color: "#6B7280", fontWeight: 400 }}>of {total} {gi.label}</span></span>
+          <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: "14px 20px", marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 12, color: "#8A8F98" }}>Group Ranking</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: gi.color || "#fff" }}>{rank} <span style={{ color: "#6B7280", fontWeight: 400 }}>of {total} {gi.label}</span></span>
           </div>
         );
       })()}
         {a.peakHistory.length >= 2 && (
-          <svg width={280} height={80} style={{ display: "block" }}>
-            <defs><linearGradient id="vpg" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#4FFFB0" stopOpacity="0.3"/>
-              <stop offset="100%" stopColor="#4FFFB0"/>
-            </linearGradient></defs>
-            <path d={sparkPath} fill="none" stroke="url(#vpg)" strokeWidth="2.5" strokeLinecap="round"/>
-            {pts.map((p, j) => <circle key={j} cx={p.x} cy={p.y} r={j === pts.length - 1 ? 5 : 2.5} fill={j === pts.length - 1 ? "#4FFFB0" : "rgba(79,255,176,0.4)"} />)}
-          </svg>
+          <SL data={a.peakHistory} color="#4FFFB0" width={280} height={80} dates={a.dateHistory} unit=" mph" />
         )}
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#6B7280", marginTop: 4 }}>
-          <span>{a.dateHistory[0]}</span><span>{a.dateHistory[a.dateHistory.length - 1]}</span>
-        </div>
       </div>
 
       <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1857,7 +1847,7 @@ export default function App() {
   const brkRank = groupAthletes.filter(a => a.best.eccBrakingRFD > sel.best.eccBrakingRFD).length + 1;
   const sortByLast = (a, b) => a.name.split(" ").slice(-1)[0].localeCompare(b.name.split(" ").slice(-1)[0]);
   const filtered = search.length > 0 ? ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).sort(sortByLast).slice(0, 25) : [...ATHLETES].sort(sortByLast).slice(0, 25);
-  const rm = [{ sl: "Jump", value: cmj.jumpHeight, norms: norms.cmjHeight, unit: '"' }, { sl: "RSI", value: cmj.rsi, norms: norms.rsiMod }, { sl: "Power", value: cmj.peakPowerBM, norms: norms.peakPowerBM, unit: " W/kg" }, { sl: "Braking", value: cmj.eccBrakingRFD, norms: norms.eccBrakingRFD, unit: " N/s" }];
+  const rm = [{ sl: "Jump", value: cmj.jumpHeight, norms: norms.cmjHeight, unit: '"' }, { sl: "RSI", value: cmj.rsi, norms: norms.rsiMod }, { sl: "Power", value: cmj.peakPowerBM, norms: norms.peakPowerBM, unit: " W/kg" }, { sl: "Brake", value: cmj.eccBrakingRFD, norms: norms.eccBrakingRFD, unit: " N/s" }];
 
   return (<>
     <style>{"@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap'); @media print { body * { visibility: hidden; } #report-content, #report-content * { visibility: visible; } #report-content { position: absolute; left: 0; top: 0; width: 100%; } }"}</style>
