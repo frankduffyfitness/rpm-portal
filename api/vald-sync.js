@@ -295,51 +295,58 @@ export default async function handler(req, res) {
       const token = await getToken();
       const testSince = since || "2026-02-20T00:00:00Z";
       
-      // First get a test
+      // Get recent tests
       const testRes = await fetch(`${FD_URL}/tests?tenantId=${tenantId}&modifiedFromUtc=${testSince}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const testData = await testRes.json();
       
       if (!testData.tests || testData.tests.length === 0) {
-        return res.status(200).json({ success: true, message: "No tests found", tenantId });
+        return res.status(200).json({ success: true, message: "No tests found" });
       }
       
-      const firstTest = testData.tests[0];
+      // Get trials for first few tests and extract metric names
+      const allMetrics = new Set();
+      const sampleTrials = [];
       
-      // Try to get trials for this test
-      const trialPatterns = [
-        `/v2019q3/teams/${tenantId}/tests/${firstTest.testId}/trials`,
-        `/trials?testId=${firstTest.testId}&tenantId=${tenantId}`,
-      ];
-      
-      const trialResults = [];
-      for (const path of trialPatterns) {
+      for (const t of testData.tests.slice(0, 5)) {
         try {
-          const fetchRes = await fetch(`${FD_URL}${path}`, {
+          const trialRes = await fetch(`${FD_URL}/v2019q3/teams/${tenantId}/tests/${t.testId}/trials`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          const raw = await fetchRes.text();
-          trialResults.push({
-            path,
-            status: fetchRes.status,
-            preview: raw.substring(0, 3000),
-          });
-          if (fetchRes.ok) break;
-        } catch (err) {
-          trialResults.push({ path, error: err.message });
-        }
+          const trials = await trialRes.json();
+          
+          if (Array.isArray(trials) && trials.length > 0) {
+            const trial = trials[0];
+            const metrics = {};
+            (trial.results || []).forEach(r => {
+              if (r.limb === "Trial" && r.repeat === 0) {
+                allMetrics.add(r.definition.result);
+                metrics[r.definition.result] = {
+                  value: r.value,
+                  name: r.definition.name,
+                  unit: r.definition.unit,
+                };
+              }
+            });
+            sampleTrials.push({
+              testId: t.testId,
+              profileId: t.profileId,
+              recorded: t.recordedDateUtc,
+              repCount: trial.results?.find(r => r.definition.result === "REPEAT_COUNT")?.value,
+              metricCount: Object.keys(metrics).length,
+              metrics,
+            });
+          }
+        } catch (e) { /* skip */ }
       }
       
       return res.status(200).json({
         success: true,
-        tenantId,
-        testUsed: {
-          testId: firstTest.testId,
-          profileId: firstTest.profileId,
-          recorded: firstTest.recordedDateUtc,
-        },
-        trialResults,
+        testsFound: testData.tests.length,
+        sampledTrials: sampleTrials.length,
+        allMetricKeys: [...allMetrics].sort(),
+        sampleTrials,
       });
     }
 
