@@ -264,8 +264,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, samples });
     }
 
-    // ─── Full sync: process all data ───
+    // ─── Full sync: process all data with parallel trial fetching ───
     const modifiedFrom = since || DEFAULT_START;
+    const until = req.query.until || null; // optional end date for chunking
     const tenantId = await getTenantId();
 
     console.log(`Fetching profiles...`);
@@ -280,32 +281,46 @@ export default async function handler(req, res) {
     });
 
     console.log(`Fetching tests since ${modifiedFrom}...`);
-    const tests = await getAllTests(tenantId, modifiedFrom);
-    console.log(`Found ${tests.length} tests, processing trials...`);
+    let tests = await getAllTests(tenantId, modifiedFrom);
+    
+    // Filter by until date if provided
+    if (until) {
+      const untilDate = new Date(until);
+      tests = tests.filter(t => new Date(t.recordedDateUtc) < untilDate);
+    }
+    
+    console.log(`Found ${tests.length} tests, processing trials in parallel...`);
 
     const cmj = {}; // pid -> [{date, ...metrics, asym}]
     const hop = {}; // pid -> [{date, ...metrics}]
-    let processed = 0, errors = 0;
+    let processed = 0, errors = 0, skipped = 0;
+    const BATCH_SIZE = 15; // parallel requests per batch
 
-    for (const t of tests) {
+    for (let i = 0; i < tests.length; i += BATCH_SIZE) {
       // Timeout safety: Vercel hobby has 60s limit
-      if (Date.now() - startTime > 50000) {
-        console.warn(`Approaching timeout at ${processed} tests, stopping`);
+      if (Date.now() - startTime > 52000) {
+        console.warn(`Approaching timeout at ${processed} of ${tests.length} tests`);
         break;
       }
 
-      try {
-        const trials = await getTrials(tenantId, t.testId);
-        if (!trials.length) continue;
+      const batch = tests.slice(i, i + BATCH_SIZE);
+      const results = await Promise.allSettled(
+        batch.map(t => getTrials(tenantId, t.testId).then(trials => ({ t, trials })))
+      );
 
+      for (const result of results) {
+        if (result.status !== "fulfilled" || !result.value.trials.length) {
+          errors++;
+          continue;
+        }
+        const { t, trials } = result.value;
         const trial = trials[0];
         const type = getTestType(trial.results);
         const date = fmtDate(t.recordedDateUtc, t.recordedDateOffset);
 
         if (type === "cmj") {
           const m = extract(trial.results, CMJ_MAP);
-          // Skip squat jumps (depth=0 means no countermovement)
-          if (isSquatJump(m)) { processed++; continue; }
+          if (isSquatJump(m)) { skipped++; processed++; continue; }
           const a = extractAsym(trial.results);
           if (!cmj[t.profileId]) cmj[t.profileId] = [];
           cmj[t.profileId].push({ date, ...m, ...a });
@@ -315,7 +330,7 @@ export default async function handler(req, res) {
           hop[t.profileId].push({ date, ...m });
         }
         processed++;
-      } catch { errors++; }
+      }
     }
 
     // Sort by date
@@ -328,15 +343,18 @@ export default async function handler(req, res) {
     Object.values(hop).forEach(a => a.sort(dateCmp));
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    const timedOut = processed < tests.length;
 
     return res.status(200).json({
       success: true,
       syncedAt: new Date().toISOString(),
       elapsed: `${elapsed}s`,
+      complete: !timedOut,
       stats: {
         profiles: profiles.length,
         totalTests: tests.length,
         processed,
+        skipped,
         errors,
         cmjAthletes: Object.keys(cmj).length,
         hopAthletes: Object.keys(hop).length,
