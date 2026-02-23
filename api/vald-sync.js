@@ -225,10 +225,16 @@ export default async function handler(req, res) {
     // ─── Test mode: verify tenant access ───
     if (test === "tenant") {
       const token = await getToken();
-      const tenantId = await getTenantId();
+      // Show raw response for debugging
+      const res = await fetch(`${TENANT_URL}/tenants`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const raw = await res.text();
       return res.status(200).json({
         success: true,
-        tenantId,
+        status: res.status,
+        url: `${TENANT_URL}/tenants`,
+        raw: raw.substring(0, 2000),
       });
     }
 
