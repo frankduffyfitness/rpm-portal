@@ -162,6 +162,8 @@ function cP(v, n, invert) {
 function gC(p) { return p >= 85 ? "#4FFFB0" : p >= 70 ? "#60A5FA" : p >= 40 ? "#FFB020" : p >= 20 ? "#FF8C42" : "#FF4D4D"; }
 function gT(p) { return p >= 90 ? "Elite" : p >= 75 ? "Above Avg" : p >= 50 ? "Average" : p >= 25 ? "Developing" : "Building"; }
 
+function oS(n) { const s = ["th","st","nd","rd"]; const v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]); }
+
 function IT({ metricKey, children }) {
   const [o, setO] = useState(false);
   const ref = useRef(null);
@@ -254,7 +256,7 @@ function MC({ metricKey, value, unit, norms, sparkData, sparkColor, bestValue, o
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 16 }}>
         <div style={{ fontSize: 36, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{typeof value === "number" ? (value >= 100 ? value.toLocaleString() : value) : value}<span style={{ fontSize: 14, fontWeight: 400, color: "#8A8F98", marginLeft: 3 }}>{unit}</span></div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: `${c}12`, borderRadius: 10, padding: "6px 12px" }}>
-          <div style={{ fontSize: 20, fontWeight: 700, color: c, lineHeight: 1 }}>{pct}<span style={{ fontSize: 11 }}>th</span></div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: c, lineHeight: 1 }}>{pct}<span style={{ fontSize: 11 }}>{["th","st","nd","rd"][(pct%100-20)%10] || ["th","st","nd","rd"][pct%100] || "th"}</span></div>
           <div style={{ fontSize: 8, color: "#8A8F98", textTransform: "uppercase", letterSpacing: 0.5 }}>percentile</div>
         </div>
       </div>
@@ -333,7 +335,7 @@ function PR({ metrics, gc }) {
         return (
           <div style={{ position: "absolute", top: Math.max(0, tipY - 44), left: Math.min(Math.max(tipX, 20), 80) + "%", transform: "translateX(-50%)", background: "#1E2128", border: "1px solid " + gC(pct) + "30", borderRadius: 8, padding: "6px 10px", whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none", textAlign: "center" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: gC(pct) }}>{m.sl}: {typeof m.value === "number" ? (m.value >= 100 ? m.value.toLocaleString() : m.value) : m.value}{m.unit || ""}</div>
-            <div style={{ fontSize: 9, color: "#8A8F98" }}>{pct}th percentile {"\u00b7"} {gT(pct)}</div>
+            <div style={{ fontSize: 9, color: "#8A8F98" }}>{oS(pct)} percentile {"\u00b7"} {gT(pct)}</div>
           </div>
         );
       })()}
@@ -853,7 +855,7 @@ function OffseasonSection({ filterGroup }) {
 }
 
 
-function HopProfile({ athlete, norms, groupInfo, compareGroup, setCompareGroup }) {
+function HopProfile({ athlete, norms, groupInfo, compareGroup, setCompareGroup, onBack }) {
   const hop = athlete.hop;
   const hopGroupAthletes = HOP_ATHLETES.filter(a => a.group === athlete.group);
   const hopGroupLabel = (GROUPS[athlete.group] || {}).label || "All";
@@ -874,6 +876,7 @@ function HopProfile({ athlete, norms, groupInfo, compareGroup, setCompareGroup }
 
   return (<>
     <div style={{ marginBottom: 16, padding: 16, background: `linear-gradient(135deg, ${egi.color}0A 0%, rgba(0,180,216,0.04) 100%)`, border: `1px solid ${egi.color}20`, borderRadius: 16 }}>
+      {onBack && <button onClick={onBack} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "4px 0", marginBottom: 12 }}>{"\u2190"} Change Athlete</button>}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
         <div style={{ width: 50, height: 50, borderRadius: 14, background: `linear-gradient(135deg, ${egi.color} 0%, #00B4D8 100%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 700, color: "#0A0C10" }}>{athlete.initials}</div>
         <div>
@@ -1223,7 +1226,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete }) {
               <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
               <td style={{ padding: "10px 0", textAlign: "center" }}>{m.value}</td>
               <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.best}</td>
-              <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{m.pct}th</td>
+              <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
               <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
             </tr>
           ))}
@@ -1248,7 +1251,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete }) {
                 <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
                 <td style={{ padding: "10px 0", textAlign: "center" }}>{m.value}</td>
                 <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.best}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{m.pct}th</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
                 <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
               </tr>
             ))}
@@ -1479,7 +1482,7 @@ function ProfileSearch({ athletes, onSelect, testLabel }) {
         <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#6B7280" }}>{"🔍"}</div>
       </div>
       <div style={{ maxHeight: 400, overflowY: "auto" }}>
-        {matches.slice(0, 30).map(a => {
+        {matches.map(a => {
           const ag = GROUPS[a.group];
           return (
             <div key={a.name} onMouseDown={(e) => { e.preventDefault(); onSelect(a); }} onTouchEnd={(e) => { e.preventDefault(); onSelect(a); }}
@@ -1618,7 +1621,7 @@ function VeloProfileSearch({ onSelect }) {
   const [q, setQ] = useState("");
   const ref = useRef(null);
   useEffect(() => { if (ref.current) ref.current.focus(); }, []);
-  const filtered = q.length > 0 ? VELO_ATHLETES.filter(a => a.name.toLowerCase().includes(q.toLowerCase())).sort((a,b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop())).slice(0, 30) : VELO_ATHLETES.sort((a,b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop())).slice(0, 30);
+  const filtered = q.length > 0 ? VELO_ATHLETES.filter(a => a.name.toLowerCase().includes(q.toLowerCase())).sort((a,b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop())) : VELO_ATHLETES.sort((a,b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop()));
   return (
     <div style={{ padding: "0 16px" }}>
       <div style={{ textAlign: "center", marginBottom: 20 }}>
@@ -1910,6 +1913,7 @@ export default function App() {
           <ProfileSearch athletes={ATHLETES} testLabel="CMJ" onSelect={(a) => { setSel(a); setCmpG(null); setProfileSearch(false); setTimeout(() => window.scrollTo(0, 0), 50); }} />
         )}
         {tab === "profile" && testType === "cmj" && !profileSearch && (<>
+        <button onClick={() => { setProfileSearch(true); window.scrollTo(0,0); }} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "4px 0 8px 16px" }}>{"\u2190"} Change Athlete</button>
           <div style={{ marginBottom: 16, padding: 16, background: `linear-gradient(135deg, ${gi.color}0A 0%, rgba(0,180,216,0.04) 100%)`, border: `1px solid ${gi.color}20`, borderRadius: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
               <div style={{ width: 50, height: 50, borderRadius: 14, background: `linear-gradient(135deg, ${gi.color} 0%, #00B4D8 100%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 700, color: "#0A0C10" }}>{sel.initials}</div>
@@ -1958,7 +1962,7 @@ export default function App() {
           <ProfileSearch athletes={HOP_ATHLETES} testLabel="Hop Test" onSelect={(a) => { setHopSel(a); setHopCmpG(null); setHopProfileSearch(false); setTimeout(() => window.scrollTo(0, 0), 50); }} />
         )}
         {tab === "profile" && testType === "hop" && !hopProfileSearch && (
-          <HopProfile athlete={hopSel} norms={HOP_NORMS} groupInfo={GROUPS[hopCmpG || hopSel.group]} compareGroup={hopCmpG} setCompareGroup={setHopCmpG} />
+          <HopProfile athlete={hopSel} norms={HOP_NORMS} groupInfo={GROUPS[hopCmpG || hopSel.group]} compareGroup={hopCmpG} setCompareGroup={setHopCmpG} onBack={() => { setHopProfileSearch(true); window.scrollTo(0,0); }} />
         )}
         {tab === "profile" && testType === "velo" && veloProfileSearch && (
           <VeloProfileSearch onSelect={(a) => { setVeloSel(a); setVeloProfileSearch(false); window.scrollTo(0,0); }} />
@@ -1981,7 +1985,8 @@ export default function App() {
         {tab === "trending" && testType === "hop" && <HopTrendingTab filterGroup={standG} />}
         {tab === "trending" && testType === "velo" && <VeloTrendingTab />}
       </div>
-      <div style={{ position: "sticky", bottom: 0, padding: "12px 20px 20px", background: "linear-gradient(0deg, #0A0C10 60%, transparent)", textAlign: "center" }}>
+      <button onClick={() => { setHopProfileSearch(true); window.scrollTo(0,0); }} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "4px 0 8px 16px" }}>{"\u2190"} Change Athlete</button>
+          <div style={{ position: "sticky", bottom: 0, padding: "12px 20px 20px", background: "linear-gradient(0deg, #0A0C10 60%, transparent)", textAlign: "center" }}>
         <div style={{ fontSize: 9, color: "#4a4f57", letterSpacing: 1 }}>RPM STRENGTH {"\u00b7"} {testType === "cmj" ? ATHLETES.length : HOP_ATHLETES.length} ATHLETES {"\u00b7"} FORCEDECKS CMJ DATA</div>
       </div>
       {showReport && (
