@@ -191,6 +191,41 @@ export default async function handler(req, res) {
       });
     }
 
+    if (test === "explore") {
+      const tenantId = await getTenantId();
+      const testSince = since || "2026-02-20T00:00:00Z";
+      const tests = await getAllTests(tenantId, testSince);
+      const firstTest = tests[0];
+      
+      // Try various bulk/alternative endpoints
+      const endpoints = [
+        `${FD_URL}/v2019q3/teams/${tenantId}/tests/${firstTest.testId}/trials`,
+        `${FD_URL}/v2019q3/teams/${tenantId}/tests?testType=CMJ`,
+        `${FD_URL}/tests/${firstTest.testId}`,
+        `${FD_URL}/tests/${firstTest.testId}/results`,
+        `${FD_URL}/v2019q3/teams/${tenantId}/results`,
+        `${FD_URL}/testresults?tenantId=${tenantId}&modifiedFromUtc=${encodeURIComponent(testSince)}`,
+        `${FD_URL}/tests/results?tenantId=${tenantId}&modifiedFromUtc=${encodeURIComponent(testSince)}`,
+      ];
+      
+      const results = [];
+      for (const url of endpoints) {
+        try {
+          const token = await getToken();
+          const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+          const body = await r.text();
+          results.push({
+            url: url.replace(tenantId, "TENANT"),
+            status: r.status,
+            preview: body.substring(0, 300),
+          });
+        } catch (err) {
+          results.push({ url: url.replace(tenantId, "TENANT"), error: err.message });
+        }
+      }
+      return res.status(200).json({ success: true, results });
+    }
+
     if (test === "tests") {
       const tenantId = await getTenantId();
       const tests = await getAllTests(tenantId, since || "2026-02-01T00:00:00Z");
