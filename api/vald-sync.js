@@ -120,7 +120,7 @@ function fmtDate(utc, offset) {
 // ═══════════════════════════════════════════
 // HANDLER
 // ═══════════════════════════════════════════
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   const startTime = Date.now();
   lastCall = 0;
 
