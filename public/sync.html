@@ -38,6 +38,7 @@
 
 <div class="row">
   <div><label>Deployment URL</label><br><input id="url" placeholder="https://your-site.vercel.app"></div>
+  <div><label>Start Date</label><br><input id="since" type="date" value="2025-06-01"></div>
   <div><label>Batch Size</label><br><input id="batch" class="sm" type="number" value="12" min="5" max="20"></div>
   <div><label>Delay (sec)</label><br><input id="delay" class="sm" type="number" value="12" min="5" max="30"></div>
 </div>
@@ -103,7 +104,9 @@ async function run(){
 
   let allTests=[];
   try{
-    const r=await fetch(`${base}/api/vald-sync?mode=list&v=${Date.now()}`);
+    const sinceVal=document.getElementById('since').value;
+    const sinceParam=sinceVal?`&since=${sinceVal}T00:00:00Z`:'';
+    const r=await fetch(`${base}/api/vald-sync?mode=list${sinceParam}&v=${Date.now()}`);
     const d=await r.json();
     if(!d.success)throw new Error(d.error||'list failed');
     allTests=d.tests||[];
@@ -198,7 +201,7 @@ async function run(){
   running=false;
   document.getElementById('goBtn').disabled=false;
   document.getElementById('stopBtn').style.display='none';
-  document.getElementById('dlBtn').style.display='';
+  document.getElementById('dlBtn').style.display='inline-block';
 }
 
 function mergeBatch(d){
