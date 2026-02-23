@@ -1,392 +1,313 @@
 /**
  * VALD ForceDecks API Sync — Vercel Serverless Function
- * 
- * Authenticates with VALD's identity server, pulls ForceDecks test data,
- * and returns processed athlete metrics for the RPM Strength portal.
- * 
- * Environment variables required (set in Vercel dashboard):
- *   VALD_CLIENT_ID     — API client ID from VALD
- *   VALD_CLIENT_SECRET — API client secret from VALD
- * 
- * Endpoints:
- *   GET /api/vald-sync              — Full sync (all data since start date)
- *   GET /api/vald-sync?since=ISO    — Incremental sync (since date)
- *   GET /api/vald-sync?test=auth    — Test authentication only
+ * RPM Strength Athlete Portal
+ *
+ * Environment variables (set in Vercel dashboard):
+ *   VALD_CLIENT_ID, VALD_CLIENT_SECRET
  */
 
-// ─── Configuration ───────────────────────────────────────────────────
 const AUTH_URL = "https://security.valdperformance.com/connect/token";
+const AUTH_URL_OLD = "https://auth.prd.vald.com/oauth/token";
 const TENANT_URL = "https://prd-use-api-externaltenants.valdperformance.com";
 const PROFILE_URL = "https://prd-use-api-externalprofile.valdperformance.com";
 const FD_URL = "https://prd-use-api-extforcedecks.valdperformance.com";
-
-// Fallback to old auth if new one isn't active yet
-const AUTH_URL_OLD = "https://auth.prd.vald.com/oauth/token";
-
-// How far back to pull data on full sync
 const DEFAULT_START = "2025-06-01T00:00:00Z";
 
-// ─── Token cache (persists across warm invocations) ──────────────────
+// Metric mapping: VALD key -> portal key
+const CMJ_MAP = {
+  JUMP_HEIGHT_INCHES: "jumpHeight",
+  RSI_MODIFIED: "rsiMod",
+  BODYMASS_RELATIVE_TAKEOFF_POWER: "peakPowerBM",
+  ECCENTRIC_BRAKING_RFD: "eccBrakingRFD",
+  BODY_WEIGHT_LBS: "bodyweightLbs",
+  COUNTERMOVEMENT_DEPTH: "depth",
+  CONCENTRIC_IMPULSE: "conImpulse",
+  ECCENTRIC_BRAKING_IMPULSE: "eccBrakingImpulse",
+  PEAK_CONCENTRIC_FORCE: "conPeakForce",
+  CONCENTRIC_RFD: "conRFD",
+};
+
+const HOP_MAP = {
+  HOP_BEST_RSI: "rsi",
+  HOP_BEST_FLIGHT_TIME: "flightTime",
+  HOP_BEST_CONTACT_TIME: "contactTime",
+  BODY_WEIGHT_LBS: "bodyweightLbs",
+};
+
+// Asymmetry metrics (need L/R limb values)
+const ASYM_KEYS = ["CONCENTRIC_IMPULSE", "ECCENTRIC_BRAKING_IMPULSE", "PEAK_CONCENTRIC_FORCE"];
+
 let tokenCache = { accessToken: null, expiresAt: 0 };
 
-// ─── Auth ────────────────────────────────────────────────────────────
 async function getToken() {
   if (tokenCache.accessToken && tokenCache.expiresAt > Date.now() + 60000) {
     return tokenCache.accessToken;
   }
+  const cid = process.env.VALD_CLIENT_ID;
+  const sec = process.env.VALD_CLIENT_SECRET;
+  if (!cid || !sec) throw new Error("Missing VALD_CLIENT_ID or VALD_CLIENT_SECRET environment variables");
 
-  const clientId = process.env.VALD_CLIENT_ID;
-  const clientSecret = process.env.VALD_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    throw new Error("Missing VALD_CLIENT_ID or VALD_CLIENT_SECRET environment variables");
-  }
-
-  // Try new auth endpoint first, fall back to old
-  const endpoints = [AUTH_URL, AUTH_URL_OLD];
-  const errors = [];
-  let lastError = null;
-
-  for (const url of endpoints) {
+  for (const url of [AUTH_URL, AUTH_URL_OLD]) {
     try {
       const body = new URLSearchParams({
         grant_type: "client_credentials",
-        client_id: clientId,
-        client_secret: clientSecret,
+        client_id: cid,
+        client_secret: sec,
+        audience: "vald-api-external",
       });
-
-      // Both endpoints require audience parameter
-      body.append("audience", "vald-api-external");
-
-      const res = await fetch(url, {
+      const r = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),
       });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        lastError = `${url}: ${res.status} ${res.statusText} — ${errText}`;
-        errors.push(lastError);
-        continue;
-      }
-
-      const data = await res.json();
-      tokenCache.accessToken = data.access_token;
-      tokenCache.expiresAt = Date.now() + (data.expires_in || 3600) * 1000;
-
-      console.log(`Authenticated via ${url}, expires in ${data.expires_in}s`);
-      return tokenCache.accessToken;
-    } catch (err) {
-      lastError = `${url}: ${err.message}`;
-      errors.push(lastError);
-      continue;
-    }
+      if (!r.ok) continue;
+      const d = await r.json();
+      tokenCache = { accessToken: d.access_token, expiresAt: Date.now() + (d.expires_in || 3600) * 1000 };
+      return d.access_token;
+    } catch { continue; }
   }
-
-  throw new Error(`Authentication failed. Errors: ${JSON.stringify(errors)}`);
+  throw new Error("Authentication failed on all endpoints");
 }
 
-// ─── API Helpers ─────────────────────────────────────────────────────
-async function apiGet(baseUrl, path, params = {}) {
+async function apiFetch(url) {
   const token = await getToken();
-  const url = new URL(path, baseUrl);
-  Object.entries(params).forEach(([k, v]) => {
-    if (v != null) url.searchParams.set(k, v);
-  });
-
-  try {
-    const res = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (res.status === 204) return null;
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`API ${res.status}: ${url.toString()} — ${errText}`);
-    }
-
-    return res.json();
-  } catch (err) {
-    throw new Error(`Fetch to ${url.toString()} failed: ${err.message}`);
-  }
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (r.status === 204) return null;
+  if (!r.ok) { const t = await r.text(); throw new Error(`API ${r.status}: ${url} — ${t}`); }
+  return r.json();
 }
 
-// ─── Data Fetchers ───────────────────────────────────────────────────
 async function getTenantId() {
-  const data = await apiGet(TENANT_URL, "/tenants");
-  // Response is {tenants: [{id, name}]}
-  const tenants = data?.tenants || data;
-  if (!tenants || !Array.isArray(tenants) || tenants.length === 0) {
-    throw new Error("No tenants found for this API client");
-  }
-  console.log(`Found ${tenants.length} tenant(s): ${tenants.map(t => t.name || t.id).join(", ")}`);
-  return tenants[0].id;
+  const d = await apiFetch(`${TENANT_URL}/tenants`);
+  const t = d?.tenants || d;
+  if (!t?.length) throw new Error("No tenants found");
+  return t[0].id;
 }
 
 async function getProfiles(tenantId) {
-  const data = await apiGet(PROFILE_URL, "/profiles", { tenantId });
-  if (!data || !Array.isArray(data)) return [];
-  console.log(`Found ${data.length} profiles`);
-  return data;
+  const d = await apiFetch(`${PROFILE_URL}/profiles?tenantId=${tenantId}`);
+  return d?.profiles || (Array.isArray(d) ? d : []);
 }
 
-async function getForceDecksTests(tenantId, modifiedFromUtc) {
-  const allTests = [];
-  let currentFrom = modifiedFromUtc;
-  let page = 1;
-  let hasMore = true;
-
-  while (hasMore) {
-    const data = await apiGet(FD_URL, "/tests", {
-      tenantId: tenantId,
-      modifiedFromUtc: currentFrom,
-    });
-
-    if (!data || !data.tests || data.tests.length === 0) {
-      hasMore = false;
-    } else {
-      allTests.push(...data.tests);
-      // Pagination: use last record's modifiedDateUtc for next pull
-      const lastModified = data.tests[data.tests.length - 1].modifiedDateUtc;
-      modifiedFromUtc = lastModified;
-      console.log(`Fetched page ${page}: ${data.tests.length} tests (last: ${lastModified})`);
-      page++;
-
-      // Safety: cap at 50 pages to avoid runaway
-      if (page > 50) {
-        console.warn("Hit 50-page cap, stopping pagination");
-        hasMore = false;
-      }
-    }
+async function getAllTests(tenantId, fromUtc) {
+  const all = [];
+  let cursor = fromUtc;
+  for (let i = 0; i < 100; i++) {
+    const d = await apiFetch(`${FD_URL}/tests?tenantId=${tenantId}&modifiedFromUtc=${encodeURIComponent(cursor)}`);
+    const tests = d?.tests || d;
+    if (!tests?.length) break;
+    all.push(...tests);
+    cursor = tests[tests.length - 1].modifiedDateUtc;
+    if (tests.length < 50) break;
   }
-
-  console.log(`Total tests fetched: ${allTests.length}`);
-  return allTests;
+  return all;
 }
 
 async function getTrials(tenantId, testId) {
-  return apiGet(FD_URL, `/v2019q3/teams/${tenantId}/tests/${testId}/trials`);
+  try {
+    return await apiFetch(`${FD_URL}/v2019q3/teams/${tenantId}/tests/${testId}/trials`) || [];
+  } catch { return []; }
 }
 
-// ─── Data Processing ─────────────────────────────────────────────────
-function processTestData(tests, profiles) {
-  // Build profile lookup
-  const profileMap = {};
-  profiles.forEach(p => {
-    const name = [p.givenName, p.familyName].filter(Boolean).join(" ").trim();
-    profileMap[p.id || p.profileId] = {
-      name: name || "Unknown",
-      givenName: p.givenName || "",
-      familyName: p.familyName || "",
-    };
-  });
+function getTestType(results) {
+  const keys = new Set((results || []).map(r => r.definition?.result));
+  if (keys.has("HOP_BEST_RSI")) return "hop";
+  if (keys.has("RSI_MODIFIED") || keys.has("JUMP_HEIGHT_INCHES")) return "cmj";
+  return "unknown";
+}
 
-  // Group tests by profile
-  const athleteTests = {};
-  tests.forEach(t => {
-    const pid = t.profileId;
-    if (!athleteTests[pid]) athleteTests[pid] = [];
-    athleteTests[pid].push(t);
+function extract(results, map) {
+  const out = {};
+  (results || []).forEach(r => {
+    if (r.limb === "Trial" && r.repeat === 0 && r.definition && map[r.definition.result]) {
+      out[map[r.definition.result]] = r.value;
+    }
   });
+  return out;
+}
 
-  return {
-    profileMap,
-    athleteTests,
-    testCount: tests.length,
-    athleteCount: Object.keys(athleteTests).length,
-    profiles: profiles.length,
-  };
+function extractAsym(results) {
+  const out = {};
+  (results || []).forEach(r => {
+    if (r.repeat !== 0 || !r.definition) return;
+    const key = r.definition.result;
+    if (!ASYM_KEYS.includes(key)) return;
+    const short = key === "CONCENTRIC_IMPULSE" ? "conImpulse" : key === "ECCENTRIC_BRAKING_IMPULSE" ? "eccBrakingImpulse" : "conPeakForce";
+    if (r.limb === "Left") out[short + "L"] = r.value;
+    else if (r.limb === "Right") out[short + "R"] = r.value;
+  });
+  return out;
+}
+
+function fmtDate(utc, offset) {
+  if (!utc) return "";
+  const d = new Date(utc);
+  if (offset != null) d.setMinutes(d.getMinutes() + offset);
+  return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
 }
 
 // ─── Main Handler ────────────────────────────────────────────────────
 export default async function handler(req, res) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+  // Increase timeout awareness
+  const startTime = Date.now();
 
   try {
     const { test, since } = req.query || {};
 
-    // ─── Test mode: just verify auth works ───
     if (test === "auth") {
       const token = await getToken();
       return res.status(200).json({
-        success: true,
-        message: "Authentication successful",
+        success: true, message: "Authentication successful",
         tokenPreview: token.substring(0, 20) + "...",
         expiresAt: new Date(tokenCache.expiresAt).toISOString(),
       });
     }
 
-    // ─── Test mode: verify tenant access ───
     if (test === "tenant") {
-      const token = await getToken();
-      const fetchRes = await fetch(`${TENANT_URL}/tenants`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const raw = await fetchRes.text();
-      return res.status(200).json({
-        success: true,
-        httpStatus: fetchRes.status,
-        url: `${TENANT_URL}/tenants`,
-        raw: raw.substring(0, 2000),
-      });
+      const tenantId = await getTenantId();
+      return res.status(200).json({ success: true, tenantId });
     }
 
-    // ─── Test mode: verify profiles ───
     if (test === "profiles") {
       const tenantId = await getTenantId();
-      const fetchRes = await fetch(`${PROFILE_URL}/profiles?tenantId=${tenantId}`, {
-        headers: { Authorization: `Bearer ${await getToken()}` },
-      });
-      const raw = await fetchRes.text();
+      const profiles = await getProfiles(tenantId);
       return res.status(200).json({
-        success: true,
-        httpStatus: fetchRes.status,
-        tenantId,
-        raw: raw.substring(0, 3000),
+        success: true, count: profiles.length,
+        sample: profiles.slice(0, 10).map(p => ({
+          id: p.profileId || p.id,
+          name: [p.givenName, p.familyName].filter(Boolean).join(" "),
+        })),
       });
     }
 
-    // ─── Test mode: fetch a small batch of tests ───
     if (test === "tests") {
       const tenantId = await getTenantId();
-      const token = await getToken();
-      const testSince = since || "2026-02-01T00:00:00Z";
-      
-      // Try multiple endpoint patterns to find the right one
-      const patterns = [
-        `/tests?tenantId=${tenantId}&modifiedFromUtc=${testSince}`,
-        `/tests?TenantId=${tenantId}&ModifiedFromUtc=${testSince}`,
-        `/tests/v2?tenantId=${tenantId}&modifiedFromUtc=${testSince}`,
-        `/v2019q3/teams/${tenantId}/tests`,
-      ];
-      
-      const results = [];
-      for (const path of patterns) {
-        try {
-          const fetchRes = await fetch(`${FD_URL}${path}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const raw = await fetchRes.text();
-          results.push({
-            path,
-            status: fetchRes.status,
-            preview: raw.substring(0, 500),
-          });
-          if (fetchRes.ok) break; // Stop on first success
-        } catch (err) {
-          results.push({ path, error: err.message });
-        }
-      }
-      
-      return res.status(200).json({ success: true, tenantId, results });
+      const tests = await getAllTests(tenantId, since || "2026-02-01T00:00:00Z");
+      return res.status(200).json({
+        success: true, testCount: tests.length,
+        sample: tests.slice(0, 5).map(t => ({
+          testId: t.testId, profileId: t.profileId, recorded: t.recordedDateUtc,
+        })),
+      });
     }
 
-    // ─── Test mode: fetch trials for a specific test ───
     if (test === "trials") {
       const tenantId = await getTenantId();
-      const token = await getToken();
-      const testSince = since || "2026-02-20T00:00:00Z";
-      
-      // Get recent tests
-      const testRes = await fetch(`${FD_URL}/tests?tenantId=${tenantId}&modifiedFromUtc=${testSince}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const testData = await testRes.json();
-      
-      if (!testData.tests || testData.tests.length === 0) {
-        return res.status(200).json({ success: true, message: "No tests found" });
+      const tests = await getAllTests(tenantId, since || "2026-02-20T00:00:00Z");
+      const profiles = await getProfiles(tenantId);
+      const pMap = {};
+      profiles.forEach(p => { pMap[p.profileId || p.id] = [p.givenName, p.familyName].filter(Boolean).join(" "); });
+
+      const samples = [];
+      for (const t of tests.slice(0, 5)) {
+        const trials = await getTrials(tenantId, t.testId);
+        if (!trials.length) continue;
+        const trial = trials[0];
+        const type = getTestType(trial.results);
+        samples.push({
+          athlete: pMap[t.profileId] || t.profileId,
+          recorded: fmtDate(t.recordedDateUtc, t.recordedDateOffset),
+          testType: type,
+          metrics: extract(trial.results, type === "hop" ? HOP_MAP : CMJ_MAP),
+          asymmetry: type === "cmj" ? extractAsym(trial.results) : undefined,
+        });
       }
-      
-      // Get trials for first few tests and extract metric names
-      const allMetrics = new Set();
-      const sampleTrials = [];
-      
-      for (const t of testData.tests.slice(0, 5)) {
-        try {
-          const trialRes = await fetch(`${FD_URL}/v2019q3/teams/${tenantId}/tests/${t.testId}/trials`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const trials = await trialRes.json();
-          
-          if (Array.isArray(trials) && trials.length > 0) {
-            const trial = trials[0];
-            const metrics = {};
-            (trial.results || []).forEach(r => {
-              if (r.limb === "Trial" && r.repeat === 0) {
-                allMetrics.add(r.definition.result);
-                metrics[r.definition.result] = {
-                  value: r.value,
-                  name: r.definition.name,
-                  unit: r.definition.unit,
-                };
-              }
-            });
-            sampleTrials.push({
-              testId: t.testId,
-              profileId: t.profileId,
-              recorded: t.recordedDateUtc,
-              repCount: trial.results?.find(r => r.definition.result === "REPEAT_COUNT")?.value,
-              metricCount: Object.keys(metrics).length,
-              metrics,
-            });
-          }
-        } catch (e) { /* skip */ }
-      }
-      
-      return res.status(200).json({
-        success: true,
-        testsFound: testData.tests.length,
-        sampledTrials: sampleTrials.length,
-        allMetricKeys: [...allMetrics].sort(),
-        sampleTrials,
-      });
+      return res.status(200).json({ success: true, samples });
     }
 
-    // ─── Full sync ───
+    // ─── Full sync: process all data ───
     const modifiedFrom = since || DEFAULT_START;
-    console.log(`Starting sync from ${modifiedFrom}`);
-
     const tenantId = await getTenantId();
+
+    console.log(`Fetching profiles...`);
     const profiles = await getProfiles(tenantId);
-    const tests = await getForceDecksTests(tenantId, modifiedFrom);
-    const processed = processTestData(tests, profiles);
+    const pMap = {};
+    profiles.forEach(p => {
+      pMap[p.profileId || p.id] = {
+        name: [p.givenName, p.familyName].filter(Boolean).join(" ").trim(),
+        given: p.givenName || "",
+        family: p.familyName || "",
+      };
+    });
+
+    console.log(`Fetching tests since ${modifiedFrom}...`);
+    const tests = await getAllTests(tenantId, modifiedFrom);
+    console.log(`Found ${tests.length} tests, processing trials...`);
+
+    const cmj = {}; // pid -> [{date, ...metrics, asym}]
+    const hop = {}; // pid -> [{date, ...metrics}]
+    let processed = 0, errors = 0;
+
+    for (const t of tests) {
+      // Timeout safety: Vercel hobby has 60s limit
+      if (Date.now() - startTime > 50000) {
+        console.warn(`Approaching timeout at ${processed} tests, stopping`);
+        break;
+      }
+
+      try {
+        const trials = await getTrials(tenantId, t.testId);
+        if (!trials.length) continue;
+
+        const trial = trials[0];
+        const type = getTestType(trial.results);
+        const date = fmtDate(t.recordedDateUtc, t.recordedDateOffset);
+
+        if (type === "cmj") {
+          const m = extract(trial.results, CMJ_MAP);
+          const a = extractAsym(trial.results);
+          if (!cmj[t.profileId]) cmj[t.profileId] = [];
+          cmj[t.profileId].push({ date, ...m, ...a });
+        } else if (type === "hop") {
+          const m = extract(trial.results, HOP_MAP);
+          if (!hop[t.profileId]) hop[t.profileId] = [];
+          hop[t.profileId].push({ date, ...m });
+        }
+        processed++;
+      } catch { errors++; }
+    }
+
+    // Sort by date
+    const dateCmp = (a, b) => {
+      const [am, ad, ay] = a.date.split("/").map(Number);
+      const [bm, bd, by] = b.date.split("/").map(Number);
+      return (ay - by) || (am - bm) || (ad - bd);
+    };
+    Object.values(cmj).forEach(a => a.sort(dateCmp));
+    Object.values(hop).forEach(a => a.sort(dateCmp));
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
     return res.status(200).json({
       success: true,
       syncedAt: new Date().toISOString(),
-      modifiedFrom,
-      tenantId,
+      elapsed: `${elapsed}s`,
       stats: {
-        profiles: processed.profiles,
-        tests: processed.testCount,
-        athletes: processed.athleteCount,
+        profiles: profiles.length,
+        totalTests: tests.length,
+        processed,
+        errors,
+        cmjAthletes: Object.keys(cmj).length,
+        hopAthletes: Object.keys(hop).length,
+        cmjSessions: Object.values(cmj).reduce((s, a) => s + a.length, 0),
+        hopSessions: Object.values(hop).reduce((s, a) => s + a.length, 0),
       },
-      // In production, this would return the fully processed data
-      // For now, return raw structure for validation
-      data: {
-        profiles: profiles.slice(0, 10),
-        recentTests: tests.slice(-10),
-      },
+      profileMap: pMap,
+      cmj,
+      hop,
     });
 
   } catch (err) {
     console.error("VALD sync error:", err);
     return res.status(500).json({
-      success: false,
-      error: err.message,
-      hint: err.message.includes("Missing VALD_CLIENT")
-        ? "Set VALD_CLIENT_ID and VALD_CLIENT_SECRET in Vercel Environment Variables"
-        : err.message.includes("Authentication failed")
-        ? "Check credentials — the March 2026 auth migration may require new credentials from VALD"
-        : "Check Vercel function logs for details",
+      success: false, error: err.message,
+      hint: err.message.includes("Missing VALD") ? "Set env vars in Vercel"
+        : err.message.includes("Authentication") ? "Check credentials"
+        : "Check Vercel function logs",
     });
   }
 }
