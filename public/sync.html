@@ -5,296 +5,235 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPM Portal — VALD Sync</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0a0a; color: #e0e0e0; font-family: 'DM Sans', -apple-system, sans-serif; padding: 24px; }
-  h1 { font-size: 24px; margin-bottom: 8px; color: #4FFFB0; }
-  .sub { color: #888; margin-bottom: 24px; font-size: 14px; }
-  .config { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-  .config label { font-size: 13px; color: #aaa; }
-  .config input { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px; width: 180px; }
-  button { background: #4FFFB0; color: #000; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button.stop { background: #FF6B6B; color: #fff; }
-  #log { background: #111; border: 1px solid #222; border-radius: 8px; padding: 16px; margin-top: 16px; max-height: 400px; overflow-y: auto; font-family: 'SF Mono', monospace; font-size: 12px; line-height: 1.8; }
-  .log-line { border-bottom: 1px solid #1a1a1a; padding: 2px 0; }
-  .log-line.ok { color: #4FFFB0; }
-  .log-line.warn { color: #FFD700; }
-  .log-line.err { color: #FF6B6B; }
-  .log-line.info { color: #60A5FA; }
-  .progress { margin-top: 16px; }
-  .progress-bar { background: #1a1a1a; border-radius: 8px; height: 24px; overflow: hidden; position: relative; }
-  .progress-fill { background: linear-gradient(90deg, #4FFFB0, #60A5FA); height: 100%; transition: width 0.3s; border-radius: 8px; }
-  .progress-text { position: absolute; top: 0; left: 0; right: 0; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #000; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 16px; }
-  .stat { background: #1a1a1a; border-radius: 8px; padding: 12px; text-align: center; }
-  .stat-val { font-size: 24px; font-weight: 700; color: #4FFFB0; }
-  .stat-label { font-size: 11px; color: #888; margin-top: 4px; }
-  .actions { display: flex; gap: 12px; margin-top: 16px; }
-  #download { display: none; }
-  .chunk-size { width: 60px !important; text-align: center; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a0a0a;color:#e0e0e0;font-family:'DM Sans',-apple-system,sans-serif;padding:24px}
+  h1{font-size:24px;margin-bottom:4px;color:#4FFFB0}
+  .sub{color:#888;margin-bottom:20px;font-size:14px}
+  .row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  label{font-size:12px;color:#999}
+  input{background:#1a1a1a;border:1px solid #333;color:#fff;padding:6px 10px;border-radius:6px;font-size:13px;width:320px}
+  input.sm{width:60px;text-align:center}
+  button{padding:10px 20px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px}
+  .go{background:#4FFFB0;color:#000}
+  .stop{background:#FF6B6B;color:#fff;display:none}
+  .dl{background:#60A5FA;color:#000;display:none}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .bar-wrap{margin:16px 0;display:none}
+  .bar{background:#1a1a1a;border-radius:8px;height:24px;position:relative;overflow:hidden}
+  .bar-fill{background:linear-gradient(90deg,#4FFFB0,#60A5FA);height:100%;transition:width .3s;border-radius:8px}
+  .bar-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#000}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:16px 0;display:none}
+  .s{background:#1a1a1a;border-radius:8px;padding:10px;text-align:center}
+  .s b{display:block;font-size:22px;color:#4FFFB0}
+  .s span{font-size:11px;color:#888}
+  #log{background:#111;border:1px solid #222;border-radius:8px;padding:14px;margin-top:12px;max-height:350px;overflow-y:auto;font-family:'SF Mono',monospace;font-size:11.5px;line-height:1.7}
+  .l{border-bottom:1px solid #1a1a1a;padding:1px 0}
+  .ok{color:#4FFFB0}.wr{color:#FFD700}.er{color:#FF6B6B}.in{color:#60A5FA}
+  .phase{font-size:13px;color:#aaa;margin-top:12px;margin-bottom:4px}
 </style>
 </head>
 <body>
 <h1>⚡ VALD Data Sync</h1>
-<p class="sub">Pulls all ForceDecks data from the VALD API in chunks, then outputs portal-ready JSON.</p>
+<p class="sub">Pulls all ForceDecks data via the VALD API. Two-phase: list all tests, then process in batches.</p>
 
-<div class="config">
-  <div>
-    <label>API Base URL</label><br>
-    <input id="baseUrl" value="" placeholder="https://your-deployment.vercel.app" style="width:340px">
-  </div>
-  <div>
-    <label>Start Date</label><br>
-    <input id="startDate" type="date" value="2025-07-01">
-  </div>
-  <div>
-    <label>End Date</label><br>
-    <input id="endDate" type="date" value="2026-03-01">
-  </div>
-  <div>
-    <label>Chunk (days)</label><br>
-    <input id="chunkDays" type="number" class="chunk-size" value="14" min="7" max="60">
-  </div>
+<div class="row">
+  <div><label>Deployment URL</label><br><input id="url" placeholder="https://your-site.vercel.app"></div>
+  <div><label>Batch Size</label><br><input id="batch" class="sm" type="number" value="12" min="5" max="20"></div>
+  <div><label>Delay (sec)</label><br><input id="delay" class="sm" type="number" value="12" min="5" max="30"></div>
+</div>
+<div class="row">
+  <button class="go" id="goBtn" onclick="run()">🚀 Start Sync</button>
+  <button class="stop" id="stopBtn" onclick="stop()">⛔ Stop</button>
+  <button class="dl" id="dlBtn" onclick="dl()">📥 Download JSON</button>
 </div>
 
-<div class="actions">
-  <button id="startBtn" onclick="startSync()">🚀 Start Sync</button>
-  <button id="stopBtn" class="stop" style="display:none" onclick="stopSync()">⛔ Stop</button>
-  <button id="download" onclick="downloadJSON()">📥 Download JSON</button>
-</div>
+<div class="phase" id="phaseText"></div>
+<div class="bar-wrap" id="barWrap"><div class="bar"><div class="bar-fill" id="barFill"></div><div class="bar-text" id="barText">0%</div></div></div>
 
-<div class="progress" id="progressWrap" style="display:none">
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill" style="width:0%"></div>
-    <div class="progress-text" id="progressText">0%</div>
-  </div>
-</div>
-
-<div class="stats" id="statsWrap" style="display:none">
-  <div class="stat"><div class="stat-val" id="statChunks">0</div><div class="stat-label">Chunks Done</div></div>
-  <div class="stat"><div class="stat-val" id="statTests">0</div><div class="stat-label">Tests Processed</div></div>
-  <div class="stat"><div class="stat-val" id="statCMJ">0</div><div class="stat-label">CMJ Sessions</div></div>
-  <div class="stat"><div class="stat-val" id="statHop">0</div><div class="stat-label">Hop Sessions</div></div>
-  <div class="stat"><div class="stat-val" id="statAthletes">0</div><div class="stat-label">Athletes</div></div>
-  <div class="stat"><div class="stat-val" id="statTime">0s</div><div class="stat-label">Elapsed</div></div>
+<div class="stats" id="statsEl">
+  <div class="s"><b id="sTests">0</b><span>Tests Found</span></div>
+  <div class="s"><b id="sProc">0</b><span>Processed</span></div>
+  <div class="s"><b id="sCMJ">0</b><span>CMJ Sessions</span></div>
+  <div class="s"><b id="sHop">0</b><span>Hop Sessions</span></div>
+  <div class="s"><b id="sAth">0</b><span>Athletes</span></div>
+  <div class="s"><b id="sTime">0s</b><span>Elapsed</span></div>
 </div>
 
 <div id="log"></div>
 
 <script>
-let running = false;
-let mergedProfileMap = {};
-let mergedCMJ = {};
-let mergedHop = {};
-let totalProcessed = 0;
+let running=false, profileMap={}, mergedCMJ={}, mergedHop={}, tenantId="";
 
-// Auto-detect base URL from current location
-(function() {
-  const host = window.location.origin;
-  if (host && !host.includes('localhost') && !host.includes('file://')) {
-    document.getElementById('baseUrl').value = host;
+// Auto-detect URL
+(()=>{const h=location.origin;if(h&&!h.includes('localhost')&&!h.includes('file://'))document.getElementById('url').value=h})();
+
+function log(m,c=''){const e=document.getElementById('log'),l=document.createElement('div');l.className='l '+c;l.textContent=`[${new Date().toLocaleTimeString()}] ${m}`;e.appendChild(l);e.scrollTop=e.scrollHeight}
+
+function pct(n,t){const p=t?Math.round(n/t*100):0;document.getElementById('barFill').style.width=p+'%';document.getElementById('barText').textContent=p+'%'}
+
+function updStats(found,proc,elapsed){
+  document.getElementById('sTests').textContent=found;
+  document.getElementById('sProc').textContent=proc;
+  document.getElementById('sCMJ').textContent=Object.values(mergedCMJ).reduce((s,a)=>s+a.length,0);
+  document.getElementById('sHop').textContent=Object.values(mergedHop).reduce((s,a)=>s+a.length,0);
+  document.getElementById('sAth').textContent=new Set([...Object.keys(mergedCMJ),...Object.keys(mergedHop)]).size;
+  document.getElementById('sTime').textContent=(elapsed/1000).toFixed(0)+'s';
+}
+
+function stop(){running=false}
+
+async function run(){
+  const base=document.getElementById('url').value.replace(/\/$/,'');
+  const batchSz=parseInt(document.getElementById('batch').value)||12;
+  const delaySec=parseInt(document.getElementById('delay').value)||12;
+  if(!base){alert('Enter deployment URL');return}
+
+  running=true;profileMap={};mergedCMJ={};mergedHop={};tenantId="";
+  document.getElementById('goBtn').disabled=true;
+  document.getElementById('stopBtn').style.display='';
+  document.getElementById('dlBtn').style.display='none';
+  document.getElementById('barWrap').style.display='';
+  document.getElementById('statsEl').style.display='';
+  document.getElementById('log').innerHTML='';
+  const t0=Date.now();
+
+  // ═══ PHASE 1: List all tests ═══
+  document.getElementById('phaseText').textContent='Phase 1: Fetching test manifest from VALD...';
+  log('Phase 1: Calling mode=list to get all test IDs...','in');
+
+  let allTests=[];
+  try{
+    const r=await fetch(`${base}/api/vald-sync?mode=list&v=${Date.now()}`);
+    const d=await r.json();
+    if(!d.success)throw new Error(d.error||'list failed');
+    allTests=d.tests||[];
+    profileMap=d.profileMap||{};
+    tenantId=d.tenantId||'';
+    log(`✓ Found ${allTests.length} tests, ${d.profileCount} profiles [${d.elapsed}]`,'ok');
+    updStats(allTests.length,0,Date.now()-t0);
+  }catch(e){
+    log(`Phase 1 failed: ${e.message}`,'er');
+    document.getElementById('goBtn').disabled=false;
+    document.getElementById('stopBtn').style.display='none';
+    return;
   }
-})();
 
-function log(msg, cls = '') {
-  const el = document.getElementById('log');
-  const line = document.createElement('div');
-  line.className = 'log-line ' + cls;
-  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-  el.appendChild(line);
-  el.scrollTop = el.scrollHeight;
-}
+  if(!allTests.length){log('No tests found. Done.','wr');return}
 
-function updateStats(chunks, elapsed) {
-  document.getElementById('statChunks').textContent = chunks;
-  document.getElementById('statTests').textContent = totalProcessed;
-  document.getElementById('statCMJ').textContent = Object.values(mergedCMJ).reduce((s, a) => s + a.length, 0);
-  document.getElementById('statHop').textContent = Object.values(mergedHop).reduce((s, a) => s + a.length, 0);
-  document.getElementById('statAthletes').textContent = new Set([...Object.keys(mergedCMJ), ...Object.keys(mergedHop)]).size;
-  document.getElementById('statTime').textContent = (elapsed / 1000).toFixed(1) + 's';
-}
+  // ═══ PHASE 2: Process trials in batches ═══
+  document.getElementById('phaseText').textContent='Phase 2: Processing trials in batches...';
+  log(`Phase 2: Processing ${allTests.length} tests in batches of ${batchSz} with ${delaySec}s delay...`,'in');
 
-function mergeData(data) {
-  // Merge profileMap
-  if (data.profileMap) Object.assign(mergedProfileMap, data.profileMap);
-  
-  // Merge CMJ
-  if (data.cmj) {
-    for (const [pid, sessions] of Object.entries(data.cmj)) {
-      if (!mergedCMJ[pid]) mergedCMJ[pid] = [];
-      mergedCMJ[pid].push(...sessions);
-    }
-  }
-  
-  // Merge Hop
-  if (data.hop) {
-    for (const [pid, sessions] of Object.entries(data.hop)) {
-      if (!mergedHop[pid]) mergedHop[pid] = [];
-      mergedHop[pid].push(...sessions);
-    }
-  }
-  
-  totalProcessed += (data.stats?.processed || 0);
-}
+  let totalProc=0;
+  const totalBatches=Math.ceil(allTests.length/batchSz);
 
-function sortAllSessions() {
-  const dateCmp = (a, b) => {
-    const [am, ad, ay] = a.date.split('/').map(Number);
-    const [bm, bd, by] = b.date.split('/').map(Number);
-    return (ay - by) || (am - bm) || (ad - bd);
-  };
-  Object.values(mergedCMJ).forEach(a => a.sort(dateCmp));
-  Object.values(mergedHop).forEach(a => a.sort(dateCmp));
-}
+  for(let b=0;b<totalBatches;b++){
+    if(!running){log('Stopped by user.','wr');break}
 
-function deduplicateSessions() {
-  // Remove duplicate sessions (same date + same metrics) that may overlap between chunks
-  const dedup = (obj) => {
-    for (const pid of Object.keys(obj)) {
-      const seen = new Set();
-      obj[pid] = obj[pid].filter(s => {
-        const key = s.date + '|' + (s.jumpHeight || s.rsi || '') + '|' + (s.bodyweightLbs || '');
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    }
-  };
-  dedup(mergedCMJ);
-  dedup(mergedHop);
-}
+    const chunk=allTests.slice(b*batchSz,(b+1)*batchSz);
+    const ids=chunk.map(t=>t.id).join(',');
+    const recs=chunk.map(t=>t.rec).join(',');
+    const offs=chunk.map(t=>t.off??'').join(',');
 
-async function startSync() {
-  const baseUrl = document.getElementById('baseUrl').value.replace(/\/$/, '');
-  const startDate = new Date(document.getElementById('startDate').value + 'T00:00:00Z');
-  const endDate = new Date(document.getElementById('endDate').value + 'T00:00:00Z');
-  const chunkDays = parseInt(document.getElementById('chunkDays').value) || 14;
-  
-  if (!baseUrl) { alert('Enter your deployment URL'); return; }
-  
-  // Reset
-  mergedProfileMap = {};
-  mergedCMJ = {};
-  mergedHop = {};
-  totalProcessed = 0;
-  running = true;
-  
-  document.getElementById('startBtn').disabled = true;
-  document.getElementById('stopBtn').style.display = '';
-  document.getElementById('progressWrap').style.display = '';
-  document.getElementById('statsWrap').style.display = '';
-  document.getElementById('download').style.display = 'none';
-  document.getElementById('log').innerHTML = '';
-  
-  // Build chunks
-  const chunks = [];
-  let cursor = new Date(startDate);
-  while (cursor < endDate) {
-    const chunkEnd = new Date(cursor.getTime() + chunkDays * 24 * 60 * 60 * 1000);
-    const end = chunkEnd > endDate ? endDate : chunkEnd;
-    chunks.push({ since: cursor.toISOString(), until: end.toISOString() });
-    cursor = end;
-  }
-  
-  log(`Starting sync: ${chunks.length} chunks of ${chunkDays} days each`, 'info');
-  log(`Range: ${startDate.toISOString().slice(0,10)} → ${endDate.toISOString().slice(0,10)}`, 'info');
-  
-  const syncStart = Date.now();
-  let completed = 0;
-  
-  for (const chunk of chunks) {
-    if (!running) { log('Sync stopped by user', 'warn'); break; }
-    
-    const label = chunk.since.slice(0,10) + ' → ' + chunk.until.slice(0,10);
-    log(`Fetching chunk: ${label}...`);
-    
-    try {
-      const url = `${baseUrl}/api/vald-sync?since=${encodeURIComponent(chunk.since)}&until=${encodeURIComponent(chunk.until)}&v=${Date.now()}`;
-      const resp = await fetch(url);
-      const data = await resp.json();
-      
-      if (!data.success) {
-        log(`Chunk failed: ${data.error || 'unknown error'}`, 'err');
-        continue;
+    // Build URL with profile IDs as indexed params
+    let url=`${base}/api/vald-sync?mode=process&tid=${tenantId}&ids=${ids}&recs=${encodeURIComponent(recs)}&offs=${encodeURIComponent(offs)}`;
+    chunk.forEach((t,i)=>{url+=`&p${i}=${t.pid}`});
+    url+=`&v=${Date.now()}`;
+
+    log(`Batch ${b+1}/${totalBatches} (${chunk.length} tests)...`);
+
+    try{
+      const r=await fetch(url);
+      const d=await r.json();
+      if(!d.success){
+        // If rate limited, wait longer and retry once
+        if(d.error&&d.error.includes('429')){
+          log(`  ⚠ Rate limited, waiting 30s before retry...`,'wr');
+          await new Promise(r=>setTimeout(r,30000));
+          const r2=await fetch(url.replace(/v=\d+/,`v=${Date.now()}`));
+          const d2=await r2.json();
+          if(d2.success){
+            mergeBatch(d2);
+            totalProc+=d2.processed||0;
+            log(`  ✓ Retry OK: ${d2.processed} processed [${d2.elapsed}]`,'ok');
+          }else{
+            log(`  ✗ Retry failed: ${d2.error}`,'er');
+          }
+        }else{
+          log(`  ✗ ${d.error}`,'er');
+        }
+      }else{
+        mergeBatch(d);
+        totalProc+=d.processed||0;
+        const sk=d.skipped?` (${d.skipped} squat jumps skipped)`:'';
+        log(`  ✓ ${d.processed} processed${sk} [${d.elapsed}]`,'ok');
       }
-      
-      mergeData(data);
-      completed++;
-      
-      const pct = Math.round((completed / chunks.length) * 100);
-      document.getElementById('progressFill').style.width = pct + '%';
-      document.getElementById('progressText').textContent = pct + '%';
-      updateStats(completed, Date.now() - syncStart);
-      
-      const cmjS = data.stats?.cmjSessions || 0;
-      const hopS = data.stats?.hopSessions || 0;
-      const skip = data.stats?.skipped || 0;
-      const timedOut = data.complete === false;
-      
-      log(`  ✓ ${label}: ${data.stats?.processed} tests → ${cmjS} CMJ, ${hopS} Hop` + 
-          (skip ? `, ${skip} squat jumps skipped` : '') +
-          (timedOut ? ' ⚠️ TIMED OUT (some tests missed)' : '') +
-          ` [${data.elapsed}]`,
-          timedOut ? 'warn' : 'ok');
-      
-    } catch (err) {
-      log(`Chunk error (${label}): ${err.message}`, 'err');
+    }catch(e){
+      log(`  ✗ Network error: ${e.message}`,'er');
     }
-    
-    // Small delay between chunks to be nice to VALD API
-    await new Promise(r => setTimeout(r, 500));
+
+    pct(b+1,totalBatches);
+    updStats(allTests.length,totalProc,Date.now()-t0);
+
+    // Wait between batches to avoid rate limits
+    if(b<totalBatches-1 && running){
+      log(`  Waiting ${delaySec}s...`);
+      await new Promise(r=>setTimeout(r,delaySec*1000));
+    }
   }
-  
-  // Sort and deduplicate
-  sortAllSessions();
-  deduplicateSessions();
-  
-  const totalCMJ = Object.values(mergedCMJ).reduce((s, a) => s + a.length, 0);
-  const totalHop = Object.values(mergedHop).reduce((s, a) => s + a.length, 0);
-  const totalAthletes = new Set([...Object.keys(mergedCMJ), ...Object.keys(mergedHop)]).size;
-  const elapsed = ((Date.now() - syncStart) / 1000).toFixed(1);
-  
-  log('', '');
-  log(`═══ SYNC COMPLETE ═══`, 'info');
-  log(`${completed}/${chunks.length} chunks processed in ${elapsed}s`, 'info');
-  log(`${totalAthletes} athletes · ${totalCMJ} CMJ sessions · ${totalHop} Hop sessions`, 'ok');
-  log(`${totalProcessed} total tests processed`, 'ok');
-  
-  updateStats(completed, Date.now() - syncStart);
-  
-  running = false;
-  document.getElementById('startBtn').disabled = false;
-  document.getElementById('stopBtn').style.display = 'none';
-  document.getElementById('download').style.display = '';
+
+  // Done
+  const cmjS=Object.values(mergedCMJ).reduce((s,a)=>s+a.length,0);
+  const hopS=Object.values(mergedHop).reduce((s,a)=>s+a.length,0);
+  const ath=new Set([...Object.keys(mergedCMJ),...Object.keys(mergedHop)]).size;
+  const elapsed=((Date.now()-t0)/1000).toFixed(0);
+
+  document.getElementById('phaseText').textContent='✅ Sync complete!';
+  log('','');
+  log(`═══ SYNC COMPLETE ═══`,'in');
+  log(`${totalProc} tests processed in ${elapsed}s`,'ok');
+  log(`${ath} athletes · ${cmjS} CMJ sessions · ${hopS} Hop sessions`,'ok');
+  updStats(allTests.length,totalProc,Date.now()-t0);
+
+  running=false;
+  document.getElementById('goBtn').disabled=false;
+  document.getElementById('stopBtn').style.display='none';
+  document.getElementById('dlBtn').style.display='';
 }
 
-function stopSync() {
-  running = false;
+function mergeBatch(d){
+  if(d.cmj)for(const[pid,sess]of Object.entries(d.cmj)){
+    if(!mergedCMJ[pid])mergedCMJ[pid]=[];
+    mergedCMJ[pid].push(...sess);
+  }
+  if(d.hop)for(const[pid,sess]of Object.entries(d.hop)){
+    if(!mergedHop[pid])mergedHop[pid]=[];
+    mergedHop[pid].push(...sess);
+  }
 }
 
-function downloadJSON() {
-  const output = {
-    syncedAt: new Date().toISOString(),
-    stats: {
-      cmjAthletes: Object.keys(mergedCMJ).length,
-      hopAthletes: Object.keys(mergedHop).length,
-      cmjSessions: Object.values(mergedCMJ).reduce((s, a) => s + a.length, 0),
-      hopSessions: Object.values(mergedHop).reduce((s, a) => s + a.length, 0),
+function dl(){
+  // Sort all sessions by date
+  const cmp=(a,b)=>{const[am,ad,ay]=a.date.split('/').map(Number);const[bm,bd,by]=b.date.split('/').map(Number);return(ay-by)||(am-bm)||(ad-bd)};
+  Object.values(mergedCMJ).forEach(a=>a.sort(cmp));
+  Object.values(mergedHop).forEach(a=>a.sort(cmp));
+
+  const out={
+    syncedAt:new Date().toISOString(),
+    stats:{
+      cmjAthletes:Object.keys(mergedCMJ).length,
+      hopAthletes:Object.keys(mergedHop).length,
+      cmjSessions:Object.values(mergedCMJ).reduce((s,a)=>s+a.length,0),
+      hopSessions:Object.values(mergedHop).reduce((s,a)=>s+a.length,0),
     },
-    profileMap: mergedProfileMap,
-    cmj: mergedCMJ,
-    hop: mergedHop,
+    profileMap,cmj:mergedCMJ,hop:mergedHop,
   };
-  
-  const blob = new Blob([JSON.stringify(output)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `vald-sync-${new Date().toISOString().slice(0,10)}.json`;
+  const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`vald-sync-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
-  URL.revokeObjectURL(url);
-  
-  log(`Downloaded: ${a.download} (${(blob.size / 1024 / 1024).toFixed(1)} MB)`, 'ok');
+  log(`Downloaded: ${a.download} (${(blob.size/1024/1024).toFixed(1)} MB)`,'ok');
 }
 </script>
 </body>
