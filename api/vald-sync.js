@@ -45,6 +45,7 @@ async function getToken() {
   // Try new auth endpoint first, fall back to old
   const endpoints = [AUTH_URL, AUTH_URL_OLD];
   const errors = [];
+  let lastError = null;
 
   for (const url of endpoints) {
     try {
