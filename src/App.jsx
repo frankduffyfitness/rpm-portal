@@ -1160,7 +1160,7 @@ function LandingPage({ onEnter, onSelectAthlete }) {
 
 
 
-function ReportView({ athlete, norms, hopAthlete, hopNorms }) {
+function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete }) {
   const gi = GROUPS[athlete.group];
   const n = norms[athlete.group] || norms.all;
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
@@ -1256,6 +1256,40 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms }) {
         </table>
       </>)}
 
+      
+      {veloAthlete && (
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Fastball Velocity (TrackMan)</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #ddd" }}>
+                <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Latest</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Peak Ever</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Avg Peak</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: "1px solid #eee" }}>
+                <td style={{ padding: "10px 0", fontWeight: 600 }}>Peak FB Velo</td>
+                <td style={{ padding: "10px 0", textAlign: "center" }}>{veloAthlete.latestPeak} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{veloAthlete.peakEver} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.avgPeak} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: veloAthlete.trend > 0 ? "#16a34a" : veloAthlete.trend < 0 ? "#dc2626" : "#666" }}>{veloAthlete.trend > 0 ? "+" : ""}{veloAthlete.trend} mph</td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid #eee" }}>
+                <td style={{ padding: "10px 0", fontWeight: 600 }}>Avg FB Velo</td>
+                <td style={{ padding: "10px 0", textAlign: "center" }}>{veloAthlete.latestAvg} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.avgAvg} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}></td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.sessions} sessions</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
       <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Key Takeaways</div>
       <div style={{ fontSize: 12, lineHeight: 1.8, color: "#333" }}>
         {cmjMetrics.filter(m => m.pct >= 75).length > 0 && (
@@ -1270,7 +1304,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms }) {
       </div>
 
       <div style={{ marginTop: 32, paddingTop: 16, borderTop: "2px solid #eee", fontSize: 10, color: "#999", textAlign: "center" }}>
-        RPM Strength {"\u00b7"} Maspeth, NY {"\u00b7"} rpmstrength.coach {"\u00b7"} Powered by ForceDecks
+        RPM Strength {"\u00b7"} Maspeth, NY {"\u00b7"} rpmstrength.coach {"\u00b7"} Powered by ForceDecks{veloAthlete ? " & TrackMan" : ""}
       </div>
     </div>
   );
@@ -1613,23 +1647,14 @@ function VeloProfileSearch({ onSelect }) {
 function VeloProfile({ athlete, onBack }) {
   const a = athlete;
   const trendColor = a.trend > 0 ? "#4FFFB0" : a.trend < 0 ? "#FF6B6B" : "#8A8F98";
-  const mn = Math.min(...a.peakHistory) * 0.97;
-  const mx = Math.max(...a.peakHistory) * 1.03;
-  const rg = mx - mn || 1;
-  const pts = a.peakHistory.map((v, j) => ({ x: (j / Math.max(1, a.peakHistory.length - 1)) * 280, y: 80 - ((v - mn) / rg) * 80 }));
-  const sparkPath = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+  
   
   const vn = VELO_NORMS.all || {};
   const pct = vn.p90 > vn.p10 ? Math.min(99, Math.max(1, Math.round(((a.peakEver - vn.p10) / (vn.p90 - vn.p10)) * 100))) : 50;
   const tierColor = pct >= 80 ? "#4FFFB0" : pct >= 60 ? "#60A5FA" : pct >= 35 ? "#FFB020" : "#FF8C42";
   const tier = pct >= 90 ? "Elite" : pct >= 75 ? "Above Avg" : pct >= 50 ? "Average" : pct >= 25 ? "Developing" : "Building";
   
-  // Avg velo sparkline
-  const amn = Math.min(...a.avgHistory) * 0.97;
-  const amx = Math.max(...a.avgHistory) * 1.03;
-  const arg = amx - amn || 1;
-  const apts = a.avgHistory.map((v, j) => ({ x: (j / Math.max(1, a.avgHistory.length - 1)) * 280, y: 80 - ((v - amn) / arg) * 80 }));
-  const avgPath = apts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+  
   
   return (
     <div style={{ padding: "0 16px" }}>
@@ -1705,18 +1730,8 @@ function VeloProfile({ athlete, onBack }) {
       <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Avg FB Velo Trend</div>
         {a.avgHistory.length >= 2 && (
-          <svg width={280} height={80} style={{ display: "block" }}>
-            <defs><linearGradient id="vag" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.3"/>
-              <stop offset="100%" stopColor="#60A5FA"/>
-            </linearGradient></defs>
-            <path d={avgPath} fill="none" stroke="url(#vag)" strokeWidth="2.5" strokeLinecap="round"/>
-            {apts.map((p, j) => <circle key={j} cx={p.x} cy={p.y} r={j === apts.length - 1 ? 5 : 2.5} fill={j === apts.length - 1 ? "#60A5FA" : "rgba(96,165,250,0.4)"} />)}
-          </svg>
+          <SL data={a.avgHistory} color="#60A5FA" width={280} height={80} dates={a.dateHistory} unit=" mph" />
         )}
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#6B7280", marginTop: 4 }}>
-          <span>{a.dateHistory[0]}</span><span>{a.dateHistory[a.dateHistory.length - 1]}</span>
-        </div>
       </div>
 
       <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1996,6 +2011,7 @@ export default function App() {
             norms={GROUP_NORMS}
             hopAthlete={HOP_ATHLETES.find(a => a.name === sel.name)}
             hopNorms={HOP_NORMS}
+            veloAthlete={VELO_BY_NAME[sel.name] || null}
           />
         </div>
       )}
