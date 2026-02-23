@@ -54,10 +54,8 @@ async function getToken() {
         client_secret: clientSecret,
       });
 
-      // New endpoint requires audience parameter
-      if (url === AUTH_URL) {
-        body.append("audience", "vald-api-external");
-      }
+      // Both endpoints require audience parameter
+      body.append("audience", "vald-api-external");
 
       const res = await fetch(url, {
         method: "POST",
