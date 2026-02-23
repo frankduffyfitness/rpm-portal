@@ -123,7 +123,14 @@ function extract(results, map) {
       out[map[r.definition.result]] = r.value;
     }
   });
+  // VALD returns kg in BODY_WEIGHT_LBS field — convert to actual lbs
+  if (out.bodyweightLbs != null) out.bodyweightLbs = +(out.bodyweightLbs * 2.20462).toFixed(1);
   return out;
+}
+
+// Check if CMJ trial is actually a squat jump (no countermovement)
+function isSquatJump(metrics) {
+  return metrics.depth === 0 || metrics.depth == null;
 }
 
 function extractAsym(results) {
@@ -208,11 +215,14 @@ export default async function handler(req, res) {
         if (!trials.length) continue;
         const trial = trials[0];
         const type = getTestType(trial.results);
+        const metrics = extract(trial.results, type === "hop" ? HOP_MAP : CMJ_MAP);
+        // Flag squat jumps
+        const squat = type === "cmj" && isSquatJump(metrics);
         samples.push({
           athlete: pMap[t.profileId] || t.profileId,
           recorded: fmtDate(t.recordedDateUtc, t.recordedDateOffset),
-          testType: type,
-          metrics: extract(trial.results, type === "hop" ? HOP_MAP : CMJ_MAP),
+          testType: squat ? "squat_jump_SKIPPED" : type,
+          metrics,
           asymmetry: type === "cmj" ? extractAsym(trial.results) : undefined,
         });
       }
@@ -259,6 +269,8 @@ export default async function handler(req, res) {
 
         if (type === "cmj") {
           const m = extract(trial.results, CMJ_MAP);
+          // Skip squat jumps (depth=0 means no countermovement)
+          if (isSquatJump(m)) { processed++; continue; }
           const a = extractAsym(trial.results);
           if (!cmj[t.profileId]) cmj[t.profileId] = [];
           cmj[t.profileId].push({ date, ...m, ...a });
