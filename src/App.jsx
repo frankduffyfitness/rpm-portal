@@ -1,4 +1,7 @@
-import { useState, 
+import {
+     
+
+            useState, 
 
 useRef, useEffect, useMemo } from "react";
 
@@ -122,6 +125,16 @@ const BW_DATA = Object.fromEntries(_BW.map(b => [b[0], {
 
 const SESSION_DATES = Object.fromEntries(_SD.map(d => [d[0], d[1]]));
 const HOP_SESSION_DATES = Object.fromEntries(_HD.map(d => [d[0], d[1]]));
+
+const _VELO = [["Aidan Cellilli","AC","col",6,78.3,76.0,74.9,77.9,76.1,"1/12/2026",[78.3,74.7,75.9,72.9,76.1,77.9],[77.0,75.8,74.0,71.8,74.5,76.1],["8/8/2025","12/23/2025","12/26/2025","12/30/2025","1/6/2026","1/12/2026"],["Live ABs","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","","",""],0.5],["Aidan Glennie","AG","hs",14,74.0,72.5,71.2,73.4,72.3,"2/4/2026",[72.3,71.8,72.6,71.8,70.9,73.8,73.7,73.4],[71.3,69.9,70.9,70.2,70.2,72.0,72.4,72.3],["12/8/2025","12/12/2025","12/15/2025","12/19/2025","12/22/2025","1/20/2026","1/28/2026","2/4/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","","",""],-0.1],["Aiden Santiago","AS","hs",5,80.4,78.8,77.5,79.2,78.3,"2/13/2026",[78.2,80.4,79.3,77.0,79.2],[75.7,79.3,78.0,76.3,78.3],["1/19/2026","2/4/2026","2/6/2026","2/10/2026","2/13/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","Forearm sore from swinging, cut short",""],-1.2],["Ami Epstein","AE","col",5,85.2,83.1,80.3,85.2,83.1,"1/16/2026",[85.1,82.2,80.4,82.6,85.2],[82.1,80.0,78.7,77.5,83.1],["8/22/2025","12/23/2025","12/29/2025","1/13/2026","1/16/2026"],["Live ABs","Bullpen","Other","Other","Bullpen"],["","","Variable Command Pen","Variable Command Pen",""],0.2],["Ben Wallace","BW","hs",14,89.8,85.6,83.5,85.8,83.3,"2/17/2026",[85.5,85.5,80.1,87.5,89.8,82.8,88.6,85.8],[83.9,83.9,74.1,85.5,88.1,80.3,86.5,83.3],["1/14/2026","1/17/2026","1/19/2026","1/22/2026","2/4/2026","2/10/2026","2/13/2026","2/17/2026"],["Other","Bullpen","Pitch Design","Bullpen","Velo Session","Bullpen","Live ABs","Bullpen"],["","","Splitter Touch-Up before Northeastern","","","Light Pen to prep for Lives","",""],3.0],["Bobby Connolly","BC","hs",4,79.6,78.8,77.0,78.1,76.2,"2/17/2026",[79.6,78.8,78.9,78.1],[78.0,76.7,77.0,76.2],["2/4/2026","2/7/2026","2/14/2026","2/17/2026"],["Bullpen","Bullpen","Bullpen","Bullpen"],["Assessment","","",""],-0.7],["Brett Baek","BB","hs",18,83.2,80.7,79.3,82.9,81.0,"2/20/2026",[80.9,81.2,82.3,82.6,83.2,82.0,81.1,82.9],[79.6,80.7,80.5,81.2,81.8,81.6,80.7,81.0],["1/20/2026","1/23/2026","1/30/2026","2/6/2026","2/10/2026","2/13/2026","2/17/2026","2/20/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","","","","",""],3.4],["CJ Burke","CB","hs",7,76.7,74.8,73.2,72.9,70.5,"2/12/2026",[73.3,75.0,73.9,76.7,75.4,76.7,72.9],[71.8,72.5,70.9,75.1,76.9,74.9,70.5],["10/21/2025","12/5/2025","12/12/2025","2/2/2026","2/6/2026","2/9/2026","2/12/2026"],["Bullpen","Bullpen","Velo Session","Velo Session","Velo Session","Bullpen","Bullpen"],["","","","","","","Arm seemed to be feeling bad"],0.7],["Christian Corey","CC","col",2,77.8,77.3,75.2,77.8,74.6,"1/23/2026",[76.9,77.8],[75.9,74.6],["1/9/2026","1/23/2026"],["Bullpen","Bullpen"],["",""],0],["Christian Peralta","CP","col",10,83.2,80.9,79.1,78.2,76.5,"1/17/2026",[83.2,79.5,83.1,80.2,80.2,81.1,81.0,78.2],[80.4,77.3,81.5,77.9,79.1,80.2,78.8,76.5],["10/31/2025","11/4/2025","11/10/2025","11/15/2025","1/6/2026","1/10/2026","1/13/2026","1/17/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","","",""],-1.7],["Christian Sanchez","CS","hs",17,74.5,70.8,68.7,71.5,70.2,"2/13/2026",[68.2,72.3,74.5,68.6,70.4,71.3,73.3,71.5],[67.6,70.2,72.4,66.5,67.0,68.0,71.2,70.2],["12/6/2025","12/8/2025","1/23/2026","1/31/2026","2/2/2026","2/6/2026","2/9/2026","2/13/2026"],["Bullpen","Bullpen","Velo Session","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","","",""],1.7],["Cole Corey","CC","hs",1,69.6,69.6,67.6,69.6,67.6,"2/4/2026",[69.6],[67.6],["2/4/2026"],["Bullpen"],["Assessment"],0],["Colin Leavy","CL","hs",11,72.2,70.6,69.1,71.6,70.4,"2/10/2026",[71.1,71.6,70.2,71.3,70.6,71.2,72.2,71.6],[68.1,69.4,71.2,69.6,68.8,69.8,70.4,70.4],["12/12/2025","12/19/2025","1/2/2026","1/9/2026","1/19/2026","1/23/2026","2/6/2026","2/10/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","","",""],3.8],["Dallas Williams","DW","hs",9,67.3,66.2,63.8,66.8,65.7,"2/11/2026",[66.1,65.2,67.3,65.9,64.8,67.1,66.2,66.8],[64.2,61.0,64.6,63.7,62.9,64.2,63.4,65.7],["12/18/2025","12/23/2025","1/2/2026","1/9/2026","1/22/2026","1/29/2026","2/5/2026","2/11/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","","",""],0.2],["Dom Persichilli","DP","col",8,85.5,83.0,80.7,82.0,80.1,"1/12/2026",[80.1,84.1,83.9,81.9,82.6,83.5,85.5,82.0],[77.8,81.9,81.8,79.9,80.5,82.0,81.7,80.1],["10/27/2025","11/19/2025","11/24/2025","12/2/2025","12/5/2025","12/12/2025","12/22/2025","1/12/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","","","","",""],1.7],["Eli Delgado","ED","col",15,87.8,84.1,82.6,81.1,79.8,"1/15/2026",[82.3,85.1,82.6,84.8,85.4,82.3,86.5,81.1],[81.5,82.6,81.3,82.6,84.2,79.6,85.0,79.8],["12/19/2025","12/23/2025","12/26/2025","12/29/2025","1/6/2026","1/9/2026","1/12/2026","1/15/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs","Pitch Design"],["","","","","","","","Prep for Live ABs"],0.5],["Eric Grgas","EG","hs",26,88.8,85.8,83.1,88.8,84.9,"2/20/2026",[86.5,87.9,87.2,83.9,86.8,87.3,84.8,88.8],[83.7,84.4,85.2,82.4,83.6,85.9,81.1,84.9],["12/22/2025","1/9/2026","1/16/2026","2/6/2026","2/9/2026","2/13/2026","2/16/2026","2/20/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","Building Back Up","Building back up still","","Body dead",""],1.5],["Francis Montalvo","FM","col",7,85.5,82.9,81.4,85.0,83.4,"1/12/2026",[85.5,81.3,79.3,82.0,84.1,83.4,85.0],[84.0,79.9,77.4,79.8,82.9,82.2,83.4],["8/22/2025","12/11/2025","12/19/2025","12/26/2025","1/2/2026","1/6/2026","1/12/2026"],["Live ABs","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","","","",""],0.8],["Frankie Muro","FM","col",11,85.9,82.0,80.1,82.7,81.8,"2/21/2026",[81.2,85.9,83.4,79.3,80.3,81.9,84.7,82.7],[80.0,83.8,80.9,77.2,78.3,80.8,83.7,81.8],["8/12/2025","8/15/2025","8/18/2025","12/16/2025","12/20/2025","1/6/2026","2/14/2026","2/21/2026"],["Bullpen","Live ABs","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","","","Body dead, focus on offspeed"],2.0],["Frankie Muzio","FM","hs",15,86.6,84.0,82.6,84.3,83.4,"2/20/2026",[82.7,85.6,84.1,84.5,84.8,82.5,84.2,84.3],[81.4,83.0,82.8,82.7,82.7,81.7,83.5,83.4],["11/18/2025","11/21/2025","1/22/2026","2/2/2026","2/5/2026","2/9/2026","2/13/2026","2/20/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs","Live ABs"],["","","","","","","",""],2.8],["Garrett Crowley","GC","pro",1,92.7,92.7,91.9,92.7,91.9,"2/6/2026",[92.7],[91.9],["2/6/2026"],["Live ABs"],[""],0],["Gavin Laya-Vetell","GL","hs",10,81.0,78.2,76.4,80.1,78.4,"2/19/2026",[76.9,78.0,79.5,78.3,77.9,77.3,81.0,80.1],[75.1,76.0,78.1,76.3,76.3,76.8,78.9,78.4],["11/3/2025","11/10/2025","11/14/2025","11/17/2025","11/21/2025","1/20/2026","1/23/2026","2/19/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Velo Session","Bullpen"],["","","","","","","",""],3.9],["George Cancel Jr","GC","hs",4,76.9,75.6,72.0,74.1,72.0,"2/19/2026",[75.3,76.9,76.1,74.1],[72.0,72.2,71.7,72.0],["1/15/2026","1/22/2026","1/29/2026","2/19/2026"],["Other","Bullpen","Velo Session","Bullpen"],["","","",""],-1.0],["Gianni Muro","GM","hs",2,73.8,73.3,71.9,73.8,70.9,"2/21/2026",[72.9,73.8],[72.9,70.9],["2/12/2026","2/21/2026"],["Assessment","Bullpen"],["Trackman not really working","Build Up"],0],["Hudson Geiger","HG","hs",2,74.4,73.8,73.2,74.4,74.4,"2/6/2026",[73.2,74.4],[72.1,74.4],["1/29/2026","2/6/2026"],["Bullpen","Other"],["",""],0],["Isaiah Rubin-Patel","IR","col",7,80.8,78.6,77.1,77.3,73.8,"1/16/2026",[80.8,80.4,79.5,77.2,77.7,77.0,77.3],[79.6,79.5,78.5,75.6,76.4,76.1,73.8],["8/15/2025","8/22/2025","8/29/2025","1/6/2026","1/9/2026","1/13/2026","1/16/2026"],["Live ABs","Live ABs","Live ABs","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","",""],-3.4],["Issac Santana","IS","hs",22,84.6,81.5,80.1,82.2,80.7,"2/13/2026",[82.8,81.8,81.6,82.0,81.2,81.5,82.2,82.2],[81.9,81.3,80.0,81.3,80.1,79.9,81.0,80.7],["11/14/2025","12/17/2025","1/17/2026","1/23/2026","1/30/2026","2/6/2026","2/9/2026","2/13/2026"],["Bullpen","Bullpen","Other","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","","","","",""],1.8],["Joey Muzio","JM","hs",2,82.7,82.2,80.2,82.7,80.7,"2/19/2026",[81.7,82.7],[79.8,80.7],["2/11/2026","2/19/2026"],["Assessment","Bullpen"],["",""],0],["Johan Cabral","JC","hs",1,75.9,75.9,74.4,75.9,74.4,"1/22/2026",[75.9],[74.4],["1/22/2026"],["Bullpen"],[""],0],["Jordan  Steiger","JS","hs",18,90.3,85.4,83.5,85.3,83.0,"2/21/2026",[85.3,82.8,88.4,85.3,90.3,85.4,87.6,85.3],[82.6,81.5,86.1,84.4,86.5,83.8,86.1,83.0],["1/15/2026","1/19/2026","1/24/2026","1/29/2026","2/2/2026","2/7/2026","2/13/2026","2/21/2026"],["Other","Pitch Design","Bullpen","Bullpen","Bullpen","Pitch Design","Live ABs","Bullpen"],["","","","","","","","Submax"],2.8],["Julian Minaya","JM","pro",16,92.9,88.9,87.7,91.3,90.0,"2/9/2026",[89.4,89.8,86.0,90.4,92.0,85.6,92.9,91.3],[88.5,88.7,84.8,89.4,90.4,84.7,91.8,90.0],["12/22/2025","1/14/2026","1/19/2026","1/23/2026","1/30/2026","2/2/2026","2/6/2026","2/9/2026"],["Bullpen","Other","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs","Bullpen"],["","Random Mound Feel","","","","","",""],2.9],["Liam Brower","LB","hs",14,86.7,84.4,82.6,84.6,82.8,"2/20/2026",[83.7,83.6,84.9,82.3,86.1,83.6,84.6,84.6],[82.4,82.4,82.8,81.3,83.4,81.7,81.9,82.8],["1/22/2026","1/30/2026","2/2/2026","2/6/2026","2/9/2026","2/13/2026","2/17/2026","2/20/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs","Bullpen","Live ABs"],["","","","","","","Trackman sort of in and out",""],-0.6],["Lucas Baker","LB","hs",4,68.6,67.4,65.4,68.6,66.7,"2/19/2026",[66.7,67.0,67.2,68.6],[65.4,64.4,65.0,66.7],["2/9/2026","2/13/2026","2/16/2026","2/19/2026"],["Bullpen","Bullpen","Bullpen","Bullpen"],["","","",""],1.1],["Mario Corso-Winks","MC","col",3,85.5,84.2,82.9,85.5,84.2,"1/29/2026",[83.8,83.4,85.5],[82.6,82.0,84.2],["9/16/2025","9/23/2025","1/29/2026"],["Bullpen","Bullpen","Bullpen"],["","","Fully tore UCL during this session"],0.9],["Michael Mihaltses","MM","hs",7,74.3,73.5,71.8,72.8,71.9,"2/17/2026",[73.0,73.7,73.1,74.3,73.4,74.0,72.8],[72.4,72.3,70.9,71.9,71.7,71.6,71.9],["1/15/2026","1/22/2026","1/31/2026","2/4/2026","2/7/2026","2/14/2026","2/17/2026"],["Other","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","","","",""],0.1],["Michael Regan","MR","hs",5,73.1,71.2,70.3,71.2,70.0,"2/19/2026",[69.9,71.4,73.1,70.6,71.2],[68.7,70.7,72.1,70.0,70.0],["1/22/2026","1/29/2026","2/6/2026","2/10/2026","2/19/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","",""],0.2],["Nolan Gomez","NG","hs",3,83.8,82.4,81.2,81.9,80.4,"11/17/2025",[83.8,81.5,81.9],[82.8,80.5,80.4],["10/30/2025","11/5/2025","11/17/2025"],["Bullpen","Bullpen","Bullpen"],["","",""],-1.0],["Ollie Star","OS","hs",9,74.0,71.2,69.3,74.0,72.5,"2/20/2026",[69.9,70.7,71.3,69.6,70.5,71.3,72.4,74.0],[67.3,68.7,69.6,69.0,66.5,69.8,71.2,72.5],["11/29/2025","12/6/2025","12/13/2025","1/10/2026","1/24/2026","1/31/2026","2/7/2026","2/20/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","","","","",""],2.8],["Rob Williams","RW","col",7,84.6,80.3,78.6,77.3,75.3,"1/14/2026",[84.6,76.8,77.6,84.1,78.7,83.3,77.3],[83.5,75.7,75.9,81.9,76.0,81.6,75.3],["8/8/2025","8/12/2025","8/14/2025","8/22/2025","8/25/2025","8/29/2025","1/14/2026"],["Live ABs","Bullpen","Bullpen","Live ABs","Bullpen","Live ABs","Bullpen"],["","","","","","",""],-0.4],["Severino Napolitano","SN","col",14,87.4,83.8,81.8,87.0,84.9,"1/12/2026",[85.6,86.3,80.7,87.4,83.5,85.6,79.8,87.0],[84.2,83.9,78.8,84.3,82.1,84.1,76.1,84.9],["12/19/2025","12/23/2025","12/26/2025","12/29/2025","1/2/2026","1/6/2026","1/9/2026","1/12/2026"],["Bullpen","Velo Session","Bullpen","Bullpen","Bullpen","Bullpen","Other","Live ABs"],["","","","","","","",""],0.8],["Shane McKenna","SM","col",5,85.5,84.8,82.8,84.5,82.4,"10/17/2025",[85.5,83.9,84.8,85.5,84.5],[83.6,81.4,83.1,83.6,82.4],["8/2/2025","8/5/2025","8/8/2025","8/15/2025","10/17/2025"],["Bullpen","Bullpen","Live ABs","Live ABs","Bullpen"],["","","","",""],0.3],["Thomas LoBello","TL","hs",18,90.9,86.9,85.2,88.9,86.6,"2/13/2026",[85.9,90.9,89.7,87.7,89.6,88.8,86.9,88.9],[84.4,88.4,87.5,85.4,88.0,90.1,86.1,86.6],["12/22/2025","1/9/2026","1/16/2026","1/19/2026","1/23/2026","2/6/2026","2/10/2026","2/13/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Bullpen","Live ABs"],["","","","Trackman Issues","","","Arm not feeling great",""],2.0],["Zach Thielen","ZT","col",4,84.5,82.5,81.2,82.3,81.1,"1/6/2026",[84.5,81.4,81.7,82.3],[83.2,79.9,80.6,81.1],["12/17/2025","12/22/2025","12/29/2025","1/6/2026"],["Bullpen","Bullpen","Bullpen","Bullpen"],["","","",""],-1.0],["Zachary Weinschel","ZW","col",5,82.6,81.5,80.2,82.6,81.8,"1/9/2026",[81.1,80.7,82.1,80.8,82.6],[80.1,78.2,80.9,80.2,81.8],["8/2/2025","12/13/2025","12/19/2025","1/6/2026","1/9/2026"],["Bullpen","Bullpen","Bullpen","Bullpen","Bullpen"],["","","","",""],0.8]];
+const VELO_NORMS = {"all":{"p10":73.1,"p25":75.9,"p50":83.2,"p75":85.9,"p90":89.8},"hs":{"p10":69.6,"p25":74.0,"p50":76.9,"p75":84.6,"p90":89.8},"col":{"p10":78.3,"p25":82.6,"p50":85.2,"p75":85.5,"p90":87.4}};
+const VELO_ATHLETES = _VELO.map(v => ({
+  name: v[0], initials: v[1], group: v[2], sessions: v[3], peakEver: v[4], avgPeak: v[5], avgAvg: v[6],
+  latestPeak: v[7], latestAvg: v[8], latestDate: v[9],
+  peakHistory: v[10], avgHistory: v[11], dateHistory: v[12], typeHistory: v[13], notesHistory: v[14],
+  trend: v[15],
+}));
+const VELO_BY_NAME = Object.fromEntries(VELO_ATHLETES.map(v => [v.name, v]));
 
 
 
@@ -1030,7 +1043,7 @@ function LandingPage({ onEnter, onSelectAthlete }) {
   const [search, setSearch] = useState("");
   const totalCMJ = ATHLETES.length;
   const totalHop = HOP_ATHLETES.length;
-  const totalUnique = new Set([...ATHLETES.map(a => a.name), ...HOP_ATHLETES.map(a => a.name)]).size;
+  const totalUnique = new Set([...ATHLETES.map(a => a.name), ...HOP_ATHLETES.map(a => a.name), ...VELO_ATHLETES.map(a => a.name)]).size;
   const totalCMJTests = ATHLETES.reduce((s, a) => s + a.testCount, 0);
   const totalHopTests = HOP_ATHLETES.reduce((s, a) => s + a.testCount, 0);
   
@@ -1105,7 +1118,7 @@ function LandingPage({ onEnter, onSelectAthlete }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 24 }}>
         {[
           { value: totalUnique, label: "Active Athletes", color: "#4FFFB0" },
-          { value: (totalCMJTests + totalHopTests).toLocaleString(), label: "Total Tests", color: "#60A5FA" },
+          { value: (totalCMJTests + totalHopTests + VELO_ATHLETES.reduce((s, a) => s + a.sessions, 0)).toLocaleString(), label: "Total Tests", color: "#60A5FA" },
           { value: totalCMJ, label: "CMJ Profiles", color: "#FFB020" },
           { value: totalHop, label: "Hop Profiles", color: "#FF6B6B" },
         ].map(s => (
@@ -1451,6 +1464,355 @@ function ProfileSearch({ athletes, onSelect, testLabel }) {
   );
 }
 
+function VeloTab() {
+  const [sort, setSort] = useState("peak");
+  const [vGroup, setVGroup] = useState("all");
+  
+  const groupFiltered = vGroup === "all" ? VELO_ATHLETES : VELO_ATHLETES.filter(a => a.group === vGroup);
+  const sorted_athletes = [...groupFiltered].sort((a, b) => {
+    if (sort === "peak") return b.peakEver - a.peakEver;
+    if (sort === "avg") return b.avgPeak - a.avgPeak;
+    if (sort === "trend") return b.trend - a.trend;
+    if (sort === "latest") return b.latestPeak - a.latestPeak;
+    return b.sessions - a.sessions;
+  });
+
+  return (
+    <div style={{ padding: "0 16px" }}>
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{"\u26BE"} Velocity Leaderboard</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>Peak FB Velo · {VELO_ATHLETES.length} pitchers · TrackMan</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        {[["peak","Peak Ever"],["latest","Latest"],["avg","Avg Peak"],["trend","Trending"]].map(([k, l]) => (
+          <button key={k} onClick={() => setSort(k)} style={{
+            padding: "6px 12px", borderRadius: 16, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600,
+            background: sort === k ? "rgba(79,255,176,0.15)" : "rgba(255,255,255,0.04)",
+            color: sort === k ? "#4FFFB0" : "#6B7280",
+          }}>{l}</button>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        {[["all","All"],["hs","High School"],["col","College"],["pro","Pro"]].map(([k, l]) => (
+          <button key={k} onClick={() => setVGroup(k)} style={{
+            padding: "5px 10px", borderRadius: 14, border: "none", cursor: "pointer", fontSize: 10, fontWeight: 600,
+            background: vGroup === k ? ((GROUPS[k] || {}).color || "#4FFFB0") + "22" : "rgba(255,255,255,0.03)",
+            color: vGroup === k ? (GROUPS[k] || {}).color || "#4FFFB0" : "#6B7280",
+          }}>{l}</button>
+        ))}
+      </div>
+
+      {sorted_athletes.map((a, i) => {
+        const vn = VELO_NORMS.all || {};
+  const pct = vn.p90 > vn.p10 ? Math.min(100, Math.max(0, ((a.peakEver - vn.p10) / (vn.p90 - vn.p10)) * 100)) : 50;
+        const tierColor = pct >= 80 ? "#4FFFB0" : pct >= 60 ? "#60A5FA" : pct >= 35 ? "#FFB020" : "#FF8C42";
+        const mn = Math.min(...a.peakHistory) * 0.97;
+        const mx = Math.max(...a.peakHistory) * 1.03;
+        const rg = mx - mn || 1;
+        const pts = a.peakHistory.map((v, j) => ({ x: (j / Math.max(1, a.peakHistory.length - 1)) * 100, y: 28 - ((v - mn) / rg) * 28 }));
+        const sparkPath = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+        
+        return (
+          <div key={a.name} style={{
+            background: "rgba(255,255,255,0.03)", borderRadius: 14, padding: "14px 16px", marginBottom: 8,
+            border: "1px solid rgba(255,255,255,0.05)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: tierColor + "22", color: tierColor,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800 }}>
+                  {i + 1}
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{a.name}</div>
+                  <div style={{ fontSize: 10, color: "#6B7280" }}><span style={{ color: (GROUPS[a.group] || {}).color || "#6B7280" }}>{(GROUPS[a.group] || {}).shortLabel || ""}</span> · {a.sessions} sessions · {a.latestDate}</div>
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: tierColor }}>{sort === "avg" ? a.avgPeak : sort === "latest" ? a.latestPeak : sort === "trend" ? (a.trend > 0 ? "+" : "") + a.trend : a.peakEver}</div>
+                <div style={{ fontSize: 9, color: "#6B7280" }}>
+                  {sort === "avg" ? "avg peak" : sort === "latest" ? "latest peak" : sort === "trend" ? "mph trend" : "mph peak"}
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 12, fontSize: 10, color: "#8A8F98" }}>
+                <span>Peak: <span style={{ color: "#fff", fontWeight: 600 }}>{a.peakEver}</span></span>
+                <span>Avg: <span style={{ color: "#fff", fontWeight: 600 }}>{a.avgAvg}</span></span>
+                <span style={{ color: a.trend > 0 ? "#4FFFB0" : a.trend < 0 ? "#FF6B6B" : "#8A8F98" }}>
+                  {a.trend > 0 ? "\u2191" : a.trend < 0 ? "\u2193" : "\u2192"}{Math.abs(a.trend)} mph
+                </span>
+              </div>
+              {a.peakHistory.length >= 2 && (
+                <svg width={100} height={28} style={{ flexShrink: 0 }}>
+                  <defs><linearGradient id={"vg"+i} x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor={tierColor} stopOpacity="0.3"/>
+                    <stop offset="100%" stopColor={tierColor}/>
+                  </linearGradient></defs>
+                  <path d={sparkPath} fill="none" stroke={"url(#vg"+i+")"} strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              )}
+            </div>
+          </div>
+        );
+      })}
+      
+      <div style={{ marginTop: 16, padding: 16, background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{"\uD83D\uDCCA"} Group Benchmarks</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {[["90th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p90],["75th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p75],["50th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p50],["25th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p25]].map(([l, v]) => (
+            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 8 }}>
+              <span style={{ fontSize: 11, color: "#6B7280" }}>{l}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{v} mph</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div style={{ marginTop: 16, fontSize: 9, color: "#4a4f57", textAlign: "center", letterSpacing: 0.5 }}>
+        RPM STRENGTH · TRACKMAN DATA
+      </div>
+    </div>
+  );
+}
+
+
+function VeloProfileSearch({ onSelect }) {
+  const [q, setQ] = useState("");
+  const ref = useRef(null);
+  useEffect(() => { if (ref.current) ref.current.focus(); }, []);
+  const filtered = q.length > 0 ? VELO_ATHLETES.filter(a => a.name.toLowerCase().includes(q.toLowerCase())).sort((a,b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop())).slice(0, 30) : VELO_ATHLETES.sort((a,b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop())).slice(0, 30);
+  return (
+    <div style={{ padding: "0 16px" }}>
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{"\u26BE"} Find Your Pitcher</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>Search by name to view their velocity profile</div>
+      </div>
+      <input ref={ref} type="text" placeholder="Search pitchers..." value={q} onChange={e => setQ(e.target.value)}
+        style={{ width: "100%", padding: "14px 16px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, color: "#fff", fontSize: 14, outline: "none", marginBottom: 12, boxSizing: "border-box" }} />
+      {filtered.map(a => (
+        <div key={a.name} onClick={() => onSelect(a)} style={{
+          display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", marginBottom: 4,
+          background: "rgba(255,255,255,0.03)", borderRadius: 12, cursor: "pointer", border: "1px solid rgba(255,255,255,0.04)",
+        }}>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(79,255,176,0.12)", color: "#4FFFB0",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>{a.initials}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{a.name}</div>
+            <div style={{ fontSize: 10, color: "#6B7280" }}><span style={{ color: (GROUPS[a.group] || {}).color || "#6B7280" }}>{(GROUPS[a.group] || {}).label || ""}</span> · {a.sessions} sessions · Peak: {a.peakEver} mph</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function VeloProfile({ athlete, onBack }) {
+  const a = athlete;
+  const trendColor = a.trend > 0 ? "#4FFFB0" : a.trend < 0 ? "#FF6B6B" : "#8A8F98";
+  const mn = Math.min(...a.peakHistory) * 0.97;
+  const mx = Math.max(...a.peakHistory) * 1.03;
+  const rg = mx - mn || 1;
+  const pts = a.peakHistory.map((v, j) => ({ x: (j / Math.max(1, a.peakHistory.length - 1)) * 280, y: 80 - ((v - mn) / rg) * 80 }));
+  const sparkPath = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+  
+  const vn = VELO_NORMS.all || {};
+  const pct = vn.p90 > vn.p10 ? Math.min(99, Math.max(1, Math.round(((a.peakEver - vn.p10) / (vn.p90 - vn.p10)) * 100))) : 50;
+  const tierColor = pct >= 80 ? "#4FFFB0" : pct >= 60 ? "#60A5FA" : pct >= 35 ? "#FFB020" : "#FF8C42";
+  const tier = pct >= 90 ? "Elite" : pct >= 75 ? "Above Avg" : pct >= 50 ? "Average" : pct >= 25 ? "Developing" : "Building";
+  
+  // Avg velo sparkline
+  const amn = Math.min(...a.avgHistory) * 0.97;
+  const amx = Math.max(...a.avgHistory) * 1.03;
+  const arg = amx - amn || 1;
+  const apts = a.avgHistory.map((v, j) => ({ x: (j / Math.max(1, a.avgHistory.length - 1)) * 280, y: 80 - ((v - amn) / arg) * 80 }));
+  const avgPath = apts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+  
+  return (
+    <div style={{ padding: "0 16px" }}>
+      <button onClick={onBack} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "4px 0", marginBottom: 12 }}>{"\u2190"} Change Pitcher</button>
+      
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: ((GROUPS[a.group] || {}).color || "#4FFFB0") + "22", color: (GROUPS[a.group] || {}).color || "#4FFFB0",
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, margin: "0 auto 10px" }}>{a.initials}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>{a.name}</div>
+        <div style={{ fontSize: 12, color: (GROUPS[a.group] || {}).color || "#6B7280", fontWeight: 600, marginTop: 4 }}>{(GROUPS[a.group] || {}).label || ""}</div>
+        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{a.sessions} sessions · Last: {a.latestDate}</div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#4FFFB0" }}>{a.peakEver}</div>
+          <div style={{ fontSize: 9, color: "#6B7280", marginTop: 2 }}>PEAK EVER</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "#60A5FA" }}>{a.avgPeak}</div>
+          <div style={{ fontSize: 9, color: "#6B7280", marginTop: 2 }}>AVG PEAK</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 800, color: trendColor }}>{a.trend > 0 ? "+" : ""}{a.trend}</div>
+          <div style={{ fontSize: 9, color: "#6B7280", marginTop: 2 }}>TREND</div>
+        </div>
+      </div>
+
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Percentile Rank</div>
+          <div style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 10, background: tierColor + "22", color: tierColor }}>{tier}</div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: tierColor }}>{pct}<span style={{ fontSize: 14, color: "#6B7280" }}>th</span></div>
+          <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 4, position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: pct + "%", background: `linear-gradient(90deg, ${tierColor}44, ${tierColor})`, borderRadius: 4 }} />
+          </div>
+        </div>
+        <div style={{ fontSize: 9, color: "#6B7280", marginTop: 6 }}>Among {VELO_ATHLETES.length} RPM pitchers (peak FB velo)</div>
+      </div>
+
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Peak FB Velo Trend</div>
+
+      {(() => {
+        const gAthletes = VELO_ATHLETES.filter(va => va.group === a.group).sort((x, y) => y.peakEver - x.peakEver);
+        const rank = gAthletes.findIndex(va => va.name === a.name) + 1;
+        const total = gAthletes.length;
+        const gi = GROUPS[a.group] || {};
+        return (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 8 }}>
+            <span style={{ fontSize: 11, color: "#8A8F98" }}>Group Ranking</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: gi.color || "#fff" }}>{rank} <span style={{ color: "#6B7280", fontWeight: 400 }}>of {total} {gi.label}</span></span>
+          </div>
+        );
+      })()}
+        {a.peakHistory.length >= 2 && (
+          <svg width={280} height={80} style={{ display: "block" }}>
+            <defs><linearGradient id="vpg" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#4FFFB0" stopOpacity="0.3"/>
+              <stop offset="100%" stopColor="#4FFFB0"/>
+            </linearGradient></defs>
+            <path d={sparkPath} fill="none" stroke="url(#vpg)" strokeWidth="2.5" strokeLinecap="round"/>
+            {pts.map((p, j) => <circle key={j} cx={p.x} cy={p.y} r={j === pts.length - 1 ? 5 : 2.5} fill={j === pts.length - 1 ? "#4FFFB0" : "rgba(79,255,176,0.4)"} />)}
+          </svg>
+        )}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#6B7280", marginTop: 4 }}>
+          <span>{a.dateHistory[0]}</span><span>{a.dateHistory[a.dateHistory.length - 1]}</span>
+        </div>
+      </div>
+
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Avg FB Velo Trend</div>
+        {a.avgHistory.length >= 2 && (
+          <svg width={280} height={80} style={{ display: "block" }}>
+            <defs><linearGradient id="vag" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.3"/>
+              <stop offset="100%" stopColor="#60A5FA"/>
+            </linearGradient></defs>
+            <path d={avgPath} fill="none" stroke="url(#vag)" strokeWidth="2.5" strokeLinecap="round"/>
+            {apts.map((p, j) => <circle key={j} cx={p.x} cy={p.y} r={j === apts.length - 1 ? 5 : 2.5} fill={j === apts.length - 1 ? "#60A5FA" : "rgba(96,165,250,0.4)"} />)}
+          </svg>
+        )}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#6B7280", marginTop: 4 }}>
+          <span>{a.dateHistory[0]}</span><span>{a.dateHistory[a.dateHistory.length - 1]}</span>
+        </div>
+      </div>
+
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 16, padding: 20, marginBottom: 12, border: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Recent Sessions</div>
+        {a.dateHistory.map((d, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < a.dateHistory.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+            <div>
+              <div style={{ fontSize: 12, color: "#fff", fontWeight: 600 }}>{d}</div>
+              <div style={{ fontSize: 10, color: "#6B7280" }}>{a.typeHistory[i]}{a.notesHistory[i] ? " · " + a.notesHistory[i] : ""}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#4FFFB0" }}>{a.peakHistory[i]}</div>
+              <div style={{ fontSize: 10, color: "#6B7280" }}>avg {a.avgHistory[i]}</div>
+            </div>
+          </div>
+        )).reverse()}
+      </div>
+    </div>
+  );
+}
+
+function VeloTrendingTab() {
+  const sorted_by_trend = [...VELO_ATHLETES].filter(a => a.sessions >= 3).sort((a, b) => b.trend - a.trend);
+  const gainers = sorted_by_trend.filter(a => a.trend > 0).slice(0, 10);
+  const decliners = sorted_by_trend.filter(a => a.trend < 0).sort((a, b) => a.trend - b.trend).slice(0, 10);
+  
+  // New peak PRs - athletes whose latest peak equals their peak ever
+  const newPRs = VELO_ATHLETES.filter(a => a.sessions >= 2 && a.latestPeak === a.peakEver).map(a => {
+    const prevPeak = a.peakHistory.length >= 2 ? Math.max(...a.peakHistory.slice(0, -1)) : null;
+    return { ...a, prevPeak };
+  });
+  
+  return (
+    <div style={{ padding: "0 16px" }}>
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{"\u26BE"} Velo Trends</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>{VELO_ATHLETES.length} pitchers · TrackMan</div>
+      </div>
+
+      {newPRs.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 10 }}>{"\uD83C\uDF1F"} New Peak Velos</div>
+          {newPRs.map(a => (
+            <div key={a.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", marginBottom: 6,
+              background: "rgba(79,255,176,0.04)", borderRadius: 12, border: "1px solid rgba(79,255,176,0.1)" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{a.name}</div>
+                <div style={{ fontSize: 10, color: "#6B7280" }}>{a.latestDate}</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {a.prevPeak && <span style={{ fontSize: 14, color: "#6B7280" }}>{a.prevPeak}</span>}
+                {a.prevPeak && <span style={{ fontSize: 12, color: "#6B7280" }}>→</span>}
+                <span style={{ fontSize: 18, fontWeight: 800, color: "#4FFFB0" }}>{a.peakEver} mph</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 10 }}>{"\u2191"} Gaining Velo</div>
+        {gainers.map((a, i) => (
+          <div key={a.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", marginBottom: 4,
+            background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(79,255,176,0.15)", color: "#4FFFB0",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800 }}>{i + 1}</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{a.name}</div>
+                <div style={{ fontSize: 10, color: "#6B7280" }}>{a.sessions} sessions</div>
+              </div>
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#4FFFB0" }}>+{a.trend} mph</div>
+          </div>
+        ))}
+      </div>
+
+      {decliners.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 10 }}>{"\u2193"} Velo Down</div>
+          {decliners.map((a, i) => (
+            <div key={a.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", marginBottom: 4,
+              background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.04)" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{a.name}</div>
+                <div style={{ fontSize: 10, color: "#6B7280" }}>{a.sessions} sessions</div>
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#FF6B6B" }}>{a.trend} mph</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState("home");
   const [testType, setTestType] = useState("cmj");
@@ -1461,6 +1823,8 @@ export default function App() {
   const [cmpG, setCmpG] = useState(null);
   const [hopSel, setHopSel] = useState(HOP_ATHLETES[0]);
   const [hopProfileSearch, setHopProfileSearch] = useState(true);
+  const [veloProfileSearch, setVeloProfileSearch] = useState(true);
+  const [veloSel, setVeloSel] = useState(VELO_ATHLETES[0] || null);
   const [showReport, setShowReport] = useState(false);
   const [hopCmpG, setHopCmpG] = useState(null);
   const [standG, setStandG] = useState("all");
@@ -1491,14 +1855,14 @@ export default function App() {
           <div style={{ width: 1, height: 24, background: "rgba(255,255,255,0.12)" }} />
           <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Athlete Portal</div>
         </div>
-        {tab !== "home" && tab === "profile" && !(testType === "cmj" ? profileSearch : hopProfileSearch) && (
+        {tab !== "home" && tab === "profile" && !(testType === "cmj" ? profileSearch : testType === "hop" ? hopProfileSearch : veloProfileSearch) && (
           <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg, ${(testType === "cmj" ? gi : GROUPS[hopCmpG || hopSel.group]).color} 0%, #00B4D8 100%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#0A0C10", cursor: "pointer" }}
-            onClick={() => { setMO(!menuOpen); setSrch(""); }}>{testType === "cmj" ? sel.initials : hopSel.initials}</div>
+            onClick={() => { setMO(!menuOpen); setSrch(""); }}>{testType === "cmj" ? sel.initials : testType === "hop" ? hopSel.initials : (veloSel || {}).initials || ""}</div>
         )}
       </div>
       {tab !== "home" && <div style={{ display: "flex", margin: "0 20px 8px", gap: 8 }}>
-        {[{ key: "cmj", label: "CMJ" }, { key: "hop", label: "Hop Test" }].map(t => (
-          <button key={t.key} onClick={() => { setTestType(t.key); setTab("profile"); window.scrollTo(0, 0); }} style={{
+        {[{ key: "cmj", label: "CMJ" }, { key: "hop", label: "Hop Test" }, { key: "velo", label: "Velo" }].map(t => (
+          <button key={t.key} onClick={() => { setTestType(t.key); setTab("profile"); if (t.key === "velo") setVeloProfileSearch(true); window.scrollTo(0, 0); }} style={{
             flex: 1, padding: "10px 0", border: "none", borderRadius: 10, cursor: "pointer",
             fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
             background: testType === t.key ? "linear-gradient(135deg, #4FFFB020, #00B4D820)" : "rgba(255,255,255,0.03)",
@@ -1577,7 +1941,10 @@ export default function App() {
           <AsymmetrySection athleteName={sel.name} />
         <BodyweightChart athleteName={sel.name} group={sel.group} />
         <Insights athlete={sel} norms={norms} groupLabel={gi.label} />
-          <button onClick={() => setShowReport(true)} style={{
+          
+        
+
+        <button onClick={() => setShowReport(true)} style={{
             width: "100%", padding: "14px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, cursor: "pointer",
             fontSize: 13, fontWeight: 700, background: "rgba(255,255,255,0.03)", color: "#8A8F98", marginTop: 12,
           }}>{"📄"} Download Report Card</button>
@@ -1588,7 +1955,13 @@ export default function App() {
         {tab === "profile" && testType === "hop" && !hopProfileSearch && (
           <HopProfile athlete={hopSel} norms={HOP_NORMS} groupInfo={GROUPS[hopCmpG || hopSel.group]} compareGroup={hopCmpG} setCompareGroup={setHopCmpG} />
         )}
-        {tab !== "home" && (tab === "standings" || tab === "trending") && (
+        {tab === "profile" && testType === "velo" && veloProfileSearch && (
+          <VeloProfileSearch onSelect={(a) => { setVeloSel(a); setVeloProfileSearch(false); window.scrollTo(0,0); }} />
+        )}
+        {tab === "profile" && testType === "velo" && !veloProfileSearch && veloSel && (
+          <VeloProfile athlete={veloSel} onBack={() => setVeloProfileSearch(true)} />
+        )}
+        {tab !== "home" && (tab === "standings" || tab === "trending") && testType !== "velo" && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Filter by group</div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
@@ -1598,8 +1971,10 @@ export default function App() {
         )}
         {tab === "standings" && testType === "cmj" && <StandingsTab filterGroup={standG} />}
         {tab === "standings" && testType === "hop" && <HopStandingsTab filterGroup={standG} />}
+        {tab === "standings" && testType === "velo" && <VeloTab />}
         {tab === "trending" && testType === "cmj" && <TrendingTab filterGroup={standG} />}
         {tab === "trending" && testType === "hop" && <HopTrendingTab filterGroup={standG} />}
+        {tab === "trending" && testType === "velo" && <VeloTrendingTab />}
       </div>
       <div style={{ position: "sticky", bottom: 0, padding: "12px 20px 20px", background: "linear-gradient(0deg, #0A0C10 60%, transparent)", textAlign: "center" }}>
         <div style={{ fontSize: 9, color: "#4a4f57", letterSpacing: 1 }}>RPM STRENGTH {"\u00b7"} {testType === "cmj" ? ATHLETES.length : HOP_ATHLETES.length} ATHLETES {"\u00b7"} FORCEDECKS CMJ DATA</div>
@@ -1608,7 +1983,13 @@ export default function App() {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#fff", overflowY: "auto" }}>
           <div style={{ position: "sticky", top: 0, background: "#fff", borderBottom: "1px solid #eee", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 1001 }}>
             <button onClick={() => setShowReport(false)} style={{ border: "none", background: "none", fontSize: 14, cursor: "pointer", color: "#666", fontWeight: 600 }}>{"\u2190"} Back</button>
-            <button onClick={() => window.print()} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
+            <button onClick={() => {
+              const el = document.getElementById("report-content");
+              const w = window.open("", "_blank");
+              w.document.write("<html><head><title>RPM Strength Report</title><style>body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;} table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:13px;} th{background:#f5f5f5;font-weight:700;font-size:11px;text-transform:uppercase;color:#666;} @media print{body{padding:10px;} @page{margin:0.5in;}}</style></head><body>" + el.innerHTML + "</body></html>");
+              w.document.close();
+              setTimeout(() => { w.print(); }, 300);
+            }} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
           </div>
           <ReportView
             athlete={sel}
