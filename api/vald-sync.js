@@ -133,14 +133,14 @@ async function getProfiles(tenantId) {
 
 async function getForceDecksTests(tenantId, modifiedFromUtc) {
   const allTests = [];
+  let currentFrom = modifiedFromUtc;
   let page = 1;
   let hasMore = true;
 
-  // Use v2 endpoint for incremental pulls (ascending by modifiedDateUtc)
   while (hasMore) {
-    const data = await apiGet(FD_URL, "/tests/v2", {
-      TenantId: tenantId,
-      ModifiedFromUtc: modifiedFromUtc,
+    const data = await apiGet(FD_URL, "/tests", {
+      tenantId: tenantId,
+      modifiedFromUtc: currentFrom,
     });
 
     if (!data || !data.tests || data.tests.length === 0) {
