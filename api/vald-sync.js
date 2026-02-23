@@ -289,6 +289,60 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, tenantId, results });
     }
 
+    // ─── Test mode: fetch trials for a specific test ───
+    if (test === "trials") {
+      const tenantId = await getTenantId();
+      const token = await getToken();
+      const testSince = since || "2026-02-20T00:00:00Z";
+      
+      // First get a test
+      const testRes = await fetch(`${FD_URL}/tests?tenantId=${tenantId}&modifiedFromUtc=${testSince}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const testData = await testRes.json();
+      
+      if (!testData.tests || testData.tests.length === 0) {
+        return res.status(200).json({ success: true, message: "No tests found", tenantId });
+      }
+      
+      const firstTest = testData.tests[0];
+      
+      // Try to get trials for this test
+      const trialPatterns = [
+        `/v2019q3/teams/${tenantId}/tests/${firstTest.testId}/trials`,
+        `/trials?testId=${firstTest.testId}&tenantId=${tenantId}`,
+      ];
+      
+      const trialResults = [];
+      for (const path of trialPatterns) {
+        try {
+          const fetchRes = await fetch(`${FD_URL}${path}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const raw = await fetchRes.text();
+          trialResults.push({
+            path,
+            status: fetchRes.status,
+            preview: raw.substring(0, 3000),
+          });
+          if (fetchRes.ok) break;
+        } catch (err) {
+          trialResults.push({ path, error: err.message });
+        }
+      }
+      
+      return res.status(200).json({
+        success: true,
+        tenantId,
+        testUsed: {
+          testId: firstTest.testId,
+          profileId: firstTest.profileId,
+          recorded: firstTest.recordedDateUtc,
+        },
+        trialResults,
+      });
+    }
+
     // ─── Full sync ───
     const modifiedFrom = since || DEFAULT_START;
     console.log(`Starting sync from ${modifiedFrom}`);
