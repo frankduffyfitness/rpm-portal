@@ -44,7 +44,7 @@ async function getToken() {
 
   // Try new auth endpoint first, fall back to old
   const endpoints = [AUTH_URL, AUTH_URL_OLD];
-  let lastError = null;
+  const errors = [];
 
   for (const url of endpoints) {
     try {
@@ -66,6 +66,7 @@ async function getToken() {
       if (!res.ok) {
         const errText = await res.text();
         lastError = `${url}: ${res.status} ${res.statusText} — ${errText}`;
+        errors.push(lastError);
         continue;
       }
 
@@ -77,11 +78,12 @@ async function getToken() {
       return tokenCache.accessToken;
     } catch (err) {
       lastError = `${url}: ${err.message}`;
+      errors.push(lastError);
       continue;
     }
   }
 
-  throw new Error(`Authentication failed on all endpoints. Last error: ${lastError}`);
+  throw new Error(`Authentication failed. Errors: ${JSON.stringify(errors)}`);
 }
 
 // ─── API Helpers ─────────────────────────────────────────────────────
