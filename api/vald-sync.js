@@ -124,28 +124,26 @@ module.exports = async function handler(req, res) {
   const startTime = Date.now();
   lastCall = 0;
 
-  // CORS for browser calls
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
-  if (req.method === "OPTIONS") return res.status(200).end();
-
   try {
+    // CORS
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    if (req.method === "OPTIONS") return res.status(200).end();
     const { mode, test, ids, since } = req.query;
 
     // ─── Diagnostic modes ───
     if (test === "auth") {
       const t = await getToken();
-      return res.json({ success: true, preview: t.substring(0, 20) + "..." });
+      return res.status(200).json({ success: true, preview: t.substring(0, 20) + "..." });
     }
     if (test === "tenant") {
       const d = await apiFetch(`${TENANT_URL}/tenants`);
-      return res.json({ success: true, tenantId: (d?.tenants || d)[0].id });
+      return res.status(200).json({ success: true, tenantId: (d?.tenants || d)[0].id });
     }
     if (test === "profiles") {
       const tid = (await apiFetch(`${TENANT_URL}/tenants`))?.tenants?.[0]?.id;
       const d = await apiFetch(`${PROFILE_URL}/profiles?tenantId=${tid}`);
       const p = d?.profiles || d;
-      return res.json({ success: true, count: p.length, sample: p.slice(0,10).map(x=>({id:x.profileId,name:x.givenName+" "+x.familyName})) });
+      return res.status(200).json({ success: true, count: p.length, sample: p.slice(0,10).map(x=>({id:x.profileId,name:x.givenName+" "+x.familyName})) });
     }
 
     // ═══ MODE: LIST ═══
@@ -185,7 +183,7 @@ module.exports = async function handler(req, res) {
       }
 
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      return res.json({
+      return res.status(200).json({
         success: true, mode: "list", elapsed: `${elapsed}s`,
         testCount: allTests.length,
         profileCount: profiles.length,
@@ -236,7 +234,7 @@ module.exports = async function handler(req, res) {
       }
 
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      return res.json({
+      return res.status(200).json({
         success: true, mode: "process", elapsed: `${elapsed}s`,
         processed, skipped, errors,
         cmj, hop,
