@@ -16,9 +16,9 @@
 
 // ─── Configuration ───────────────────────────────────────────────────
 const AUTH_URL = "https://security.valdperformance.com/connect/token";
-const TENANT_URL = "https://prd-use-api-externaltenant.valdperformance.com";
+const TENANT_URL = "https://prd-use-api-externaltenants.valdperformance.com";
 const PROFILE_URL = "https://prd-use-api-externalprofile.valdperformance.com";
-const FD_URL = "https://prd-use-api-externalforcedecks.valdperformance.com";
+const FD_URL = "https://prd-use-api-extforcedecks.valdperformance.com";
 
 // Fallback to old auth if new one isn't active yet
 const AUTH_URL_OLD = "https://auth.prd.vald.com/oauth/token";
