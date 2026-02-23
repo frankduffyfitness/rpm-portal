@@ -95,17 +95,21 @@ async function apiGet(baseUrl, path, params = {}) {
     if (v != null) url.searchParams.set(k, v);
   });
 
-  const res = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  if (res.status === 204) return null; // No content
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`API ${res.status}: ${url.pathname} — ${errText}`);
+    if (res.status === 204) return null;
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`API ${res.status}: ${url.toString()} — ${errText}`);
+    }
+
+    return res.json();
+  } catch (err) {
+    throw new Error(`Fetch to ${url.toString()} failed: ${err.message}`);
   }
-
-  return res.json();
 }
 
 // ─── Data Fetchers ───────────────────────────────────────────────────
