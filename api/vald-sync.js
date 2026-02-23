@@ -115,11 +115,13 @@ async function apiGet(baseUrl, path, params = {}) {
 // ─── Data Fetchers ───────────────────────────────────────────────────
 async function getTenantId() {
   const data = await apiGet(TENANT_URL, "/tenants");
-  if (!data || !Array.isArray(data) || data.length === 0) {
+  // Response is {tenants: [{id, name}]}
+  const tenants = data?.tenants || data;
+  if (!tenants || !Array.isArray(tenants) || tenants.length === 0) {
     throw new Error("No tenants found for this API client");
   }
-  console.log(`Found ${data.length} tenant(s): ${data.map(t => t.name || t.tenantId).join(", ")}`);
-  return data[0].tenantId;
+  console.log(`Found ${tenants.length} tenant(s): ${tenants.map(t => t.name || t.id).join(", ")}`);
+  return tenants[0].id;
 }
 
 async function getProfiles(tenantId) {
@@ -240,14 +242,15 @@ export default async function handler(req, res) {
     // ─── Test mode: verify profiles ───
     if (test === "profiles") {
       const tenantId = await getTenantId();
-      const profiles = await getProfiles(tenantId);
+      const fetchRes = await fetch(`${PROFILE_URL}/profiles?tenantId=${tenantId}`, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      const raw = await fetchRes.text();
       return res.status(200).json({
         success: true,
-        count: profiles.length,
-        sample: profiles.slice(0, 5).map(p => ({
-          id: p.id || p.profileId,
-          name: [p.givenName, p.familyName].filter(Boolean).join(" "),
-        })),
+        httpStatus: fetchRes.status,
+        tenantId,
+        raw: raw.substring(0, 3000),
       });
     }
 
