@@ -257,18 +257,36 @@ export default async function handler(req, res) {
     // ─── Test mode: fetch a small batch of tests ───
     if (test === "tests") {
       const tenantId = await getTenantId();
-      const testSince = since || "2026-02-01T00:00:00Z"; // Recent data only for testing
-      const tests = await getForceDecksTests(tenantId, testSince);
-      return res.status(200).json({
-        success: true,
-        testCount: tests.length,
-        sample: tests.slice(0, 3).map(t => ({
-          testId: t.testId,
-          profileId: t.profileId,
-          recorded: t.recordedDateUtc,
-          testType: t.testType || t.testTypeName,
-        })),
-      });
+      const token = await getToken();
+      const testSince = since || "2026-02-01T00:00:00Z";
+      
+      // Try multiple endpoint patterns to find the right one
+      const patterns = [
+        `/tests?tenantId=${tenantId}&modifiedFromUtc=${testSince}`,
+        `/tests?TenantId=${tenantId}&ModifiedFromUtc=${testSince}`,
+        `/tests/v2?tenantId=${tenantId}&modifiedFromUtc=${testSince}`,
+        `/v2019q3/teams/${tenantId}/tests`,
+      ];
+      
+      const results = [];
+      for (const path of patterns) {
+        try {
+          const fetchRes = await fetch(`${FD_URL}${path}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const raw = await fetchRes.text();
+          results.push({
+            path,
+            status: fetchRes.status,
+            preview: raw.substring(0, 500),
+          });
+          if (fetchRes.ok) break; // Stop on first success
+        } catch (err) {
+          results.push({ path, error: err.message });
+        }
+      }
+      
+      return res.status(200).json({ success: true, tenantId, results });
     }
 
     // ─── Full sync ───
