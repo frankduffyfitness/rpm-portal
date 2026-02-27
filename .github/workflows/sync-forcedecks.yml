@@ -1,0 +1,97 @@
+name: Sync ForceDecks Data
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      full_sync:
+        description: 'Full sync (re-pull all tests from 2020)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  VALD_CLIENT_ID: ${{ secrets.VALD_CLIENT_ID }}
+  VALD_CLIENT_SECRET: ${{ secrets.VALD_CLIENT_SECRET }}
+  VALD_AUDIENCE: vald-api-external
+  VALD_TENANT_ID: 3127f695-175f-4b63-8331-f1295a34cd51
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Restore sync state
+        uses: actions/cache@v4
+        with:
+          path: vald_sync_state.json
+          key: vald-sync-state-${{ github.run_id }}
+          restore-keys: |
+            vald-sync-state-
+
+      - name: Run VALD Sync
+        run: |
+          if [ "${{ github.event.inputs.full_sync }}" == "true" ]; then
+            python vald_sync.py --full
+          else
+            python vald_sync.py
+          fi
+
+      - name: Generate portal data
+        run: |
+          APP_JSX=$(find . -name "App.jsx" -not -path "*/node_modules/*" | head -1)
+          if [ -z "$APP_JSX" ]; then
+            echo "ERROR: App.jsx not found in repo"
+            exit 1
+          fi
+          echo "Found App.jsx at: $APP_JSX"
+          python generate_portal_data.py forcedecks_portal.json "$APP_JSX"
+          if [ -f "App_updated.jsx" ]; then
+            mv App_updated.jsx "$APP_JSX"
+            echo "Replaced $APP_JSX with updated data"
+          else
+            echo "ERROR: App_updated.jsx not generated"
+            exit 1
+          fi
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet && echo "has_changes=false" >> "$GITHUB_OUTPUT" || echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "RPM Auto-Sync"
+          git config user.email "sync@rpmstrength.coach"
+          git add -A
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          ATHLETES=$(python -c "import json; d=json.load(open('forcedecks_portal.json')); print(d['meta']['totalAthletes'])" 2>/dev/null || echo "?")
+          TESTS=$(python -c "import json; d=json.load(open('forcedecks_portal.json')); print(d['meta']['totalTests'])" 2>/dev/null || echo "?")
+          git commit -m "🔄 ForceDecks sync: ${TIMESTAMP} (${ATHLETES} athletes, ${TESTS} tests)"
+          git push
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "### 🏋️ ForceDecks Sync Results" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
+            echo "✅ **New data pushed → Vercel auto-deploying**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **No new data since last sync — deploy skipped**" >> $GITHUB_STEP_SUMMARY
+          fi
