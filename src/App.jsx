@@ -1328,13 +1328,14 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
 
       <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Countermovement Jump (CMJ)</div>
       <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
+        <colgroup><col style={{width:"30%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/></colgroup>
         <thead>
           <tr style={{ borderBottom: "2px solid #ddd" }}>
-            <th style={{ textAlign: "left", padding: "8px 8px", fontWeight: 700, width: "30%" }}>Metric</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Current</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Best Ever</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Percentile</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Rating</th>
+            <th style={{ textAlign: "left", padding: "8px 8px", fontWeight: 700 }}>Metric</th>
+            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Current</th>
+            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Best Ever</th>
+            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Percentile</th>
+            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Rating</th>
           </tr>
         </thead>
         <tbody>
@@ -1381,13 +1382,14 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Fastball Velocity (TrackMan)</div>
           <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
+            <colgroup><col style={{width:"30%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/></colgroup>
             <thead>
               <tr style={{ borderBottom: "2px solid #ddd" }}>
-                <th style={{ textAlign: "left", padding: "8px 8px", fontWeight: 700, width: "30%" }}>Metric</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Latest</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Peak Ever</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Avg Peak</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700, width: "17.5%" }}>Trend</th>
+                <th style={{ textAlign: "left", padding: "8px 8px", fontWeight: 700 }}>Metric</th>
+                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Latest</th>
+                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Peak Ever</th>
+                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Avg Peak</th>
+                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Trend</th>
               </tr>
             </thead>
             <tbody>
