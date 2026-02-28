@@ -1218,6 +1218,12 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         const lastDate = dates.length > 0 ? dates[dates.length - 1] : "";
         const bw = BW_DATA[athlete.name];
         const isFemale = athlete.group === "fem";
+        const metricDescs = {
+          "Jump Height": "Measures how high the athlete's center of mass rises during a countermovement jump. A key indicator of lower-body power and the ability to produce force quickly. Improvements here reflect gains in strength, rate of force development, and movement efficiency.",
+          "RSI-modified": "Reactive Strength Index (modified) divides jump height by time to takeoff. It captures how explosively an athlete can load and unload during a jump. Higher values mean the athlete produces more power in less time \u2014 critical for sprinting, cutting, and sport-specific quickness.",
+          "Peak Power / BM": "The highest instantaneous power output during the jump, divided by bodyweight. This metric normalizes for size, showing true relative explosiveness. Gains indicate the athlete is becoming more powerful pound-for-pound.",
+          "Ecc Braking RFD": "Rate of Force Development during the braking (deceleration) phase of the jump. Measures how quickly the athlete can absorb and redirect force. Essential for change-of-direction ability, landing mechanics, and injury resilience.",
+        };
         const metrics = [
           { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '"', decimals: 1 },
           { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "", decimals: 2 },
@@ -1229,50 +1235,80 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         const bwChange = bw && !isFemale ? bw.change : null;
 
         return (<>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 6, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Offseason Progress</div>
-        <div style={{ fontSize: 11, color: "#666", marginBottom: 6 }}>{offseason.sessions} sessions tracked {firstDate && lastDate ? <span>from <strong>{firstDate}</strong> to <strong>{lastDate}</strong></span> : "this offseason"}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 4, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Offseason Progress</div>
+        <div style={{ fontSize: 11, color: "#666", marginBottom: 16 }}>{offseason.sessions} sessions tracked {firstDate && lastDate ? <span>from <strong>{firstDate}</strong> to <strong>{lastDate}</strong></span> : "this offseason"}</div>
 
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-          {metrics.map((m, i) => (
-            <div key={i} style={{ flex: 1, background: m.change > 0 ? "#f0fdf4" : m.change < 0 ? "#fef2f2" : "#f9fafb", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: "1px solid " + (m.change > 0 ? "#bbf7d0" : m.change < 0 ? "#fecaca" : "#e5e7eb") }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: m.change > 0 ? "#16a34a" : m.change < 0 ? "#dc2626" : "#666" }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</div>
-              <div style={{ fontSize: 9, color: "#666", marginTop: 2 }}>{m.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16, fontSize: 12 }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #ddd" }}>
-              <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>First Test</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Latest Test</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {metrics.map((m, i) => (
-              <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{m.decimals > 0 ? m.last.toFixed(m.decimals) : m.last.toLocaleString()}{m.unit}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700, color: m.change > 0 ? "#16a34a" : m.change < 0 ? "#dc2626" : "#666" }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {!isFemale && bw && bw.history.length >= 2 && (
-          <div style={{ background: "#f9fafb", borderRadius: 8, padding: "12px 16px", marginBottom: 16, border: "1px solid #e5e7eb" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>Bodyweight</div>
-                <div style={{ fontSize: 11, color: "#666" }}>{bw.history[0]} lbs \u2192 {bw.current} lbs</div>
+        {metrics.map((m, i) => {
+          const maxVal = Math.max(m.first, m.last);
+          const firstPct = maxVal > 0 ? (m.first / maxVal) * 100 : 0;
+          const lastPct = maxVal > 0 ? (m.last / maxVal) * 100 : 0;
+          const arrow = m.change > 0 ? "\u2191" : m.change < 0 ? "\u2193" : "\u2192";
+          const changeColor = m.change > 0 ? "#16a34a" : m.change < 0 ? "#dc2626" : "#666";
+          return (
+            <div key={i} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: i < metrics.length - 1 ? "1px solid #f0f0f0" : "none" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>{m.label}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: changeColor }}>{arrow}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: changeColor }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</span>
+                </div>
               </div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: bwChange > 0 ? "#16a34a" : bwChange < 0 ? "#dc2626" : "#666" }}>{bwChange > 0 ? "+" : ""}{bwChange} lbs</div>
+              <div style={{ fontSize: 10, color: "#666", lineHeight: 1.5, marginBottom: 8 }}>{metricDescs[m.label]}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>First</span>
+                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: firstPct + "%", background: "#c7d2fe", borderRadius: 4 }} />
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#888", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>Now</span>
+                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: lastPct + "%", background: m.change >= 0 ? "#86efac" : "#fca5a5", borderRadius: 4 }} />
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#111", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.last.toFixed(m.decimals) : m.last.toLocaleString()}{m.unit}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })}
+
+        {!isFemale && bw && bw.history.length >= 2 && (() => {
+          const bwHist = bw.history;
+          const bwDates = bw.dates || [];
+          const mn = Math.min(...bwHist) * 0.97;
+          const mx = Math.max(...bwHist) * 1.03;
+          const rg = mx - mn || 1;
+          const svgW = 400;
+          const svgH = 40;
+          const pts = bwHist.map((v, j) => ({ x: (j / Math.max(1, bwHist.length - 1)) * svgW, y: svgH - ((v - mn) / rg) * svgH }));
+          const pathD = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+          const areaD = pathD + " L" + svgW + "," + svgH + " L0," + svgH + " Z";
+          return (
+            <div style={{ background: "#f9fafb", borderRadius: 8, padding: "12px 16px", marginBottom: 16, border: "1px solid #e5e7eb" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>Bodyweight</div>
+                  <div style={{ fontSize: 11, color: "#666" }}>{bwHist[0]} lbs {"\u2192"} {bw.current} lbs</div>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: bwChange > 0 ? "#16a34a" : bwChange < 0 ? "#dc2626" : "#666" }}>{bwChange > 0 ? "+" : ""}{bwChange} lbs</div>
+              </div>
+              <svg width={svgW} height={svgH} viewBox={"0 0 " + svgW + " " + svgH} style={{ display: "block", width: "100%" }}>
+                <path d={areaD} fill="rgba(96,165,250,0.15)" />
+                <path d={pathD} fill="none" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx={pts[0].x} cy={pts[0].y} r="3" fill="#60A5FA" />
+                <circle cx={pts[pts.length-1].x} cy={pts[pts.length-1].y} r="3" fill="#60A5FA" />
+              </svg>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#999", marginTop: 2 }}>
+                <span>{bwDates[0]}</span>
+                <span>{bwDates[bwDates.length - 1]}</span>
+              </div>
+            </div>
+          );
+        })()}
 
         <div style={{ background: "#f9fafb", borderRadius: 8, padding: "14px 16px", marginBottom: 16, border: "1px solid #e5e7eb", fontSize: 12, lineHeight: 1.8, color: "#333" }}>
           <div style={{ fontWeight: 700, color: "#111", marginBottom: 6 }}>Summary</div>
