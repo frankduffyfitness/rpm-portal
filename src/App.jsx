@@ -1163,7 +1163,7 @@ function LandingPage({ onEnter, onSelectAthlete }) {
 
 
 
-function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete }) {
+function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason }) {
   const gi = GROUPS[athlete.group];
   const n = norms[athlete.group] || norms.all;
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
@@ -1208,6 +1208,39 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete }) {
           <div style={{ fontSize: 13, color: "#666" }}>{gi.label} {"\u00b7"} {athlete.bw} lbs {"\u00b7"} {athlete.testCount} sessions</div>
         </div>
       </div>
+
+      {offseason && offseason.sessions >= 2 && (<>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 6, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Offseason Progress</div>
+        <div style={{ fontSize: 11, color: "#666", marginBottom: 14 }}>{offseason.sessions} sessions tracked this offseason</div>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12, fontSize: 12 }}>
+          <thead>
+            <tr style={{ borderBottom: "2px solid #ddd" }}>
+              <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
+              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>First Test</th>
+              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Latest Test</th>
+              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '"', decimals: 1 },
+              { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "", decimals: 2 },
+              { label: "Peak Power / BM", first: offseason.ppFirst, last: offseason.ppLast, change: offseason.ppChange, unit: " W/kg", decimals: 1 },
+              { label: "Ecc Braking RFD", first: offseason.brkFirst, last: offseason.brkLast, change: offseason.brkChange, unit: " N/s", decimals: 0 },
+            ].filter(m => m.first > 0 && m.last > 0).map((m, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
+                <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{m.decimals > 0 ? m.last.toFixed(m.decimals) : m.last.toLocaleString()}{m.unit}</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700, color: m.change > 0 ? "#16a34a" : m.change < 0 ? "#dc2626" : "#666" }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{ borderTop: "1px dashed #ccc", marginBottom: 24, paddingTop: 4 }}>
+          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>Percentile Rankings</div>
+        </div>
+      </>)}
 
       <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Countermovement Jump (CMJ)</div>
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
@@ -2007,6 +2040,7 @@ export default function App() {
             hopAthlete={HOP_ATHLETES.find(a => a.name === sel.name)}
             hopNorms={HOP_NORMS}
             veloAthlete={VELO_BY_NAME[sel.name] || null}
+            offseason={OFFSEASON.find(o => o.name === sel.name)}
           />
         </div>
       )}
