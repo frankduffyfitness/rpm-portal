@@ -158,8 +158,15 @@ for pid, ath in fd['athletes'].items():
         'sessions': sessions,
     })
 # Filter out statistical outlier sessions (misreads)
+# Override list: {athlete_name: [metrics to skip]}
+OUTLIER_OVERRIDES = {
+    "Rocco Rossi": ["rsi"],
+}
 for ath in athletes_data:
+    skip = OUTLIER_OVERRIDES.get(ath['name'], [])
     for metric in ['jh', 'rsi', 'pp', 'brk']:
+        if metric in skip:
+            continue
         vals = [s[metric] for s in ath['sessions'] if s.get(metric) is not None]
         if len(vals) >= 5:
             mean = sum(vals) / len(vals)
