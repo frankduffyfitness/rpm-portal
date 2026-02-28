@@ -1209,10 +1209,36 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         </div>
       </div>
 
-      {offseason && offseason.sessions >= 2 && (<>
+      {offseason && offseason.sessions >= 2 && (() => {
+        const dates = SESSION_DATES[athlete.name] || [];
+        const firstDate = dates.length > 0 ? dates[0] : "";
+        const lastDate = dates.length > 0 ? dates[dates.length - 1] : "";
+        const bw = BW_DATA[athlete.name];
+        const isFemale = athlete.group === "fem";
+        const metrics = [
+          { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '"', decimals: 1 },
+          { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "", decimals: 2 },
+          { label: "Peak Power / BM", first: offseason.ppFirst, last: offseason.ppLast, change: offseason.ppChange, unit: " W/kg", decimals: 1 },
+          { label: "Ecc Braking RFD", first: offseason.brkFirst, last: offseason.brkLast, change: offseason.brkChange, unit: " N/s", decimals: 0 },
+        ].filter(m => m.first > 0 && m.last > 0);
+        const improved = metrics.filter(m => m.change > 0);
+        const declined = metrics.filter(m => m.change < 0);
+        const bwChange = bw && !isFemale ? bw.change : null;
+
+        return (<>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 6, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Offseason Progress</div>
-        <div style={{ fontSize: 11, color: "#666", marginBottom: 14 }}>{offseason.sessions} sessions tracked this offseason</div>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12, fontSize: 12 }}>
+        <div style={{ fontSize: 11, color: "#666", marginBottom: 6 }}>{offseason.sessions} sessions tracked {firstDate && lastDate ? <span>from <strong>{firstDate}</strong> to <strong>{lastDate}</strong></span> : "this offseason"}</div>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          {metrics.map((m, i) => (
+            <div key={i} style={{ flex: 1, background: m.change > 0 ? "#f0fdf4" : m.change < 0 ? "#fef2f2" : "#f9fafb", borderRadius: 8, padding: "10px 8px", textAlign: "center", border: "1px solid " + (m.change > 0 ? "#bbf7d0" : m.change < 0 ? "#fecaca" : "#e5e7eb") }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: m.change > 0 ? "#16a34a" : m.change < 0 ? "#dc2626" : "#666" }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</div>
+              <div style={{ fontSize: 9, color: "#666", marginTop: 2 }}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16, fontSize: 12 }}>
           <thead>
             <tr style={{ borderBottom: "2px solid #ddd" }}>
               <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
@@ -1222,12 +1248,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             </tr>
           </thead>
           <tbody>
-            {[
-              { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '"', decimals: 1 },
-              { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "", decimals: 2 },
-              { label: "Peak Power / BM", first: offseason.ppFirst, last: offseason.ppLast, change: offseason.ppChange, unit: " W/kg", decimals: 1 },
-              { label: "Ecc Braking RFD", first: offseason.brkFirst, last: offseason.brkLast, change: offseason.brkChange, unit: " N/s", decimals: 0 },
-            ].filter(m => m.first > 0 && m.last > 0).map((m, i) => (
+            {metrics.map((m, i) => (
               <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
                 <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
                 <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</td>
@@ -1237,10 +1258,34 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             ))}
           </tbody>
         </table>
-        <div style={{ borderTop: "1px dashed #ccc", marginBottom: 24, paddingTop: 4 }}>
-          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>Percentile Rankings</div>
+
+        {!isFemale && bw && bw.history.length >= 2 && (
+          <div style={{ background: "#f9fafb", borderRadius: 8, padding: "12px 16px", marginBottom: 16, border: "1px solid #e5e7eb" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>Bodyweight</div>
+                <div style={{ fontSize: 11, color: "#666" }}>{bw.history[0]} lbs \u2192 {bw.current} lbs</div>
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: bwChange > 0 ? "#16a34a" : bwChange < 0 ? "#dc2626" : "#666" }}>{bwChange > 0 ? "+" : ""}{bwChange} lbs</div>
+            </div>
+          </div>
+        )}
+
+        <div style={{ background: "#f9fafb", borderRadius: 8, padding: "14px 16px", marginBottom: 16, border: "1px solid #e5e7eb", fontSize: 12, lineHeight: 1.8, color: "#333" }}>
+          <div style={{ fontWeight: 700, color: "#111", marginBottom: 6 }}>Summary</div>
+          <div>
+            {athlete.name.split(" ")[0]} has completed <strong>{offseason.sessions} testing sessions</strong> this offseason{firstDate && lastDate ? <span>, spanning from {firstDate} to {lastDate}</span> : ""}.
+            {improved.length > 0 && <span> Improvements were seen in <strong>{improved.map(m => m.label).join(", ")}</strong>, increasing by {improved.map(m => "+" + m.change.toFixed(1) + "%").join(", ")} respectively.</span>}
+            {declined.length > 0 && <span> {improved.length > 0 ? "However, " : ""}<strong>{declined.map(m => m.label).join(", ")}</strong> declined by {declined.map(m => m.change.toFixed(1) + "%").join(", ")}.</span>}
+            {!isFemale && bwChange !== null && bwChange !== 0 && <span> Bodyweight {bwChange > 0 ? "increased" : "decreased"} by {Math.abs(bwChange)} lbs over this period.</span>}
+          </div>
         </div>
-      </>)}
+
+        <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
+          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>Percentile Rankings on next page</div>
+        </div>
+      </>);
+      })()}
 
       <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Countermovement Jump (CMJ)</div>
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
