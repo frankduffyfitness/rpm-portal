@@ -157,6 +157,18 @@ for pid, ath in fd['athletes'].items():
         'initials': get_initials(name),
         'sessions': sessions,
     })
+# Filter out statistical outlier sessions (misreads)
+for ath in athletes_data:
+    for metric in ['jh', 'rsi', 'pp', 'brk']:
+        vals = [s[metric] for s in ath['sessions'] if s.get(metric) is not None]
+        if len(vals) >= 5:
+            mean = sum(vals) / len(vals)
+            std = (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
+            if std > 0:
+                for s in ath['sessions']:
+                    if s.get(metric) is not None and abs(s[metric] - mean) > 3 * std:
+                        s[metric] = None
+
 # Filter out athletes with no test in the last 6 weeks
 athletes_data = [a for a in athletes_data if a['sessions'][0]['date'] >= ACTIVE_CUTOFF]
 # Sort athletes by name
