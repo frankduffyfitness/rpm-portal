@@ -607,6 +607,11 @@ print(f"\nWritten to portal_data_arrays.js ({os.path.getsize('portal_data_arrays
 
 # ─── Now splice into App.jsx ─────────────────────────────────────────────────
 
+# Update LAST_UPDATED date
+import re
+today_str = datetime.now().strftime('%B %-d, %Y')
+jsx = re.sub(r'const LAST_UPDATED = ".*?";', f'const LAST_UPDATED = "{today_str}";', jsx)
+
 # Find where each const is defined and replace it
 replacements = {
     '_A': _A, '_T': _T, '_PB': _PB, '_WM': _WM, '_MH': _MH,
