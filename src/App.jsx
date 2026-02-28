@@ -194,6 +194,7 @@ function IT({ metricKey, children }) {
 
 function SL({ data, color = "#4FFFB0", width = 140, height = 44, dates, unit = "" }) {
   const [hover, setHover] = useState(null);
+  const [hoverPct, setHoverPct] = useState(0);
   const ref = useRef(null);
   if (!data || data.length < 2) return null;
   const mn = Math.min(...data) * 0.93, mx = Math.max(...data) * 1.07, rg = mx - mn || 1;
@@ -212,6 +213,7 @@ function SL({ data, color = "#4FFFB0", width = 140, height = 44, dates, unit = "
       if (d < minDist) { minDist = d; closest = i; }
     });
     setHover(closest);
+    setHoverPct((clientX - rect.left) / rect.width * 100);
   }
 
   return (
@@ -230,7 +232,7 @@ function SL({ data, color = "#4FFFB0", width = 140, height = 44, dates, unit = "
         {hover != null && <line x1={pts[hover].x} y1="0" x2={pts[hover].x} y2={height} stroke={color} strokeOpacity="0.2" strokeWidth="1" />}
       </svg>
       {hover != null && (
-        <div style={{ position: "absolute", top: -32, left: Math.min(Math.max(pts[hover].x / width * 100, 15), 85) + "%", transform: "translateX(-50%)", background: "#1E2128", border: "1px solid " + color + "30", borderRadius: 8, padding: "4px 8px", whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", top: -32, left: Math.min(Math.max(hoverPct, 8), 92) + "%", transform: "translateX(-50%)", background: "#1E2128", border: "1px solid " + color + "30", borderRadius: 8, padding: "4px 8px", whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none" }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: color }}>{data[hover]}{unit}</span>
           {dates && dates[hover] && <span style={{ fontSize: 9, color: "#6B7280", marginLeft: 6 }}>{dates[hover]}</span>}
         </div>
@@ -313,6 +315,7 @@ function PR({ metrics, gc }) {
       if (d < minDist) { minDist = d; closest = i; }
     });
     setHover(closest);
+    setHoverPct((clientX - rect.left) / rect.width * 100);
   }
 
   return (
