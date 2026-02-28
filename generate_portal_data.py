@@ -12,7 +12,7 @@ import statistics
 
 PORTAL_JSON = sys.argv[1] if len(sys.argv) > 1 else "forcedecks_portal.json"
 CURRENT_JSX = sys.argv[2] if len(sys.argv) > 2 else "App.jsx"
-ACTIVE_CUTOFF = datetime(2026, 1, 1)
+ACTIVE_CUTOFF = datetime.now() - timedelta(days=42)
 MIN_SESSIONS = 5
 HISTORY_LEN = 8  # last 8 sessions for sparklines
 
@@ -157,7 +157,8 @@ for pid, ath in fd['athletes'].items():
         'initials': get_initials(name),
         'sessions': sessions,
     })
-
+# Filter out athletes with no test in the last 6 weeks
+athletes_data = [a for a in athletes_data if a['sessions'][0]['date'] >= ACTIVE_CUTOFF]
 # Sort athletes by name
 athletes_data.sort(key=lambda a: a['name'])
 
