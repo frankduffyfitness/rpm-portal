@@ -1321,6 +1321,11 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         </div>
 
         <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
+          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>{hopTrend && hopTrend.sessions >= 2 ? "Hop Test Progress on next page" : "Percentile Rankings on next page"}</div>
+        </div>
+      </>);
+      })()}
+
       {hopTrend && hopTrend.sessions >= 2 && (() => {
         const hopDates = HOP_SESSION_DATES[athlete.name] || [];
         const hopFirstDate = hopDates.length > 0 ? hopDates[0] : "";
