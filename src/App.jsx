@@ -1321,11 +1321,6 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         </div>
 
         <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
-          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>{hopTrend && hopTrend.sessions >= 2 ? "Hop Test Progress on next page" : "Percentile Rankings on next page"}</div>
-        </div>
-      </>);
-      })()}
-
       {hopTrend && hopTrend.sessions >= 2 && (() => {
         const hopDates = HOP_SESSION_DATES[athlete.name] || [];
         const hopFirstDate = hopDates.length > 0 ? hopDates[0] : "";
@@ -1340,6 +1335,28 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
           { label: "Flight Time", first: hopTrend.ft_first, last: hopTrend.ft_last, change: hopTrend.ft_change, unit: " ms", decimals: 0, invert: false },
           { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms", decimals: 0, invert: true },
         ].filter(m => m.first > 0 && m.last > 0);
+        const hopImproved = hopMetricsData.filter(m => m.invert ? m.change < 0 : m.change > 0);
+        const hopDeclined = hopMetricsData.filter(m => m.invert ? m.change > 0 : m.change < 0);
+
+        const sparkW = 280;
+        const sparkH = 35;
+        function miniChart(history, color) {
+          if (!history || history.length < 2) return null;
+          const mn = Math.min(...history) * 0.95;
+          const mx = Math.max(...history) * 1.05;
+          const rg = mx - mn || 1;
+          const pts = history.map((v, j) => ({ x: (j / Math.max(1, history.length - 1)) * sparkW, y: sparkH - ((v - mn) / rg) * sparkH }));
+          const pathD = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+          const areaD = pathD + " L" + sparkW + "," + sparkH + " L0," + sparkH + " Z";
+          return (
+            <svg width={sparkW} height={sparkH} viewBox={"0 0 " + sparkW + " " + sparkH} style={{ display: "block", width: "100%" }}>
+              <path d={areaD} fill={color + "20"} />
+              <path d={pathD} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx={pts[0].x} cy={pts[0].y} r="3" fill={color} />
+              <circle cx={pts[pts.length-1].x} cy={pts[pts.length-1].y} r="3" fill={color} />
+            </svg>
+          );
+        }
 
         return (<>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 4, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Hop Test Progress</div>
@@ -1353,11 +1370,10 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
           const isBad = m.invert ? m.change > 0 : m.change < 0;
           const arrow = isGood ? "\u2191" : isBad ? "\u2193" : "\u2192";
           const changeColor = isGood ? "#16a34a" : isBad ? "#dc2626" : "#666";
-          const displayChange = m.invert ? -m.change : m.change;
           return (
             <div key={i} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: i < hopMetricsData.length - 1 ? "1px solid #f0f0f0" : "none" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>{m.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>{m.label}{hopAthlete && hopAthlete.best && <span style={{ fontSize: 10, fontWeight: 400, color: "#999", marginLeft: 8 }}>Best: {m.decimals > 0 ? (m.label === "RSI" ? hopAthlete.best.rsi : m.label === "Flight Time" ? hopAthlete.best.ft : hopAthlete.best.ct) : (m.label === "RSI" ? hopAthlete.best.rsi : m.label === "Flight Time" ? hopAthlete.best.ft : hopAthlete.best.ct)}{m.unit}</span>}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: changeColor }}>{arrow}</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: changeColor }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</span>
@@ -1385,6 +1401,34 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             </div>
           );
         })}
+
+        {hopAthlete && (
+          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+            {[
+              { label: "RSI", history: hopAthlete.rsiHistory, color: "#FF6B6B" },
+              { label: "Flight Time", history: hopAthlete.ftHistory, color: "#60A5FA" },
+              { label: "Contact Time", history: hopAthlete.ctHistory, color: "#4FFFB0" },
+            ].map((c, i) => c.history && c.history.length >= 2 && (
+              <div key={i} style={{ flex: 1, background: "#f9fafb", borderRadius: 8, padding: "10px 12px", border: "1px solid #e5e7eb" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#555", marginBottom: 6 }}>{c.label} Trend</div>
+                {miniChart(c.history, c.color)}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: "#aaa", marginTop: 2 }}>
+                  <span>{hopFirstDate}</span>
+                  <span>{hopLastDate}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ background: "#f9fafb", borderRadius: 8, padding: "14px 16px", marginBottom: 16, border: "1px solid #e5e7eb", fontSize: 12, lineHeight: 1.8, color: "#333" }}>
+          <div style={{ fontWeight: 700, color: "#111", marginBottom: 6 }}>Summary</div>
+          <div>
+            {athlete.name.split(" ")[0]} has completed <strong>{hopTrend.sessions} hop test sessions</strong> this offseason{hopFirstDate && hopLastDate ? <span>, spanning from {hopFirstDate} to {hopLastDate}</span> : ""}.
+            {hopImproved.length > 0 && <span> Improvements were seen in <strong>{hopImproved.map(m => m.label).join(", ")}</strong>, {hopImproved.length === 1 ? "changing" : "changing"} by {hopImproved.map(m => (m.invert ? "" : "+") + m.change.toFixed(1) + "%").join(", ")} respectively.</span>}
+            {hopDeclined.length > 0 && <span> {hopImproved.length > 0 ? "However, " : ""}<strong>{hopDeclined.map(m => m.label).join(", ")}</strong> {hopDeclined.length === 1 ? "moved" : "moved"} by {hopDeclined.map(m => (m.change > 0 ? "+" : "") + m.change.toFixed(1) + "%").join(", ")}.</span>}
+          </div>
+        </div>
 
         <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
           <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>Percentile Rankings on next page</div>
