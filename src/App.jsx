@@ -1340,7 +1340,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
 
         const sparkW = 280;
         const sparkH = 35;
-        function miniChart(history, color) {
+        const miniChart = (history, color) => {
           if (!history || history.length < 2) return null;
           const mn = Math.min(...history) * 0.95;
           const mx = Math.max(...history) * 1.05;
