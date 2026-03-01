@@ -87,8 +87,15 @@ def fetch_tests(token, modified_from="2020-01-01T00:00:00Z"):
         time.sleep(RATE_LIMIT_PAUSE)
         resp = requests.get(f"{FORCEDECKS_BASE}/tests", headers=H(token),
             params={"tenantId": TENANT_ID, "modifiedFromUtc": cursor}, timeout=30)
-        resp.raise_for_status()
-        tests = resp.json().get("tests", [])
+        if resp.status_code != 200:
+            log(f"  ERROR: API returned {resp.status_code}: {resp.text[:200]}")
+            resp.raise_for_status()
+        try:
+            tests = resp.json().get("tests", [])
+        except Exception as e:
+            log(f"  ERROR: Failed to parse JSON: {e}")
+            log(f"  Response content: {resp.text[:300]}")
+            raise
         if not tests:
             break
         all_tests.extend(tests)
