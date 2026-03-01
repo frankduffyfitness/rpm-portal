@@ -1166,7 +1166,7 @@ function LandingPage({ onEnter, onSelectAthlete }) {
 
 
 
-function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason }) {
+function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend }) {
   const gi = GROUPS[athlete.group];
   const n = norms[athlete.group] || norms.all;
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
@@ -1319,6 +1319,72 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             {!isFemale && bwChange !== null && bwChange !== 0 && <span> Bodyweight {bwChange > 0 ? "increased" : "decreased"} by {Math.abs(bwChange)} lbs over this period.</span>}
           </div>
         </div>
+
+        <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
+          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>{hopTrend && hopTrend.sessions >= 2 ? "Hop Test Progress on next page" : "Percentile Rankings on next page"}</div>
+        </div>
+      </>);
+      })()}
+
+      {hopTrend && hopTrend.sessions >= 2 && (() => {
+        const hopDates = HOP_SESSION_DATES[athlete.name] || [];
+        const hopFirstDate = hopDates.length > 0 ? hopDates[0] : "";
+        const hopLastDate = hopDates.length > 0 ? hopDates[hopDates.length - 1] : "";
+        const hopDescs = {
+          "RSI": "Reactive Strength Index measures how efficiently the athlete converts ground contact into flight. Calculated as flight time divided by contact time, it reflects elastic and reactive ability \u2014 essential for sprinting, jumping, and change of direction.",
+          "Flight Time": "The duration the athlete is airborne between hops. Longer flight times with short ground contact indicate greater force production and explosive ability during rapid, repeated movements.",
+          "Contact Time": "How long the foot stays on the ground between hops. Shorter contact times while maintaining flight time demonstrate better lower-limb stiffness and reactive strength \u2014 critical for speed and agility.",
+        };
+        const hopMetricsData = [
+          { label: "RSI", first: hopTrend.rsi_first, last: hopTrend.rsi_last, change: hopTrend.rsi_change, unit: "", decimals: 2, invert: false },
+          { label: "Flight Time", first: hopTrend.ft_first, last: hopTrend.ft_last, change: hopTrend.ft_change, unit: " ms", decimals: 0, invert: false },
+          { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms", decimals: 0, invert: true },
+        ].filter(m => m.first > 0 && m.last > 0);
+
+        return (<>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 4, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Hop Test Progress</div>
+        <div style={{ fontSize: 11, color: "#666", marginBottom: 16 }}>{hopTrend.sessions} sessions tracked {hopFirstDate && hopLastDate ? <span>from <strong>{hopFirstDate}</strong> to <strong>{hopLastDate}</strong></span> : "this offseason"}</div>
+
+        {hopMetricsData.map((m, i) => {
+          const maxVal = Math.max(m.first, m.last);
+          const firstPct = maxVal > 0 ? (m.first / maxVal) * 100 : 0;
+          const lastPct = maxVal > 0 ? (m.last / maxVal) * 100 : 0;
+          const isGood = m.invert ? m.change < 0 : m.change > 0;
+          const isBad = m.invert ? m.change > 0 : m.change < 0;
+          const arrow = isGood ? "\u2191" : isBad ? "\u2193" : "\u2192";
+          const changeColor = isGood ? "#16a34a" : isBad ? "#dc2626" : "#666";
+          const displayChange = m.invert ? -m.change : m.change;
+          return (
+            <div key={i} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: i < hopMetricsData.length - 1 ? "1px solid #f0f0f0" : "none" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>{m.label}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: changeColor }}>{arrow}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: changeColor }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</span>
+                </div>
+              </div>
+              <div style={{ fontSize: 10, color: "#666", lineHeight: 1.5, marginBottom: 8 }}>{hopDescs[m.label]}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>First</span>
+                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: firstPct + "%", background: "#c7d2fe", borderRadius: 4 }} />
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#888", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>Now</span>
+                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: lastPct + "%", background: isGood ? "#86efac" : isBad ? "#fca5a5" : "#d1d5db", borderRadius: 4 }} />
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#111", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.last.toFixed(m.decimals) : m.last.toLocaleString()}{m.unit}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
 
         <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
           <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>Percentile Rankings on next page</div>
@@ -2125,6 +2191,7 @@ export default function App() {
             hopNorms={HOP_NORMS}
             veloAthlete={VELO_BY_NAME[sel.name] || null}
             offseason={OFFSEASON.find(o => o.name === sel.name)}
+            hopTrend={HOP_TRENDS.find(t => t.name === sel.name)}
           />
         </div>
       )}
