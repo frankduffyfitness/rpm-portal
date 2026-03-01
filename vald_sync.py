@@ -87,6 +87,9 @@ def fetch_tests(token, modified_from="2020-01-01T00:00:00Z"):
         time.sleep(RATE_LIMIT_PAUSE)
         resp = requests.get(f"{FORCEDECKS_BASE}/tests", headers=H(token),
             params={"tenantId": TENANT_ID, "modifiedFromUtc": cursor}, timeout=30)
+        if resp.status_code == 204:
+            log(f"  No new data (HTTP 204)")
+            break
         if resp.status_code != 200:
             log(f"  ERROR: API returned {resp.status_code}: {resp.text[:200]}")
             resp.raise_for_status()
