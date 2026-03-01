@@ -1327,25 +1327,24 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
       })()}
 
       <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Countermovement Jump (CMJ)</div>
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
-        <colgroup><col style={{width:"30%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/></colgroup>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
         <thead>
           <tr style={{ borderBottom: "2px solid #ddd" }}>
-            <th style={{ textAlign: "left", padding: "8px 8px", fontWeight: 700 }}>Metric</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Current</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Best Ever</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Percentile</th>
-            <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Rating</th>
+            <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
+            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Current</th>
+            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Best Ever</th>
+            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Percentile</th>
+            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Rating</th>
           </tr>
         </thead>
         <tbody>
           {cmjMetrics.map((m, i) => (
             <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-              <td style={{ padding: "10px 8px", fontWeight: 600 }}>{m.label}</td>
-              <td style={{ padding: "10px 8px", textAlign: "center" }}>{m.value}</td>
-              <td style={{ padding: "10px 8px", textAlign: "center", color: "#888" }}>{m.best}</td>
-              <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
-              <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
+              <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
+              <td style={{ padding: "10px 0", textAlign: "center" }}>{m.value}</td>
+              <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.best}</td>
+              <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
+              <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
             </tr>
           ))}
         </tbody>
@@ -1353,7 +1352,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
 
       {hopMetrics && (<>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Repeated Hop Test</div>
-        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
           <thead>
             <tr style={{ borderBottom: "2px solid #ddd" }}>
               <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
@@ -1366,11 +1365,11 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
           <tbody>
             {hopMetrics.map((m, i) => (
               <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 8px", fontWeight: 600 }}>{m.label}</td>
-                <td style={{ padding: "10px 8px", textAlign: "center" }}>{m.value}</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", color: "#888" }}>{m.best}</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
+                <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
+                <td style={{ padding: "10px 0", textAlign: "center" }}>{m.value}</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.best}</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
               </tr>
             ))}
           </tbody>
@@ -1381,31 +1380,30 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
       {veloAthlete && (
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Fastball Velocity (TrackMan)</div>
-          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
-            <colgroup><col style={{width:"30%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/><col style={{width:"17.5%"}}/></colgroup>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
             <thead>
               <tr style={{ borderBottom: "2px solid #ddd" }}>
-                <th style={{ textAlign: "left", padding: "8px 8px", fontWeight: 700 }}>Metric</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Latest</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Peak Ever</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Avg Peak</th>
-                <th style={{ textAlign: "center", padding: "8px 8px", fontWeight: 700 }}>Trend</th>
+                <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Latest</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Peak Ever</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Avg Peak</th>
+                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Trend</th>
               </tr>
             </thead>
             <tbody>
               <tr style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 8px", fontWeight: 600 }}>Peak FB Velo</td>
-                <td style={{ padding: "10px 8px", textAlign: "center" }}>{veloAthlete.latestPeak} mph</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700 }}>{veloAthlete.peakEver} mph</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", color: "#888" }}>{veloAthlete.avgPeak} mph</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 600, color: veloAthlete.trend > 0 ? "#16a34a" : veloAthlete.trend < 0 ? "#dc2626" : "#666" }}>{veloAthlete.trend > 0 ? "+" : ""}{veloAthlete.trend} mph</td>
+                <td style={{ padding: "10px 0", fontWeight: 600 }}>Peak FB Velo</td>
+                <td style={{ padding: "10px 0", textAlign: "center" }}>{veloAthlete.latestPeak} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{veloAthlete.peakEver} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.avgPeak} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: veloAthlete.trend > 0 ? "#16a34a" : veloAthlete.trend < 0 ? "#dc2626" : "#666" }}>{veloAthlete.trend > 0 ? "+" : ""}{veloAthlete.trend} mph</td>
               </tr>
               <tr style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 8px", fontWeight: 600 }}>Avg FB Velo</td>
-                <td style={{ padding: "10px 8px", textAlign: "center" }}>{veloAthlete.latestAvg} mph</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", color: "#888" }}>{veloAthlete.avgAvg} mph</td>
-                <td style={{ padding: "10px 8px", textAlign: "center", color: "#888" }}></td>
-                <td style={{ padding: "10px 8px", textAlign: "center", color: "#888" }}>{veloAthlete.sessions} sessions</td>
+                <td style={{ padding: "10px 0", fontWeight: 600 }}>Avg FB Velo</td>
+                <td style={{ padding: "10px 0", textAlign: "center" }}>{veloAthlete.latestAvg} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.avgAvg} mph</td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}></td>
+                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.sessions} sessions</td>
               </tr>
             </tbody>
           </table>
