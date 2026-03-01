@@ -1327,7 +1327,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
       })()}
 
       <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Countermovement Jump (CMJ)</div>
-      <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
         <thead>
           <tr style={{ borderBottom: "2px solid #ddd" }}>
             <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
@@ -1352,7 +1352,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
 
       {hopMetrics && (<>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Repeated Hop Test</div>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
           <thead>
             <tr style={{ borderBottom: "2px solid #ddd" }}>
               <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
@@ -1380,7 +1380,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
       {veloAthlete && (
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Fastball Velocity (TrackMan)</div>
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
             <thead>
               <tr style={{ borderBottom: "2px solid #ddd" }}>
                 <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
