@@ -256,7 +256,46 @@ def main():
             log(f"  Progress: {i + 1}/{len(tests)} tests")
     log(f"All {len(tests)} tests processed.")
     log("Building portal data (8 metrics only)...")
-    portal_data = build_portal_data(profiles, tests, trials_by_test)
+    new_portal_data = build_portal_data(profiles, tests, trials_by_test)
+
+    # Merge with existing data on incremental syncs
+    if not full_sync and os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE) as f:
+                existing = json.load(f)
+            existing_athletes = existing.get("athletes", {})
+            new_athletes = new_portal_data.get("athletes", {})
+            log(f"Merging {len(new_athletes)} updated athletes into {len(existing_athletes)} existing...")
+            for pid, ath in new_athletes.items():
+                if pid in existing_athletes:
+                    # Merge new tests into existing athlete
+                    existing_dates = {t["date"] for t in existing_athletes[pid]["tests"]}
+                    for t in ath["tests"]:
+                        if t["date"] not in existing_dates:
+                            existing_athletes[pid]["tests"].append(t)
+                    existing_athletes[pid]["tests"].sort(key=lambda t: t["date"], reverse=True)
+                    # Update name/DOB in case it changed
+                    existing_athletes[pid]["name"] = ath["name"]
+                    existing_athletes[pid]["dateOfBirth"] = ath["dateOfBirth"]
+                else:
+                    existing_athletes[pid] = ath
+            total_tests = sum(len(a["tests"]) for a in existing_athletes.values())
+            portal_data = {
+                "meta": {
+                    "syncDate": new_portal_data["meta"]["syncDate"],
+                    "totalAthletes": len(existing_athletes),
+                    "totalTests": total_tests,
+                    "totalTrials": new_portal_data["meta"]["totalTrials"],
+                },
+                "athletes": existing_athletes,
+            }
+            log(f"Merged: {len(existing_athletes)} athletes, {total_tests} tests")
+        except (json.JSONDecodeError, KeyError) as e:
+            log(f"WARNING: Could not merge with existing data ({e}), using new data only")
+            portal_data = new_portal_data
+    else:
+        portal_data = new_portal_data
+
     with open(OUTPUT_FILE, "w") as f:
         json.dump(portal_data, f, separators=(',', ':'), default=str)
     file_size_mb = os.path.getsize(OUTPUT_FILE) / (1024 * 1024)
