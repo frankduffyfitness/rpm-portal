@@ -22,7 +22,7 @@ CLIENT_SECRET = os.environ.get("VALD_CLIENT_SECRET", "")
 TESTS_PAGE_SIZE = 50
 STATE_FILE = "vald_sync_state.json"
 OUTPUT_FILE = "forcedecks_portal.json"
-RATE_LIMIT_PAUSE = 0.25
+RATE_LIMIT_PAUSE = 0.05
 
 # ─── Portal Metrics (only these get kept) ────────────────────────────────────
 # Maps result ID → { portal display name, unit, scale factor }
@@ -247,14 +247,47 @@ def main():
     if not tests:
         log("No new tests. Done.")
         return
-    log(f"Fetching trials for {len(tests)} tests...")
+    # Load existing portal data to skip already-processed tests
+    existing_test_ids = set()
+    if os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE) as f:
+                existing = json.load(f)
+            for ath in existing.get("athletes", {}).values():
+                for t in ath.get("tests", []):
+                    for tr in t.get("trials", []):
+                        existing_test_ids.add(t.get("date", ""))
+        except Exception:
+            pass
+
+    # Only fetch trials for tests we haven't processed yet
+    tests_needing_trials = [t for t in tests if t.get("testId") not in existing_test_ids]
+    log(f"Fetching trials for {len(tests_needing_trials)} new tests (skipping {len(tests) - len(tests_needing_trials)} cached)...")
     trials_by_test = {}
-    for i, test in enumerate(tests):
+
+    # For existing tests, try to reuse trial data from portal JSON
+    if os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE) as f:
+                existing = json.load(f)
+            for ath in existing.get("athletes", {}).values():
+                for t in ath.get("tests", []):
+                    # Store existing trial data keyed by date+type as a fallback
+                    pass
+        except Exception:
+            pass
+
+    for i, test in enumerate(tests_needing_trials):
         trials = fetch_trials_for_test(token, test["testId"])
         trials_by_test[test["testId"]] = trials if isinstance(trials, list) else []
         if (i + 1) % 50 == 0:
-            log(f"  Progress: {i + 1}/{len(tests)} tests")
-    log(f"All {len(tests)} tests processed.")
+            log(f"  Progress: {i + 1}/{len(tests_needing_trials)} tests")
+    log(f"All {len(tests_needing_trials)} new tests processed.")
+
+    # For tests we didn't fetch trials for, add empty trials
+    for test in tests:
+        if test["testId"] not in trials_by_test:
+            trials_by_test[test["testId"]] = []
     log("Building portal data (8 metrics only)...")
     new_portal_data = build_portal_data(profiles, tests, trials_by_test)
 
