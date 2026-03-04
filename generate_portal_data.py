@@ -46,7 +46,17 @@ def extract_groups_from_jsx(jsx):
 
 GROUP_MAP = extract_groups_from_jsx(jsx)
 
+# Manual group overrides (VALD doesn't store group info)
+GROUP_OVERRIDES = {
+    "Nick Padilla": "pro",
+    "Matt Bowman": "pro",
+    "Julian Minaya": "pro",
+    "Mike Sirota": "pro",
+}
+
 def get_group(name):
+    if name in GROUP_OVERRIDES:
+        return GROUP_OVERRIDES[name]
     return GROUP_MAP.get(name, "hs")  # default to hs if unknown
 
 def get_initials(name):
