@@ -67,6 +67,15 @@ def compute_session_avg(trials, metric_key):
             vals.append(v)
     return round(sum(vals) / len(vals), 2) if vals else None
 
+def compute_session_best(trials, metric_key):
+    """Best (max) of a metric across all trials in a test."""
+    vals = []
+    for tr in trials:
+        v = tr['metrics'].get(metric_key)
+        if v is not None:
+            vals.append(v)
+    return round(max(vals), 2) if vals else None
+
 def compute_session_brk_avg(trials):
     """Average of (Left + Right) braking RFD across all trials."""
     vals = []
@@ -127,9 +136,9 @@ for pid, ath in fd['athletes'].items():
         except:
             continue
         
-        jh = compute_session_avg(test['trials'], 'jumpHeight')
-        rsi = compute_session_avg(test['trials'], 'rsiModified')
-        pp = compute_session_avg(test['trials'], 'relativePower')
+        jh = compute_session_best(test['trials'], 'jumpHeight')
+        rsi = compute_session_best(test['trials'], 'rsiModified')
+        pp = compute_session_best(test['trials'], 'relativePower')
         brk = compute_session_brk_avg(test['trials'])
         bw = compute_session_avg(test['trials'], 'bodyweightLbs')
         
