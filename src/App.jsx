@@ -618,9 +618,9 @@ function PRSection({ filterGroup, onSelect }) {
     return list;
   }, [filterGroup]);
 
-  const metricLabels = { JH: "Jump Height", RSI: "RSI-mod", PP: "Power/BM" };
-  const metricColors = { JH: "#4FFFB0", RSI: "#FF6B6B", PP: "#60A5FA" };
-  const metricUnits = { JH: '"', RSI: "", PP: " W/kg" };
+  const metricLabels = { JH: "Jump Height", RSI: "RSI-mod", PP: "Power/BM", BRK: "Braking RFD" };
+  const metricColors = { JH: "#4FFFB0", RSI: "#FF6B6B", PP: "#60A5FA", BRK: "#FFB020" };
+  const metricUnits = { JH: '"', RSI: "", PP: " W/kg", BRK: " N/s" };
 
   if (!data.length) return <div style={{ fontSize: 12, color: "#6B7280", textAlign: "center", padding: 40 }}>No new personal bests this session. Check back after the next round of testing!</div>;
 
