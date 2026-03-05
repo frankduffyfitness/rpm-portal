@@ -46,6 +46,9 @@ def extract_groups_from_jsx(jsx):
 
 GROUP_MAP = extract_groups_from_jsx(jsx)
 
+# Athletes to exclude from portal
+EXCLUDE_ATHLETES = {"Liam Murphy"}
+
 # Manual group overrides (VALD doesn't store group info)
 GROUP_OVERRIDES = {
     "Nick Padilla": "pro",
