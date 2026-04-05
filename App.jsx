@@ -22,7 +22,7 @@ const GROUPS = {
   stf: { label: "Staff", shortLabel: "STF", color: "#8A8F98" },
 };
 
-const LAST_UPDATED = "April 4, 2026";
+const LAST_UPDATED = "April 5, 2026";
 
 const ATHLETES = _A.map((a, i) => {
   const pb = _PB[i] || [];
