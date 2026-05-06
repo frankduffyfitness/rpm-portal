@@ -16,6 +16,7 @@ TENANT_ID = "3127f695-175f-4b63-8331-f1295a34cd51"
 AUTH_URL = "https://auth.prd.vald.com/oauth/token"
 FORCEDECKS_BASE = "https://prd-use-api-extforcedecks.valdperformance.com"
 PROFILES_BASE = "https://prd-use-api-externalprofile.valdperformance.com"
+TENANTS_BASE = "https://prd-use-api-externaltenants.valdperformance.com"
 AUTH_AUDIENCE = "vald-api-external"
 CLIENT_ID = os.environ.get("VALD_CLIENT_ID", "jOvajkmerTNoNt1wV4xrtgEizdBCt8Va")
 CLIENT_SECRET = os.environ.get("VALD_CLIENT_SECRET", "")
@@ -62,6 +63,19 @@ def H(token):
     return {"Authorization": f"Bearer {token}"}
 
 
+def fetch_groups(token):
+    """Return {groupId: groupName} for all groups in this tenant."""
+    log("Fetching groups...")
+    resp = requests.get(f"{TENANTS_BASE}/groups",
+        headers=H(token), params={"TenantId": TENANT_ID}, timeout=30)
+    resp.raise_for_status()
+    groups = {}
+    for g in resp.json().get("groups", []):
+        groups[g["id"]] = g.get("name", "")
+    log(f"Total groups: {len(groups)} ({', '.join(groups.values())})")
+    return groups
+
+
 def fetch_profiles(token):
     log("Fetching profiles...")
     resp = requests.get(f"{PROFILES_BASE}/profiles",
@@ -73,9 +87,29 @@ def fetch_profiles(token):
             "givenName": p.get("givenName", ""),
             "familyName": p.get("familyName", ""),
             "dateOfBirth": p.get("dateOfBirth"),
+            "groups": [],  # populated by attach_groups_to_profiles
         }
     log(f"Total profiles: {len(profiles)}")
     return profiles
+
+
+def attach_groups_to_profiles(token, profiles, groups):
+    """For each group, fetch its members and tag each profile with group names.
+    Modifies `profiles` in place."""
+    log("Fetching group memberships...")
+    for group_id, group_name in groups.items():
+        time.sleep(RATE_LIMIT_PAUSE)
+        resp = requests.get(f"{PROFILES_BASE}/profiles",
+            headers=H(token),
+            params={"tenantId": TENANT_ID, "GroupId": group_id, "pageSize": 500},
+            timeout=30)
+        resp.raise_for_status()
+        members = resp.json().get("profiles", [])
+        for p in members:
+            pid = p.get("profileId")
+            if pid in profiles and group_name not in profiles[pid]["groups"]:
+                profiles[pid]["groups"].append(group_name)
+        log(f"  {group_name}: {len(members)} members")
 
 
 def fetch_tests(token, modified_from="2020-01-01T00:00:00Z"):
@@ -172,7 +206,7 @@ def process_trial(trial):
 
 
 def build_portal_data(profiles, tests, trials_by_test):
-    athletes = defaultdict(lambda: {"name": "", "dateOfBirth": None, "tests": []})
+    athletes = defaultdict(lambda: {"name": "", "dateOfBirth": None, "groups": [], "tests": []})
     total_trials = 0
 
     for test in tests:
@@ -182,6 +216,7 @@ def build_portal_data(profiles, tests, trials_by_test):
         ath = athletes[pid]
         ath["name"] = f"{profile.get('givenName', '')} {profile.get('familyName', '')}".strip()
         ath["dateOfBirth"] = profile.get("dateOfBirth")
+        ath["groups"] = profile.get("groups", [])
 
         raw_trials = trials_by_test.get(tid, [])
         trials = []
@@ -238,6 +273,8 @@ def main():
     log("=" * 50)
     token = authenticate()
     profiles = fetch_profiles(token)
+    groups = fetch_groups(token)
+    attach_groups_to_profiles(token, profiles, groups)
     modified_from = "2020-01-01T00:00:00Z" if full_sync else load_sync_state()
     if full_sync:
         log("Full sync requested.")
@@ -307,11 +344,18 @@ def main():
                         if t["date"] not in existing_dates:
                             existing_athletes[pid]["tests"].append(t)
                     existing_athletes[pid]["tests"].sort(key=lambda t: t["date"], reverse=True)
-                    # Update name/DOB in case it changed
+                    # Update name/DOB/groups in case they changed
                     existing_athletes[pid]["name"] = ath["name"]
                     existing_athletes[pid]["dateOfBirth"] = ath["dateOfBirth"]
+                    existing_athletes[pid]["groups"] = ath["groups"]
                 else:
                     existing_athletes[pid] = ath
+            # Refresh groups for athletes who had no new tests this sync
+            # (catches group changes in VALD even without test activity)
+            for pid, profile in profiles.items():
+                if pid in existing_athletes and pid not in new_athletes:
+                    existing_athletes[pid]["groups"] = profile.get("groups", [])
+                    existing_athletes[pid]["name"] = f"{profile.get('givenName','')} {profile.get('familyName','')}".strip() or existing_athletes[pid]["name"]
             total_tests = sum(len(a["tests"]) for a in existing_athletes.values())
             portal_data = {
                 "meta": {
