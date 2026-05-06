@@ -49,7 +49,8 @@ GROUP_MAP = extract_groups_from_jsx(jsx)
 # Athletes to exclude from portal
 EXCLUDE_ATHLETES = {"Liam Murphy"}
 
-# Manual group overrides (VALD doesn't store group info)
+# Manual group overrides — these always win, even over VALD.
+# Keep this for athletes whose VALD group is wrong or who aren't yet in VALD.
 GROUP_OVERRIDES = {
     "Nick Padilla": "pro",
     "Matt Bowman": "pro",
@@ -57,10 +58,39 @@ GROUP_OVERRIDES = {
     "Mike Sirota": "pro",
 }
 
-def get_group(name):
+# Map VALD group names → portal short codes.
+# Edit this if you rename a group in VALD or add a new group.
+VALD_GROUP_TO_CODE = {
+    "Pro":             "pro",
+    "Staff":           "stf",
+    "College":         "col",
+    "High School":     "hs",
+    "Middle School":   "ms",
+    "Female Athletes": "fem",
+}
+
+# Priority for athletes who belong to multiple VALD groups.
+# Highest priority wins. Example: a college female who is in both
+# "College" and "Female Athletes" will be classified as "col".
+# Reorder this list if you want different behavior.
+GROUP_PRIORITY = ["pro", "stf", "col", "hs", "ms", "fem"]
+
+
+def get_group(name, vald_groups=None):
+    # 1. Manual overrides always win.
     if name in GROUP_OVERRIDES:
         return GROUP_OVERRIDES[name]
-    return GROUP_MAP.get(name, "hs")  # default to hs if unknown
+    # 2. Use VALD group memberships when available.
+    if vald_groups:
+        codes = {VALD_GROUP_TO_CODE[g] for g in vald_groups if g in VALD_GROUP_TO_CODE}
+        if codes:
+            for code in GROUP_PRIORITY:
+                if code in codes:
+                    return code
+            return next(iter(codes))
+    # 3. Fall back to whatever group this name had in the previous App.jsx,
+    #    then to "hs" if completely unknown.
+    return GROUP_MAP.get(name, "hs")
 
 def get_initials(name):
     parts = name.strip().split()
@@ -175,7 +205,7 @@ for pid, ath in fd['athletes'].items():
     athletes_data.append({
         'name': name,
         'pid': pid,
-        'group': get_group(name),
+        'group': get_group(name, ath.get('groups')),
         'initials': get_initials(name),
         'sessions': sessions,
     })
