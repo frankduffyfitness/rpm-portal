@@ -189,7 +189,10 @@ def fetch_trials_for_test(token, test_id):
 
 
 def process_trial(trial):
-    """Extract only the 8 portal metrics from a trial, including L/R for asymmetry."""
+    """Extract metrics from a trial. Keeps the 8 named CMJ portal metrics
+    AND retains every other result ID under a raw `r<ID>` key so non-CMJ
+    metrics (hop tests, etc.) are preserved for downstream generators.
+    L/R limbs get suffixes (L/R) on the raw key."""
     metrics = {}
 
     for result in trial.get("results", []):
@@ -198,22 +201,28 @@ def process_trial(trial):
         if result_id is None:
             result_id = result.get("definition", {}).get("id")
 
-        if result_id not in PORTAL_METRIC_IDS:
-            continue
-
         value = result.get("value")
         limb = result.get("limb", "Trial")
-        meta = PORTAL_METRICS[result_id]
-        scale = meta["scale"]
-        display_value = round(value * scale, 2) if value is not None else None
 
-        key = meta["key"]
-        if limb == "Left":
-            key = f"{meta['key']}Left"
-        elif limb == "Right":
-            key = f"{meta['key']}Right"
-
-        metrics[key] = display_value
+        if result_id in PORTAL_METRIC_IDS:
+            meta = PORTAL_METRICS[result_id]
+            scale = meta["scale"]
+            display_value = round(value * scale, 2) if value is not None else None
+            key = meta["key"]
+            if limb == "Left":
+                key = f"{meta['key']}Left"
+            elif limb == "Right":
+                key = f"{meta['key']}Right"
+            metrics[key] = display_value
+        elif result_id is not None and value is not None:
+            # Unknown ID: keep raw value with raw-id key so downstream code
+            # can still access hop test metrics, etc.
+            key = f"r{result_id}"
+            if limb == "Left":
+                key += "L"
+            elif limb == "Right":
+                key += "R"
+            metrics[key] = round(value, 4)
 
     # Calculate asymmetry percentages for L/R metrics
     for base_key in ["concentricImpulse", "eccBrakingImpulse", "concPeakForce"]:
