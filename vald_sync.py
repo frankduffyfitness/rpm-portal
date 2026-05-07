@@ -39,6 +39,29 @@ PORTAL_METRICS = {
 }
 PORTAL_METRIC_IDS = set(PORTAL_METRICS.keys())
 
+# DIAGNOSTIC (temporary): capture all result IDs by test type so we can extend
+# PORTAL_METRICS to support hop tests. Remove once IDs are known.
+_DISCOVERED_IDS = {}  # key: (testType, resultId)  -> dict with sample data
+
+
+def discover_metric(test_type, trial):
+    if not test_type or test_type == "CMJ":
+        return
+    for result in trial.get("results", []):
+        rid = result.get("resultId") or result.get("definition", {}).get("id")
+        if rid is None:
+            continue
+        key = (test_type, rid)
+        if key not in _DISCOVERED_IDS:
+            _DISCOVERED_IDS[key] = {
+                "count": 0,
+                "sample_value": result.get("value"),
+                "limb": result.get("limb"),
+                "definition": result.get("definition", {}),
+                "unit": result.get("unit"),
+            }
+        _DISCOVERED_IDS[key]["count"] += 1
+
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
@@ -219,6 +242,9 @@ def build_portal_data(profiles, tests, trials_by_test):
         ath["groups"] = profile.get("groups", [])
 
         raw_trials = trials_by_test.get(tid, [])
+        # DIAGNOSTIC: capture result IDs for non-CMJ tests
+        for t in raw_trials:
+            discover_metric(test.get("testType", ""), t)
         trials = []
         for t in raw_trials:
             metrics = process_trial(t)
@@ -381,6 +407,21 @@ def main():
         save_sync_state(max(t.get("modifiedDateUtc", "") for t in tests))
     m = portal_data["meta"]
     log("=" * 50)
+    if _DISCOVERED_IDS:
+        log("DIAGNOSTIC: result IDs captured for non-CMJ tests")
+        log("(used to find hop test metric IDs; remove this once known)")
+        from collections import defaultdict as _dd
+        by_type = _dd(list)
+        for (tt, rid), info in _DISCOVERED_IDS.items():
+            by_type[tt].append((rid, info))
+        for tt in sorted(by_type.keys()):
+            log(f"  testType={tt}  ({len(by_type[tt])} unique result IDs)")
+            for rid, info in sorted(by_type[tt]):
+                defn = info.get("definition") or {}
+                name = defn.get("name") or defn.get("description") or "?"
+                unit = info.get("unit") or defn.get("unit") or "?"
+                log(f"    resultId={rid:>10}  name={name!r:35}  unit={unit:>6}  sample_value={info['sample_value']}  limb={info['limb']}  count={info['count']}")
+        log("=" * 50)
     log("SYNC COMPLETE!")
     log(f"  Athletes: {m['totalAthletes']}")
     log(f"  Tests:    {m['totalTests']}")
