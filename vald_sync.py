@@ -28,6 +28,7 @@ RATE_LIMIT_PAUSE = 0.05
 # ─── Portal Metrics (only these get kept) ────────────────────────────────────
 # Maps result ID → { portal display name, unit, scale factor }
 PORTAL_METRICS = {
+    # CMJ metrics
     6553614: {"key": "jumpHeight",         "label": "Jump Height",         "unit": "in",   "scale": 1},
     6553698: {"key": "rsiModified",        "label": "RSI-modified",        "unit": "m/s",  "scale": 0.01},
     6553604: {"key": "relativePower",      "label": "Relative Power",      "unit": "W/kg", "scale": 1},
@@ -36,31 +37,13 @@ PORTAL_METRICS = {
     6553703: {"key": "eccBrakingImpulse",  "label": "Ecc Braking Impulse", "unit": "N·s",  "scale": 1},
     6553685: {"key": "concPeakForce",      "label": "Conc Peak Force",     "unit": "N",    "scale": 1},
      655387: {"key": "bodyweightLbs",      "label": "Bodyweight",          "unit": "lbs",  "scale": 2.20462},
+    # HJ (Hop Jump) metrics — VALD returns CT/FT in seconds, scale ×1000 to ms
+    13303819: {"key": "hopRsi",            "label": "Hop RSI (FT/CT)",     "unit": "ratio","scale": 1},
+    13303814: {"key": "hopContactTime",    "label": "Hop Contact Time",    "unit": "ms",   "scale": 1000},
+    13303815: {"key": "hopFlightTime",     "label": "Hop Flight Time",     "unit": "ms",   "scale": 1000},
+    13303818: {"key": "hopPeakForce",      "label": "Hop Peak Force",      "unit": "N",    "scale": 1},
 }
 PORTAL_METRIC_IDS = set(PORTAL_METRICS.keys())
-
-# DIAGNOSTIC (temporary): capture all result IDs by test type so we can extend
-# PORTAL_METRICS to support hop tests. Remove once IDs are known.
-_DISCOVERED_IDS = {}  # key: (testType, resultId)  -> dict with sample data
-
-
-def discover_metric(test_type, trial):
-    if not test_type or test_type == "CMJ":
-        return
-    for result in trial.get("results", []):
-        rid = result.get("resultId") or result.get("definition", {}).get("id")
-        if rid is None:
-            continue
-        key = (test_type, rid)
-        if key not in _DISCOVERED_IDS:
-            _DISCOVERED_IDS[key] = {
-                "count": 0,
-                "sample_value": result.get("value"),
-                "limb": result.get("limb"),
-                "definition": result.get("definition", {}),
-                "unit": result.get("unit"),
-            }
-        _DISCOVERED_IDS[key]["count"] += 1
 
 
 def log(msg):
@@ -189,10 +172,8 @@ def fetch_trials_for_test(token, test_id):
 
 
 def process_trial(trial):
-    """Extract metrics from a trial. Keeps the 8 named CMJ portal metrics
-    AND retains every other result ID under a raw `r<ID>` key so non-CMJ
-    metrics (hop tests, etc.) are preserved for downstream generators.
-    L/R limbs get suffixes (L/R) on the raw key."""
+    """Extract the named portal metrics (CMJ + Hop) from a trial.
+    L/R limbs get Left/Right suffixes."""
     metrics = {}
 
     for result in trial.get("results", []):
@@ -201,28 +182,22 @@ def process_trial(trial):
         if result_id is None:
             result_id = result.get("definition", {}).get("id")
 
+        if result_id not in PORTAL_METRIC_IDS:
+            continue
+
         value = result.get("value")
         limb = result.get("limb", "Trial")
+        meta = PORTAL_METRICS[result_id]
+        scale = meta["scale"]
+        display_value = round(value * scale, 2) if value is not None else None
 
-        if result_id in PORTAL_METRIC_IDS:
-            meta = PORTAL_METRICS[result_id]
-            scale = meta["scale"]
-            display_value = round(value * scale, 2) if value is not None else None
-            key = meta["key"]
-            if limb == "Left":
-                key = f"{meta['key']}Left"
-            elif limb == "Right":
-                key = f"{meta['key']}Right"
-            metrics[key] = display_value
-        elif result_id is not None and value is not None:
-            # Unknown ID: keep raw value with raw-id key so downstream code
-            # can still access hop test metrics, etc.
-            key = f"r{result_id}"
-            if limb == "Left":
-                key += "L"
-            elif limb == "Right":
-                key += "R"
-            metrics[key] = round(value, 4)
+        key = meta["key"]
+        if limb == "Left":
+            key = f"{meta['key']}Left"
+        elif limb == "Right":
+            key = f"{meta['key']}Right"
+
+        metrics[key] = display_value
 
     # Calculate asymmetry percentages for L/R metrics
     for base_key in ["concentricImpulse", "eccBrakingImpulse", "concPeakForce"]:
@@ -251,9 +226,6 @@ def build_portal_data(profiles, tests, trials_by_test):
         ath["groups"] = profile.get("groups", [])
 
         raw_trials = trials_by_test.get(tid, [])
-        # DIAGNOSTIC: capture result IDs for non-CMJ tests
-        for t in raw_trials:
-            discover_metric(test.get("testType", ""), t)
         trials = []
         for t in raw_trials:
             metrics = process_trial(t)
@@ -416,21 +388,6 @@ def main():
         save_sync_state(max(t.get("modifiedDateUtc", "") for t in tests))
     m = portal_data["meta"]
     log("=" * 50)
-    if _DISCOVERED_IDS:
-        log("DIAGNOSTIC: result IDs captured for non-CMJ tests")
-        log("(used to find hop test metric IDs; remove this once known)")
-        from collections import defaultdict as _dd
-        by_type = _dd(list)
-        for (tt, rid), info in _DISCOVERED_IDS.items():
-            by_type[tt].append((rid, info))
-        for tt in sorted(by_type.keys()):
-            log(f"  testType={tt}  ({len(by_type[tt])} unique result IDs)")
-            for rid, info in sorted(by_type[tt]):
-                defn = info.get("definition") or {}
-                name = defn.get("name") or defn.get("description") or "?"
-                unit = info.get("unit") or defn.get("unit") or "?"
-                log(f"    resultId={rid:>10}  name={name!r:35}  unit={unit:>6}  sample_value={info['sample_value']}  limb={info['limb']}  count={info['count']}")
-        log("=" * 50)
     log("SYNC COMPLETE!")
     log(f"  Athletes: {m['totalAthletes']}")
     log(f"  Tests:    {m['totalTests']}")
