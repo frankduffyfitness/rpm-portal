@@ -34,6 +34,12 @@ HOP_MANUAL_EXCLUSIONS = {
     "Jackson Cintron": [
         "2026-01-29",  # 4.16/4.09 RSI session — pending Frank's check with athlete
     ],
+    "Ivan Victorio": [
+        "2026-02-06",  # 4.03 RSI trial w/ CT 126 vs his ~190 norm — likely missed-takeoff misread
+    ],
+    "Scottie Nieto": [
+        "2026-03-04",  # 4.12 RSI trial — 0.5+ above his consistent 3.0–3.63 ceiling
+    ],
 }
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
@@ -288,14 +294,23 @@ for pid, ath in fd['athletes'].items():
 
     hj_tests.sort(key=lambda t: t['date'], reverse=True)
 
-    # Per-athlete misread filter: drop trials with FT > 1.5× athlete's median FT.
-    # Pattern: athlete jumps off the plate, sensor misses landing, FT inflates.
+    # Per-athlete misread filters (per-athlete relative thresholds):
+    #   FT > 1.5× median FT  →  athlete jumped off the plate (sensor missed landing).
+    #   CT < 0.6× median CT  →  sensor missed takeoff/landing edge (impossibly short contact).
+    # Both inflate RSI = FT/CT, so we drop those trials before picking the best.
     all_ft = [
         tr['metrics'].get(HOP_FT_KEY)
         for test in hj_tests for tr in test['trials']
         if tr['metrics'].get(HOP_FT_KEY) is not None
     ]
+    all_ct = [
+        tr['metrics'].get(HOP_CT_KEY)
+        for test in hj_tests for tr in test['trials']
+        if tr['metrics'].get(HOP_CT_KEY) is not None
+    ]
     ft_ceiling = (statistics.median(all_ft) * 1.5) if all_ft else float('inf')
+    # Hard global floor of 100ms backstops athletes with too-few trials for a stable median.
+    ct_floor = max(statistics.median(all_ct) * 0.6, 100) if all_ct else 100
 
     sessions = []
     for test in hj_tests:
@@ -311,8 +326,9 @@ for pid, ath in fd['athletes'].items():
             tr for tr in test['trials']
             if tr['metrics'].get(HOP_FT_KEY) is not None
             and tr['metrics'][HOP_FT_KEY] <= ft_ceiling
-            and tr['metrics'].get(HOP_RSI_KEY) is not None
             and tr['metrics'].get(HOP_CT_KEY) is not None
+            and tr['metrics'][HOP_CT_KEY] >= ct_floor
+            and tr['metrics'].get(HOP_RSI_KEY) is not None
         ]
         if not valid:
             continue
