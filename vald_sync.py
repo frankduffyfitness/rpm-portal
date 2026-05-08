@@ -183,6 +183,15 @@ def process_trial(trial):
             result_id = result.get("definition", {}).get("id")
 
         if result_id not in PORTAL_METRIC_IDS:
+            # DIAGNOSTIC: capture every hop-range result ID (13303xxx) we don't already
+            # have a name for, so we can identify VALD's Mean RSI metric by inspecting
+            # the synced data. Remove once Mean RSI is identified and added to PORTAL_METRICS.
+            if isinstance(result_id, int) and 13303000 <= result_id < 13304000:
+                value = result.get("value")
+                limb = result.get("limb", "Trial")
+                suffix = "" if limb == "Trial" else limb
+                if value is not None:
+                    metrics[f"hopRaw_{result_id}{suffix}"] = round(value, 4)
             continue
 
         value = result.get("value")
