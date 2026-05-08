@@ -18,7 +18,10 @@ HISTORY_LEN = 8  # last 8 sessions for sparklines
 
 # ─── Hop test metric keys ───────────────────────────────────────────────────
 # vald_sync.py stores hop metrics under these keys (see PORTAL_METRICS in vald_sync).
-HOP_RSI_KEY        = "hopRsi"           # Best RSI (Flight/Contact Time) — ratio
+# RSI displayed on the portal is VALD's "Mean RSI" (averaged across hops within a
+# trial), to match VALD Hub's headline number. hopRsi (single-best-hop) is also
+# captured but is no longer used as the displayed metric.
+HOP_RSI_KEY        = "hopMeanRsi"       # Mean RSI (FT/CT averaged over hops) — ratio
 HOP_CT_KEY         = "hopContactTime"   # Best Contact Time — milliseconds
 HOP_FT_KEY         = "hopFlightTime"    # Best Flight Time — milliseconds
 HOP_PEAK_FORCE_KEY = "hopPeakForce"     # Best Peak Force — Newtons
