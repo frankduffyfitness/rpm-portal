@@ -7,15 +7,15 @@ import json, sys, os
 from datetime import datetime, timedelta
 from collections import defaultdict
 import statistics
- 
+
 # ─── Config ──────────────────────────────────────────────────────────────────
- 
+
 PORTAL_JSON = sys.argv[1] if len(sys.argv) > 1 else "forcedecks_portal.json"
 CURRENT_JSX = sys.argv[2] if len(sys.argv) > 2 else "App.jsx"
 ACTIVE_CUTOFF = datetime.now() - timedelta(days=42)
 MIN_SESSIONS = 5
 HISTORY_LEN = 8  # last 8 sessions for sparklines
- 
+
 # ─── Hop test metric keys ───────────────────────────────────────────────────
 # vald_sync.py stores hop metrics under these keys (see PORTAL_METRICS in vald_sync).
 HOP_RSI_KEY        = "hopRsi"           # Best RSI (Flight/Contact Time) — ratio
@@ -23,20 +23,29 @@ HOP_CT_KEY         = "hopContactTime"   # Best Contact Time — milliseconds
 HOP_FT_KEY         = "hopFlightTime"    # Best Flight Time — milliseconds
 HOP_PEAK_FORCE_KEY = "hopPeakForce"     # Best Peak Force — Newtons
 HOP_TEST_TYPE      = "HJ"               # primary hop test type to process
-# PFBM is computed: peak_force_N / (bodyweight_kg × 9.81), giving BW units
 G = 9.81
 LB_PER_KG = 2.20462
- 
+
+# ─── Manual hop-test exclusions ──────────────────────────────────────────────
+# Athletes -> list of test dates (YYYY-MM-DD) to skip entirely.
+# Use this when a specific session looks suspect and we're awaiting athlete
+# confirmation. Drop entries here once a session is confirmed real or fake.
+HOP_MANUAL_EXCLUSIONS = {
+    "Jackson Cintron": [
+        "2026-01-29",  # 4.16/4.09 RSI session — pending Frank's check with athlete
+    ],
+}
+
 # ─── Load Data ───────────────────────────────────────────────────────────────
- 
+
 with open(PORTAL_JSON) as f:
     fd = json.load(f)
- 
+
 with open(CURRENT_JSX) as f:
     jsx = f.read()
- 
+
 # ─── Extract group mapping from existing _A ──────────────────────────────────
- 
+
 def extract_groups_from_jsx(jsx):
     """Pull name→group from existing _A array."""
     import re
@@ -54,12 +63,12 @@ def extract_groups_from_jsx(jsx):
         if a[0] not in groups:
             groups[a[0]] = a[2]
     return groups
- 
+
 GROUP_MAP = extract_groups_from_jsx(jsx)
- 
+
 # Athletes to exclude from portal
 EXCLUDE_ATHLETES = {"Liam Murphy"}
- 
+
 # Manual group overrides — these always win, even over VALD.
 # Keep this for athletes whose VALD group is wrong or who aren't yet in VALD.
 GROUP_OVERRIDES = {
@@ -68,7 +77,7 @@ GROUP_OVERRIDES = {
     "Julian Minaya": "pro",
     "Mike Sirota": "pro",
 }
- 
+
 # Map VALD group names → portal short codes.
 # Edit this if you rename a group in VALD or add a new group.
 VALD_GROUP_TO_CODE = {
@@ -79,14 +88,14 @@ VALD_GROUP_TO_CODE = {
     "Middle School":   "ms",
     "Female Athletes": "fem",
 }
- 
+
 # Priority for athletes who belong to multiple VALD groups.
 # Highest priority wins. Example: a college female who is in both
 # "College" and "Female Athletes" will be classified as "col".
 # Reorder this list if you want different behavior.
 GROUP_PRIORITY = ["pro", "stf", "col", "hs", "ms", "fem"]
- 
- 
+
+
 def get_group(name, vald_groups=None):
     # 1. Manual overrides always win.
     if name in GROUP_OVERRIDES:
@@ -102,16 +111,16 @@ def get_group(name, vald_groups=None):
     # 3. Fall back to whatever group this name had in the previous App.jsx,
     #    then to "hs" if completely unknown.
     return GROUP_MAP.get(name, "hs")
- 
+
 def get_initials(name):
     parts = name.strip().split()
     if len(parts) >= 2:
         return (parts[0][0] + parts[-1][0]).upper()
     return name[:2].upper()
- 
- 
+
+
 # ─── Process CMJ Sessions ────────────────────────────────────────────────────
- 
+
 def compute_session_avg(trials, metric_key):
     """Average of a metric across all trials in a test."""
     vals = []
@@ -120,7 +129,7 @@ def compute_session_avg(trials, metric_key):
         if v is not None:
             vals.append(v)
     return round(sum(vals) / len(vals), 2) if vals else None
- 
+
 def compute_session_best(trials, metric_key):
     """Best (max) of a metric across all trials in a test."""
     vals = []
@@ -129,7 +138,7 @@ def compute_session_best(trials, metric_key):
         if v is not None:
             vals.append(v)
     return round(max(vals), 2) if vals else None
- 
+
 def compute_session_brk_avg(trials):
     """Average of (Left + Right) braking RFD across all trials."""
     vals = []
@@ -140,7 +149,7 @@ def compute_session_brk_avg(trials):
         if bl is not None and br is not None:
             vals.append(abs(bl) + abs(br))
     return round(sum(vals) / len(vals)) if vals else None
- 
+
 def compute_session_asym(trials, base_key):
     """Average asymmetry for a metric across trials. Returns (pct, dominant_side, left_val, right_val)."""
     pcts = []
@@ -163,12 +172,12 @@ def compute_session_asym(trials, base_key):
     avg_r = round(sum(r_vals) / len(r_vals))
     dom = "R" if avg_r > avg_l else "L" if avg_l > avg_r else "="
     return avg_pct, dom, avg_l, avg_r
- 
- 
+
+
 # ─── Build Athlete CMJ Data ─────────────────────────────────────────────────
- 
+
 athletes_data = []
- 
+
 for pid, ath in fd['athletes'].items():
     name = ath['name']
     if not name:
@@ -238,43 +247,56 @@ for ath in athletes_data:
                 for s in ath['sessions']:
                     if s.get(metric) is not None and abs(s[metric] - mean) > 3 * std:
                         s[metric] = None
- 
+
 # Filter out athletes with no test in the last 6 weeks
 athletes_data = [a for a in athletes_data if a['sessions'][0]['date'] >= ACTIVE_CUTOFF]
 # Sort athletes by name
 athletes_data.sort(key=lambda a: a['name'])
- 
- 
+
+
 # ─── Build Athlete Hop Test Data ─────────────────────────────────────────────
- 
+
 def hop_best(trials, key):
     vals = [t['metrics'].get(key) for t in trials]
     vals = [v for v in vals if v is not None]
     return round(max(vals), 2) if vals else None
- 
+
 def hop_avg(trials, key):
     vals = [t['metrics'].get(key) for t in trials]
     vals = [v for v in vals if v is not None]
     return round(sum(vals) / len(vals), 2) if vals else None
- 
+
 def hop_min(trials, key):
     """For metrics where lower is better (e.g. contact time)."""
     vals = [t['metrics'].get(key) for t in trials]
     vals = [v for v in vals if v is not None]
     return round(min(vals), 2) if vals else None
- 
+
 hop_athletes_data = []
 for pid, ath in fd['athletes'].items():
     name = ath['name']
     if not name:
         continue
- 
+
     hj_tests = [t for t in ath['tests'] if t['testType'] == HOP_TEST_TYPE and t['trials']]
+    # Apply manual session exclusions (suspect tests pending confirmation)
+    excluded_dates = set(HOP_MANUAL_EXCLUSIONS.get(name, []))
+    if excluded_dates:
+        hj_tests = [t for t in hj_tests if t['date'][:10] not in excluded_dates]
     if not hj_tests:
         continue
- 
+
     hj_tests.sort(key=lambda t: t['date'], reverse=True)
- 
+
+    # Per-athlete misread filter: drop trials with FT > 1.5× athlete's median FT.
+    # Pattern: athlete jumps off the plate, sensor misses landing, FT inflates.
+    all_ft = [
+        tr['metrics'].get(HOP_FT_KEY)
+        for test in hj_tests for tr in test['trials']
+        if tr['metrics'].get(HOP_FT_KEY) is not None
+    ]
+    ft_ceiling = (statistics.median(all_ft) * 1.5) if all_ft else float('inf')
+
     sessions = []
     for test in hj_tests:
         dt_str = test['date'][:10]
@@ -282,30 +304,47 @@ for pid, ath in fd['athletes'].items():
             dt = datetime.strptime(dt_str, '%Y-%m-%d')
         except:
             continue
- 
-        rsi = hop_best(test['trials'], HOP_RSI_KEY)
-        ct = hop_min(test['trials'], HOP_CT_KEY)   # CT: lower is better
-        ft = hop_avg(test['trials'], HOP_FT_KEY)
-        # Bodyweight comes from the named PORTAL_METRICS — same key as CMJ
+
+        # Drop misread trials, then pick the single best-RSI trial of this test.
+        # All metrics for this session come from THAT trial — no cross-trial mixing.
+        valid = [
+            tr for tr in test['trials']
+            if tr['metrics'].get(HOP_FT_KEY) is not None
+            and tr['metrics'][HOP_FT_KEY] <= ft_ceiling
+            and tr['metrics'].get(HOP_RSI_KEY) is not None
+            and tr['metrics'].get(HOP_CT_KEY) is not None
+        ]
+        if not valid:
+            continue
+
+        best = max(valid, key=lambda tr: tr['metrics'][HOP_RSI_KEY])
+        m = best['metrics']
+        rsi = round(m[HOP_RSI_KEY], 2)
+        ct = round(m[HOP_CT_KEY], 2)
+        ft = round(m[HOP_FT_KEY], 2)
+        # Bodyweight averaged across all trials in this test (not affected by misreads).
         bw_vals = [tr['metrics'].get('bodyweightLbs') for tr in test['trials']]
         bw_vals = [v for v in bw_vals if v is not None]
         bw = round(sum(bw_vals) / len(bw_vals), 2) if bw_vals else None
-        # PFBM = peak force (N) / (bodyweight_kg × g), giving BW ratio units
-        peak_force = hop_best(test['trials'], HOP_PEAK_FORCE_KEY)
-        pfbm = None
-        if peak_force is not None and bw:
+        # True PFBM = (PeakForceLeft + PeakForceRight) / (BW_kg × g), giving body-weight units.
+        # NOTE: VALD's bare `hopPeakForce` field is L/R asymmetry %, not Newtons — don't use it.
+        pfL = m.get('hopPeakForceLeft')
+        pfR = m.get('hopPeakForceRight')
+        if pfL is not None and pfR is not None and bw:
             bw_kg = bw / LB_PER_KG
-            pfbm = round(peak_force / (bw_kg * G), 2)
- 
+            pfbm = round((pfL + pfR) / (bw_kg * G), 2)
+        else:
+            pfbm = None
+
         sessions.append({
             'date': dt,
             'date_str': dt.strftime('%m/%d/%Y'),
             'rsi': rsi, 'ct': ct, 'ft': ft, 'pfbm': pfbm, 'bw': bw,
         })
- 
+
     if not sessions:
         continue
- 
+
     hop_athletes_data.append({
         'name': name,
         'pid': pid,
@@ -313,15 +352,15 @@ for pid, ath in fd['athletes'].items():
         'initials': get_initials(name),
         'sessions': sessions,
     })
- 
+
 # Filter out hop athletes with no test in the last 6 weeks (matches CMJ behavior)
 hop_athletes_data = [a for a in hop_athletes_data if a['sessions'][0]['date'] >= ACTIVE_CUTOFF]
 # Sort by name
 hop_athletes_data.sort(key=lambda a: a['name'])
- 
- 
+
+
 # ─── Generate _A Array ───────────────────────────────────────────────────────
- 
+
 def gen_A(athletes_data):
     """_A: [name, initials, group, bw, testCount, latestDate, jh, rsi, pp, brk, jhHist, rsiHist, bestJH, bestRSI, bestPP, bestBRK]"""
     rows = []
@@ -361,10 +400,10 @@ def gen_A(athletes_data):
         ])
     
     return rows
- 
- 
+
+
 # ─── Generate _PB Array ─────────────────────────────────────────────────────
- 
+
 def gen_PB(athletes_data):
     """_PB: per athlete, [allJH, allRSI, allPP, allBRK, tmJH, tmRSI, tmPP, tmBRK, lmJH, lmRSI, lmPP, lmBRK, twJH, twRSI, twPP, twBRK]
     tm=this month, lm=last month, tw=this week"""
@@ -406,10 +445,10 @@ def gen_PB(athletes_data):
         rows.append(all_best + tm_best + lm_best + tw_best)
     
     return rows
- 
- 
+
+
 # ─── Generate _T Array (Trends) ─────────────────────────────────────────────
- 
+
 def gen_T(athletes_data):
     """_T: [name, group, sessions, jh_first, jh_last, jh_change, rsi_first, rsi_last, rsi_change, pp_first, pp_last, pp_change, brk_first, brk_last, brk_change]"""
     rows = []
@@ -444,10 +483,10 @@ def gen_T(athletes_data):
         ])
     
     return rows
- 
- 
+
+
 # ─── Generate _WM Array (Weekly Movers) ─────────────────────────────────────
- 
+
 def gen_WM(athletes_data):
     """_WM: [name, initials, group, jhPrev, jhCurr, jhChange%, rsiPrev, rsiCurr, rsiChange%, prevDate, currDate]"""
     rows = []
@@ -474,10 +513,10 @@ def gen_WM(athletes_data):
         ])
     
     return rows
- 
- 
+
+
 # ─── Generate _MH Array (Monthly Highlights) ────────────────────────────────
- 
+
 def gen_MH(athletes_data):
     """_MH: [name, initials, group, jhPrev, jhCurr, jhChange%, rsiPrev, rsiCurr, rsiChange%]
     Compares this month avg vs last month avg."""
@@ -514,10 +553,10 @@ def gen_MH(athletes_data):
         rows.append([ath['name'], ath['initials'], ath['group'], lm_jh, tm_jh, jh_chg, lm_rsi, tm_rsi, rsi_chg])
     
     return rows
- 
- 
+
+
 # ─── Generate _OS Array (Offseason Tracking) ────────────────────────────────
- 
+
 def gen_OS(athletes_data):
     """_OS: [name, initials, group, sessions, jhFirst, jhLast, jhChange%, rsiFirst, rsiLast, rsiChange%, ppFirst, ppLast, ppChange%, brkFirst, brkLast, brkChange%]"""
     rows = []
@@ -550,10 +589,10 @@ def gen_OS(athletes_data):
         ])
     
     return rows
- 
- 
+
+
 # ─── Generate _ASY Array ────────────────────────────────────────────────────
- 
+
 def gen_ASY(athletes_data):
     """_ASY: [name, conImpulse%, conSide, eccBraking%, eccSide, concPeakForce%, cpfSide, domSide, lImpulse, rImpulse, histSigned[]]"""
     rows = []
@@ -589,10 +628,10 @@ def gen_ASY(athletes_data):
         rows.append([ath['name'], con_a, con_d, ecc_a, ecc_d, cpf_a, cpf_d, dom, con_l, con_r, hist_signed])
     
     return rows
- 
- 
+
+
 # ─── Generate _BW Array ─────────────────────────────────────────────────────
- 
+
 def gen_BW(athletes_data):
     """_BW: [name, history[], current, change, dates[]]"""
     rows = []
@@ -612,10 +651,10 @@ def gen_BW(athletes_data):
         rows.append([ath['name'], history, current, change, dates])
     
     return rows
- 
- 
+
+
 # ─── Generate _SD Array (Session Dates) ─────────────────────────────────────
- 
+
 def gen_SD(athletes_data):
     """_SD: [name, dates[]]  (dates as MM/DD/YYYY strings, oldest to newest)"""
     rows = []
@@ -624,10 +663,10 @@ def gen_SD(athletes_data):
         dates = [sess['date_str'] for sess in reversed(s)]
         rows.append([ath['name'], dates])
     return rows
- 
- 
+
+
 # ─── Generate _N (Group Norms) ───────────────────────────────────────────────
- 
+
 def gen_N(athletes_data):
     """Group norms: percentiles for each metric per group."""
     groups = defaultdict(lambda: {'jh': [], 'rsi': [], 'pp': [], 'brk': []})
@@ -675,10 +714,10 @@ def gen_N(athletes_data):
             norms[g][nk] = pctiles(data[mk])
     
     return norms
- 
- 
+
+
 # ─── Generate _PR Array (Personal Records) ──────────────────────────────────
- 
+
 def gen_PR(athletes_data):
     """_PR: [name, initials, group, date, [[metric, prev, curr, change%], ...]]
     PRs = new all-time bests set in the most recent session."""
@@ -707,10 +746,10 @@ def gen_PR(athletes_data):
             rows.append([ath['name'], ath['initials'], ath['group'], latest['date_str'], prs])
     
     return rows
- 
- 
+
+
 # ─── Generate Hop Test Arrays ────────────────────────────────────────────────
- 
+
 def gen_HA(hop_athletes_data):
     """_HA: [name, initials, group, bw, testCount, latestDate,
             rsi, ct, ft, pfbm, rsiHist, ctHist,
@@ -719,7 +758,7 @@ def gen_HA(hop_athletes_data):
     for ath in hop_athletes_data:
         s = ath['sessions']
         latest = s[0]
- 
+
         bw = round(latest['bw'], 1) if latest['bw'] else 0
         test_count = len(s)
         latest_date = latest['date_str']
@@ -727,32 +766,32 @@ def gen_HA(hop_athletes_data):
         ct = round(latest['ct'], 1) if latest['ct'] else 0
         ft = round(latest['ft'], 1) if latest['ft'] else 0
         pfbm = round(latest['pfbm'], 2) if latest['pfbm'] else 0
- 
+
         # Last HISTORY_LEN sessions, oldest to newest
         hist = s[:HISTORY_LEN]
         hist.reverse()
         rsi_hist = [round(h['rsi'], 2) for h in hist if h['rsi'] is not None]
         ct_hist = [round(h['ct'], 1) for h in hist if h['ct'] is not None]
         ft_hist = [round(h['ft'], 1) for h in hist if h['ft'] is not None]
- 
+
         all_rsi = [h['rsi'] for h in s if h['rsi'] is not None]
         all_ct = [h['ct'] for h in s if h['ct'] is not None]
         all_ft = [h['ft'] for h in s if h['ft'] is not None]
         all_pfbm = [h['pfbm'] for h in s if h['pfbm'] is not None]
- 
+
         best_rsi = round(max(all_rsi), 2) if all_rsi else 0
         best_ct = round(min(all_ct), 1) if all_ct else 0  # CT: lower is better
         best_ft = round(max(all_ft), 1) if all_ft else 0
         best_pfbm = round(max(all_pfbm), 2) if all_pfbm else 0
- 
+
         rows.append([
             ath['name'], ath['initials'], ath['group'], bw, test_count, latest_date,
             rsi, ct, ft, pfbm, rsi_hist, ct_hist,
             best_rsi, best_ct, best_ft, best_pfbm, ft_hist,
         ])
     return rows
- 
- 
+
+
 def gen_HPB(hop_athletes_data):
     """_HPB: per athlete, [allRSI, allCT, allFT, allPFBM,
                            tmRSI, tmCT, tmFT, tmPFBM,
@@ -763,7 +802,7 @@ def gen_HPB(hop_athletes_data):
     last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
     last_month_end = this_month_start - timedelta(days=1)
     this_week_start = now - timedelta(days=7)
- 
+
     def best_in_range(sessions, start_dt=None, end_dt=None):
         filtered = sessions
         if start_dt:
@@ -782,7 +821,7 @@ def gen_HPB(hop_athletes_data):
             round(max(ft_vals), 1) if ft_vals else None,
             round(max(pfbm_vals), 2) if pfbm_vals else None,
         ]
- 
+
     rows = []
     for ath in hop_athletes_data:
         s = ath['sessions']
@@ -793,8 +832,8 @@ def gen_HPB(hop_athletes_data):
             best_in_range(s, this_week_start)
         )
     return rows
- 
- 
+
+
 def gen_HT(hop_athletes_data):
     """_HT: [name, group, sessions, rsi_first, rsi_last, rsi_change,
             ct_first, ct_last, ct_change, ft_first, ft_last, ft_change]"""
@@ -805,19 +844,19 @@ def gen_HT(hop_athletes_data):
             continue
         first = s[-1]
         last = s[0]
- 
+
         def change_pct(old, new):
             if old and new and old != 0:
                 return round((new - old) / abs(old) * 100, 1)
             return 0
- 
+
         rsi_f = round(first['rsi'], 2) if first['rsi'] else 0
         rsi_l = round(last['rsi'], 2) if last['rsi'] else 0
         ct_f = round(first['ct'], 1) if first['ct'] else 0
         ct_l = round(last['ct'], 1) if last['ct'] else 0
         ft_f = round(first['ft'], 1) if first['ft'] else 0
         ft_l = round(last['ft'], 1) if last['ft'] else 0
- 
+
         rows.append([
             ath['name'], ath['group'], len(s),
             rsi_f, rsi_l, change_pct(rsi_f, rsi_l),
@@ -825,12 +864,12 @@ def gen_HT(hop_athletes_data):
             ft_f, ft_l, change_pct(ft_f, ft_l),
         ])
     return rows
- 
- 
+
+
 def gen_HN(hop_athletes_data):
     """Hop group norms: percentiles for each metric per group."""
     groups = defaultdict(lambda: {'rsi': [], 'ct': [], 'ft': [], 'pfbm': []})
- 
+
     for ath in hop_athletes_data:
         s = ath['sessions']
         if len(s) < MIN_SESSIONS:
@@ -844,7 +883,7 @@ def gen_HN(hop_athletes_data):
             if v:
                 groups[g][m].append(v)
                 groups['all'][m].append(v)
- 
+
     def pctiles(vals):
         if len(vals) < 3:
             return {"p10": 0, "p25": 0, "p50": 0, "p75": 0, "p90": 0}
@@ -857,7 +896,7 @@ def gen_HN(hop_athletes_data):
             frac = idx - lo
             return round(vals[lo] + frac * (vals[hi] - vals[lo]), 2)
         return {"p10": p(10), "p25": p(25), "p50": p(50), "p75": p(75), "p90": p(90)}
- 
+
     norms = {}
     metric_map = {'rsi': 'rsi', 'ct': 'ct', 'ft': 'ft', 'pfbm': 'pfbm'}
     for g, data in groups.items():
@@ -865,8 +904,8 @@ def gen_HN(hop_athletes_data):
         for mk, nk in metric_map.items():
             norms[g][nk] = pctiles(data[mk])
     return norms
- 
- 
+
+
 def gen_HD(hop_athletes_data):
     """_HD: [name, dates[]]  (oldest to newest)"""
     rows = []
@@ -875,12 +914,12 @@ def gen_HD(hop_athletes_data):
         dates = [sess['date_str'] for sess in reversed(s)]
         rows.append([ath['name'], dates])
     return rows
- 
- 
+
+
 # ─── Generate All ────────────────────────────────────────────────────────────
- 
+
 print("Generating portal data arrays...", flush=True)
- 
+
 _A = gen_A(athletes_data)
 _PB = gen_PB(athletes_data)
 _T = gen_T(athletes_data)
@@ -892,14 +931,14 @@ _BW = gen_BW(athletes_data)
 _SD = gen_SD(athletes_data)
 _N = gen_N(athletes_data)
 _PR = gen_PR(athletes_data)
- 
+
 # Hop test arrays
 _HA = gen_HA(hop_athletes_data)
 _HPB = gen_HPB(hop_athletes_data)
 _HT = gen_HT(hop_athletes_data)
 _HN = gen_HN(hop_athletes_data)
 _HD = gen_HD(hop_athletes_data)
- 
+
 print(f"  _A:   {len(_A)} athletes", flush=True)
 print(f"  _PB:  {len(_PB)} entries", flush=True)
 print(f"  _T:   {len(_T)} trends", flush=True)
@@ -916,14 +955,14 @@ print(f"  _HPB: {len(_HPB)} hop personal bests", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
 print(f"  _HD:  {len(_HD)} hop session dates", flush=True)
- 
+
 # ─── Write JS Output ─────────────────────────────────────────────────────────
- 
+
 def js_val(v):
     if v is None:
         return 'null'
     return json.dumps(v)
- 
+
 output_lines = []
 output_lines.append(f"const _A = {json.dumps(_A, separators=(',', ':'))};")
 output_lines.append(f"const _T = {json.dumps(_T, separators=(',', ':'))};")
@@ -941,26 +980,26 @@ output_lines.append(f"const _HPB = {json.dumps(_HPB, separators=(',', ':'))};")
 output_lines.append(f"const _HT = {json.dumps(_HT, separators=(',', ':'))};")
 output_lines.append(f"const _HN = {json.dumps(_HN, separators=(',', ':'))};")
 output_lines.append(f"const _HD = {json.dumps(_HD, separators=(',', ':'))};")
- 
+
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
- 
+
 print(f"\nWritten to portal_data_arrays.js ({os.path.getsize('portal_data_arrays.js') / 1024:.0f} KB)", flush=True)
- 
+
 # ─── Now splice into App.jsx ─────────────────────────────────────────────────
- 
+
 # Update LAST_UPDATED date
 import re
 today_str = datetime.now().strftime('%B %-d, %Y')
 jsx = re.sub(r'const LAST_UPDATED = ".*?";', f'const LAST_UPDATED = "{today_str}";', jsx)
- 
+
 # Find where each const is defined and replace it
 replacements = {
     '_A': _A, '_T': _T, '_PB': _PB, '_WM': _WM, '_MH': _MH,
     '_OS': _OS, '_ASY': _ASY, '_BW': _BW, '_SD': _SD, '_N': _N, '_PR': _PR,
 }
 replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _HD})
- 
+
 new_jsx = jsx
 for var_name, data in replacements.items():
     marker = f'const {var_name} = '
@@ -980,10 +1019,10 @@ for var_name, data in replacements.items():
     replacement = f'const {var_name} = {json.dumps(data, separators=(",", ":"))};'
     new_jsx = new_jsx[:start] + replacement + new_jsx[end:]
     print(f"  Replaced {var_name} ({end - start} → {len(replacement)} chars)", flush=True)
- 
+
 # Write updated App.jsx
 with open("App_updated.jsx", "w") as f:
     f.write(new_jsx)
- 
+
 print(f"\nUpdated App.jsx written to App_updated.jsx ({os.path.getsize('App_updated.jsx') / 1024:.0f} KB)", flush=True)
 print("Done!", flush=True)
