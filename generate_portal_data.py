@@ -12,6 +12,7 @@ import statistics
 
 PORTAL_JSON = sys.argv[1] if len(sys.argv) > 1 else "forcedecks_portal.json"
 CURRENT_JSX = sys.argv[2] if len(sys.argv) > 2 else "App.jsx"
+TRACKMAN_JSON = sys.argv[3] if len(sys.argv) > 3 else "trackman_portal.json"
 ACTIVE_CUTOFF = datetime.now() - timedelta(days=42)
 MIN_SESSIONS = 5
 HISTORY_LEN = 8  # last 8 sessions for sparklines
@@ -45,6 +46,13 @@ HOP_MANUAL_EXCLUSIONS = {
     ],
 }
 
+# ─── Velo (Trackman) config ──────────────────────────────────────────────────
+VELO_HISTORY_LEN = 8                          # last N sessions in sparkline history
+VELO_SUBMAX_TYPES = {"Low Effort", "Rehab"}   # excluded from "best ever" math
+# Manual session exclusions for velo (mirror HOP_MANUAL_EXCLUSIONS pattern).
+# Athletes -> list of session dates (YYYY-MM-DD) to skip entirely.
+VELO_MANUAL_EXCLUSIONS = {}
+
 # ─── Load Data ───────────────────────────────────────────────────────────────
 
 with open(PORTAL_JSON) as f:
@@ -52,6 +60,12 @@ with open(PORTAL_JSON) as f:
 
 with open(CURRENT_JSX) as f:
     jsx = f.read()
+
+# Trackman is optional — generator stays backwards-compatible if missing.
+trackman = None
+if os.path.exists(TRACKMAN_JSON):
+    with open(TRACKMAN_JSON) as f:
+        trackman = json.load(f)
 
 # ─── Extract group mapping from existing _A ──────────────────────────────────
 
@@ -935,6 +949,145 @@ def gen_HD(hop_athletes_data):
     return rows
 
 
+# ─── Velo (Trackman) generator ───────────────────────────────────────────────
+
+def _velo_initials(name):
+    """First initial + first letter of last name. Hyphenated last names stay
+    intact (Laya-Vetell → 'L', Corso-Winks → 'C')."""
+    parts = name.split()
+    if not parts:
+        return name[:2].upper()
+    first = parts[0][0].upper()
+    last = parts[-1][0].upper() if len(parts) > 1 else (parts[0][1:2].upper() or first)
+    return first + last
+
+
+def _velo_extract_groups_from_jsx(jsx_text):
+    """Pull name → group from existing _VELO and _A/_HA arrays.
+    Existing _VELO classifications win — they reflect Frank's pitcher-aware bucketing."""
+    import re
+    out = {}
+    for var, idx in (("_VELO", 2), ("_A", 2), ("_HA", 2)):
+        m = re.search(rf"const {var}\s*=\s*(\[[\s\S]*?\]);", jsx_text)
+        if not m:
+            continue
+        try:
+            rows = json.loads(m.group(1))
+        except Exception:
+            continue
+        for row in rows:
+            if isinstance(row, list) and len(row) > idx and isinstance(row[0], str):
+                # Don't overwrite — first source wins (so _VELO trumps later)
+                if row[0] not in out:
+                    out[row[0]] = row[idx]
+    return out
+
+
+def _format_us_date(iso_date):
+    """YYYY-MM-DD → M/D/YYYY (matching existing _VELO format)."""
+    try:
+        d = datetime.strptime(iso_date, "%Y-%m-%d")
+        return f"{d.month}/{d.day}/{d.year}"
+    except Exception:
+        return iso_date
+
+
+def gen_VELO(trackman_data, group_map, exclusions):
+    """_VELO row schema (16 columns):
+        [name, initials, group, sessions,
+         peakEver, avgPeak, avgAvg,
+         latestPeak, latestAvg, latestDate,
+         peakHistory, avgHistory, datesHistory, sessionTypeHistory, notesHistory,
+         trend]
+
+    Filters:
+      - Manual session-date exclusions are dropped entirely (not even displayed).
+      - Submax (Low Effort / Rehab) and Trackman-issue-flagged sessions are
+        excluded from `peakEver` / `avgPeak` / `avgAvg` / `trend` math but still
+        appear in the history sparklines so coaches see the full record.
+    """
+    if not trackman_data:
+        return []
+
+    rows = []
+    for name, ath in (trackman_data.get("athletes") or {}).items():
+        sessions = ath.get("sessions") or []
+        if not sessions:
+            continue
+
+        # Drop manually-excluded sessions
+        excl_dates = set(exclusions.get(name, []))
+        if excl_dates:
+            sessions = [s for s in sessions if s.get("date") not in excl_dates]
+        if not sessions:
+            continue
+
+        # JSON has sessions newest→oldest. We need oldest→newest for history.
+        sessions_chrono = list(reversed(sessions))
+
+        # Eligible = not submax, not flagged. Used for best/avg/trend math.
+        eligible = [
+            s for s in sessions_chrono
+            if not s.get("isSubmax") and not s.get("isFlagged")
+        ]
+        if not eligible:
+            continue  # athlete has no max-effort data — skip from leaderboard
+
+        # Latest = most recent session (any type) per existing UX
+        latest = sessions_chrono[-1]
+        latest_peak = latest.get("peakVelo")
+        latest_avg = latest.get("avgVelo") if latest.get("avgVelo") is not None else 0
+        latest_date = _format_us_date(latest.get("date", ""))
+
+        # History: last N sessions chronologically
+        history = sessions_chrono[-VELO_HISTORY_LEN:]
+        peak_hist = [s.get("peakVelo") for s in history]
+        avg_hist = [
+            s.get("avgVelo") if s.get("avgVelo") is not None else s.get("peakVelo")
+            for s in history
+        ]
+        date_hist = [_format_us_date(s.get("date", "")) for s in history]
+        type_hist = [s.get("sessionType", "") for s in history]
+        notes_hist = [s.get("notes", "") for s in history]
+
+        # Best / aggregate stats from eligible-only
+        eligible_peaks = [s["peakVelo"] for s in eligible if s.get("peakVelo") is not None]
+        eligible_avgs  = [s["avgVelo"]  for s in eligible if s.get("avgVelo")  is not None]
+        peak_ever = round(max(eligible_peaks), 1)
+        avg_peak  = round(sum(eligible_peaks) / len(eligible_peaks), 1)
+        avg_avg   = round(sum(eligible_avgs) / len(eligible_avgs), 1) if eligible_avgs else 0
+
+        # Trend = build-up indicator: mean(last 4 eligible peaks) − mean(prior eligible peaks)
+        # Positive = trending above career baseline; negative = trending below.
+        if len(eligible) >= 5:
+            recent = eligible[-4:]
+            prior = eligible[:-4]
+            trend = round(
+                sum(s["peakVelo"] for s in recent) / 4
+                - sum(s["peakVelo"] for s in prior) / len(prior),
+                1,
+            )
+        elif len(eligible) >= 2:
+            trend = round(eligible[-1]["peakVelo"] - eligible[0]["peakVelo"], 1)
+        else:
+            trend = 0.0
+
+        group = group_map.get(name, "hs")  # default new pitchers to high school
+        initials = _velo_initials(name)
+        sessions_count = len(sessions)  # total displayed sessions (post-exclusion)
+
+        rows.append([
+            name, initials, group, sessions_count,
+            peak_ever, avg_peak, avg_avg,
+            latest_peak, latest_avg, latest_date,
+            peak_hist, avg_hist, date_hist, type_hist, notes_hist,
+            trend,
+        ])
+
+    rows.sort(key=lambda r: r[0])  # alphabetical by name
+    return rows
+
+
 # ─── Generate All ────────────────────────────────────────────────────────────
 
 print("Generating portal data arrays...", flush=True)
@@ -958,6 +1111,11 @@ _HT = gen_HT(hop_athletes_data)
 _HN = gen_HN(hop_athletes_data)
 _HD = gen_HD(hop_athletes_data)
 
+# Velo (Trackman) array — pulls existing pitcher classifications from _VELO/_A/_HA in the
+# current App.jsx so groups don't reset on every sync.
+_velo_groups = _velo_extract_groups_from_jsx(jsx)
+_VELO = gen_VELO(trackman, _velo_groups, VELO_MANUAL_EXCLUSIONS)
+
 print(f"  _A:   {len(_A)} athletes", flush=True)
 print(f"  _PB:  {len(_PB)} entries", flush=True)
 print(f"  _T:   {len(_T)} trends", flush=True)
@@ -971,6 +1129,7 @@ print(f"  _N:   {len(_N)} groups", flush=True)
 print(f"  _PR:  {len(_PR)} new PRs", flush=True)
 print(f"  _HA:  {len(_HA)} hop athletes", flush=True)
 print(f"  _HPB: {len(_HPB)} hop personal bests", flush=True)
+print(f"  _VELO: {len(_VELO)} pitchers (trackman {'loaded' if trackman else 'MISSING — _VELO empty'})", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
 print(f"  _HD:  {len(_HD)} hop session dates", flush=True)
@@ -999,6 +1158,7 @@ output_lines.append(f"const _HPB = {json.dumps(_HPB, separators=(',', ':'))};")
 output_lines.append(f"const _HT = {json.dumps(_HT, separators=(',', ':'))};")
 output_lines.append(f"const _HN = {json.dumps(_HN, separators=(',', ':'))};")
 output_lines.append(f"const _HD = {json.dumps(_HD, separators=(',', ':'))};")
+output_lines.append(f"const _VELO = {json.dumps(_VELO, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -1018,6 +1178,7 @@ replacements = {
     '_OS': _OS, '_ASY': _ASY, '_BW': _BW, '_SD': _SD, '_N': _N, '_PR': _PR,
 }
 replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _HD})
+replacements.update({'_VELO': _VELO})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
