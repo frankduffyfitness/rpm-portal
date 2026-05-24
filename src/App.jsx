@@ -35,7 +35,7 @@ const GROUPS = {
   stf: { label: "Staff", shortLabel: "STF", color: "#8A8F98" },
 };
 
-const LAST_UPDATED = "May 23, 2026";
+const LAST_UPDATED = "May 24, 2026";
 
 const ATHLETES = _A.map((a, i) => {
   const pb = _PB[i] || [];
