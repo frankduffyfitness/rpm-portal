@@ -252,24 +252,98 @@ for pid, ath in fd['athletes'].items():
         'initials': get_initials(name),
         'sessions': sessions,
     })
-# Filter out statistical outlier sessions (misreads)
-# Override list: {athlete_name: [metrics to skip]}
+# ─── Filter out statistical-outlier sessions (force-plate misreads) ──────────
+# Robust per-athlete, per-metric filter using the MEDIAN and MAD (median
+# absolute deviation) instead of mean/standard-deviation. mean+SD is fooled when
+# an athlete has 2+ bad reads: the outliers inflate BOTH the mean and the SD, so
+# they mask each other and slip through a 3-SD test (this is exactly how Timmy
+# Stines' 26.2"/24.8" CMJ misreads got published next to his real ~13" jumps).
+# MAD is resistant to multiple outliers, so it catches them.
+#
+# OUTLIER_OVERRIDES disables filtering for a given athlete+metric — use it when
+# an athlete legitimately has extreme-but-real values you don't want dropped.
 OUTLIER_OVERRIDES = {
     "Rocco Rossi": ["rsi"],
 }
+# A value is dropped as a misread when EITHER:
+#   (1) it falls outside hard physiological bounds (a sensor error no matter
+#       what the athlete's history looks like), OR
+#   (2) it is BOTH a robust-statistical outlier (>3.5 MAD from the median) AND
+#       deviates from the athlete's own median by more than a per-metric margin.
+# The AND in (2) is the key guardrail: a consistent athlete has a tiny MAD, so a
+# genuinely good day can look like a 3.5-sigma outlier — but a real day-to-day
+# swing is small in PERCENT terms, while a misread is huge (Timmy's 26" is +79%
+# over his ~14.6" median). Requiring both spares real performance and still
+# catches the impossible reads.
+ROBUST_Z_CUTOFF = 3.5     # robust "standard deviations" from the median
+_MAD_TO_SD = 1.4826       # scales MAD onto a normal-SD footing
+PCT_FROM_MEDIAN = {       # how far from the athlete's median = implausible
+    'jh':  0.40,          # CMJ jump height — tight; real session-to-session <~30%
+    'pp':  0.40,          # relative peak power — fairly stable
+    'rsi': 0.55,          # RSI-modified — a bit noisier
+    'brk': 0.80,          # eccentric braking RFD — genuinely noisy, stay loose
+}
+ABS_BOUNDS = {            # hard sanity bounds; outside = sensor error, always drop
+    'jh':  (2.0, 50.0),   # inches
+    'rsi': (0.0, 5.0),    # RSI-mod realistically maxes well under 5
+    'pp':  (0.0, 120.0),  # W/kg
+}                         # 'brk' intentionally omitted — too variable for a fixed bound
+
+def _impossible(metric, v):
+    lo, hi = ABS_BOUNDS.get(metric, (None, None))
+    return lo is not None and (v < lo or v > hi)
+
+_misread_log = []   # (name, metric, date, value, median, robust_z, caught_by_old_filter)
 for ath in athletes_data:
     skip = OUTLIER_OVERRIDES.get(ath['name'], [])
     for metric in ['jh', 'rsi', 'pp', 'brk']:
         if metric in skip:
             continue
         vals = [s[metric] for s in ath['sessions'] if s.get(metric) is not None]
-        if len(vals) >= 5:
-            mean = sum(vals) / len(vals)
-            std = (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
-            if std > 0:
-                for s in ath['sessions']:
-                    if s.get(metric) is not None and abs(s[metric] - mean) > 3 * std:
-                        s[metric] = None
+        # Always enforce hard bounds, even with too few sessions for statistics.
+        if len(vals) < 5:
+            for s in ath['sessions']:
+                v = s.get(metric)
+                if v is not None and _impossible(metric, v):
+                    _misread_log.append((ath['name'], metric, s['date_str'], v,
+                                         None, None, False))
+                    s[metric] = None
+            continue
+        med = statistics.median(vals)
+        mad = statistics.median([abs(v - med) for v in vals])
+        # Old mean/SD numbers: back-stop the degenerate MAD==0 case and flag in
+        # the preview report which misreads the old mean/SD filter would miss.
+        mean = sum(vals) / len(vals)
+        std = (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
+        scale = _MAD_TO_SD * mad if mad > 0 else std   # fall back to SD if MAD==0
+        pct = PCT_FROM_MEDIAN.get(metric, 0.50)
+        for s in ath['sessions']:
+            v = s.get(metric)
+            if v is None:
+                continue
+            robust_out = scale > 0 and abs(v - med) / scale > ROBUST_Z_CUTOFF
+            big_dev = med > 0 and abs(v - med) / med > pct
+            if _impossible(metric, v) or (robust_out and big_dev):
+                caught_by_old = std > 0 and abs(v - mean) > 3 * std
+                rz = round(abs(v - med) / scale, 1) if scale > 0 else None
+                _misread_log.append((ath['name'], metric, s['date_str'], v,
+                                     round(med, 2), rz, caught_by_old))
+                s[metric] = None
+
+# Optional preview report: set MISREAD_REPORT=<path> to dump everything this
+# filter excluded, flagging which the previous mean/SD filter would have missed.
+if os.environ.get("MISREAD_REPORT"):
+    _new_only = [r for r in _misread_log if not r[6]]
+    with open(os.environ["MISREAD_REPORT"], "w") as _rf:
+        _rf.write(f"Sessions excluded as misreads: {len(_misread_log)}\n")
+        _rf.write(f"Newly caught (old mean/SD filter MISSED these): {len(_new_only)}\n\n")
+        _rf.write(f"{'Athlete':<24}{'metric':<7}{'date':<12}{'value':>10}{'median':>9}{'robustZ':>9}  new?\n")
+        for name, metric, date_str, v, med, rz, old in sorted(_misread_log, key=lambda r: (r[0], r[1], r[2])):
+            med_s = '—' if med is None else f"{med}"
+            rz_s = 'bound' if rz is None else f"{rz}"
+            _rf.write(f"{name:<24}{metric:<7}{date_str:<12}{v:>10}{med_s:>9}{rz_s:>9}  {'' if old else 'NEW'}\n")
+    print(f"Misread report -> {os.environ['MISREAD_REPORT']} "
+          f"({len(_misread_log)} excluded, {len(_new_only)} newly caught)", flush=True)
 
 # Filter out athletes with no test in the last 6 weeks
 athletes_data = [a for a in athletes_data if a['sessions'][0]['date'] >= ACTIVE_CUTOFF]
@@ -394,20 +468,31 @@ hop_athletes_data.sort(key=lambda a: a['name'])
 
 # ─── Generate _A Array ───────────────────────────────────────────────────────
 
+def _latest_valid(sessions, key):
+    """Most recent non-None value for a metric (sessions are newest-first).
+    Used so a misread that was nulled by the outlier filter falls back to the
+    athlete's last real reading instead of displaying 0."""
+    for sess in sessions:
+        if sess.get(key) is not None:
+            return sess[key]
+    return None
+
+
 def gen_A(athletes_data):
     """_A: [name, initials, group, bw, testCount, latestDate, jh, rsi, pp, brk, jhHist, rsiHist, bestJH, bestRSI, bestPP, bestBRK]"""
     rows = []
     for ath in athletes_data:
         s = ath['sessions']
         latest = s[0]
-        
+
         bw = round(latest['bw'], 1) if latest['bw'] else 0
         test_count = len(s)
         latest_date = latest['date_str']
-        jh = round(latest['jh'], 1) if latest['jh'] else 0
-        rsi = round(latest['rsi'], 2) if latest['rsi'] else 0
-        pp = round(latest['pp'], 1) if latest['pp'] else 0
-        brk = latest['brk'] or 0
+        jh_v, rsi_v, pp_v, brk_v = (_latest_valid(s, k) for k in ('jh', 'rsi', 'pp', 'brk'))
+        jh = round(jh_v, 1) if jh_v else 0
+        rsi = round(rsi_v, 2) if rsi_v else 0
+        pp = round(pp_v, 1) if pp_v else 0
+        brk = brk_v or 0
         
         # History (last 8 sessions, oldest to newest)
         hist = s[:HISTORY_LEN]
