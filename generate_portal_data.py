@@ -1110,6 +1110,15 @@ def gen_VELO(trackman_data, group_map, exclusions):
         # JSON has sessions newest→oldest. We need oldest→newest for history.
         sessions_chrono = list(reversed(sessions))
 
+        # 6-week active cutoff — drop pitchers who haven't thrown recently, matching
+        # the CMJ/hop ACTIVE_CUTOFF behavior. Based on the most recent session of any
+        # type, so a recent low-effort / rehab throw still counts as active.
+        try:
+            if datetime.strptime(sessions_chrono[-1].get("date", ""), "%Y-%m-%d") < ACTIVE_CUTOFF:
+                continue
+        except (ValueError, TypeError):
+            pass
+
         # Eligible = not submax, not flagged. Used for best/avg/trend math.
         eligible = [
             s for s in sessions_chrono
