@@ -99,6 +99,16 @@ GROUP_OVERRIDES = {
     "Matt Bowman": "pro",
     "Julian Minaya": "pro",
     "Mike Sirota": "pro",
+    # College pitchers
+    "Joe Hauser": "col",
+    "Shea O'Sullivan": "col",
+    "Addison Hinz-Camarano": "col",
+    "Zach Weinschel": "col",
+    "Darren Espinal": "col",
+    # Middle school
+    "Josh Miller": "ms",
+    # Men's league
+    "Carlos Solorzano": "ml",
 }
 
 # Map VALD group names → portal short codes.
@@ -109,6 +119,7 @@ VALD_GROUP_TO_CODE = {
     "College":         "col",
     "High School":     "hs",
     "Middle School":   "ms",
+    "Men's League":    "ml",
     "Female Athletes": "fem",
 }
 
@@ -116,7 +127,7 @@ VALD_GROUP_TO_CODE = {
 # Highest priority wins. Example: a college female who is in both
 # "College" and "Female Athletes" will be classified as "col".
 # Reorder this list if you want different behavior.
-GROUP_PRIORITY = ["pro", "stf", "col", "hs", "ms", "fem"]
+GROUP_PRIORITY = ["pro", "stf", "col", "ml", "hs", "ms", "fem"]
 
 
 def get_group(name, vald_groups=None):
@@ -1166,7 +1177,9 @@ def gen_VELO(trackman_data, group_map, exclusions):
         else:
             trend = 0.0
 
-        group = group_map.get(name, "hs")  # default new pitchers to high school
+        # Manual GROUP_OVERRIDES win (consistent with CMJ/hop get_group); then the
+        # name's existing classification from the jsx arrays; else default to HS.
+        group = GROUP_OVERRIDES.get(name) or group_map.get(name, "hs")
         initials = _velo_initials(name)
         sessions_count = len(sessions)  # total displayed sessions (post-exclusion)
 
