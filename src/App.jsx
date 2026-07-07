@@ -1913,32 +1913,91 @@ function PlotLegend({ types }) {
   );
 }
 
+// Shared hover/tap selection for the plot average dots. Wraps the visible dot
+// with an invisible 14px hit circle (finger-sized), supports mouse hover and
+// touch tap (tap again or tap empty space to dismiss).
+function AvgDot({ x, y, color, active, dimmed, onHover, onLeave, onTap }) {
+  return (
+    <g style={{ cursor: "pointer" }}
+      onMouseEnter={onHover} onMouseLeave={onLeave}
+      onClick={(e) => { e.stopPropagation(); onTap(); }}>
+      <circle cx={x} cy={y} r="14" fill="transparent" />
+      <circle cx={x} cy={y} r={active ? 8.5 : 7} fill={color}
+        fillOpacity={dimmed ? 0.35 : 1}
+        stroke={active ? "#fff" : "rgba(255,255,255,0.75)"}
+        strokeWidth={active ? 2 : 1.2} />
+    </g>
+  );
+}
+
+function DotDetail({ type, tot, mode }) {
+  // type: [name, count, veloAvg, veloMax, ivb, hb, spin, ext, relH, relSide, eff, mvN]
+  const box = { minHeight: 38, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 };
+  if (!type) {
+    return <div style={box}><span style={{ fontSize: 9, color: "#4A4F57" }}>Tap a large dot for pitch details</span></div>;
+  }
+  const L = ({ children }) => <span style={{ color: "#6B7280" }}>{children}</span>;
+  const partial = type[11] != null && type[11] < type[1];
+  return (
+    <div style={{ ...box, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "7px 12px" }}>
+      <div style={{ fontSize: 10.5, color: "#E0E0E0", display: "flex", flexWrap: "wrap", gap: "3px 10px", alignItems: "center", justifyContent: "center", fontWeight: 600 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: pColor(type[0]), display: "inline-block" }} />
+          <span style={{ color: pColor(type[0]), fontWeight: 800 }}>{type[0]}</span>
+        </span>
+        <span><L>{type[1] === 1 ? "pitch" : "pitches"} </L>{type[1]} {partial ? <L>({type[11]} tracked)</L> : null}</span>
+        {mode === "mv" ? (<>
+          <span><L>velo </L>{type[2] != null ? type[2].toFixed(1) : "–"}<L> mph</L></span>
+          <span><L>ivb </L>{type[4] != null ? type[4].toFixed(1) : "–"}</span>
+          <span><L>hb </L>{type[5] != null ? type[5].toFixed(1) : "–"}</span>
+          <span><L>spin </L>{type[6] != null ? type[6] : "–"}</span>
+          {type[10] != null ? <span><L>eff </L>{type[10]}%</span> : null}
+        </>) : (<>
+          <span><L>rel height </L>{type[8] != null ? type[8].toFixed(1) : "–"}<L> ft</L></span>
+          <span><L>rel side </L>{type[9] != null ? type[9].toFixed(1) : "–"}<L> ft</L></span>
+          <span><L>extension </L>{type[7] != null ? type[7].toFixed(1) : "–"}<L> ft</L></span>
+        </>)}
+      </div>
+    </div>
+  );
+}
+
 function MovementPlot({ session }) {
   const W = 320, C = W / 2, S = W / 50; // ±25 in domain
   const cl = (v) => Math.max(-24.5, Math.min(24.5, v));
   const X = (v) => C + cl(v) * S, Y = (v) => C - cl(v) * S;
   const dots = session.dots.filter((d) => d[1] != null && d[2] != null);
+  const [hov, setHov] = useState(null);
+  const [pin, setPin] = useState(null);
+  const act = pin != null ? pin : hov;
   return (
-    <svg viewBox={"0 0 " + W + " " + W} style={{ width: "100%", display: "block" }}>
-      {[-20, -10, 10, 20].map((g) => (
-        <g key={g}>
-          <line x1={X(g)} y1={0} x2={X(g)} y2={W} stroke="rgba(255,255,255,0.05)" />
-          <line x1={0} y1={Y(g)} x2={W} y2={Y(g)} stroke="rgba(255,255,255,0.05)" />
-          <text x={X(g)} y={C + 12} textAnchor="middle" fontSize="8" fill="#4A4F57">{g}</text>
-          <text x={C + 5} y={Y(g) + 3} fontSize="8" fill="#4A4F57">{g}</text>
-        </g>
-      ))}
-      <line x1={C} y1={0} x2={C} y2={W} stroke="rgba(255,255,255,0.14)" />
-      <line x1={0} y1={C} x2={W} y2={C} stroke="rgba(255,255,255,0.14)" />
-      {dots.map((d, i) => (
-        <circle key={i} cx={X(d[2])} cy={Y(d[1])} r="4"
-          fill={pColor((session.types[d[0]] || [])[0])} fillOpacity="0.4" />
-      ))}
-      {session.types.map((t, i) => (t[4] != null && t[5] != null) ? (
-        <circle key={"a" + i} cx={X(t[5])} cy={Y(t[4])} r="7"
-          fill={pColor(t[0])} stroke="rgba(255,255,255,0.75)" strokeWidth="1.2" />
-      ) : null)}
-    </svg>
+    <div>
+      <DotDetail type={act != null ? session.types[act] : null} tot={session.tot} mode="mv" />
+      <svg viewBox={"0 0 " + W + " " + W} style={{ width: "100%", display: "block" }}
+        onClick={() => setPin(null)}>
+        {[-20, -10, 10, 20].map((g) => (
+          <g key={g}>
+            <line x1={X(g)} y1={0} x2={X(g)} y2={W} stroke="rgba(255,255,255,0.05)" />
+            <line x1={0} y1={Y(g)} x2={W} y2={Y(g)} stroke="rgba(255,255,255,0.05)" />
+            <text x={X(g)} y={C + 12} textAnchor="middle" fontSize="8" fill="#4A4F57">{g}</text>
+            <text x={C + 5} y={Y(g) + 3} fontSize="8" fill="#4A4F57">{g}</text>
+          </g>
+        ))}
+        <line x1={C} y1={0} x2={C} y2={W} stroke="rgba(255,255,255,0.14)" />
+        <line x1={0} y1={C} x2={W} y2={C} stroke="rgba(255,255,255,0.14)" />
+        {dots.map((d, i) => (
+          <circle key={i} cx={X(d[2])} cy={Y(d[1])} r="4"
+            fill={pColor((session.types[d[0]] || [])[0])}
+            fillOpacity={act == null ? 0.4 : (d[0] === act ? 0.55 : 0.12)} />
+        ))}
+        {session.types.map((t, i) => (t[4] != null && t[5] != null) ? (
+          <AvgDot key={"a" + i} x={X(t[5])} y={Y(t[4])} color={pColor(t[0])}
+            active={act === i} dimmed={act != null && act !== i}
+            onHover={() => setHov(i)} onLeave={() => setHov(null)}
+            onTap={() => setPin(pin === i ? null : i)} />
+        ) : null)}
+      </svg>
+    </div>
   );
 }
 
@@ -1947,30 +2006,40 @@ function ReleasePlot({ session }) {
   const X = (v) => W / 2 + Math.max(-4, Math.min(4, v)) * 38;
   const Y = (v) => GY - Math.max(0, Math.min(7.2, v)) * 22;
   const dots = session.dots.filter((d) => d[3] != null && d[4] != null);
+  const [hov, setHov] = useState(null);
+  const [pin, setPin] = useState(null);
+  const act = pin != null ? pin : hov;
   return (
-    <svg viewBox={"0 0 " + W + " " + H} style={{ width: "100%", display: "block" }}>
-      {[2, 4, 6].map((g) => (
-        <g key={g}>
-          <line x1={0} y1={Y(g)} x2={W} y2={Y(g)} stroke="rgba(255,255,255,0.05)" />
-          <text x={5} y={Y(g) + 3} fontSize="8" fill="#4A4F57">{g}ft</text>
-        </g>
-      ))}
-      {[-2, 2].map((g) => (
-        <text key={g} x={X(g)} y={GY + 12} textAnchor="middle" fontSize="8" fill="#4A4F57">{g}</text>
-      ))}
-      <path d={"M " + (W / 2 - 92) + " " + GY + " Q " + W / 2 + " " + (GY - 20) + " " + (W / 2 + 92) + " " + GY}
-        fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" />
-      <rect x={W / 2 - 11} y={GY - 13} width="22" height="3" rx="1" fill="rgba(255,255,255,0.35)" />
-      <line x1={0} y1={GY} x2={W} y2={GY} stroke="rgba(255,255,255,0.12)" />
-      {dots.map((d, i) => (
-        <circle key={i} cx={X(d[4])} cy={Y(d[3])} r="4"
-          fill={pColor((session.types[d[0]] || [])[0])} fillOpacity="0.4" />
-      ))}
-      {session.types.map((t, i) => (t[8] != null && t[9] != null) ? (
-        <circle key={"a" + i} cx={X(t[9])} cy={Y(t[8])} r="7"
-          fill={pColor(t[0])} stroke="rgba(255,255,255,0.75)" strokeWidth="1.2" />
-      ) : null)}
-    </svg>
+    <div>
+      <DotDetail type={act != null ? session.types[act] : null} tot={session.tot} mode="rel" />
+      <svg viewBox={"0 0 " + W + " " + H} style={{ width: "100%", display: "block" }}
+        onClick={() => setPin(null)}>
+        {[2, 4, 6].map((g) => (
+          <g key={g}>
+            <line x1={0} y1={Y(g)} x2={W} y2={Y(g)} stroke="rgba(255,255,255,0.05)" />
+            <text x={5} y={Y(g) + 3} fontSize="8" fill="#4A4F57">{g}ft</text>
+          </g>
+        ))}
+        {[-2, 2].map((g) => (
+          <text key={g} x={X(g)} y={GY + 12} textAnchor="middle" fontSize="8" fill="#4A4F57">{g}</text>
+        ))}
+        <path d={"M " + (W / 2 - 92) + " " + GY + " Q " + W / 2 + " " + (GY - 20) + " " + (W / 2 + 92) + " " + GY}
+          fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" />
+        <rect x={W / 2 - 11} y={GY - 13} width="22" height="3" rx="1" fill="rgba(255,255,255,0.35)" />
+        <line x1={0} y1={GY} x2={W} y2={GY} stroke="rgba(255,255,255,0.12)" />
+        {dots.map((d, i) => (
+          <circle key={i} cx={X(d[4])} cy={Y(d[3])} r="4"
+            fill={pColor((session.types[d[0]] || [])[0])}
+            fillOpacity={act == null ? 0.4 : (d[0] === act ? 0.55 : 0.12)} />
+        ))}
+        {session.types.map((t, i) => (t[8] != null && t[9] != null) ? (
+          <AvgDot key={"a" + i} x={X(t[9])} y={Y(t[8])} color={pColor(t[0])}
+            active={act === i} dimmed={act != null && act !== i}
+            onHover={() => setHov(i)} onLeave={() => setHov(null)}
+            onTap={() => setPin(pin === i ? null : i)} />
+        ) : null)}
+      </svg>
+    </div>
   );
 }
 
@@ -2023,7 +2092,7 @@ function BullpenBreakdown({ name }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: pColor(t[0]) }} />
               <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", flex: 1 }}>{t[0]}</div>
-              <div style={{ fontSize: 10, color: "#6B7280" }}>{t[1]} {"·"} {Math.round((t[1] / s.tot) * 100)}%{t[11] != null && t[11] < t[1] ? <span style={{ color: "#4A4F57" }}> {"·"} {t[11]}/{t[1]} tracked</span> : null}</div>
+              <div style={{ fontSize: 10, color: "#6B7280" }}>{t[1]} {t[1] === 1 ? "pitch" : "pitches"} {"·"} {Math.round((t[1] / s.tot) * 100)}% usage{t[11] != null && t[11] < t[1] ? <span style={{ color: "#4A4F57" }}> {"·"} {t[11]}/{t[1]} tracked</span> : null}</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
               {cells(t).map(([l, v], j) => (
