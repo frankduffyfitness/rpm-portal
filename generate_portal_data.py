@@ -1271,6 +1271,54 @@ _HD = gen_HD(hop_athletes_data)
 _velo_groups = _velo_extract_groups_from_jsx(jsx)
 _VELO = gen_VELO(trackman, _velo_groups, VELO_MANUAL_EXCLUSIONS)
 
+
+# ─── TrackMan session reports (Bullpen Breakdown) ────────────────────────────
+# trackman_reports.json is produced by trackman_reports_sync.py from the
+# per-session PDF exports. Keyed by athlete name; rendered on the velo profile.
+TRACKMAN_REPORTS_JSON = "trackman_reports.json"
+
+def _month_abbr(iso):
+    d = datetime.strptime(iso, "%Y-%m-%d")
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    return d, months[d.month - 1]
+
+def gen_TMR(velo_rows):
+    """_TMR: {name: [session, ...]} newest-first. Per session:
+    {d: chip label, df: full date, st: session type, tot: pitch count,
+     types: [[name, count, veloAvg, veloMax, ivb, hb, spin, ext, relH, relSide, eff]],
+     dots:  [[typeIdx, ivb, hb, relH, relSide]]}   (typeIdx → types index)"""
+    if not os.path.exists(TRACKMAN_REPORTS_JSON):
+        return {}
+    with open(TRACKMAN_REPORTS_JSON) as f:
+        rep = json.load(f)
+    velo_names = {r[0] for r in velo_rows}
+    out = {}
+    for name, ath in (rep.get("athletes") or {}).items():
+        if name not in velo_names:
+            print(f"  NOTE: trackman reports for '{name}' but no active velo "
+                  f"card — breakdown won't show until they're active", flush=True)
+        sess_out = []
+        for s in ath.get("sessions", []):
+            d, mon = _month_abbr(s["date"])
+            tnames = [t["name"] for t in s["types"]]
+            types_arr = [[t["name"], t["count"], t["veloAvg"], t["veloMax"],
+                          t["ivb"], t["hb"],
+                          round(t["spinAvg"]) if t["spinAvg"] is not None else None,
+                          t["ext"], t["relH"], t["relSide"], t["effAvg"]]
+                         for t in s["types"]]
+            dots = [[tnames.index(p["type"]) if p.get("type") in tnames else -1,
+                     p["ivb"], p["hb"], p["relH"], p["relSide"]]
+                    for p in s["pitches"]]
+            sess_out.append({"d": f"{mon} {d.day}", "df": f"{mon} {d.day}, {d.year}",
+                             "st": s["sessionType"], "tot": s["total"],
+                             "types": types_arr, "dots": dots})
+        if sess_out:
+            out[name] = sess_out
+    return out
+
+_TMR = gen_TMR(_VELO)
+
 print(f"  _A:   {len(_A)} athletes", flush=True)
 print(f"  _PB:  {len(_PB)} entries", flush=True)
 print(f"  _T:   {len(_T)} trends", flush=True)
@@ -1285,6 +1333,8 @@ print(f"  _PR:  {len(_PR)} new PRs", flush=True)
 print(f"  _HA:  {len(_HA)} hop athletes", flush=True)
 print(f"  _HPB: {len(_HPB)} hop personal bests", flush=True)
 print(f"  _VELO: {len(_VELO)} pitchers (trackman {'loaded' if trackman else 'MISSING — _VELO empty'})", flush=True)
+print(f"  _TMR: {len(_TMR)} pitchers with bullpen reports "
+      f"({sum(len(v) for v in _TMR.values())} sessions)", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
 print(f"  _HD:  {len(_HD)} hop session dates", flush=True)
@@ -1314,6 +1364,7 @@ output_lines.append(f"const _HT = {json.dumps(_HT, separators=(',', ':'))};")
 output_lines.append(f"const _HN = {json.dumps(_HN, separators=(',', ':'))};")
 output_lines.append(f"const _HD = {json.dumps(_HD, separators=(',', ':'))};")
 output_lines.append(f"const _VELO = {json.dumps(_VELO, separators=(',', ':'))};")
+output_lines.append(f"const _TMR = {json.dumps(_TMR, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -1334,6 +1385,7 @@ replacements = {
 }
 replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _HD})
 replacements.update({'_VELO': _VELO})
+replacements.update({'_TMR': _TMR})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
