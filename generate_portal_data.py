@@ -293,11 +293,13 @@ PCT_FROM_MEDIAN = {       # how far from the athlete's median = implausible
     'pp':  0.40,          # relative peak power — fairly stable
     'rsi': 0.55,          # RSI-modified — a bit noisier
     'brk': 0.80,          # eccentric braking RFD — genuinely noisy, stay loose
+    'bw':  0.25,          # bodyweight — very stable; a 25%+ single-session swing = scale misread
 }
 ABS_BOUNDS = {            # hard sanity bounds; outside = sensor error, always drop
     'jh':  (2.0, 50.0),   # inches
     'rsi': (0.0, 5.0),    # RSI-mod realistically maxes well under 5
     'pp':  (0.0, 120.0),  # W/kg
+    'bw':  (40.0, 400.0), # lbs — backstop for absurd scale reads
 }                         # 'brk' intentionally omitted — too variable for a fixed bound
 
 def _impossible(metric, v):
@@ -307,12 +309,15 @@ def _impossible(metric, v):
 _misread_log = []   # (name, metric, date, value, median, robust_z, caught_by_old_filter)
 for ath in athletes_data:
     skip = OUTLIER_OVERRIDES.get(ath['name'], [])
-    for metric in ['jh', 'rsi', 'pp', 'brk']:
+    for metric in ['jh', 'rsi', 'pp', 'brk', 'bw']:
         if metric in skip:
             continue
         vals = [s[metric] for s in ath['sessions'] if s.get(metric) is not None]
-        # Always enforce hard bounds, even with too few sessions for statistics.
-        if len(vals) < 5:
+        # With 1-2 readings there's no basis for a relative outlier test, so only
+        # hard physiological bounds apply. The robust median/MAD test kicks in at 3+
+        # (was 5) so athletes with just a handful of sessions — e.g. a middle-schooler
+        # with 4 tests and one 42.8 lb scale misread — are still protected.
+        if len(vals) < 3:
             for s in ath['sessions']:
                 v = s.get(metric)
                 if v is not None and _impossible(metric, v):
@@ -496,10 +501,10 @@ def gen_A(athletes_data):
         s = ath['sessions']
         latest = s[0]
 
-        bw = round(latest['bw'], 1) if latest['bw'] else 0
         test_count = len(s)
         latest_date = latest['date_str']
-        jh_v, rsi_v, pp_v, brk_v = (_latest_valid(s, k) for k in ('jh', 'rsi', 'pp', 'brk'))
+        bw_v, jh_v, rsi_v, pp_v, brk_v = (_latest_valid(s, k) for k in ('bw', 'jh', 'rsi', 'pp', 'brk'))
+        bw = round(bw_v, 1) if bw_v else 0
         jh = round(jh_v, 1) if jh_v else 0
         rsi = round(rsi_v, 2) if rsi_v else 0
         pp = round(pp_v, 1) if pp_v else 0
