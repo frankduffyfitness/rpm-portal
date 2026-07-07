@@ -299,12 +299,43 @@ ABS_BOUNDS = {            # hard sanity bounds; outside = sensor error, always d
     'jh':  (2.0, 50.0),   # inches
     'rsi': (0.0, 5.0),    # RSI-mod realistically maxes well under 5
     'pp':  (0.0, 120.0),  # W/kg
-    'bw':  (40.0, 400.0), # lbs — backstop for absurd scale reads
+    'bw':  (50.0, 400.0), # lbs — no RPM athlete is under 50 lb, so sub-50 = misread even at low session counts
 }                         # 'brk' intentionally omitted — too variable for a fixed bound
 
 def _impossible(metric, v):
     lo, hi = ABS_BOUNDS.get(metric, (None, None))
     return lo is not None and (v < lo or v > hi)
+
+
+def _filter_one_metric(athletes, metric, log):
+    """Apply the same robust misread filter to a single metric across a list of
+    athletes. Used to extend bodyweight filtering to the hop pipeline (a scale
+    misread shows up in both CMJ and hop, which are built separately)."""
+    pct = PCT_FROM_MEDIAN.get(metric, 0.50)
+    for ath in athletes:
+        vals = [s[metric] for s in ath['sessions'] if s.get(metric) is not None]
+        if len(vals) < 3:
+            for s in ath['sessions']:
+                v = s.get(metric)
+                if v is not None and _impossible(metric, v):
+                    log.append((ath['name'], metric, s['date_str'], v, None, None, False))
+                    s[metric] = None
+            continue
+        med = statistics.median(vals)
+        mad = statistics.median([abs(v - med) for v in vals])
+        mean = sum(vals) / len(vals)
+        std = (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
+        scale = _MAD_TO_SD * mad if mad > 0 else std
+        for s in ath['sessions']:
+            v = s.get(metric)
+            if v is None:
+                continue
+            robust_out = scale > 0 and abs(v - med) / scale > ROBUST_Z_CUTOFF
+            big_dev = med > 0 and abs(v - med) / med > pct
+            if _impossible(metric, v) or (robust_out and big_dev):
+                rz = round(abs(v - med) / scale, 1) if scale > 0 else None
+                log.append((ath['name'], metric, s['date_str'], v, round(med, 2), rz, False))
+                s[metric] = None
 
 _misread_log = []   # (name, metric, date, value, median, robust_z, caught_by_old_filter)
 for ath in athletes_data:
@@ -475,6 +506,16 @@ for pid, ath in fd['athletes'].items():
         'initials': get_initials(name),
         'sessions': sessions,
     })
+
+# Bodyweight is measured by the same force plate for hop tests, so a scale misread
+# (e.g. Scarlett Molina's 42.8 lb) lands in the hop pipeline too — apply the same
+# bodyweight filter here. pfbm divides by bodyweight, so null it on any session
+# whose bodyweight we drop (its value is derived from the bad reading).
+_filter_one_metric(hop_athletes_data, 'bw', _misread_log)
+for ath in hop_athletes_data:
+    for s in ath['sessions']:
+        if s.get('bw') is None:
+            s['pfbm'] = None
 
 # Filter out hop athletes with no test in the last 6 weeks (matches CMJ behavior)
 hop_athletes_data = [a for a in hop_athletes_data if a['sessions'][0]['date'] >= ACTIVE_CUTOFF]
@@ -893,13 +934,15 @@ def gen_HA(hop_athletes_data):
         s = ath['sessions']
         latest = s[0]
 
-        bw = round(latest['bw'], 1) if latest['bw'] else 0
+        bw_v = _latest_valid(s, 'bw')      # fall back past a nulled scale misread
+        bw = round(bw_v, 1) if bw_v else 0
         test_count = len(s)
         latest_date = latest['date_str']
         rsi = round(latest['rsi'], 2) if latest['rsi'] else 0
         ct = round(latest['ct'], 1) if latest['ct'] else 0
         ft = round(latest['ft'], 1) if latest['ft'] else 0
-        pfbm = round(latest['pfbm'], 2) if latest['pfbm'] else 0
+        pfbm_v = _latest_valid(s, 'pfbm')  # derived from bw; nulled alongside a bad bw
+        pfbm = round(pfbm_v, 2) if pfbm_v else 0
 
         # Last HISTORY_LEN sessions, oldest to newest
         hist = s[:HISTORY_LEN]
