@@ -1286,8 +1286,16 @@ def _month_abbr(iso):
 def gen_TMR(velo_rows):
     """_TMR: {name: [session, ...]} newest-first. Per session:
     {d: chip label, df: full date, st: session type, tot: pitch count,
-     types: [[name, count, veloAvg, veloMax, ivb, hb, spin, ext, relH, relSide, eff]],
-     dots:  [[typeIdx, ivb, hb, relH, relSide]]}   (typeIdx → types index)"""
+     types: [[name, count, veloAvg, veloMax, ivb, hb, spin, ext, relH, relSide, eff, mvN]],
+     dots:  [[typeIdx, ivb, hb, relH, relSide]]}   (typeIdx → types index)
+
+    Movement (ivb/hb) is computed from the MEASURED per-pitch data, not from
+    TrackMan's summary row: the mobile unit often fails to track movement on
+    breaking pitches, and the summary averages demonstrably contradict the
+    report's own per-pitch rows there (e.g. LoBello 7/6 "curveball avg IVB
+    +9.2" whose two measured pitches average −2). mvN = movement-tracked pitch
+    count; averages show when ≥2 pitches tracked (or the type fully tracked),
+    else null → the UI renders "–" and draws no average dot."""
     if not os.path.exists(TRACKMAN_REPORTS_JSON):
         return {}
     with open(TRACKMAN_REPORTS_JSON) as f:
@@ -1302,11 +1310,21 @@ def gen_TMR(velo_rows):
         for s in ath.get("sessions", []):
             d, mon = _month_abbr(s["date"])
             tnames = [t["name"] for t in s["types"]]
-            types_arr = [[t["name"], t["count"], t["veloAvg"], t["veloMax"],
-                          t["ivb"], t["hb"],
-                          round(t["spinAvg"]) if t["spinAvg"] is not None else None,
-                          t["ext"], t["relH"], t["relSide"], t["effAvg"]]
-                         for t in s["types"]]
+            types_arr = []
+            for t in s["types"]:
+                measured = [p for p in s["pitches"]
+                            if p.get("type") == t["name"]
+                            and p.get("ivb") is not None and p.get("hb") is not None]
+                mv_n = len(measured)
+                if mv_n >= 2 or (mv_n >= 1 and mv_n == t["count"]):
+                    ivb_v = round(sum(p["ivb"] for p in measured) / mv_n, 1)
+                    hb_v = round(sum(p["hb"] for p in measured) / mv_n, 1)
+                else:
+                    ivb_v = hb_v = None
+                types_arr.append([t["name"], t["count"], t["veloAvg"], t["veloMax"],
+                                  ivb_v, hb_v,
+                                  round(t["spinAvg"]) if t["spinAvg"] is not None else None,
+                                  t["ext"], t["relH"], t["relSide"], t["effAvg"], mv_n])
             dots = [[tnames.index(p["type"]) if p.get("type") in tnames else -1,
                      p["ivb"], p["hb"], p["relH"], p["relSide"]]
                     for p in s["pitches"]]
