@@ -580,6 +580,12 @@ def gen_A(athletes_data):
         hist.reverse()
         jh_hist = [round(h['jh'], 1) for h in hist if h['jh'] is not None]
         rsi_hist = [round(h['rsi'], 2) for h in hist if h['rsi'] is not None]
+        # Dates paired 1:1 with each (filtered) history above — the profile
+        # sparklines previously indexed the athlete's FULL session-date list,
+        # so hover labels showed their first-ever sessions (e.g. Tyler Koenig's
+        # recent jumps labeled 08/2025).
+        jh_hist_d = [h['date_str'] for h in hist if h['jh'] is not None]
+        rsi_hist_d = [h['date_str'] for h in hist if h['rsi'] is not None]
         
         # All-time bests
         all_jh = [h['jh'] for h in s if h['jh'] is not None]
@@ -595,7 +601,8 @@ def gen_A(athletes_data):
         rows.append([
             ath['name'], ath['initials'], ath['group'], bw, test_count, latest_date,
             jh, rsi, pp, brk, jh_hist, rsi_hist,
-            best_jh, best_rsi, best_pp, best_brk
+            best_jh, best_rsi, best_pp, best_brk,
+            jh_hist_d, rsi_hist_d
         ])
     
     return rows
@@ -969,6 +976,9 @@ def gen_HA(hop_athletes_data):
         rsi_hist = [round(h['rsi'], 2) for h in hist if h['rsi'] is not None]
         ct_hist = [round(h['ct'], 1) for h in hist if h['ct'] is not None]
         ft_hist = [round(h['ft'], 1) for h in hist if h['ft'] is not None]
+        rsi_hist_d = [h['date_str'] for h in hist if h['rsi'] is not None]
+        ct_hist_d = [h['date_str'] for h in hist if h['ct'] is not None]
+        ft_hist_d = [h['date_str'] for h in hist if h['ft'] is not None]
 
         all_rsi = [h['rsi'] for h in s if h['rsi'] is not None]
         all_ct = [h['ct'] for h in s if h['ct'] is not None]
@@ -984,6 +994,7 @@ def gen_HA(hop_athletes_data):
             ath['name'], ath['initials'], ath['group'], bw, test_count, latest_date,
             rsi, ct, ft, pfbm, rsi_hist, ct_hist,
             best_rsi, best_ct, best_ft, best_pfbm, ft_hist,
+            rsi_hist_d, ct_hist_d, ft_hist_d,
         ])
     return rows
 
