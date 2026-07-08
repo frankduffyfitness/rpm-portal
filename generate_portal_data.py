@@ -111,6 +111,26 @@ GROUP_OVERRIDES = {
     "Carlos Solorzano": "ml",
 }
 
+# Female athletes (Frank's definitive roster, 2026-07-08). They KEEP their
+# school group as the primary classification (rankings, card color, percentile
+# comparisons) and are additionally labeled/filterable as Female Athletes:
+# they feed the 'fem' norms alongside their school group's, get a FEM badge,
+# and match the Female Athletes filter. Matching collapses whitespace (the
+# VALD data has e.g. "Francesca  Albergo" with a double space).
+FEMALE_ATHLETES = {
+    "Francesca Albergo", "Nicole Berinato", "Victoria Barrientos",
+    "Grace Bekios", "Bella Cafasso", "Sophia Conrath", "Barbara DiMaria",
+    "Niki Eckert", "Samantha Hartwig", "Aryanna Hernandez", "Tiana Hernandez",
+    "Lyla Kondel", "Amber Mangold", "Scarlett Molina", "Diem Nenadich",
+    "Angelina Pardo", "Olivia Pichardo", "Anaya Sanchez", "Olivia Santiago",
+    "Lily Sheehan", "Jayleen Torres", "Morgan Wallace", "Amy Welsh",
+}
+_FEM_NORM = {" ".join(n.split()).lower() for n in FEMALE_ATHLETES}
+
+def is_female(name):
+    return " ".join((name or "").split()).lower() in _FEM_NORM
+
+
 # Map VALD group names → portal short codes.
 # Edit this if you rename a group in VALD or add a new group.
 VALD_GROUP_TO_CODE = {
@@ -855,18 +875,13 @@ def gen_N(athletes_data):
             continue
         
         g = ath['group']
-        if latest['jh']: 
-            groups[g]['jh'].append(latest['jh'])
-            groups['all']['jh'].append(latest['jh'])
-        if latest['rsi']:
-            groups[g]['rsi'].append(latest['rsi'])
-            groups['all']['rsi'].append(latest['rsi'])
-        if latest['pp']:
-            groups[g]['pp'].append(latest['pp'])
-            groups['all']['pp'].append(latest['pp'])
-        if latest['brk']:
-            groups[g]['brk'].append(latest['brk'])
-            groups['all']['brk'].append(latest['brk'])
+        # Female athletes feed the 'fem' norms IN ADDITION to their school
+        # group's — dual membership, so "vs Female Athletes" comparisons work.
+        targets = ['all', g] + (['fem'] if is_female(ath['name']) and g != 'fem' else [])
+        for m in ('jh', 'rsi', 'pp', 'brk'):
+            if latest[m]:
+                for t in targets:
+                    groups[t][m].append(latest[m])
     
     def pctiles(vals):
         if len(vals) < 3:
@@ -1055,11 +1070,13 @@ def gen_HN(hop_athletes_data):
         if latest['date'] < ACTIVE_CUTOFF:
             continue
         g = ath['group']
+        # Dual membership: female athletes also feed the 'fem' hop norms.
+        targets = ['all', g] + (['fem'] if is_female(ath['name']) and g != 'fem' else [])
         for m in ('rsi', 'ct', 'ft', 'pfbm'):
             v = latest.get(m)
             if v:
-                groups[g][m].append(v)
-                groups['all'][m].append(v)
+                for t in targets:
+                    groups[t][m].append(v)
 
     def pctiles(vals):
         if len(vals) < 3:
@@ -1337,6 +1354,12 @@ def gen_TMR(velo_rows):
 
 _TMR = gen_TMR(_VELO)
 
+# Female-athlete name list for the UI (exact data-spelling strings, so
+# FEM_SET.has(a.name) matches even quirks like "Francesca  Albergo").
+_FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
+              {ath['name'] for ath in hop_athletes_data if is_female(ath['name'])} |
+              {r[0] for r in _VELO if is_female(r[0])})
+
 print(f"  _A:   {len(_A)} athletes", flush=True)
 print(f"  _PB:  {len(_PB)} entries", flush=True)
 print(f"  _T:   {len(_T)} trends", flush=True)
@@ -1353,6 +1376,7 @@ print(f"  _HPB: {len(_HPB)} hop personal bests", flush=True)
 print(f"  _VELO: {len(_VELO)} pitchers (trackman {'loaded' if trackman else 'MISSING — _VELO empty'})", flush=True)
 print(f"  _TMR: {len(_TMR)} pitchers with bullpen reports "
       f"({sum(len(v) for v in _TMR.values())} sessions)", flush=True)
+print(f"  _FEM: {len(_FEM)} female athletes labeled", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
 print(f"  _HD:  {len(_HD)} hop session dates", flush=True)
@@ -1383,6 +1407,7 @@ output_lines.append(f"const _HN = {json.dumps(_HN, separators=(',', ':'))};")
 output_lines.append(f"const _HD = {json.dumps(_HD, separators=(',', ':'))};")
 output_lines.append(f"const _VELO = {json.dumps(_VELO, separators=(',', ':'))};")
 output_lines.append(f"const _TMR = {json.dumps(_TMR, separators=(',', ':'))};")
+output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -1404,6 +1429,7 @@ replacements = {
 replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _HD})
 replacements.update({'_VELO': _VELO})
 replacements.update({'_TMR': _TMR})
+replacements.update({'_FEM': _FEM})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
