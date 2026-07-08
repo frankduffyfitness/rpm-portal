@@ -1744,6 +1744,17 @@ function ProfileSearch({ athletes, onSelect, testLabel }) {
   );
 }
 
+// True percentile rank among active RPM pitchers (peak FB velo). Replaces the
+// old two-anchor interpolation between p10 and p90, which clamped everyone at
+// or below the 10th-percentile velo to "1st" (~6 of 56 pitchers) and everyone
+// at or above the 90th to "99th".
+function veloPct(peak) {
+  let below = 0, ties = 0;
+  for (const v of VELO_ATHLETES) { if (v.peakEver < peak) below++; else if (v.peakEver === peak) ties++; }
+  const n = VELO_ATHLETES.length || 1;
+  return Math.min(99, Math.max(1, Math.round(((below + 0.5 * ties) / n) * 100)));
+}
+
 function VeloTab({ onSelect }) {
   const [sort, setSort] = useState("peak");
   const [vGroup, setVGroup] = useState("all");
@@ -1785,8 +1796,7 @@ function VeloTab({ onSelect }) {
       </div>
 
       {sorted_athletes.map((a, i) => {
-        const vn = VELO_NORMS.all || {};
-  const pct = vn.p90 > vn.p10 ? Math.min(100, Math.max(0, ((a.peakEver - vn.p10) / (vn.p90 - vn.p10)) * 100)) : 50;
+        const pct = veloPct(a.peakEver);
         const tierColor = pct >= 80 ? "#4FFFB0" : pct >= 60 ? "#60A5FA" : pct >= 35 ? "#FFB020" : "#FF8C42";
         const mn = Math.min(...a.peakHistory) * 0.97;
         const mx = Math.max(...a.peakHistory) * 1.03;
@@ -2140,8 +2150,7 @@ function VeloProfile({ athlete, onBack }) {
   const trendColor = a.trend > 0 ? "#4FFFB0" : a.trend < 0 ? "#FF6B6B" : "#8A8F98";
   
   
-  const vn = VELO_NORMS.all || {};
-  const pct = vn.p90 > vn.p10 ? Math.min(99, Math.max(1, Math.round(((a.peakEver - vn.p10) / (vn.p90 - vn.p10)) * 100))) : 50;
+  const pct = veloPct(a.peakEver);
   const tierColor = pct >= 80 ? "#4FFFB0" : pct >= 60 ? "#60A5FA" : pct >= 35 ? "#FFB020" : "#FF8C42";
   const tier = pct >= 90 ? "Elite" : pct >= 75 ? "Above Avg" : pct >= 50 ? "Average" : pct >= 25 ? "Developing" : "Building";
   
