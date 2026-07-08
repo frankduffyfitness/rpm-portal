@@ -2172,7 +2172,7 @@ function VeloProfile({ athlete, onBack }) {
           <div style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 10, background: tierColor + "22", color: tierColor }}>{tier}</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: tierColor }}>{pct}<span style={{ fontSize: 14, color: "#6B7280" }}>th</span></div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: tierColor }}>{pct}<span style={{ fontSize: 14, color: "#6B7280" }}>{["th","st","nd","rd"][(pct%100-20)%10] || ["th","st","nd","rd"][pct%100] || "th"}</span></div>
           <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 4, position: "relative" }}>
             <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: pct + "%", background: `linear-gradient(90deg, ${tierColor}44, ${tierColor})`, borderRadius: 4 }} />
           </div>
@@ -2351,7 +2351,7 @@ export default function App() {
         )}
       </div>
       {tab !== "home" && <div style={{ display: "flex", margin: "0 20px 8px", gap: 8 }}>
-        {[{ key: "cmj", label: "CMJ" }, { key: "hop", label: "Hop Test" }, { key: "velo", label: "Velo" }].map(t => (
+        {[{ key: "cmj", label: "CMJ" }, { key: "hop", label: "Hop Test" }, { key: "velo", label: "TrackMan" }].map(t => (
           <button key={t.key} onClick={() => { setTestType(t.key); setTab("profile"); if (t.key === "velo") setVeloProfileSearch(true); window.scrollTo(0, 0); }} style={{
             flex: 1, padding: "10px 0", border: "none", borderRadius: 10, cursor: "pointer",
             fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
