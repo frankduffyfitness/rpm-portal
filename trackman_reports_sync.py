@@ -166,11 +166,56 @@ def assign_types(pitches, types, log_prefix=""):
             cands.append((dv * dv + ds * ds + dh * dh, i, t["name"]))
     cands.sort()
     assigned = {}
-    for dist, i, tname in cands:
+    for dd, i, tname in cands:
         if i in assigned or quotas.get(tname, 0) <= 0:
             continue
         assigned[i] = tname
         quotas[tname] -= 1
+
+    # 2-opt refinement against TrackMan's OWN aggregates: greedy quota-filling
+    # can strand a pitch on the wrong type (e.g. the session's hardest pitch
+    # labeled Sinker because closer pitches filled the Fastball quota first).
+    # The ground truth we can check is the summary table's per-type velo/spin
+    # averages, so swap pitch pairs whenever the exchange brings our per-type
+    # means closer to the table's. Quotas are preserved by swapping.
+    table = {t["name"]: t for t in types}
+
+    def objective(a):
+        cost = 0.0
+        by_type = {}
+        for i, tn in a.items():
+            by_type.setdefault(tn, []).append(pitches[i])
+        for tn, ps in by_type.items():
+            t = table[tn]
+            if t.get("veloAvg") is not None:
+                cost += abs(sum(p["velo"] for p in ps) / len(ps) - t["veloAvg"])
+            spins = [p["spin"] for p in ps if p["spin"] is not None]
+            if spins and t.get("spinAvg") is not None:
+                cost += abs(sum(spins) / len(spins) - t["spinAvg"]) / 150.0
+            hbs = [p["hb"] for p in ps if p["hb"] is not None]
+            if hbs and t.get("hb") is not None:
+                cost += abs(sum(hbs) / len(hbs) - t["hb"]) / 4.0
+        return cost
+
+    idxs = list(assigned.keys())
+    best = objective(assigned)
+    for _ in range(10):  # converges in 1-2 passes at these sizes
+        improved = False
+        for a_i in range(len(idxs)):
+            for b_i in range(a_i + 1, len(idxs)):
+                i, j = idxs[a_i], idxs[b_i]
+                if assigned[i] == assigned[j]:
+                    continue
+                assigned[i], assigned[j] = assigned[j], assigned[i]
+                cost = objective(assigned)
+                if cost + 1e-9 < best:
+                    best = cost
+                    improved = True
+                else:
+                    assigned[i], assigned[j] = assigned[j], assigned[i]
+        if not improved:
+            break
+
     for i, p in enumerate(pitches):
         p["type"] = assigned.get(i)
 
