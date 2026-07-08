@@ -90,7 +90,11 @@ def extract_groups_from_jsx(jsx):
 GROUP_MAP = extract_groups_from_jsx(jsx)
 
 # Athletes to exclude from portal
-EXCLUDE_ATHLETES = {"Liam Murphy"}
+EXCLUDE_ATHLETES = {"Liam Murphy", "Steph Staiano"}
+_EXCL_NORM = {" ".join(n.split()).lower() for n in EXCLUDE_ATHLETES}
+
+def is_excluded(name):
+    return " ".join((name or "").split()).lower() in _EXCL_NORM
 
 # Manual group overrides — these always win, even over VALD.
 # Keep this for athletes whose VALD group is wrong or who aren't yet in VALD.
@@ -234,7 +238,7 @@ athletes_data = []
 
 for pid, ath in fd['athletes'].items():
     name = ath['name']
-    if not name:
+    if not name or is_excluded(name):
         continue
     
     cmj_tests = [t for t in ath['tests'] if t['testType'] == 'CMJ' and t['trials']]
@@ -439,7 +443,7 @@ def hop_min(trials, key):
 hop_athletes_data = []
 for pid, ath in fd['athletes'].items():
     name = ath['name']
-    if not name:
+    if not name or is_excluded(name):
         continue
 
     hj_tests = [t for t in ath['tests'] if t['testType'] == HOP_TEST_TYPE and t['trials']]
@@ -1173,7 +1177,7 @@ def gen_VELO(trackman_data, group_map, exclusions):
     rows = []
     for name, ath in (trackman_data.get("athletes") or {}).items():
         sessions = ath.get("sessions") or []
-        if not sessions:
+        if not sessions or is_excluded(name):
             continue
 
         # Drop manually-excluded sessions
@@ -1320,6 +1324,8 @@ def gen_TMR(velo_rows):
     velo_names = {r[0] for r in velo_rows}
     out = {}
     for name, ath in (rep.get("athletes") or {}).items():
+        if is_excluded(name):
+            continue
         if name not in velo_names:
             print(f"  NOTE: trackman reports for '{name}' but no active velo "
                   f"card — breakdown won't show until they're active", flush=True)
