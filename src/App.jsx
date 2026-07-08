@@ -2648,7 +2648,7 @@ export default function App() {
             <button onClick={() => {
               const el = document.getElementById("report-content");
               const w = window.open("", "_blank");
-              w.document.write("<html><head><title>RPM Strength Pitching Report</title><style>body{margin:0;padding:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:8px 0;} th,td{padding:5px 8px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:12px;} th{background:#f5f5f5;font-weight:700;font-size:10px;text-transform:uppercase;color:#666;} @media print{body{padding:0;} @page{size:letter;margin:0.4in;}}</style></head><body>" + el.innerHTML + "</body></html>");
+              w.document.write("<html><head><title>RPM Strength Pitching Report</title><style>body{margin:0;padding:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:8px 0;} th,td{padding:5px 8px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:12px;} th{background:#f5f5f5;font-weight:700;font-size:10px;text-transform:uppercase;color:#666;} @media print{@page{size:letter;margin:0;} body{padding:0.4in !important;}}</style></head><body>" + el.innerHTML + "</body></html>");
               w.document.close();
               // Fit to ONE page: usable letter height at 0.4in margins ~= 980px.
               // Scale the whole body down when the report is taller than that.
