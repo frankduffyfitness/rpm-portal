@@ -2162,13 +2162,13 @@ function TrackManReportView({ athlete }) {
   const sessions = _TMR[a.name] || [];
   const s = sessions[0] || null;   // most recent bullpen breakdown
   const fmt = (v, d) => (v == null ? "\u2013" : d != null ? v.toFixed(d) : v);
-  const sect = { fontSize: 14, fontWeight: 800, color: "#111", borderBottom: "2px solid #eee", paddingBottom: 6, margin: "22px 0 10px" };
+  const sect = { fontSize: 14, fontWeight: 800, color: "#111", borderBottom: "2px solid #eee", paddingBottom: 5, margin: "14px 0 8px" };
   const thS = { padding: "6px 8px", textAlign: "left", fontSize: 9, textTransform: "uppercase", letterSpacing: 0.5, color: "#666", background: "#f5f5f5", borderBottom: "1px solid #e0e0e0" };
   const tdS = { padding: "6px 8px", fontSize: 11.5, color: "#1a1a1a", borderBottom: "1px solid #eee" };
 
   return (
-    <div id="report-content" style={{ fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 650, margin: "0 auto", padding: "32px 24px", color: "#1a1a1a", background: "#fff" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "3px solid #111", paddingBottom: 16, marginBottom: 24 }}>
+    <div id="report-content" style={{ fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 650, margin: "0 auto", padding: "20px 24px", color: "#1a1a1a", background: "#fff" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "3px solid #111", paddingBottom: 10, marginBottom: 16 }}>
         <div>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#111" }}>RPM STRENGTH</div>
           <div style={{ fontSize: 11, color: "#666", letterSpacing: 1, textTransform: "uppercase" }}>Pitching Performance Report {"\u00b7"} TrackMan</div>
@@ -2179,9 +2179,9 @@ function TrackManReportView({ athlete }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 18 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
         <div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#111" }}>{a.name}</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#111" }}>{a.name}</div>
           <div style={{ fontSize: 13, color: "#666" }}>{gi.label} {"\u00b7"} {a.sessions} velo sessions {"\u00b7"} Last: {a.latestDate}</div>
         </div>
         <div style={{ textAlign: "right" }}>
@@ -2224,9 +2224,9 @@ function TrackManReportView({ athlete }) {
         </table>
         <div style={{ fontSize: 9, color: "#999", marginTop: 4 }}>Velocity in mph {"\u00b7"} movement (IVB/HB) in inches, averaged from tracked pitches {"\u00b7"} spin in rpm {"\u00b7"} extension in feet {"\u00b7"} Eff = spin efficiency</div>
 
-        <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
+        <div style={{ display: "flex", gap: 14, marginTop: 10 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "#111", marginBottom: 6 }}>Pitch Movement <span style={{ fontWeight: 400, color: "#999" }}>(pitcher{"\u2019"}s view)</span></div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "#111", marginBottom: 4 }}>Pitch Movement <span style={{ fontWeight: 400, color: "#999" }}>(pitcher{"\u2019"}s view)</span></div>
             <MovementPlot session={s} light />
           </div>
           <div style={{ flex: 1 }}>
@@ -2259,7 +2259,7 @@ function TrackManReportView({ athlete }) {
         </tbody>
       </table>
 
-      <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1px solid #eee", display: "flex", justifyContent: "space-between", fontSize: 9, color: "#999" }}>
+      <div style={{ marginTop: 14, paddingTop: 8, borderTop: "1px solid #eee", display: "flex", justifyContent: "space-between", fontSize: 9, color: "#999" }}>
         <span>RPM Strength {"\u00b7"} Pitching Development</span>
         <span>Data: TrackMan {"\u00b7"} rpmstrength.coach</span>
       </div>
@@ -2648,9 +2648,16 @@ export default function App() {
             <button onClick={() => {
               const el = document.getElementById("report-content");
               const w = window.open("", "_blank");
-              w.document.write("<html><head><title>RPM Strength Pitching Report</title><style>body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;} table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:13px;} th{background:#f5f5f5;font-weight:700;font-size:11px;text-transform:uppercase;color:#666;} @media print{body{padding:10px;} @page{margin:0.5in;}}</style></head><body>" + el.innerHTML + "</body></html>");
+              w.document.write("<html><head><title>RPM Strength Pitching Report</title><style>body{margin:0;padding:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:8px 0;} th,td{padding:5px 8px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:12px;} th{background:#f5f5f5;font-weight:700;font-size:10px;text-transform:uppercase;color:#666;} @media print{body{padding:0;} @page{size:letter;margin:0.4in;}}</style></head><body>" + el.innerHTML + "</body></html>");
               w.document.close();
-              setTimeout(() => { w.print(); }, 300);
+              // Fit to ONE page: usable letter height at 0.4in margins ~= 980px.
+              // Scale the whole body down when the report is taller than that.
+              setTimeout(() => {
+                const h = w.document.body.scrollHeight;
+                const target = 960;
+                if (h > target) w.document.body.style.zoom = String(Math.max(0.55, target / h));
+                w.print();
+              }, 300);
             }} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
           </div>
           <TrackManReportView athlete={veloSel} />
