@@ -614,9 +614,11 @@ def gen_PB(athletes_data):
     """_PB: per athlete, [allJH, allRSI, allPP, allBRK, tmJH, tmRSI, tmPP, tmBRK, lmJH, lmRSI, lmPP, lmBRK, twJH, twRSI, twPP, twBRK]
     tm=this month, lm=last month, tw=this week"""
     now = datetime.now()
-    this_month_start = now.replace(day=1)
+    # Normalize to midnight: now.replace(day=1) keeps the time-of-day, which
+    # silently excluded sessions dated the 1st of the month from "This Month".
+    this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
-    last_month_end = this_month_start - timedelta(days=1)
+    last_month_end = this_month_start - timedelta(seconds=1)
     # This week = last 7 days
     this_week_start = now - timedelta(days=7)
     
@@ -695,6 +697,7 @@ def gen_T(athletes_data):
 
 def gen_WM(athletes_data):
     """_WM: [name, initials, group, jhPrev, jhCurr, jhChange%, rsiPrev, rsiCurr, rsiChange%, prevDate, currDate]"""
+    week_ago = datetime.now() - timedelta(days=7)
     rows = []
     for ath in athletes_data:
         s = ath['sessions']
@@ -703,6 +706,11 @@ def gen_WM(athletes_data):
         
         curr = s[0]
         prev = s[1]
+        # The section is titled "This Week" — only count athletes whose most
+        # recent session actually happened in the last 7 days. Previously an
+        # athlete whose last two sessions were months old still ranked here.
+        if curr['date'] < week_ago:
+            continue
         
         jh_c = round(curr['jh'], 1) if curr['jh'] else 0
         jh_p = round(prev['jh'], 1) if prev['jh'] else 0
@@ -727,9 +735,9 @@ def gen_MH(athletes_data):
     """_MH: [name, initials, group, jhPrev, jhCurr, jhChange%, rsiPrev, rsiCurr, rsiChange%]
     Compares this month avg vs last month avg."""
     now = datetime.now()
-    tm_start = now.replace(day=1)
+    tm_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     lm_start = (tm_start - timedelta(days=1)).replace(day=1)
-    lm_end = tm_start - timedelta(days=1)
+    lm_end = tm_start - timedelta(seconds=1)
     
     rows = []
     for ath in athletes_data:
