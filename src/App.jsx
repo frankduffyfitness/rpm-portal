@@ -1955,7 +1955,6 @@ function DotDetail({ type, tot, mode }) {
     return <div style={box}><span style={{ fontSize: 9, color: "#4A4F57" }}>Tap a large dot for pitch details</span></div>;
   }
   const L = ({ children }) => <span style={{ color: "#6B7280" }}>{children}</span>;
-  const partial = type[11] != null && type[11] < type[1];
   return (
     <div style={{ ...box, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "7px 12px" }}>
       <div style={{ fontSize: 10.5, color: "#E0E0E0", display: "flex", flexWrap: "wrap", gap: "3px 10px", alignItems: "center", justifyContent: "center", fontWeight: 600 }}>
@@ -1963,7 +1962,7 @@ function DotDetail({ type, tot, mode }) {
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: pColor(type[0]), display: "inline-block" }} />
           <span style={{ color: pColor(type[0]), fontWeight: 800 }}>{type[0]}</span>
         </span>
-        <span><L>{type[1] === 1 ? "pitch" : "pitches"} </L>{type[1]} {partial ? <L>({type[11]} tracked)</L> : null}</span>
+        <span><L>{type[1] === 1 ? "pitch" : "pitches"} </L>{type[1]}</span>
         {mode === "mv" ? (<>
           <span><L>velo </L>{type[2] != null ? type[2].toFixed(1) : "–"}<L> mph</L></span>
           <span><L>ivb </L>{type[4] != null ? type[4].toFixed(1) : "–"}</span>
@@ -2115,7 +2114,7 @@ function BullpenBreakdown({ name }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: pColor(t[0]) }} />
               <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", flex: 1 }}>{t[0]}</div>
-              <div style={{ fontSize: 10, color: "#6B7280" }}>{t[1]} {t[1] === 1 ? "pitch" : "pitches"} {"·"} {Math.round((t[1] / s.tot) * 100)}% usage{t[11] != null && t[11] < t[1] ? <span style={{ color: "#4A4F57" }}> {"·"} {t[11]}/{t[1]} tracked</span> : null}</div>
+              <div style={{ fontSize: 10, color: "#6B7280" }}>{t[1]} {t[1] === 1 ? "pitch" : "pitches"} {"·"} {Math.round((t[1] / s.tot) * 100)}% usage</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
               {cells(t).map(([l, v], j) => (
@@ -2209,7 +2208,7 @@ function TrackManReportView({ athlete }) {
             {s.types.map((t, i) => (
               <tr key={i}>
                 <td style={{ ...tdS, fontWeight: 700 }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: pColor(t[0]), marginRight: 6, verticalAlign: "middle" }} />{t[0]}</td>
-                <td style={tdS}>{t[1]}{t[11] != null && t[11] < t[1] ? <span style={{ color: "#999", fontSize: 9 }}> ({t[11]} trk)</span> : null}</td>
+                <td style={tdS}>{t[1]}</td>
                 <td style={tdS}>{Math.round((t[1] / s.tot) * 100)}%</td>
                 <td style={{ ...tdS, fontWeight: 700 }}>{fmt(t[2], 1)}</td>
                 <td style={tdS}>{fmt(t[3], 1)}</td>
@@ -2222,7 +2221,7 @@ function TrackManReportView({ athlete }) {
             ))}
           </tbody>
         </table>
-        <div style={{ fontSize: 9, color: "#999", marginTop: 4 }}>Velocity in mph {"\u00b7"} movement (IVB/HB) in inches, averaged from tracked pitches {"\u00b7"} spin in rpm {"\u00b7"} extension in feet {"\u00b7"} Eff = spin efficiency</div>
+        <div style={{ fontSize: 9, color: "#999", marginTop: 4 }}>Velocity in mph {"\u00b7"} movement (IVB/HB) in inches {"\u00b7"} spin in rpm {"\u00b7"} extension in feet {"\u00b7"} Eff = spin efficiency</div>
 
         <div style={{ display: "flex", gap: 14, marginTop: 10 }}>
           <div style={{ flex: 1 }}>
