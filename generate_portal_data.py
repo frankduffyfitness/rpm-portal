@@ -1317,6 +1317,12 @@ _VELO = gen_VELO(trackman, _velo_groups, VELO_MANUAL_EXCLUSIONS)
 # per-session PDF exports. Keyed by athlete name; rendered on the velo profile.
 TRACKMAN_REPORTS_JSON = "trackman_reports.json"
 
+# Manual coach notes for bullpen-report sessions, keyed by (athlete, ISO date).
+# Shown on the session header in the Bullpen Breakdown and the report card.
+TMR_SESSION_NOTES = {
+    ("Nikhil Parikh", "2026-07-10"): "Low intensity",
+}
+
 def _month_abbr(iso):
     d = datetime.strptime(iso, "%Y-%m-%d")
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -1370,9 +1376,13 @@ def gen_TMR(velo_rows):
             dots = [[tnames.index(p["type"]) if p.get("type") in tnames else -1,
                      p["ivb"], p["hb"], p["relH"], p["relSide"]]
                     for p in s["pitches"]]
-            sess_out.append({"d": f"{mon} {d.day}", "df": f"{mon} {d.day}, {d.year}",
-                             "st": s["sessionType"], "tot": s["total"],
-                             "types": types_arr, "dots": dots})
+            entry = {"d": f"{mon} {d.day}", "df": f"{mon} {d.day}, {d.year}",
+                     "st": s["sessionType"], "tot": s["total"],
+                     "types": types_arr, "dots": dots}
+            note = TMR_SESSION_NOTES.get((name, s["date"]))
+            if note:
+                entry["note"] = note
+            sess_out.append(entry)
         if sess_out:
             out[name] = sess_out
     return out
