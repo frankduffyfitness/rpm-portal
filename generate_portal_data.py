@@ -105,6 +105,7 @@ GROUP_OVERRIDES = {
     "Mike Sirota": "pro",
     # College pitchers
     "Joe Hauser": "col",
+    "Michael Destefano": "col",
     "Shea O'Sullivan": "col",
     "Addison Hinz-Camarano": "col",
     "Zach Weinschel": "col",
