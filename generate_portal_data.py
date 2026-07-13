@@ -1220,10 +1220,15 @@ def gen_VELO(trackman_data, group_map, exclusions):
             pass
 
         # Eligible = not submax, not flagged. Used for best/avg/trend math.
+        # PROVISIONAL sessions (auto-filled from bullpen-report PDFs while the
+        # master sheet catches up) count toward PEAK velo and history, but are
+        # excluded from average/trend math until the coach's official row
+        # confirms the session type.
         eligible = [
             s for s in sessions_chrono
             if not s.get("isSubmax") and not s.get("isFlagged")
         ]
+        confirmed = [s for s in eligible if not s.get("provisional")]
         if not eligible:
             continue  # athlete has no max-effort data — skip from leaderboard
 
@@ -1244,25 +1249,27 @@ def gen_VELO(trackman_data, group_map, exclusions):
         type_hist = [s.get("sessionType", "") for s in history]
         notes_hist = [s.get("notes", "") for s in history]
 
-        # Best / aggregate stats from eligible-only
+        # Peak from ALL eligible (incl. provisional); averages from confirmed only
         eligible_peaks = [s["peakVelo"] for s in eligible if s.get("peakVelo") is not None]
-        eligible_avgs  = [s["avgVelo"]  for s in eligible if s.get("avgVelo")  is not None]
         peak_ever = round(max(eligible_peaks), 1)
-        avg_peak  = round(sum(eligible_peaks) / len(eligible_peaks), 1)
-        avg_avg   = round(sum(eligible_avgs) / len(eligible_avgs), 1) if eligible_avgs else 0
+        avg_pool = confirmed if confirmed else eligible
+        pool_peaks = [s["peakVelo"] for s in avg_pool if s.get("peakVelo") is not None]
+        pool_avgs  = [s["avgVelo"]  for s in avg_pool if s.get("avgVelo")  is not None]
+        avg_peak  = round(sum(pool_peaks) / len(pool_peaks), 1) if pool_peaks else 0
+        avg_avg   = round(sum(pool_avgs) / len(pool_avgs), 1) if pool_avgs else 0
 
-        # Trend = build-up indicator: mean(last 4 eligible peaks) − mean(prior eligible peaks)
-        # Positive = trending above career baseline; negative = trending below.
-        if len(eligible) >= 5:
-            recent = eligible[-4:]
-            prior = eligible[:-4]
+        # Trend = build-up indicator over CONFIRMED sessions only.
+        tpool = confirmed if len(confirmed) >= 2 else eligible
+        if len(tpool) >= 5:
+            recent = tpool[-4:]
+            prior = tpool[:-4]
             trend = round(
                 sum(s["peakVelo"] for s in recent) / 4
                 - sum(s["peakVelo"] for s in prior) / len(prior),
                 1,
             )
-        elif len(eligible) >= 2:
-            trend = round(eligible[-1]["peakVelo"] - eligible[0]["peakVelo"], 1)
+        elif len(tpool) >= 2:
+            trend = round(tpool[-1]["peakVelo"] - tpool[0]["peakVelo"], 1)
         else:
             trend = 0.0
 

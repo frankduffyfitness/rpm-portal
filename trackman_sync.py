@@ -18,6 +18,7 @@ can treat it the same way.
 """
 import csv
 import json
+import os
 import re
 import sys
 from datetime import datetime, date, timezone
@@ -231,14 +232,64 @@ def build_portal(sessions, program_links):
                     "notes":       s["notes"],
                     "isFlagged":   s["isFlagged"],
                     "isSubmax":    s["isSubmax"],
+                    **({"provisional": True} if s.get("provisional") else {}),
                 }
                 for s in rows
             ],
         }
+    merge_report_sessions(athletes)
     return {
         "lastSyncedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "athletes": athletes,
     }
+
+
+def merge_report_sessions(athletes, reports_path="trackman_reports.json"):
+    """Fill master-sheet gaps from the bullpen-report PDFs.
+
+    The coach's master sheet typically lags the PDF exports by a few days, so a
+    pitcher's newest session (and any velo PR in it) was invisible to the velo
+    tracker even though it showed on his Bullpen Breakdown. For any (athlete,
+    date) present in trackman_reports.json but missing from the master sheet,
+    append a PROVISIONAL session using the report's fastball numbers. These
+    count toward peak velo and appear in history (labeled), but are excluded
+    from average/trend math until the coach's official row arrives with the
+    session type (which then replaces them on the next sync)."""
+    if not os.path.exists(reports_path):
+        return
+    try:
+        rep = json.load(open(reports_path))
+    except Exception:
+        return
+    added = 0
+    for name, r in (rep.get("athletes") or {}).items():
+        ath = athletes.get(name)
+        if not ath:
+            continue  # only fill gaps for athletes the coach already tracks
+        have = {s["date"] for s in ath["sessions"]}
+        for s in r.get("sessions", []):
+            if s["date"] in have:
+                continue
+            fb = next((t for t in s.get("types", []) if t.get("name") == "Fastball"), None)
+            peak = (fb or {}).get("veloMax") or max(
+                (t.get("veloMax") or 0 for t in s.get("types", [])), default=0)
+            if not peak:
+                continue
+            ath["sessions"].append({
+                "date": s["date"],
+                "peakVelo": round(peak, 1),
+                "avgVelo": round(fb["veloAvg"], 1) if fb and fb.get("veloAvg") else None,
+                "sessionType": "Bullpen",
+                "notes": "Auto-added from TrackMan report",
+                "isFlagged": False,
+                "isSubmax": False,
+                "provisional": True,
+            })
+            added += 1
+        ath["sessions"].sort(key=lambda x: x["date"], reverse=True)
+    if added:
+        print(f"[trackman_sync] filled {added} session(s) from bullpen reports "
+              f"(provisional until master sheet catches up)", file=sys.stderr)
 
 
 # ─── Entry point ─────────────────────────────────────────────────────────────
