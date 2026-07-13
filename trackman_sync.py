@@ -237,11 +237,38 @@ def build_portal(sessions, program_links):
                 for s in rows
             ],
         }
+    merge_supplement(athletes)
     merge_report_sessions(athletes)
     return {
         "lastSyncedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "athletes": athletes,
     }
+
+
+def merge_supplement(athletes, path="master_sheet_supplement.csv"):
+    """Official session rows Frank pastes directly (same columns as the master
+    sheet). Applied AFTER the sheet: rows already present in the sheet are
+    skipped, so once a future sheet export contains them this file is inert.
+    These are official (coach-confirmed) rows, so they take precedence over
+    the provisional PDF fill that runs after this."""
+    if not os.path.exists(path):
+        return
+    added = 0
+    with open(path, newline="", encoding="utf-8") as f:
+        for s in parse_master_rows(csv.DictReader(f)):
+            name = s["name"]
+            if name not in athletes:
+                athletes[name] = {"name": name, "programUrl": "", "sessions": []}
+            ath = athletes[name]
+            if any(x["date"] == s["date"] for x in ath["sessions"]):
+                continue
+            s.pop("programUrl", None)
+            ath["sessions"].append(s)
+            added += 1
+        for ath in athletes.values():
+            ath["sessions"].sort(key=lambda x: x["date"], reverse=True)
+    if added:
+        print(f"[trackman_sync] added {added} official session(s) from supplement", file=sys.stderr)
 
 
 def merge_report_sessions(athletes, reports_path="trackman_reports.json"):

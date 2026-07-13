@@ -1,5 +1,5 @@
 {
-  "lastSyncedAt": "2026-07-13T19:16:45Z",
+  "lastSyncedAt": "2026-07-13T19:28:48Z",
   "athletes": {
     "Darren Espinal": {
       "name": "Darren Espinal",
@@ -778,13 +778,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Nikhil Parikh",
           "peakVelo": 75.0,
           "avgVelo": 70.0,
-          "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "sessionType": "Low Effort",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": true
         },
         {
           "date": "2026-07-08",
@@ -830,13 +830,13 @@
       "sessions": [
         {
           "date": "2026-07-11",
+          "name": "Michael Destefano",
           "peakVelo": 74.8,
-          "avgVelo": null,
+          "avgVelo": 72.3,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-08",
@@ -939,13 +939,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Matthew Mamak",
           "peakVelo": 72.8,
           "avgVelo": 72.3,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-07",
@@ -1105,13 +1105,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Rob Romero",
           "peakVelo": 68.9,
           "avgVelo": 68.6,
-          "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "sessionType": "Low Effort",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": true
         },
         {
           "date": "2026-07-07",
@@ -1232,13 +1232,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "CJ Burke",
           "peakVelo": 75.8,
           "avgVelo": 73.9,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-07",
@@ -1410,13 +1410,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Joe Hauser",
           "peakVelo": 92.3,
           "avgVelo": 90.6,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-07",
@@ -1654,13 +1654,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Christian Sanchez",
           "peakVelo": 71.3,
           "avgVelo": 70.1,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-06",
@@ -2132,13 +2132,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Eric Grgas",
           "peakVelo": 86.8,
           "avgVelo": 84.6,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-06",
@@ -2454,13 +2454,13 @@
       "sessions": [
         {
           "date": "2026-07-11",
+          "name": "Kai Ventura",
           "peakVelo": 75.5,
           "avgVelo": 73.2,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-06",
@@ -2524,13 +2524,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Liam Brower",
           "peakVelo": 84.7,
           "avgVelo": 83.4,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-06",
@@ -2738,13 +2738,13 @@
       "sessions": [
         {
           "date": "2026-07-11",
+          "name": "Thomas LoBello",
           "peakVelo": 88.7,
           "avgVelo": 86.3,
-          "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "sessionType": "Short Slope",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-07-06",
@@ -3800,6 +3800,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/1mGR3u6cbIh92m7dMwcnCu2Y-LGPdY4t6N7IwyuUzpVI/edit",
       "sessions": [
         {
+          "date": "2026-07-10",
+          "name": "Nicky Callonas",
+          "peakVelo": 62.8,
+          "avgVelo": 62.4,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
           "date": "2026-07-01",
           "peakVelo": 67.6,
           "avgVelo": 65.7,
@@ -3843,13 +3853,13 @@
       "sessions": [
         {
           "date": "2026-07-10",
+          "name": "Frankie Muro",
           "peakVelo": 81.6,
           "avgVelo": 79.3,
-          "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "sessionType": "Low Effort",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": true
         },
         {
           "date": "2026-07-01",
@@ -5269,13 +5279,13 @@
       "sessions": [
         {
           "date": "2026-07-11",
+          "name": "Christian Peralta",
           "peakVelo": 81.9,
-          "avgVelo": null,
+          "avgVelo": 80.3,
           "sessionType": "Bullpen",
-          "notes": "Auto-added from TrackMan report",
+          "notes": "",
           "isFlagged": false,
-          "isSubmax": false,
-          "provisional": true
+          "isSubmax": false
         },
         {
           "date": "2026-06-09",
@@ -7829,6 +7839,22 @@
           "peakVelo": 85.5,
           "avgVelo": 83.6,
           "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Jackson Mavrides": {
+      "name": "Jackson Mavrides",
+      "programUrl": "",
+      "sessions": [
+        {
+          "date": "2026-07-11",
+          "name": "Jackson Mavrides",
+          "peakVelo": 68.8,
+          "avgVelo": 67.4,
+          "sessionType": "Short Slope",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
