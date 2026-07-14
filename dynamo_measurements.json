@@ -1,9 +1,9 @@
 {
   "meta": {
     "purpose": "Per-athlete one-time measurements the VALD DynaMo API does not capture. Feeds the body-mass-normalized peak-torque metric (torque = peak force N x lever arm m). Joined to VALD data by athlete name.",
-    "forearmMethod": "Floor to the middle of the DynaMo pad, measured in inches, in the locked test position. Serves as the ER/IR lever arm.",
+    "forearmMethod": "Floor to the middle of the DynaMo pad, measured in inches, with the elbow flush to the floor. The elbow-on-floor is the rotation axis, so this is a true ER/IR moment arm.",
     "inchToMeter": 0.0254,
-    "note": "Confirm the elbow/rotation axis sits at the floor reference for this to be a true moment arm. The ER:IR ratio does NOT depend on it (lever arm cancels); only the absolute torque normalization does."
+    "note": "Axis confirmed (Frank, 2026-07-14): elbow is flush to the floor every test, so floor-to-pad is a valid moment arm. Torque = peak force (N) x forearmMeters."
   },
   "athletes": {
     "Tom Hackimer":   { "throwingArm": "R", "forearmInches": 11.5,   "forearmRaw": "11 1/2\"", "forearmMeters": 0.2921 },
