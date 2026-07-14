@@ -1,0 +1,76 @@
+name: Sync DynaMo Data
+
+# Manual-dispatch only until the DynaMo API mapping is validated on a real run.
+# First run it with debug=true, download the dynamo-raw-debug artifact, confirm
+# the base URL + RESULT_KEYS in dynamo_sync.py, THEN add a schedule if desired.
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Debug (dump raw API response as an artifact, do not require valid mapping)'
+        required: false
+        default: 'true'
+        type: boolean
+      full_sync:
+        description: 'Full sync (re-pull all DynaMo tests from 2020)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  VALD_CLIENT_ID: ${{ secrets.VALD_CLIENT_ID }}
+  VALD_CLIENT_SECRET: ${{ secrets.VALD_CLIENT_SECRET }}
+  VALD_TENANT_ID: 3127f695-175f-4b63-8331-f1295a34cd51
+
+jobs:
+  sync-dynamo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run DynaMo sync
+        run: |
+          ARGS=""
+          [ "${{ github.event.inputs.debug }}" == "true" ] && ARGS="$ARGS --debug"
+          [ "${{ github.event.inputs.full_sync }}" == "true" ] && ARGS="$ARGS --full"
+          echo "python dynamo_sync.py $ARGS"
+          python dynamo_sync.py $ARGS
+
+      - name: Upload raw debug (schema inspection)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynamo-raw-debug
+          path: dynamo_raw_debug.json
+          if-no-files-found: ignore
+
+      - name: Regenerate portal data
+        run: |
+          APP_JSX=$(find . -name "App.jsx" -not -path "*/node_modules/*" | head -1)
+          python generate_portal_data.py forcedecks_portal.json "$APP_JSX"
+          if [ -f "App_updated.jsx" ]; then mv App_updated.jsx "$APP_JSX"; fi
+
+      - name: Commit and push if changed
+        run: |
+          rm -f dynamo_raw_debug.json
+          git config user.name "RPM Auto-Sync"
+          git config user.email "sync@rpmstrength.coach"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "🔄 DynaMo sync: $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi

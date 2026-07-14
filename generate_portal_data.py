@@ -1410,6 +1410,30 @@ def gen_TMR(velo_rows):
 
 _TMR = gen_TMR(_VELO)
 
+# ─── DynaMo (VALD shoulder-strength) — staff-only page ───────────────────────
+DYNAMO_JSON = "dynamo_portal.json"
+def gen_DYNAMO():
+    """_DYNAMO: [{name, group, dob, tests:[...]}] for the password-gated DynaMo
+    page. Source: dynamo_portal.json (produced by dynamo_sync.py from the VALD
+    DynaMo API; seeded from Jason Peacock's baseline until the sync runs)."""
+    if not os.path.exists(DYNAMO_JSON):
+        return []
+    try:
+        data = json.load(open(DYNAMO_JSON))
+    except Exception:
+        return []
+    out = []
+    for name, a in (data.get("athletes") or {}).items():
+        out.append({
+            "name": a.get("name", name),
+            "group": a.get("group", "hs"),
+            "dob": a.get("dob"),
+            "tests": a.get("tests", []),
+        })
+    out.sort(key=lambda x: x["name"].split()[-1] if x["name"] else "")
+    return out
+_DYNAMO = gen_DYNAMO()
+
 # Female-athlete name list for the UI (exact data-spelling strings, so
 # FEM_SET.has(a.name) matches even quirks like "Francesca  Albergo").
 _FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
@@ -1432,6 +1456,7 @@ print(f"  _HPB: {len(_HPB)} hop personal bests", flush=True)
 print(f"  _VELO: {len(_VELO)} pitchers (trackman {'loaded' if trackman else 'MISSING — _VELO empty'})", flush=True)
 print(f"  _TMR: {len(_TMR)} pitchers with bullpen reports "
       f"({sum(len(v) for v in _TMR.values())} sessions)", flush=True)
+print(f"  _DYNAMO: {len(_DYNAMO)} athletes with DynaMo tests", flush=True)
 print(f"  _FEM: {len(_FEM)} female athletes labeled", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
@@ -1463,6 +1488,7 @@ output_lines.append(f"const _HN = {json.dumps(_HN, separators=(',', ':'))};")
 output_lines.append(f"const _HD = {json.dumps(_HD, separators=(',', ':'))};")
 output_lines.append(f"const _VELO = {json.dumps(_VELO, separators=(',', ':'))};")
 output_lines.append(f"const _TMR = {json.dumps(_TMR, separators=(',', ':'))};")
+output_lines.append(f"const _DYNAMO = {json.dumps(_DYNAMO, separators=(',', ':'))};")
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
@@ -1485,6 +1511,7 @@ replacements = {
 replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _HD})
 replacements.update({'_VELO': _VELO})
 replacements.update({'_TMR': _TMR})
+replacements.update({'_DYNAMO': _DYNAMO})
 replacements.update({'_FEM': _FEM})
 
 new_jsx = jsx
