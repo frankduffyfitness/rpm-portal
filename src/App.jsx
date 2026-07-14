@@ -1177,387 +1177,279 @@ function LandingPage({ onEnter, onSelectAthlete }) {
 
 
 
-function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend }) {
-  const gi = GROUPS[athlete.group];
-  const n = norms[athlete.group] || norms.all;
-  const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
+const RPM_LOGO_DARK = "data:image/png;base64,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";
 
-  function pctLabel(pct) {
-    if (pct >= 90) return "Elite";
-    if (pct >= 75) return "Above Average";
-    if (pct >= 50) return "Average";
-    if (pct >= 25) return "Below Average";
-    return "Needs Development";
-  }
+// ─── Unified 3-page report card: CMJ / Hop Test / TrackMan ───────────────────
+const RPT = {
+  navy: "#1B2A44", orange: "#DD5228", gray: "#5B6470", lgray: "#98A0AA",
+  line: "#E3E6EA", thbg: "#F4F5F7",
+};
 
-  const cmjMetrics = [
-    { label: "Jump Height", value: athlete.cmj.jumpHeight + '"', pct: cP(athlete.cmj.jumpHeight, n.cmjHeight), best: athlete.best.jumpHeight + '"' },
-    { label: "RSI-modified", value: athlete.cmj.rsi, pct: cP(athlete.cmj.rsi, n.rsiMod), best: athlete.best.rsi },
-    { label: "Concentric Impulse", value: athlete.cmj.conImpulse + " N\u00b7s", pct: cP(athlete.cmj.conImpulse, n.conImpulse), best: athlete.best.conImpulse + " N\u00b7s" },
-    { label: "Eccentric Braking RFD", value: athlete.cmj.eccBrakingRFD.toLocaleString() + " N/s", pct: cP(athlete.cmj.eccBrakingRFD, n.eccBrakingRFD), best: athlete.best.eccBrakingRFD.toLocaleString() + " N/s" },
-  ];
-
-  const hopMetrics = hopAthlete && hn ? [
-    { label: "Hop RSI", value: hopAthlete.hop.rsi, pct: cP(hopAthlete.hop.rsi, hn.rsi), best: hopAthlete.best.rsi },
-    { label: "Flight Time", value: hopAthlete.hop.ft + " ms", pct: cP(hopAthlete.hop.ft, hn.ft), best: hopAthlete.best.ft + " ms" },
-    { label: "Contact Time", value: hopAthlete.hop.ct + " ms", pct: cP(hopAthlete.hop.ct, hn.ct, true), best: hopAthlete.best.ct + " ms" },
-  ] : null;
-
+function RptPctBar({ pct }) {
   return (
-    <div id="report-content" style={{ fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 650, margin: "0 auto", padding: "32px 24px", color: "#1a1a1a", background: "#fff" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "3px solid #111", paddingBottom: 16, marginBottom: 24 }}>
-        <div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "#111" }}>RPM STRENGTH</div>
-          <div style={{ fontSize: 11, color: "#666", letterSpacing: 1, textTransform: "uppercase" }}>Athlete Performance Report</div>
-        </div>
-        <div style={{ textAlign: "right", fontSize: 11, color: "#666" }}>
-          <div>Generated {LAST_UPDATED}</div>
-          <div>rpmstrength.coach</div>
-        </div>
+    <div>
+      <div style={{ position: "relative", height: 8, background: "#EEF0F3", borderRadius: 4 }}>
+        {[25, 50, 75].map(t => <div key={t} style={{ position: "absolute", left: t + "%", top: 0, width: 1, height: "100%", background: "#DDE1E6" }} />)}
+        <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: Math.max(2, pct) + "%", background: "linear-gradient(90deg,#F0906B," + RPT.orange + ")", borderRadius: 4 }} />
       </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24 }}>
-        <div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#111" }}>{athlete.name}</div>
-          <div style={{ fontSize: 13, color: "#666" }}>{gi.label} {"\u00b7"} {athlete.bw} lbs {"\u00b7"} {athlete.testCount} sessions</div>
-        </div>
-      </div>
-
-      {offseason && offseason.sessions >= 2 && (() => {
-        const dates = SESSION_DATES[athlete.name] || [];
-        const firstDate = dates.length > 0 ? dates[0] : "";
-        const lastDate = dates.length > 0 ? dates[dates.length - 1] : "";
-        const bw = BW_DATA[athlete.name];
-        const isFemale = athlete.group === "fem" || FEM_SET.has(athlete.name);
-        const metricDescs = {
-          "Jump Height": "Measures how high the athlete's center of mass rises during a countermovement jump. A key indicator of lower-body power and the ability to produce force quickly. Improvements here reflect gains in strength, rate of force development, and movement efficiency.",
-          "RSI-modified": "Reactive Strength Index (modified) divides jump height by time to takeoff. It captures how explosively an athlete can load and unload during a jump. Higher values mean the athlete produces more power in less time \u2014 critical for sprinting, cutting, and sport-specific quickness.",
-          "Concentric Impulse": "The total net force the athlete applies through the entire push-off phase, over time. Bigger impulse means more momentum at takeoff. Gains indicate the athlete is producing more total drive off the ground.",
-          "Ecc Braking RFD": "Rate of Force Development during the braking (deceleration) phase of the jump. Measures how quickly the athlete can absorb and redirect force. Essential for change-of-direction ability, landing mechanics, and injury resilience.",
-        };
-        const metrics = [
-          { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '"', decimals: 1 },
-          { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "", decimals: 2 },
-          { label: "Concentric Impulse", first: offseason.ppFirst, last: offseason.ppLast, change: offseason.ppChange, unit: " N\u00b7s", decimals: 1 },
-          { label: "Ecc Braking RFD", first: offseason.brkFirst, last: offseason.brkLast, change: offseason.brkChange, unit: " N/s", decimals: 0 },
-        ].filter(m => m.first > 0 && m.last > 0);
-        const improved = metrics.filter(m => m.change > 0);
-        const declined = metrics.filter(m => m.change < 0);
-        const bwChange = bw && !isFemale ? bw.change : null;
-
-        return (<>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 4, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Offseason Progress</div>
-        <div style={{ fontSize: 11, color: "#666", marginBottom: 16 }}>{offseason.sessions} sessions tracked {firstDate && lastDate ? <span>from <strong>{firstDate}</strong> to <strong>{lastDate}</strong></span> : "this offseason"}</div>
-
-        {metrics.map((m, i) => {
-          const maxVal = Math.max(m.first, m.last);
-          const firstPct = maxVal > 0 ? (m.first / maxVal) * 100 : 0;
-          const lastPct = maxVal > 0 ? (m.last / maxVal) * 100 : 0;
-          const arrow = m.change > 0 ? "\u2191" : m.change < 0 ? "\u2193" : "\u2192";
-          const changeColor = m.change > 0 ? "#16a34a" : m.change < 0 ? "#dc2626" : "#666";
-          return (
-            <div key={i} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: i < metrics.length - 1 ? "1px solid #f0f0f0" : "none" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>{m.label}</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: changeColor }}>{arrow}</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: changeColor }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div style={{ fontSize: 10, color: "#666", lineHeight: 1.5, marginBottom: 8 }}>{metricDescs[m.label]}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>First</span>
-                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: firstPct + "%", background: "#c7d2fe", borderRadius: 4 }} />
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: "#888", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>Now</span>
-                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: lastPct + "%", background: m.change >= 0 ? "#86efac" : "#fca5a5", borderRadius: 4 }} />
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#111", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.last.toFixed(m.decimals) : m.last.toLocaleString()}{m.unit}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {!isFemale && bw && bw.history.length >= 2 && (() => {
-          const bwHist = bw.history;
-          const bwDates = bw.dates || [];
-          const mn = Math.min(...bwHist) * 0.97;
-          const mx = Math.max(...bwHist) * 1.03;
-          const rg = mx - mn || 1;
-          const svgW = 400;
-          const svgH = 40;
-          const pts = bwHist.map((v, j) => ({ x: (j / Math.max(1, bwHist.length - 1)) * svgW, y: svgH - ((v - mn) / rg) * svgH }));
-          const pathD = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
-          const areaD = pathD + " L" + svgW + "," + svgH + " L0," + svgH + " Z";
-          return (
-            <div style={{ background: "#f9fafb", borderRadius: 8, padding: "12px 16px", marginBottom: 16, border: "1px solid #e5e7eb" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>Bodyweight</div>
-                  <div style={{ fontSize: 11, color: "#666" }}>{bwHist[0]} lbs {"\u2192"} {bw.current} lbs</div>
-                </div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: bwChange > 0 ? "#16a34a" : bwChange < 0 ? "#dc2626" : "#666" }}>{bwChange > 0 ? "+" : ""}{bwChange} lbs</div>
-              </div>
-              <svg width={svgW} height={svgH} viewBox={"0 0 " + svgW + " " + svgH} style={{ display: "block", width: "100%" }}>
-                <path d={areaD} fill="rgba(96,165,250,0.15)" />
-                <path d={pathD} fill="none" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx={pts[0].x} cy={pts[0].y} r="3" fill="#60A5FA" />
-                <circle cx={pts[pts.length-1].x} cy={pts[pts.length-1].y} r="3" fill="#60A5FA" />
-              </svg>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#999", marginTop: 2 }}>
-                <span>{bwDates[0]}</span>
-                <span>{bwDates[bwDates.length - 1]}</span>
-              </div>
-            </div>
-          );
-        })()}
-
-        <div style={{ background: "#f9fafb", borderRadius: 8, padding: "14px 16px", marginBottom: 16, border: "1px solid #e5e7eb", fontSize: 12, lineHeight: 1.8, color: "#333" }}>
-          <div style={{ fontWeight: 700, color: "#111", marginBottom: 6 }}>Summary</div>
-          <div>
-            {athlete.name.split(" ")[0]} has completed <strong>{offseason.sessions} testing sessions</strong> this offseason{firstDate && lastDate ? <span>, spanning from {firstDate} to {lastDate}</span> : ""}.
-            {improved.length > 0 && <span> Improvements were seen in <strong>{improved.map(m => m.label).join(", ")}</strong>, increasing by {improved.map(m => "+" + m.change.toFixed(1) + "%").join(", ")} respectively.</span>}
-            {declined.length > 0 && <span> {improved.length > 0 ? "However, " : ""}<strong>{declined.map(m => m.label).join(", ")}</strong> declined by {declined.map(m => m.change.toFixed(1) + "%").join(", ")}.</span>}
-            {!isFemale && bwChange !== null && bwChange !== 0 && <span> Bodyweight {bwChange > 0 ? "increased" : "decreased"} by {Math.abs(bwChange)} lbs over this period.</span>}
-          </div>
-        </div>
-
-        <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
-          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>{hopTrend && hopTrend.sessions >= 2 ? "Hop Test Progress follows" : "Percentile Rankings follow"}</div>
-        </div>
-      </>);
-      })()}
-
-      {hopTrend && hopTrend.sessions >= 2 && (() => {
-        const hopDates = HOP_SESSION_DATES[athlete.name] || [];
-        const hopFirstDate = hopDates.length > 0 ? hopDates[0] : "";
-        const hopLastDate = hopDates.length > 0 ? hopDates[hopDates.length - 1] : "";
-        const hopDescs = {
-          "RSI": "Reactive Strength Index measures how efficiently the athlete converts ground contact into flight. Calculated as flight time divided by contact time, it reflects elastic and reactive ability \u2014 essential for sprinting, jumping, and change of direction.",
-          "Flight Time": "The duration the athlete is airborne between hops. Longer flight times with short ground contact indicate greater force production and explosive ability during rapid, repeated movements.",
-          "Contact Time": "How long the foot stays on the ground between hops. Shorter contact times while maintaining flight time demonstrate better lower-limb stiffness and reactive strength \u2014 critical for speed and agility.",
-        };
-        const hopMetricsData = [
-          { label: "RSI", first: hopTrend.rsi_first, last: hopTrend.rsi_last, change: hopTrend.rsi_change, unit: "", decimals: 2, invert: false },
-          { label: "Flight Time", first: hopTrend.ft_first, last: hopTrend.ft_last, change: hopTrend.ft_change, unit: " ms", decimals: 0, invert: false },
-          { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms", decimals: 0, invert: true },
-        ].filter(m => m.first > 0 && m.last > 0);
-        const hopImproved = hopMetricsData.filter(m => m.invert ? m.change < 0 : m.change > 0);
-        const hopDeclined = hopMetricsData.filter(m => m.invert ? m.change > 0 : m.change < 0);
-
-        const sparkW = 280;
-        const sparkH = 35;
-        const miniChart = (history, color) => {
-          if (!history || history.length < 2) return null;
-          const mn = Math.min(...history) * 0.95;
-          const mx = Math.max(...history) * 1.05;
-          const rg = mx - mn || 1;
-          const pts = history.map((v, j) => ({ x: (j / Math.max(1, history.length - 1)) * sparkW, y: sparkH - ((v - mn) / rg) * sparkH }));
-          const pathD = pts.map((p, j) => (j === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
-          const areaD = pathD + " L" + sparkW + "," + sparkH + " L0," + sparkH + " Z";
-          return (
-            <svg width={sparkW} height={sparkH} viewBox={"0 0 " + sparkW + " " + sparkH} style={{ display: "block", width: "100%" }}>
-              <path d={areaD} fill={color + "20"} />
-              <path d={pathD} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx={pts[0].x} cy={pts[0].y} r="3" fill={color} />
-              <circle cx={pts[pts.length-1].x} cy={pts[pts.length-1].y} r="3" fill={color} />
-            </svg>
-          );
-        }
-
-        return (<>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 4, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Hop Test Progress</div>
-        <div style={{ fontSize: 11, color: "#666", marginBottom: 16 }}>{hopTrend.sessions} sessions tracked {hopFirstDate && hopLastDate ? <span>from <strong>{hopFirstDate}</strong> to <strong>{hopLastDate}</strong></span> : "this offseason"}</div>
-
-        {hopMetricsData.map((m, i) => {
-          const maxVal = Math.max(m.first, m.last);
-          const firstPct = maxVal > 0 ? (m.first / maxVal) * 100 : 0;
-          const lastPct = maxVal > 0 ? (m.last / maxVal) * 100 : 0;
-          const isGood = m.invert ? m.change < 0 : m.change > 0;
-          const isBad = m.invert ? m.change > 0 : m.change < 0;
-          const arrow = isGood ? "\u2191" : isBad ? "\u2193" : "\u2192";
-          const changeColor = isGood ? "#16a34a" : isBad ? "#dc2626" : "#666";
-          return (
-            <div key={i} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: i < hopMetricsData.length - 1 ? "1px solid #f0f0f0" : "none" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#111" }}>{m.label}{hopAthlete && hopAthlete.best && <span style={{ fontSize: 10, fontWeight: 400, color: "#999", marginLeft: 8 }}>Best: {m.decimals > 0 ? (m.label === "RSI" ? hopAthlete.best.rsi : m.label === "Flight Time" ? hopAthlete.best.ft : hopAthlete.best.ct) : (m.label === "RSI" ? hopAthlete.best.rsi : m.label === "Flight Time" ? hopAthlete.best.ft : hopAthlete.best.ct)}{m.unit}</span>}</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: changeColor }}>{arrow}</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: changeColor }}>{m.change > 0 ? "+" : ""}{m.change.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div style={{ fontSize: 10, color: "#666", lineHeight: 1.5, marginBottom: 8 }}>{hopDescs[m.label]}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>First</span>
-                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: firstPct + "%", background: "#c7d2fe", borderRadius: 4 }} />
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: "#888", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.first.toFixed(m.decimals) : m.first.toLocaleString()}{m.unit}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: 10, color: "#999", width: 32 }}>Now</span>
-                    <div style={{ flex: 1, height: 14, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: lastPct + "%", background: isGood ? "#86efac" : isBad ? "#fca5a5" : "#d1d5db", borderRadius: 4 }} />
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#111", width: 70, textAlign: "right" }}>{m.decimals > 0 ? m.last.toFixed(m.decimals) : m.last.toLocaleString()}{m.unit}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {hopAthlete && (
-          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            {[
-              { label: "RSI", history: hopAthlete.rsiHistory, color: "#FF6B6B" },
-              { label: "Flight Time", history: hopAthlete.ftHistory, color: "#60A5FA" },
-              { label: "Contact Time", history: hopAthlete.ctHistory, color: "#4FFFB0" },
-            ].map((c, i) => c.history && c.history.length >= 2 && (
-              <div key={i} style={{ flex: 1, background: "#f9fafb", borderRadius: 8, padding: "10px 12px", border: "1px solid #e5e7eb" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "#555", marginBottom: 6 }}>{c.label} Trend</div>
-                {miniChart(c.history, c.color)}
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: "#aaa", marginTop: 2 }}>
-                  <span>{hopFirstDate}</span>
-                  <span>{hopLastDate}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div style={{ background: "#f9fafb", borderRadius: 8, padding: "14px 16px", marginBottom: 16, border: "1px solid #e5e7eb", fontSize: 12, lineHeight: 1.8, color: "#333" }}>
-          <div style={{ fontWeight: 700, color: "#111", marginBottom: 6 }}>Summary</div>
-          <div>
-            {athlete.name.split(" ")[0]} has completed <strong>{hopTrend.sessions} hop test sessions</strong> this offseason{hopFirstDate && hopLastDate ? <span>, spanning from {hopFirstDate} to {hopLastDate}</span> : ""}.
-            {hopImproved.length > 0 && <span> Improvements were seen in <strong>{hopImproved.map(m => m.label).join(", ")}</strong>, {hopImproved.length === 1 ? "changing" : "changing"} by {hopImproved.map(m => (m.invert ? "" : "+") + m.change.toFixed(1) + "%").join(", ")} respectively.</span>}
-            {hopDeclined.length > 0 && <span> {hopImproved.length > 0 ? "However, " : ""}<strong>{hopDeclined.map(m => m.label).join(", ")}</strong> {hopDeclined.length === 1 ? "moved" : "moved"} by {hopDeclined.map(m => (m.change > 0 ? "+" : "") + m.change.toFixed(1) + "%").join(", ")}.</span>}
-          </div>
-        </div>
-
-        <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
-          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>Percentile Rankings on next page</div>
-        </div>
-      </>);
-      })()}
-
-      <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Countermovement Jump (CMJ)</div>
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
-        <thead>
-          <tr style={{ borderBottom: "2px solid #ddd" }}>
-            <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
-            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Current</th>
-            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Best Ever</th>
-            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Percentile</th>
-            <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Rating</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cmjMetrics.map((m, i) => (
-            <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-              <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
-              <td style={{ padding: "10px 0", textAlign: "center" }}>{m.value}</td>
-              <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.best}</td>
-              <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
-              <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {hopMetrics && (<>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Repeated Hop Test</div>
-        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #ddd" }}>
-              <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Current</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Best Ever</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Percentile</th>
-              <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Rating</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hopMetrics.map((m, i) => (
-              <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 0", fontWeight: 600 }}>{m.label}</td>
-                <td style={{ padding: "10px 0", textAlign: "center" }}>{m.value}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{m.best}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{oS(m.pct)}</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: m.pct >= 75 ? "#16a34a" : m.pct >= 50 ? "#2563eb" : m.pct >= 25 ? "#d97706" : "#dc2626" }}>{pctLabel(m.pct)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </>)}
-
-      
-      {veloAthlete && (
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Fastball Velocity (TrackMan)</div>
-          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginBottom: 24, fontSize: 12 }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid #ddd" }}>
-                <th style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>Metric</th>
-                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Latest</th>
-                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Peak Ever</th>
-                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Avg Peak</th>
-                <th style={{ textAlign: "center", padding: "8px 0", fontWeight: 700 }}>Trend</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 0", fontWeight: 600 }}>Peak FB Velo</td>
-                <td style={{ padding: "10px 0", textAlign: "center" }}>{veloAthlete.latestPeak} mph</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 700 }}>{veloAthlete.peakEver} mph</td>
-                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.avgPeak} mph</td>
-                <td style={{ padding: "10px 0", textAlign: "center", fontWeight: 600, color: veloAthlete.trend > 0 ? "#16a34a" : veloAthlete.trend < 0 ? "#dc2626" : "#666" }}>{veloAthlete.trend > 0 ? "+" : ""}{veloAthlete.trend} mph</td>
-              </tr>
-              <tr style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "10px 0", fontWeight: 600 }}>Avg FB Velo</td>
-                <td style={{ padding: "10px 0", textAlign: "center" }}>{veloAthlete.latestAvg} mph</td>
-                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.avgAvg} mph</td>
-                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}></td>
-                <td style={{ padding: "10px 0", textAlign: "center", color: "#888" }}>{veloAthlete.sessions} sessions</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <div style={{ fontSize: 16, fontWeight: 700, color: "#111", marginBottom: 12, borderBottom: "2px solid #eee", paddingBottom: 6 }}>Key Takeaways</div>
-      <div style={{ fontSize: 12, lineHeight: 1.8, color: "#333" }}>
-        {cmjMetrics.filter(m => m.pct >= 75).length > 0 && (
-          <div style={{ marginBottom: 8 }}>{"\u2705"} <strong>Strengths:</strong> {cmjMetrics.filter(m => m.pct >= 75).map(m => m.label).join(", ")} {cmjMetrics.filter(m => m.pct >= 75).length === 1 ? "ranks" : "rank"} above the 75th percentile for {gi.label} athletes.</div>
-        )}
-        {cmjMetrics.filter(m => m.pct < 25).length > 0 && (
-          <div style={{ marginBottom: 8 }}>{"\u26A0\uFE0F"} <strong>Areas to Develop:</strong> {cmjMetrics.filter(m => m.pct < 25).map(m => m.label).join(", ")} {cmjMetrics.filter(m => m.pct < 25).length === 1 ? "is" : "are"} below the 25th percentile and should be a training priority.</div>
-        )}
-        {cmjMetrics.every(m => m.pct >= 25 && m.pct < 75) && (
-          <div style={{ marginBottom: 8 }}>{"\uD83D\uDFE1"} Well-rounded profile with all metrics in the average range. Consistent training will drive continued improvement across all areas.</div>
-        )}
-      </div>
-
-      <div style={{ marginTop: 32, paddingTop: 16, borderTop: "2px solid #eee", fontSize: 10, color: "#999", textAlign: "center" }}>
-        RPM Strength {"\u00b7"} Maspeth, NY {"\u00b7"} rpmstrength.coach {"\u00b7"} Powered by ForceDecks{veloAthlete ? " & TrackMan" : ""}
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 7, color: RPT.lgray, marginTop: 2 }}>
+        <span>0</span><span>25th</span><span>50th</span><span>75th</span><span>99th</span>
       </div>
     </div>
   );
 }
 
+function RptTier({ pct }) {
+  const t = pct >= 90 ? "Elite" : pct >= 75 ? "Above Average" : pct >= 50 ? "Average" : pct >= 25 ? "Developing" : "Building";
+  return <span style={{ fontSize: 9, fontWeight: 700, color: RPT.orange }}>{t}</span>;
+}
 
+function RptMetricRow({ label, desc, value, best, pct }) {
+  return (
+    <div style={{ padding: "10px 0", borderBottom: "1px solid " + RPT.line }}>
+      <div style={{ display: "flex", alignItems: "baseline", marginBottom: 6 }}>
+        <div style={{ width: 190 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: RPT.navy }}>{label}</div>
+          <div style={{ fontSize: 8.5, color: RPT.lgray, lineHeight: 1.35, paddingRight: 10 }}>{desc}</div>
+        </div>
+        <div style={{ width: 110 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, color: RPT.navy }}>{value}</div>
+          <div style={{ fontSize: 8.5, color: RPT.lgray }}>best: {best}</div>
+        </div>
+        <div style={{ width: 92, textAlign: "right" }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: RPT.orange }}>{pct}<span style={{ fontSize: 9 }}>{["th","st","nd","rd"][(pct%100-20)%10] || ["th","st","nd","rd"][pct%100] || "th"}</span></div>
+          <RptTier pct={pct} />
+        </div>
+      </div>
+      <RptPctBar pct={pct} />
+    </div>
+  );
+}
 
+function RptHeader({ athlete, gi, title, sub, first }) {
+  return (
+    <div style={{ marginBottom: first ? 14 : 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <img src={RPM_LOGO_DARK} style={{ height: first ? 30 : 22 }} alt="RPM Strength" />
+        <div style={{ textAlign: "right", fontSize: 9, color: RPT.gray }}>
+          <div>Generated {LAST_UPDATED}</div>
+          <div>rpmstrength.coach</div>
+        </div>
+      </div>
+      <div style={{ borderBottom: "3px solid " + RPT.navy, margin: "8px 0 12px" }} />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div>
+          <div style={{ fontSize: first ? 21 : 16, fontWeight: 800, color: RPT.navy }}>{athlete.name}</div>
+          <div style={{ fontSize: 10, color: RPT.gray }}>{gi.label}{FEM_SET.has(athlete.name) ? " \u00b7 Female Athletes" : ""} {"\u00b7"} Athlete Performance Report</div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: RPT.orange }}>{title}</div>
+          <div style={{ fontSize: 9, color: RPT.gray }}>{sub}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RptSection({ title, children }) {
+  return (<>
+    <div style={{ fontSize: 12, fontWeight: 800, color: RPT.orange, margin: "16px 0 6px" }}>{title}</div>
+    {children}
+  </>);
+}
+
+function RptProgressRows({ rows }) {
+  return (
+    <div>
+      {rows.filter(r => r.first || r.last).map((r, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", padding: "6px 0", borderBottom: "1px solid " + RPT.line, fontSize: 11 }}>
+          <div style={{ width: 190, fontWeight: 700, color: RPT.navy }}>{r.label}</div>
+          <div style={{ width: 150, color: RPT.gray }}>{r.first}{r.unit} {"\u2192"} <strong style={{ color: RPT.navy }}>{r.last}{r.unit}</strong></div>
+          <div style={{ width: 70, textAlign: "right", fontWeight: 800, color: r.change > 0 ? "#1B7F4B" : r.change < 0 ? "#C0392B" : RPT.gray }}>
+            {r.change > 0 ? "+" : ""}{Number(r.change).toFixed(1)}%
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RptFooter({ page, total, label }) {
+  return (
+    <div style={{ marginTop: 16, paddingTop: 8, borderTop: "1px solid " + RPT.line, display: "flex", justifyContent: "space-between", fontSize: 8.5, color: RPT.lgray }}>
+      <span>RPM Strength {"\u00b7"} Queens, NY</span>
+      <span>{label}</span>
+      <span>Page {page} of {total}</span>
+    </div>
+  );
+}
+
+function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend }) {
+  const gi = GROUPS[athlete.group];
+  const n = norms[athlete.group] || norms.all;
+  const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
+  const tmr = veloAthlete ? (_TMR[veloAthlete.name] || []) : [];
+  const bp = tmr[0] || null;
+  const sessDates = SESSION_DATES[athlete.name] || [];
+  const hopDates = HOP_SESSION_DATES[athlete.name] || [];
+
+  const pages = 1 + (hopAthlete && hn ? 1 : 0) + (veloAthlete ? 1 : 0);
+  let pageNo = 0;
+  const pageStyle = { fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 660, margin: "0 auto 28px", padding: "26px 28px", color: "#1a1a1a", background: "#fff", boxShadow: "0 1px 6px rgba(0,0,0,0.12)" };
+
+  const fmtRank = (rank, total) => rank ? rank + " of " + total + " " + gi.label : "\u2013";
+  const jhRankG = ATHLETES.filter(a => a.group === athlete.group);
+  const jhRank = jhRankG.filter(a => a.best.jumpHeight > athlete.best.jumpHeight).length + 1;
+
+  return (
+    <div id="report-content" style={{ background: "#F0F1F3", padding: "18px 0" }}>
+
+      {/* ── PAGE 1: CMJ ── */}
+      <div className="rpt-page" style={pageStyle}>
+        <RptHeader athlete={athlete} gi={gi} first
+          title="COUNTERMOVEMENT JUMP" sub={"ForceDecks \u00b7 " + athlete.testCount + " sessions \u00b7 last " + athlete.latestDate} />
+        <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + gi.label}>
+          <RptMetricRow label="Jump Height" desc="How high the athlete jumps. The headline measure of lower-body power."
+            value={athlete.cmj.jumpHeight + '\u0022'} best={athlete.best.jumpHeight + '\u0022'} pct={cP(athlete.cmj.jumpHeight, n.cmjHeight)} />
+          <RptMetricRow label="RSI-modified" desc="Jump height relative to time on the ground. Explosiveness per second of effort."
+            value={athlete.cmj.rsi} best={athlete.best.rsi} pct={cP(athlete.cmj.rsi, n.rsiMod)} />
+          <RptMetricRow label="Concentric Impulse" desc="Total drive applied through the push-off. Closely tied to takeoff velocity."
+            value={athlete.cmj.conImpulse + " N\u00b7s"} best={athlete.best.conImpulse + " N\u00b7s"} pct={cP(athlete.cmj.conImpulse, n.conImpulse)} />
+          <RptMetricRow label="Eccentric Braking RFD" desc="How fast force builds while absorbing the dip. Reflects braking strength and stiffness."
+            value={athlete.cmj.eccBrakingRFD.toLocaleString() + " N/s"} best={athlete.best.eccBrakingRFD.toLocaleString() + " N/s"} pct={cP(athlete.cmj.eccBrakingRFD, n.eccBrakingRFD)} />
+        </RptSection>
+        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+          <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
+            <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>GROUP RANK (JUMP)</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{fmtRank(jhRank, jhRankG.length)}</div>
+          </div>
+          <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
+            <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>TESTING WINDOW</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{sessDates[0] || "\u2013"} {"\u2192"} {sessDates[sessDates.length - 1] || "\u2013"}</div>
+          </div>
+        </div>
+        {offseason && offseason.sessions >= 2 && (
+          <RptSection title="Progress (first session vs latest)">
+            <RptProgressRows rows={[
+              { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '\u0022' },
+              { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "" },
+              { label: "Concentric Impulse", first: offseason.ppFirst, last: offseason.ppLast, change: offseason.ppChange, unit: " N\u00b7s" },
+              { label: "Ecc Braking RFD", first: offseason.brkFirst, last: offseason.brkLast, change: offseason.brkChange, unit: " N/s" },
+            ]} />
+          </RptSection>
+        )}
+        <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + gi.label} />
+      </div>
+
+      {/* ── PAGE 2: HOP ── */}
+      {hopAthlete && hn && (
+        <div className="rpt-page" style={pageStyle}>
+          <RptHeader athlete={athlete} gi={gi}
+            title="REPEATED HOP TEST" sub={"ForceDecks \u00b7 " + hopAthlete.testCount + " sessions \u00b7 last " + hopAthlete.latestDate} />
+          <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + gi.label}>
+            <RptMetricRow label="Hop RSI" desc="Flight time divided by contact time. The key measure of reactive, elastic ability."
+              value={hopAthlete.hop.rsi} best={hopAthlete.best.rsi} pct={cP(hopAthlete.hop.rsi, hn.rsi)} />
+            <RptMetricRow label="Flight Time" desc="Time in the air between hops. Longer flight means more force in less ground time."
+              value={hopAthlete.hop.ft + " ms"} best={hopAthlete.best.ft + " ms"} pct={cP(hopAthlete.hop.ft, hn.ft)} />
+            <RptMetricRow label="Contact Time" desc="Time on the ground between hops. Shorter contact with maintained height shows better stiffness."
+              value={hopAthlete.hop.ct + " ms"} best={hopAthlete.best.ct + " ms"} pct={cP(hopAthlete.hop.ct, hn.ct, true)} />
+            {hopAthlete.hop.pfbm ? (
+              <RptMetricRow label="Relative Peak Force" desc="Peak ground force divided by bodyweight. Force output in a very short window."
+                value={hopAthlete.hop.pfbm + " N/BW"} best={hopAthlete.best.pfbm + " N/BW"} pct={cP(hopAthlete.hop.pfbm, hn.pfbm)} />
+            ) : null}
+          </RptSection>
+          <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+            <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
+              <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>TESTING WINDOW</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{hopDates[0] || "\u2013"} {"\u2192"} {hopDates[hopDates.length - 1] || "\u2013"}</div>
+            </div>
+          </div>
+          {hopTrend && hopTrend.sessions >= 2 && (
+            <RptSection title="Progress (first session vs latest)">
+              <RptProgressRows rows={[
+                { label: "Hop RSI", first: hopTrend.rsi_first, last: hopTrend.rsi_last, change: hopTrend.rsi_change, unit: "" },
+                { label: "Flight Time", first: hopTrend.ft_first, last: hopTrend.ft_last, change: hopTrend.ft_change, unit: " ms" },
+                { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms" },
+              ]} />
+            </RptSection>
+          )}
+          <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + gi.label} />
+        </div>
+      )}
+
+      {/* ── PAGE 3: TRACKMAN ── */}
+      {veloAthlete && (
+        <div className="rpt-page" style={pageStyle}>
+          <RptHeader athlete={athlete} gi={gi}
+            title="TRACKMAN PITCHING" sub={veloAthlete.sessions + " velo sessions \u00b7 last " + veloAthlete.latestDate} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 4 }}>
+            {[["PEAK FB EVER", veloAthlete.peakEver + " mph"], ["AVG PEAK", veloAthlete.avgPeak + " mph"],
+              ["LATEST PEAK", veloAthlete.latestPeak + " mph"],
+              ["PERCENTILE", (() => { const p = veloPct(veloAthlete.peakEver); return p + (["th","st","nd","rd"][(p%100-20)%10] || ["th","st","nd","rd"][p%100] || "th"); })()]].map(([l, v], i) => (
+              <div key={i} style={{ border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 6px", textAlign: "center" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: i === 3 ? RPT.orange : RPT.navy }}>{v}</div>
+                <div style={{ fontSize: 7.5, color: RPT.lgray, letterSpacing: 0.4, marginTop: 2 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 8 }}><RptPctBar pct={veloPct(veloAthlete.peakEver)} /></div>
+          <div style={{ fontSize: 8.5, color: RPT.lgray, marginTop: 2 }}>Peak fastball percentile among {VELO_ATHLETES.length} active RPM pitchers.</div>
+          {bp && (<>
+            <RptSection title={"Latest Bullpen \u00b7 " + bp.df + " \u00b7 " + bp.st + " \u00b7 " + bp.tot + " pitches" + (bp.note ? " \u00b7 " + bp.note : "")}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead><tr>{["Pitch", "#", "Use", "Avg", "Max", "IVB", "HB", "Spin", "Eff"].map((h, i) => (
+                  <th key={i} style={{ padding: "4px 6px", textAlign: i > 0 ? "right" : "left", fontSize: 8, textTransform: "uppercase", color: RPT.gray, background: RPT.thbg, borderBottom: "1px solid " + RPT.line }}>{h}</th>
+                ))}</tr></thead>
+                <tbody>{bp.types.map((t, i) => (
+                  <tr key={i}>
+                    <td style={{ padding: "4px 6px", fontSize: 10.5, fontWeight: 700, color: RPT.navy, borderBottom: "1px solid " + RPT.line }}>
+                      <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: pColor(t[0]), marginRight: 5, verticalAlign: "middle" }} />{t[0]}
+                    </td>
+                    {[t[1], Math.round((t[1] / bp.tot) * 100) + "%", t[2] != null ? t[2].toFixed(1) : "\u2013", t[3] != null ? t[3].toFixed(1) : "\u2013",
+                      t[4] != null ? t[4].toFixed(1) : "\u2013", t[5] != null ? t[5].toFixed(1) : "\u2013", t[6] != null ? t[6] : "\u2013",
+                      t[10] != null ? t[10] + "%" : "\u2013"].map((v, j) => (
+                      <td key={j} style={{ padding: "4px 6px", textAlign: "right", fontSize: 10.5, color: "#1a1a1a", borderBottom: "1px solid " + RPT.line }}>{v}</td>
+                    ))}
+                  </tr>
+                ))}</tbody>
+              </table>
+            </RptSection>
+            <div style={{ display: "flex", gap: 14, marginTop: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: RPT.navy, marginBottom: 4 }}>Pitch Movement <span style={{ fontWeight: 400, color: RPT.lgray }}>(pitcher{"\u2019"}s view)</span></div>
+                <MovementPlot session={bp} light />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: RPT.navy, marginBottom: 4 }}>Release Point</div>
+                <ReleasePlot session={bp} light />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 6 }}>
+                  {bp.types.map((t, i) => (
+                    <span key={i} style={{ fontSize: 8, fontWeight: 700, color: RPT.gray }}>
+                      <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: pColor(t[0]), marginRight: 3 }} />{PITCH_ABBR[t[0]] || t[0]}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>)}
+          <RptSection title="Recent Velo Sessions">
+            <div>
+              {veloAthlete.dateHistory.map((d, i) => ({ d, t: veloAthlete.typeHistory[i], p: veloAthlete.peakHistory[i], a: veloAthlete.avgHistory[i] })).reverse().slice(0, 5).map((s, i) => (
+                <div key={i} style={{ display: "flex", padding: "4px 0", borderBottom: "1px solid " + RPT.line, fontSize: 10.5 }}>
+                  <div style={{ width: 90, color: RPT.gray }}>{s.d}</div>
+                  <div style={{ flex: 1, color: RPT.gray }}>{s.t}</div>
+                  <div style={{ width: 70, textAlign: "right", fontWeight: 800, color: RPT.navy }}>{s.p} mph</div>
+                  <div style={{ width: 70, textAlign: "right", color: RPT.gray }}>avg {s.a}</div>
+                </div>
+              ))}
+            </div>
+          </RptSection>
+          <RptFooter page={++pageNo} total={pages} label="Data: TrackMan" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 function BodyweightChart({ athleteName, group }) {
   if (group === "fem" || FEM_SET.has(athleteName)) return null;
@@ -2626,50 +2518,28 @@ export default function App() {
               const w = window.open("", "_blank");
               w.document.write("<html><head><title>RPM Strength Report</title><style>body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:13px;} th{background:#f5f5f5;font-weight:700;font-size:11px;text-transform:uppercase;color:#666;} .pg{box-sizing:border-box;overflow:hidden;} @media print{@page{size:letter;margin:0;}}</style></head><body><div id=" + JSON.stringify("src") + ">" + el.innerHTML + "</div></body></html>");
               w.document.close();
-              // Paginate: scale to the fewest readable pages, then pack whole
-              // sections per page so nothing splits mid-card. Zero @page margin
-              // removes the browser's header/footer; each page div carries its
-              // own padding instead.
+              // Each .rpt-page prints as exactly one sheet: measured and
+              // zoom-fitted individually. Zero @page margin removes the
+              // browser's header/footer; each sheet carries its own padding.
               setTimeout(() => {
                 const doc = w.document, srcEl = doc.getElementById("src");
-                const kids = Array.from(srcEl.children);
-                const PAGE = 1056, PAD = 46, USABLE = PAGE - 2 * PAD;
-                const mb = (k) => parseFloat(w.getComputedStyle(k).marginBottom) || 0;
-                const H = kids.reduce((s, k) => s + k.getBoundingClientRect().height + mb(k), 0);
-                const heights = kids.map((k) => k.getBoundingClientRect().height + mb(k));
-                // Whole sections never split across pages, so page bottoms waste
-                // some space. Test-pack at each candidate zoom and step down
-                // until the target page count actually holds.
-                const packCount = (zz) => {
-                  const cap = (USABLE / zz) * 0.985;
-                  let pages = 0, acc = Infinity;
-                  for (const h of heights) { if (acc + h > cap) { pages++; acc = 0; } acc += h; }
-                  return pages;
-                };
-                let z = 1, target = 1, found = false;
-                for (target = 1; target < 6 && !found; found || target++) {
-                  z = Math.min(1, (target * USABLE) / H);
-                  while (z >= 0.66) {
-                    if (packCount(z) <= target) { found = true; break; }
-                    z -= 0.02;
-                  }
-                }
-                const uL = (USABLE / z) * 0.985, pgH = PAGE / z, padL = PAD / z;
-                const pages = [];
-                let page = null, acc = Infinity;
-                for (const k of kids) {
-                  const h = k.getBoundingClientRect().height + mb(k);
-                  if (acc + h > uL) {
-                    page = doc.createElement("div"); page.className = "pg";
-                    page.style.height = pgH + "px"; page.style.padding = padL + "px";
-                    page.style.pageBreakAfter = "always";
-                    pages.push(page); acc = 0;
-                  }
-                  page.appendChild(k); acc += h;
-                }
-                if (pages.length) pages[pages.length - 1].style.pageBreakAfter = "auto";
-                srcEl.replaceWith.apply(srcEl, pages);
-                doc.body.style.zoom = String(z);
+                srcEl.style.background = "#fff"; srcEl.style.padding = "0";
+                const rpts = Array.from(doc.querySelectorAll(".rpt-page"));
+                const PAGE = 1056, PAD = 42, USABLE = PAGE - 2 * PAD;
+                rpts.forEach((p, i) => {
+                  p.style.boxShadow = "none"; p.style.margin = "0 auto";
+                  const h = p.getBoundingClientRect().height;
+                  const z = Math.min(1, USABLE / h);
+                  const wrap = doc.createElement("div");
+                  wrap.style.boxSizing = "border-box";
+                  wrap.style.height = (PAGE / z) + "px";
+                  wrap.style.paddingTop = (PAD / z) + "px";
+                  wrap.style.overflow = "hidden";
+                  wrap.style.zoom = String(z);
+                  if (i < rpts.length - 1) wrap.style.pageBreakAfter = "always";
+                  p.parentNode.insertBefore(wrap, p);
+                  wrap.appendChild(p);
+                });
                 w.print();
               }, 300);
             }} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
