@@ -1341,7 +1341,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
           </div>
         </div>
         {offseason && offseason.sessions >= 2 && (
-          <RptSection title="PR Progress \u00b7 first session vs personal best">
+          <RptSection title={"PR Progress \u00b7 first session vs personal best"}>
             <RptProgressRows rows={[
               { label: "Jump Height", first: offseason.jhFirst, last: athlete.best.jumpHeight, change: prChg(offseason.jhFirst, athlete.best.jumpHeight), unit: '\u0022' },
               { label: "RSI-modified", first: offseason.rsiFirst, last: athlete.best.rsi, change: prChg(offseason.rsiFirst, athlete.best.rsi), unit: "" },
@@ -1377,7 +1377,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             </div>
           </div>
           {hopTrend && hopTrend.sessions >= 2 && (
-            <RptSection title="PR Progress \u00b7 first session vs personal best">
+            <RptSection title={"PR Progress \u00b7 first session vs personal best"}>
               <RptProgressRows rows={[
                 { label: "Hop RSI", first: hopTrend.rsi_first, last: hopAthlete.best.rsi, change: prChg(hopTrend.rsi_first, hopAthlete.best.rsi), unit: "" },
                 { label: "Flight Time", first: hopTrend.ft_first, last: hopAthlete.best.ft, change: prChg(hopTrend.ft_first, hopAthlete.best.ft), unit: " ms" },
