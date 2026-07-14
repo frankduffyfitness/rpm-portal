@@ -1,5 +1,5 @@
 {
-  "lastSyncedAt": "2026-07-14T02:44:01Z",
+  "lastSyncedAt": "2026-07-14T15:18:14Z",
   "athletes": {
     "Darren Espinal": {
       "name": "Darren Espinal",
@@ -3416,6 +3416,16 @@
       "name": "Mason Morello",
       "programUrl": "https://docs.google.com/spreadsheets/d/1feN0CQ91V0Bh--xbAnfslrgQ9TV2G1aVgel65FuogxQ/edit",
       "sessions": [
+        {
+          "date": "2026-07-14",
+          "peakVelo": 79.4,
+          "avgVelo": null,
+          "sessionType": "Bullpen",
+          "notes": "Auto-added from TrackMan report",
+          "isFlagged": false,
+          "isSubmax": false,
+          "provisional": true
+        },
         {
           "date": "2026-07-03",
           "peakVelo": 78.4,
