@@ -401,3 +401,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Manual full re-pull trigger 2026-07-14 21:24 — import Zachary Uysal DynaMo test
