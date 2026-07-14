@@ -97,10 +97,31 @@ def H(token):
     return {"Authorization": f"Bearer {token}"}
 
 
+def get_with_retry(url, token, params=None, tries=4, timeout=30):
+    """GET with backoff on 429/5xx/network errors — transient VALD hiccups
+    should not kill a whole CI sync run."""
+    for attempt in range(tries):
+        try:
+            r = requests.get(url, headers=H(token), params=params, timeout=timeout)
+            if r.status_code in (429, 500, 502, 503, 504) and attempt < tries - 1:
+                wait = 3 * (attempt + 1)
+                log(f"  HTTP {r.status_code} from {url.split('.com')[0]}…, retrying in {wait}s")
+                time.sleep(wait)
+                continue
+            return r
+        except requests.RequestException as e:
+            if attempt < tries - 1:
+                wait = 3 * (attempt + 1)
+                log(f"  {e.__class__.__name__}, retrying in {wait}s")
+                time.sleep(wait)
+                continue
+            raise
+
+
 # ─── Profiles + groups (same endpoints as vald_sync.py) ──────────────────────
 def fetch_profiles_with_groups(token):
-    r = requests.get(f"{PROFILES_BASE}/profiles", headers=H(token),
-                     params={"tenantId": TENANT_ID, "pageSize": 500}, timeout=30)
+    r = get_with_retry(f"{PROFILES_BASE}/profiles", token,
+                       params={"tenantId": TENANT_ID, "pageSize": 500})
     r.raise_for_status()
     profiles = {}
     for p in r.json().get("profiles", []):
@@ -109,14 +130,14 @@ def fetch_profiles_with_groups(token):
             "dob": (p.get("dateOfBirth") or "")[:10] or None,
             "groups": [],
         }
-    gr = requests.get(f"{TENANTS_BASE}/groups", headers=H(token),
-                      params={"TenantId": TENANT_ID}, timeout=30)
+    gr = get_with_retry(f"{TENANTS_BASE}/groups", token,
+                        params={"TenantId": TENANT_ID})
     if gr.status_code == 200:
         for g in gr.json().get("groups", []):
             time.sleep(RATE_LIMIT_PAUSE)
-            mr = requests.get(f"{PROFILES_BASE}/profiles", headers=H(token),
-                              params={"tenantId": TENANT_ID, "GroupId": g["id"],
-                                      "pageSize": 500}, timeout=30)
+            mr = get_with_retry(f"{PROFILES_BASE}/profiles", token,
+                                params={"tenantId": TENANT_ID, "GroupId": g["id"],
+                                        "pageSize": 500})
             if mr.status_code != 200:
                 continue
             for p in mr.json().get("profiles", []):
@@ -141,12 +162,11 @@ def fetch_dynamo_tests(token, modified_from):
     tests, page = [], 1
     while True:
         time.sleep(RATE_LIMIT_PAUSE)
-        r = requests.get(f"{DYNAMO_BASE}/v2022q2/teams/{TENANT_ID}/tests",
-                         headers=H(token),
-                         params={"modifiedFromUTC": modified_from,
-                                 "includeRepSummaries": "true",
-                                 "page": page},
-                         timeout=30)
+        r = get_with_retry(f"{DYNAMO_BASE}/v2022q2/teams/{TENANT_ID}/tests",
+                           token,
+                           params={"modifiedFromUTC": modified_from,
+                                   "includeRepSummaries": "true",
+                                   "page": page})
         if r.status_code == 204:
             break
         r.raise_for_status()
