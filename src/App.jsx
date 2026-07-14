@@ -1185,12 +1185,22 @@ const RPT = {
   line: "#E3E6EA", thbg: "#F4F5F7",
 };
 
+// Percentile color scale: muted red -> amber -> green, matching the
+// progress-row change colors so the whole report shares one data language.
+function rptBandColor(pct) {
+  return pct >= 75 ? "#1B7F4B" : pct >= 40 ? "#B7791F" : "#C0392B";
+}
+
 function RptPctBar({ pct }) {
+  const w = Math.max(2, Math.min(99, pct));
   return (
     <div>
       <div style={{ position: "relative", height: 8, background: "#EEF0F3", borderRadius: 4 }}>
-        {[25, 50, 75].map(t => <div key={t} style={{ position: "absolute", left: t + "%", top: 0, width: 1, height: "100%", background: "#DDE1E6" }} />)}
-        <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: Math.max(2, pct) + "%", background: "linear-gradient(90deg,#F0906B," + RPT.orange + ")", borderRadius: 4 }} />
+        {[25, 50, 75].map(t => <div key={t} style={{ position: "absolute", left: t + "%", top: 0, width: 1, height: "100%", background: "#DDE1E6", zIndex: 1 }} />)}
+        <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: w + "%", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: (10000 / w) + "%",
+            background: "linear-gradient(90deg,#C0392B 0%,#E8A13D 50%,#1B7F4B 100%)" }} />
+        </div>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 7, color: RPT.lgray, marginTop: 2 }}>
         <span>0</span><span>25th</span><span>50th</span><span>75th</span><span>99th</span>
@@ -1201,7 +1211,7 @@ function RptPctBar({ pct }) {
 
 function RptTier({ pct }) {
   const t = pct >= 90 ? "Elite" : pct >= 75 ? "Above Average" : pct >= 50 ? "Average" : pct >= 25 ? "Developing" : "Building";
-  return <span style={{ fontSize: 9, fontWeight: 700, color: RPT.orange }}>{t}</span>;
+  return <span style={{ fontSize: 9, fontWeight: 700, color: rptBandColor(pct) }}>{t}</span>;
 }
 
 function RptMetricRow({ label, desc, value, best, pct }) {
@@ -1217,7 +1227,7 @@ function RptMetricRow({ label, desc, value, best, pct }) {
           <div style={{ fontSize: 8.5, color: RPT.lgray }}>best: {best}</div>
         </div>
         <div style={{ width: 92, textAlign: "right" }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: RPT.orange }}>{pct}<span style={{ fontSize: 9 }}>{["th","st","nd","rd"][(pct%100-20)%10] || ["th","st","nd","rd"][pct%100] || "th"}</span></div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: rptBandColor(pct) }}>{pct}<span style={{ fontSize: 9 }}>{["th","st","nd","rd"][(pct%100-20)%10] || ["th","st","nd","rd"][pct%100] || "th"}</span></div>
           <RptTier pct={pct} />
         </div>
       </div>
@@ -1387,7 +1397,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
               ["LATEST PEAK", veloAthlete.latestPeak + " mph"],
               ["PERCENTILE", (() => { const p = veloPct(veloAthlete.peakEver); return p + (["th","st","nd","rd"][(p%100-20)%10] || ["th","st","nd","rd"][p%100] || "th"); })()]].map(([l, v], i) => (
               <div key={i} style={{ border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 6px", textAlign: "center" }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: i === 3 ? RPT.orange : RPT.navy }}>{v}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: i === 3 ? rptBandColor(veloPct(veloAthlete.peakEver)) : RPT.navy }}>{v}</div>
                 <div style={{ fontSize: 7.5, color: RPT.lgray, letterSpacing: 0.4, marginTop: 2 }}>{l}</div>
               </div>
             ))}
