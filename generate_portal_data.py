@@ -1412,23 +1412,45 @@ _TMR = gen_TMR(_VELO)
 
 # ─── DynaMo (VALD shoulder-strength) — staff-only page ───────────────────────
 DYNAMO_JSON = "dynamo_portal.json"
+DYNAMO_MEAS_JSON = "dynamo_measurements.json"
+DYNAMO_TORQUE_MOVES = {"External Rotation", "Internal Rotation"}  # rotational only
+def _load_dynamo_meas():
+    if not os.path.exists(DYNAMO_MEAS_JSON):
+        return {}
+    try:
+        return (json.load(open(DYNAMO_MEAS_JSON)) or {}).get("athletes", {})
+    except Exception:
+        return {}
 def gen_DYNAMO():
     """_DYNAMO: [{name, group, dob, tests:[...]}] for the password-gated DynaMo
-    page. Source: dynamo_portal.json (produced by dynamo_sync.py from the VALD
-    DynaMo API; seeded from Jason Peacock's baseline until the sync runs)."""
+    page. Joins raw force (dynamo_portal.json, from the VALD DynaMo API) with the
+    manual forearm lever arms (dynamo_measurements.json) to add per-side torque
+    (N·m = peak force N × lever arm m) on ER/IR movements. Computed here so it
+    refreshes on every portal build as new measurements are added — the DynaMo
+    sync itself early-exits when there are no new tests."""
     if not os.path.exists(DYNAMO_JSON):
         return []
     try:
         data = json.load(open(DYNAMO_JSON))
     except Exception:
         return []
+    meas = _load_dynamo_meas()
     out = []
     for name, a in (data.get("athletes") or {}).items():
+        arm = (meas.get(a.get("name", name)) or {}).get("forearmMeters")
+        tests = a.get("tests", [])
+        for t in tests:
+            for mv in t.get("movements", []):
+                pk = mv.get("peakN")
+                if arm and mv.get("name") in DYNAMO_TORQUE_MOVES and pk:
+                    mv["torqueNm"] = [round(v * arm, 1) if v is not None else None for v in pk]
+                else:
+                    mv.pop("torqueNm", None)  # stale/ineligible → drop
         out.append({
             "name": a.get("name", name),
             "group": a.get("group", "hs"),
             "dob": a.get("dob"),
-            "tests": a.get("tests", []),
+            "tests": tests,
         })
     out.sort(key=lambda x: x["name"].split()[-1] if x["name"] else "")
     return out
