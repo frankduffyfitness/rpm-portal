@@ -1171,6 +1171,14 @@ function LandingPage({ onEnter, onSelectAthlete }) {
       
 
 
+      <button onClick={() => { window.location.hash = "dynamo"; window.location.reload(); }} style={{
+        display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 18px",
+        border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, cursor: "pointer",
+        fontSize: 12, fontWeight: 600, background: "rgba(255,255,255,0.03)", color: "#8A8F98",
+      }}>
+        {"🔒"} Coach Log-In
+      </button>
+
       <div style={{ marginTop: 20, fontSize: 9, color: "#4a4f57", letterSpacing: 0.5 }}>
         Updated {LAST_UPDATED}
       </div>
@@ -2656,7 +2664,7 @@ function DynamoPage() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <div style={{ height: 40 }} />
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-        <img src={RPM_LOGO} alt="RPM Strength" style={{ height: 30, width: "auto" }} />
+        <img src={RPM_LOGO} alt="RPM Strength" title="Back to Athlete Portal" onClick={() => { window.location.hash = ""; window.location.reload(); }} style={{ height: 30, width: "auto", cursor: "pointer" }} />
         <div style={{ width: 1, height: 22, background: "rgba(255,255,255,0.12)" }} />
         <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>DynaMo</div>
         <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#4FFFB0", background: "rgba(79,255,176,0.1)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 6, padding: "2px 6px" }}>STAFF</div>
