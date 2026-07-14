@@ -1332,7 +1332,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         </div>
 
         <div style={{ pageBreakAfter: "always", borderTop: "1px dashed #ccc", paddingTop: 4, marginBottom: 0 }}>
-          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>{hopTrend && hopTrend.sessions >= 2 ? "Hop Test Progress on next page" : "Percentile Rankings on next page"}</div>
+          <div style={{ fontSize: 9, color: "#aaa", textAlign: "center", fontStyle: "italic" }}>{hopTrend && hopTrend.sessions >= 2 ? "Hop Test Progress follows" : "Percentile Rankings follow"}</div>
         </div>
       </>);
       })()}
@@ -2624,9 +2624,54 @@ export default function App() {
             <button onClick={() => {
               const el = document.getElementById("report-content");
               const w = window.open("", "_blank");
-              w.document.write("<html><head><title>RPM Strength Report</title><style>body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;} table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:13px;} th{background:#f5f5f5;font-weight:700;font-size:11px;text-transform:uppercase;color:#666;} @media print{body{padding:10px;} @page{margin:0.5in;}}</style></head><body>" + el.innerHTML + "</body></html>");
+              w.document.write("<html><head><title>RPM Strength Report</title><style>body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:13px;} th{background:#f5f5f5;font-weight:700;font-size:11px;text-transform:uppercase;color:#666;} .pg{box-sizing:border-box;overflow:hidden;} @media print{@page{size:letter;margin:0;}}</style></head><body><div id=" + JSON.stringify("src") + ">" + el.innerHTML + "</div></body></html>");
               w.document.close();
-              setTimeout(() => { w.print(); }, 300);
+              // Paginate: scale to the fewest readable pages, then pack whole
+              // sections per page so nothing splits mid-card. Zero @page margin
+              // removes the browser's header/footer; each page div carries its
+              // own padding instead.
+              setTimeout(() => {
+                const doc = w.document, srcEl = doc.getElementById("src");
+                const kids = Array.from(srcEl.children);
+                const PAGE = 1056, PAD = 46, USABLE = PAGE - 2 * PAD;
+                const mb = (k) => parseFloat(w.getComputedStyle(k).marginBottom) || 0;
+                const H = kids.reduce((s, k) => s + k.getBoundingClientRect().height + mb(k), 0);
+                const heights = kids.map((k) => k.getBoundingClientRect().height + mb(k));
+                // Whole sections never split across pages, so page bottoms waste
+                // some space. Test-pack at each candidate zoom and step down
+                // until the target page count actually holds.
+                const packCount = (zz) => {
+                  const cap = (USABLE / zz) * 0.985;
+                  let pages = 0, acc = Infinity;
+                  for (const h of heights) { if (acc + h > cap) { pages++; acc = 0; } acc += h; }
+                  return pages;
+                };
+                let z = 1, target = 1, found = false;
+                for (target = 1; target < 6 && !found; found || target++) {
+                  z = Math.min(1, (target * USABLE) / H);
+                  while (z >= 0.66) {
+                    if (packCount(z) <= target) { found = true; break; }
+                    z -= 0.02;
+                  }
+                }
+                const uL = (USABLE / z) * 0.985, pgH = PAGE / z, padL = PAD / z;
+                const pages = [];
+                let page = null, acc = Infinity;
+                for (const k of kids) {
+                  const h = k.getBoundingClientRect().height + mb(k);
+                  if (acc + h > uL) {
+                    page = doc.createElement("div"); page.className = "pg";
+                    page.style.height = pgH + "px"; page.style.padding = padL + "px";
+                    page.style.pageBreakAfter = "always";
+                    pages.push(page); acc = 0;
+                  }
+                  page.appendChild(k); acc += h;
+                }
+                if (pages.length) pages[pages.length - 1].style.pageBreakAfter = "auto";
+                srcEl.replaceWith.apply(srcEl, pages);
+                doc.body.style.zoom = String(z);
+                w.print();
+              }, 300);
             }} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
           </div>
           <ReportView
