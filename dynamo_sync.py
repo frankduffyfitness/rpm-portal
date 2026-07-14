@@ -62,6 +62,8 @@ DYNAMO_BASE   = os.environ.get("VALD_DYNAMO_BASE",
 
 OUTPUT_FILE      = "dynamo_portal.json"
 ANNOTATIONS_FILE = "dynamo_annotations.json"
+MEASUREMENTS_FILE = "dynamo_measurements.json"
+TORQUE_MOVEMENTS = {"External Rotation", "Internal Rotation"}  # rotational — grip is excluded
 STATE_FILE       = "dynamo_sync_state.json"
 RATE_LIMIT_PAUSE = 0.05
 LOCAL_TZ         = ZoneInfo("America/New_York")   # session date = RPM local date
@@ -333,11 +335,37 @@ def build_portal(profiles, tests, annotations):
             })
         athletes[name] = {"name": name, "group": group_code(prof.get("groups")),
                           "dob": prof.get("dob"), "tests": tests_out}
+    apply_torque(athletes, load_measurements())
     return {
         "meta": {"syncDate": datetime.now(timezone.utc).isoformat(),
                  "source": "VALD DynaMo", "totalAthletes": len(athletes)},
         "athletes": athletes,
     }
+
+
+def load_measurements(path=MEASUREMENTS_FILE):
+    if not os.path.exists(path):
+        return {}
+    try:
+        return (json.load(open(path)) or {}).get("athletes", {})
+    except Exception:
+        return {}
+
+
+def apply_torque(athletes, meas):
+    """Add per-side torque (N·m = peak force N × lever arm m) to ER/IR movements
+    for athletes with a measured forearm length. Missing measurement → no torque
+    field (so the leaderboard excludes them; never substitute a default)."""
+    for name, a in athletes.items():
+        arm = (meas.get(name) or {}).get("forearmMeters")
+        if not arm:
+            continue
+        for t in a.get("tests", []):
+            for mv in t.get("movements", []):
+                if mv.get("name") in TORQUE_MOVEMENTS and mv.get("peakN"):
+                    mv["torqueNm"] = [round(v * arm, 1) if v is not None else None
+                                      for v in mv["peakN"]]
+    return athletes
 
 
 # ─── State + merge ───────────────────────────────────────────────────────────
