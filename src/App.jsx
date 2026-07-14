@@ -1275,7 +1275,7 @@ function RptProgressRows({ rows }) {
         <div key={i} style={{ display: "flex", alignItems: "center", padding: "6px 0", borderBottom: "1px solid " + RPT.line, fontSize: 11 }}>
           <div style={{ width: 190, fontWeight: 700, color: RPT.navy }}>{r.label}</div>
           <div style={{ width: 150, color: RPT.gray }}>{r.first}{r.unit} {"\u2192"} <strong style={{ color: RPT.navy }}>{r.last}{r.unit}</strong></div>
-          <div style={{ width: 70, textAlign: "right", fontWeight: 800, color: r.change > 0 ? "#1B7F4B" : r.change < 0 ? "#C0392B" : RPT.gray }}>
+          <div style={{ width: 70, textAlign: "right", fontWeight: 800, color: r.change === 0 ? RPT.gray : (r.invert ? r.change < 0 : r.change > 0) ? "#1B7F4B" : "#C0392B" }}>
             {r.change > 0 ? "+" : ""}{Number(r.change).toFixed(1)}%
           </div>
         </div>
@@ -1379,7 +1379,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
               <RptProgressRows rows={[
                 { label: "Hop RSI", first: hopTrend.rsi_first, last: hopTrend.rsi_last, change: hopTrend.rsi_change, unit: "" },
                 { label: "Flight Time", first: hopTrend.ft_first, last: hopTrend.ft_last, change: hopTrend.ft_change, unit: " ms" },
-                { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms" },
+                { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms", invert: true },
               ]} />
             </RptSection>
           )}
