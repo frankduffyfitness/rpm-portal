@@ -1,10 +1,20 @@
 {
-  "lastSyncedAt": "2026-07-13T19:28:48Z",
+  "lastSyncedAt": "2026-07-14T02:44:01Z",
   "athletes": {
     "Darren Espinal": {
       "name": "Darren Espinal",
       "programUrl": "https://docs.google.com/spreadsheets/d/1sXoUKXZy90kVzClgqj5s8h9PrzeDdzwlEOyqcC1q2E4/edit",
       "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "Darren Espinal",
+          "peakVelo": 75.2,
+          "avgVelo": 71.3,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
         {
           "date": "2026-07-09",
           "peakVelo": 65.1,
@@ -420,6 +430,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/1_LJFbAJcoD_v1cf5h9bzDeOlP0BMdeOsk3LrfsXbYmo/edit",
       "sessions": [
         {
+          "date": "2026-07-13",
+          "name": "Zach Powell",
+          "peakVelo": 80.8,
+          "avgVelo": 79.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
           "date": "2026-07-09",
           "peakVelo": 78.2,
           "avgVelo": 77.4,
@@ -530,6 +550,16 @@
       "name": "Eli Delgado",
       "programUrl": "https://docs.google.com/spreadsheets/d/1KdAjjbSUcsHis_6xHIZJw7AfVxGFyzVARmtm8TBEAVA/edit",
       "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "Eli Delgado",
+          "peakVelo": 84.0,
+          "avgVelo": 83.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-08",
           "peakVelo": 84.5,
@@ -887,6 +917,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/1RolTZLMDk65bZ7Rk3YKt1cYabida0zjAilcV3av3q94/edit",
       "sessions": [
         {
+          "date": "2026-07-13",
+          "name": "Axel Campos",
+          "peakVelo": 77.9,
+          "avgVelo": 76.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
           "date": "2026-07-07",
           "peakVelo": 77.3,
           "avgVelo": 76.2,
@@ -1183,6 +1223,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/13Az_T3tQp7dGeAgd9EmSvzLp2jHCct85OvWHHKOiFGg/edit",
       "sessions": [
         {
+          "date": "2026-07-13",
+          "name": "Pat Rodriguez",
+          "peakVelo": 71.6,
+          "avgVelo": 70.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
           "date": "2026-07-07",
           "peakVelo": 72.0,
           "avgVelo": 69.8,
@@ -1230,6 +1280,16 @@
       "name": "CJ Burke",
       "programUrl": "https://docs.google.com/spreadsheets/d/1e18KNjC5ofJBe--I0XSvdwrgYl8CX_rpe9D7lPj5jzQ/edit",
       "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "CJ Burke",
+          "peakVelo": 78.3,
+          "avgVelo": 75.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-10",
           "name": "CJ Burke",
@@ -1653,6 +1713,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/1vV7s8Zib5HiLXudEO9KceSNkbTWl-aFmwxPoPJLmi2U/edit",
       "sessions": [
         {
+          "date": "2026-07-13",
+          "name": "Christian Sanchez",
+          "peakVelo": 73.9,
+          "avgVelo": 71.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
           "date": "2026-07-10",
           "name": "Christian Sanchez",
           "peakVelo": 71.3,
@@ -1912,6 +1982,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/1iqZUm3WrVxGrhQnAisM0J3YTmi_MCs7Cxc4jOq8blJo/edit",
       "sessions": [
         {
+          "date": "2026-07-13",
+          "name": "Elian Carrasco",
+          "peakVelo": 85.4,
+          "avgVelo": 84.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
           "date": "2026-07-06",
           "peakVelo": 80.6,
           "avgVelo": 79.2,
@@ -2130,6 +2210,16 @@
       "name": "Eric Grgas",
       "programUrl": "https://docs.google.com/spreadsheets/d/1P87835IqgerW2JA48uxsPyhNUuLpFEVLi6H1ykTdE3U/edit",
       "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "Eric Grgas",
+          "peakVelo": 85.3,
+          "avgVelo": 84.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-10",
           "name": "Eric Grgas",
@@ -2522,6 +2612,16 @@
       "name": "Liam Brower",
       "programUrl": "https://docs.google.com/spreadsheets/d/1wTjOXk78i1cLhs-eNMxnBB86p352IwWTemZZiIETNhE/edit",
       "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "Liam Brower",
+          "peakVelo": 85.7,
+          "avgVelo": 85.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-10",
           "name": "Liam Brower",
@@ -4857,6 +4957,16 @@
       "name": "Angelo Nunes",
       "programUrl": "https://docs.google.com/spreadsheets/d/1wnA2Q4xyTacZ5n8XQ-zBVyp1Vfa_vtBDeNyb-KpcEyc/edit",
       "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "Angelo Nunes",
+          "peakVelo": 86.9,
+          "avgVelo": 84.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-06-22",
           "peakVelo": 85.1,
@@ -7855,6 +7965,22 @@
           "peakVelo": 68.8,
           "avgVelo": 67.4,
           "sessionType": "Short Slope",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Thomas DiGiovanna": {
+      "name": "Thomas DiGiovanna",
+      "programUrl": "",
+      "sessions": [
+        {
+          "date": "2026-07-13",
+          "name": "Thomas DiGiovanna",
+          "peakVelo": 81.0,
+          "avgVelo": 79.6,
+          "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
