@@ -2539,7 +2539,9 @@ export default function App() {
                 rpts.forEach((p, i) => {
                   p.style.boxShadow = "none"; p.style.margin = "0 auto";
                   const h = p.getBoundingClientRect().height;
-                  const z = Math.min(1, USABLE / h);
+                  // Scale UP as well as down (capped 1.3x) so lighter pages
+                  // fill the sheet instead of leaving a dead bottom third.
+                  const z = Math.min(1.3, USABLE / h);
                   const wrap = doc.createElement("div");
                   wrap.style.boxSizing = "border-box";
                   wrap.style.height = (PAGE / z) + "px";
@@ -2547,6 +2549,11 @@ export default function App() {
                   wrap.style.overflow = "hidden";
                   wrap.style.zoom = String(z);
                   if (i < rpts.length - 1) wrap.style.pageBreakAfter = "always";
+                  // Pin the footer to the bottom edge of the sheet.
+                  p.style.display = "flex"; p.style.flexDirection = "column";
+                  p.style.boxSizing = "border-box";
+                  p.style.height = (USABLE / z) + "px";
+                  if (p.lastElementChild) p.lastElementChild.style.marginTop = "auto";
                   p.parentNode.insertBefore(wrap, p);
                   wrap.appendChild(p);
                 });
