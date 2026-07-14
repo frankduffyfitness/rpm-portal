@@ -2430,10 +2430,8 @@ function DynamoReport({ athlete, onBack }) {
   const date = t && t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
   const shorten = (n) => n.replace(" (Abduction)", "").replace("Shoulder ", "");
   // RPM standard screen = shoulder ER/IR + grip. Anything else on the unit is
-  // a rehab / return-to-play protocol — shown separately, managed individually.
-  const isCore = (m) => DYN_CORE.includes(m.name);
-  const core = t.movements.filter(isCore);
-  const rehab = t.movements.filter((m) => !isCore(m));
+  // a rehab / return-to-play protocol — kept in the data, not shown here.
+  const core = t.movements.filter((m) => DYN_CORE.includes(m.name));
   return (
     <div>
       <button onClick={onBack} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "0 0 12px" }}>{"←"} All athletes</button>
@@ -2475,16 +2473,6 @@ function DynamoReport({ athlete, onBack }) {
         </DynSection>
       )}
 
-      {rehab.length > 0 && (
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px dashed rgba(255,255,255,0.12)" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#8A9099", textTransform: "uppercase" }}>Rehab / Return-to-Play Tests</div>
-          <div style={{ fontSize: 11, color: "#6B7280", marginTop: 3, lineHeight: 1.45 }}>Outside the standard ER/IR + grip screen — tested as part of an individual protocol and managed separately.</div>
-          <DynSection title="Peak Force" subtitle={null}>
-            {rehab.map((m, i) => <DynMovement key={i} m={m} />)}
-          </DynSection>
-        </div>
-      )}
-
       {t.discomfortNote && (
         <div style={{ marginTop: 16, padding: 14, background: "rgba(249,115,98,0.06)", border: "1px solid rgba(249,115,98,0.2)", borderRadius: 12 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: DYN_RED, marginBottom: 6 }}>Discomfort Reported During Testing</div>
@@ -2510,11 +2498,10 @@ function DynamoRoster({ onSelect }) {
       {_DYNAMO.map((a, i) => {
         const g = GROUPS[a.group]; const t = a.tests[0];
         const date = t && t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
-        const hasRtp = t && t.movements.some((m) => !DYN_CORE.includes(m.name));
         return (
           <div key={i} onClick={() => onSelect(a)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 8, cursor: "pointer" }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", display: "flex", alignItems: "center", gap: 8 }}>{a.name}{hasRtp && <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#FBBF24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 6, padding: "2px 6px" }}>RTP</span>}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{a.name}</div>
               <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{(g && g.label) || a.group} · {t ? t.type : ""} · {date}</div>
             </div>
             <div style={{ color: "#4A4F57", fontSize: 18 }}>{"›"}</div>
@@ -2525,11 +2512,122 @@ function DynamoRoster({ onSelect }) {
   );
 }
 
+// Best-side peak force (N) for a movement within one test (max across entries
+// and sides — grip is often recorded multiple times in a session).
+function dynTestPeak(test, movementName) {
+  const vals = test.movements.filter((m) => m.name === movementName)
+    .flatMap((m) => m.peakN).filter((v) => v !== null && v !== undefined);
+  return vals.length ? Math.max(...vals) : null;
+}
+function dynBestEver(athlete, movementName) {
+  const vals = athlete.tests.map((t) => dynTestPeak(t, movementName)).filter((v) => v !== null);
+  return vals.length ? Math.max(...vals) : null;
+}
+const DYN_METRICS = [["External Rotation", "ER"], ["Internal Rotation", "IR"], ["Grip Squeeze", "Grip"]];
+const DYN_LBS = (n) => (n / 4.44822).toFixed(1);
+
+function DynamoStandings({ onSelect }) {
+  const [metric, setMetric] = useState("External Rotation");
+  const [gr, setGr] = useState("all");
+  const groupsPresent = [...new Set(_DYNAMO.map((a) => a.group))];
+  const pool = (gr === "all" ? _DYNAMO : _DYNAMO.filter((a) => a.group === gr))
+    .map((a) => ({ a, v: dynBestEver(a, metric) }))
+    .filter((x) => x.v !== null)
+    .sort((x, y) => y.v - x.v);
+  return (
+    <div>
+      <div style={{ textAlign: "center", marginBottom: 18 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{"💪"} Strength Leaderboard</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>Best-side peak force · {_DYNAMO.length} athletes · VALD DynaMo</div>
+      </div>
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 12, flexWrap: "wrap" }}>
+        {DYN_METRICS.map(([name, label]) => (
+          <button key={name} onClick={() => setMetric(name)} style={{ padding: "6px 12px", borderRadius: 16, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600,
+            background: metric === name ? "rgba(79,255,176,0.15)" : "rgba(255,255,255,0.04)", color: metric === name ? "#4FFFB0" : "#6B7280" }}>{label}</button>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        {[["all", "All"], ...groupsPresent.map((k) => [k, (GROUPS[k] || {}).label || k])].map(([k, l]) => (
+          <button key={k} onClick={() => setGr(k)} style={{ padding: "5px 10px", borderRadius: 14, border: "none", cursor: "pointer", fontSize: 10, fontWeight: 600,
+            background: gr === k ? ((GROUPS[k] || {}).color || "#4FFFB0") + "22" : "rgba(255,255,255,0.03)", color: gr === k ? (GROUPS[k] || {}).color || "#4FFFB0" : "#6B7280" }}>{l}</button>
+        ))}
+      </div>
+      {pool.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No {metric} tests in this group yet.</div>}
+      {pool.map(({ a, v }, i) => {
+        const t = a.tests[0];
+        const date = t && t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
+        return (
+          <div key={a.name} onClick={() => onSelect(a)} style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", marginBottom: 8,
+            background: "rgba(255,255,255,0.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(79,255,176,0.13)", color: "#4FFFB0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800 }}>{i + 1}</div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{a.name}</div>
+                <div style={{ fontSize: 10, color: "#6B7280" }}><span style={{ color: (GROUPS[a.group] || {}).color || "#6B7280" }}>{(GROUPS[a.group] || {}).shortLabel || a.group}</span> · {a.tests.length} session{a.tests.length === 1 ? "" : "s"} · {date}</div>
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 19, fontWeight: 800, color: "#4FFFB0" }}>{v.toFixed(1)} N</div>
+              <div style={{ fontSize: 9, color: "#6B7280" }}>{DYN_LBS(v)} lbs</div>
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ marginTop: 16, fontSize: 9, color: "#4a4f57", textAlign: "center", letterSpacing: 0.5 }}>RPM STRENGTH · VALD DYNAMO DATA</div>
+    </div>
+  );
+}
+
+function DynamoTrending({ onSelect }) {
+  const multi = _DYNAMO.filter((a) => a.tests.length >= 2).map((a) => {
+    const latest = a.tests[0], first = a.tests[a.tests.length - 1];
+    const deltas = DYN_METRICS.map(([name, label]) => {
+      const l = dynTestPeak(latest, name), f = dynTestPeak(first, name);
+      return (l !== null && f !== null) ? { label, delta: l - f } : null;
+    }).filter(Boolean);
+    return { a, deltas };
+  }).filter((x) => x.deltas.length > 0)
+    .sort((x, y) => Math.max(...y.deltas.map((d) => d.delta)) - Math.max(...x.deltas.map((d) => d.delta)));
+  return (
+    <div>
+      <div style={{ textAlign: "center", marginBottom: 18 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{"📈"} Strength Trends</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>Latest vs first test · best-side peak force · VALD DynaMo</div>
+      </div>
+      {multi.length === 0 && (
+        <div style={{ fontSize: 13, color: "#6B7280", padding: "32px 20px", textAlign: "center", lineHeight: 1.6 }}>
+          Trends appear once athletes have 2+ DynaMo sessions.<br />Re-test athletes to start tracking progress here.
+        </div>
+      )}
+      {multi.map(({ a, deltas }) => (
+        <div key={a.name} onClick={() => onSelect(a)} style={{ cursor: "pointer", padding: "13px 16px", marginBottom: 8, background: "rgba(255,255,255,0.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{a.name}</div>
+              <div style={{ fontSize: 10, color: "#6B7280" }}><span style={{ color: (GROUPS[a.group] || {}).color || "#6B7280" }}>{(GROUPS[a.group] || {}).shortLabel || a.group}</span> · {a.tests.length} sessions</div>
+            </div>
+            <div style={{ color: "#4A4F57", fontSize: 18 }}>{"›"}</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {deltas.map(({ label, delta }) => (
+              <div key={label} style={{ display: "flex", alignItems: "baseline", gap: 5, padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,0.03)" }}>
+                <span style={{ fontSize: 10, color: "#6B7280" }}>{label}</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: delta > 0 ? "#4FFFB0" : delta < 0 ? "#FF6B6B" : "#8A8F98" }}>{delta > 0 ? "+" : ""}{delta.toFixed(1)} N</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function DynamoPage() {
   const [ok, setOk] = useState(() => { try { return sessionStorage.getItem("dyn_ok") === "1"; } catch (e) { return false; } });
   const [pw, setPw] = useState("");
   const [err, setErr] = useState(false);
   const [sel, setSel] = useState(null);
+  const [dynTab, setDynTab] = useState("standings");
   const submit = (e) => {
     e.preventDefault();
     if (pw === DYNAMO_PASSWORD) { setOk(true); setErr(false); try { sessionStorage.setItem("dyn_ok", "1"); } catch (e) {} }
@@ -2560,7 +2658,18 @@ function DynamoPage() {
       </form>
     );
   }
-  return shell(sel ? <DynamoReport athlete={sel} onBack={() => setSel(null)} /> : <DynamoRoster onSelect={setSel} />);
+  const open = (a) => { setSel(a); setDynTab("athletes"); window.scrollTo(0, 0); };
+  return shell(<>
+    <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3 }}>
+      {[["standings", "🏆 Standings"], ["trending", "📈 Trending"], ["athletes", "👤 Athletes"]].map(([k, l]) => (
+        <button key={k} onClick={() => { setDynTab(k); if (k !== "athletes") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
+          background: dynTab === k ? "rgba(79,255,176,0.12)" : "transparent", color: dynTab === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
+      ))}
+    </div>
+    {dynTab === "standings" && <DynamoStandings onSelect={open} />}
+    {dynTab === "trending" && <DynamoTrending onSelect={open} />}
+    {dynTab === "athletes" && (sel ? <DynamoReport athlete={sel} onBack={() => setSel(null)} /> : <DynamoRoster onSelect={(a) => open(a)} />)}
+  </>);
 }
 
 export default function App() {
