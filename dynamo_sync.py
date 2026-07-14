@@ -64,6 +64,12 @@ OUTPUT_FILE      = "dynamo_portal.json"
 ANNOTATIONS_FILE = "dynamo_annotations.json"
 # Torque (force × lever arm) is computed in generate_portal_data.py, which joins
 # raw force here with the manual forearm measurements on every portal build.
+
+# Canonicalize VALD DynaMo profile names to the spelling used elsewhere in the
+# portal (TrackMan/velo), so an athlete's data unifies and measurements join.
+NAME_ALIASES = {
+    "Zach Uysal": "Zachary Uysal",
+}
 STATE_FILE       = "dynamo_sync_state.json"
 RATE_LIMIT_PAUSE = 0.05
 LOCAL_TZ         = ZoneInfo("America/New_York")   # session date = RPM local date
@@ -128,7 +134,9 @@ def fetch_profiles_with_groups(token):
     profiles = {}
     for p in r.json().get("profiles", []):
         profiles[p["profileId"]] = {
-            "name": f"{p.get('givenName','')} {p.get('familyName','')}".strip(),
+            "name": NAME_ALIASES.get(
+                f"{p.get('givenName','')} {p.get('familyName','')}".strip(),
+                f"{p.get('givenName','')} {p.get('familyName','')}".strip()),
             "dob": (p.get("dateOfBirth") or "")[:10] or None,
             "groups": [],
         }
@@ -401,5 +409,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Manual full re-pull trigger 2026-07-14 21:24 — import Zachary Uysal DynaMo test
