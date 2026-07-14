@@ -1308,6 +1308,8 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
   const pageStyle = { fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 660, margin: "0 auto 28px", padding: "26px 28px", color: "#1a1a1a", background: "#fff", boxShadow: "0 1px 6px rgba(0,0,0,0.12)" };
 
   const fmtRank = (rank, total) => rank ? rank + " of " + total + " " + gi.label : "\u2013";
+  // PR progress: first-ever session vs personal best (per metric)
+  const prChg = (first, best) => (first && best ? Math.round(((best - first) / Math.abs(first)) * 1000) / 10 : 0);
   const jhRankG = ATHLETES.filter(a => a.group === athlete.group);
   const jhRank = jhRankG.filter(a => a.best.jumpHeight > athlete.best.jumpHeight).length + 1;
 
@@ -1339,12 +1341,12 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
           </div>
         </div>
         {offseason && offseason.sessions >= 2 && (
-          <RptSection title="Progress (first session vs latest)">
+          <RptSection title="PR Progress \u00b7 first session vs personal best">
             <RptProgressRows rows={[
-              { label: "Jump Height", first: offseason.jhFirst, last: offseason.jhLast, change: offseason.jhChange, unit: '\u0022' },
-              { label: "RSI-modified", first: offseason.rsiFirst, last: offseason.rsiLast, change: offseason.rsiChange, unit: "" },
-              { label: "Concentric Impulse", first: offseason.ppFirst, last: offseason.ppLast, change: offseason.ppChange, unit: " N\u00b7s" },
-              { label: "Ecc Braking RFD", first: offseason.brkFirst, last: offseason.brkLast, change: offseason.brkChange, unit: " N/s" },
+              { label: "Jump Height", first: offseason.jhFirst, last: athlete.best.jumpHeight, change: prChg(offseason.jhFirst, athlete.best.jumpHeight), unit: '\u0022' },
+              { label: "RSI-modified", first: offseason.rsiFirst, last: athlete.best.rsi, change: prChg(offseason.rsiFirst, athlete.best.rsi), unit: "" },
+              { label: "Concentric Impulse", first: offseason.ppFirst, last: athlete.best.conImpulse, change: prChg(offseason.ppFirst, athlete.best.conImpulse), unit: " N\u00b7s" },
+              { label: "Ecc Braking RFD", first: offseason.brkFirst, last: athlete.best.eccBrakingRFD, change: prChg(offseason.brkFirst, athlete.best.eccBrakingRFD), unit: " N/s" },
             ]} />
           </RptSection>
         )}
@@ -1375,11 +1377,11 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             </div>
           </div>
           {hopTrend && hopTrend.sessions >= 2 && (
-            <RptSection title="Progress (first session vs latest)">
+            <RptSection title="PR Progress \u00b7 first session vs personal best">
               <RptProgressRows rows={[
-                { label: "Hop RSI", first: hopTrend.rsi_first, last: hopTrend.rsi_last, change: hopTrend.rsi_change, unit: "" },
-                { label: "Flight Time", first: hopTrend.ft_first, last: hopTrend.ft_last, change: hopTrend.ft_change, unit: " ms" },
-                { label: "Contact Time", first: hopTrend.ct_first, last: hopTrend.ct_last, change: hopTrend.ct_change, unit: " ms", invert: true },
+                { label: "Hop RSI", first: hopTrend.rsi_first, last: hopAthlete.best.rsi, change: prChg(hopTrend.rsi_first, hopAthlete.best.rsi), unit: "" },
+                { label: "Flight Time", first: hopTrend.ft_first, last: hopAthlete.best.ft, change: prChg(hopTrend.ft_first, hopAthlete.best.ft), unit: " ms" },
+                { label: "Contact Time", first: hopTrend.ct_first, last: hopAthlete.best.ct, change: prChg(hopTrend.ct_first, hopAthlete.best.ct), unit: " ms", invert: true },
               ]} />
             </RptSection>
           )}
