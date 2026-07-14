@@ -260,7 +260,16 @@ for pid, ath in fd['athletes'].items():
         
         jh = compute_session_best(test['trials'], 'jumpHeight')
         rsi = compute_session_best(test['trials'], 'rsiModified')
-        pp = compute_session_best(test['trials'], 'relativePower')
+        # 'pp' slot now carries CONCENTRIC IMPULSE (N·s), replacing relative
+        # peak power (2026-07-13, Frank's call — the gym programs off impulse).
+        # The base 'concentricImpulse' trial field stores the asymmetry value;
+        # the true total is Left + Right.
+        ci_vals = []
+        for tr in test['trials']:
+            l_, r_ = tr['metrics'].get('concentricImpulseLeft'), tr['metrics'].get('concentricImpulseRight')
+            if l_ is not None and r_ is not None:
+                ci_vals.append(l_ + r_)
+        pp = round(max(ci_vals), 1) if ci_vals else None
         brk = compute_session_brk_avg(test['trials'])
         bw = compute_session_avg(test['trials'], 'bodyweightLbs')
         
@@ -315,7 +324,7 @@ ROBUST_Z_CUTOFF = 3.5     # robust "standard deviations" from the median
 _MAD_TO_SD = 1.4826       # scales MAD onto a normal-SD footing
 PCT_FROM_MEDIAN = {       # how far from the athlete's median = implausible
     'jh':  0.40,          # CMJ jump height — tight; real session-to-session <~30%
-    'pp':  0.40,          # relative peak power — fairly stable
+    'pp':  0.40,          # concentric impulse — fairly stable
     'rsi': 0.55,          # RSI-modified — a bit noisier
     'brk': 0.80,          # eccentric braking RFD — genuinely noisy, stay loose
     'bw':  0.25,          # bodyweight — very stable; a 25%+ single-session swing = scale misread
@@ -323,7 +332,7 @@ PCT_FROM_MEDIAN = {       # how far from the athlete's median = implausible
 ABS_BOUNDS = {            # hard sanity bounds; outside = sensor error, always drop
     'jh':  (2.0, 50.0),   # inches
     'rsi': (0.0, 5.0),    # RSI-mod realistically maxes well under 5
-    'pp':  (0.0, 120.0),  # W/kg
+    'pp':  (50.0, 900.0), # concentric impulse, N·s
     'bw':  (50.0, 400.0), # lbs — no RPM athlete is under 50 lb, so sub-50 = misread even at low session counts
 }                         # 'brk' intentionally omitted — too variable for a fixed bound
 
@@ -917,7 +926,7 @@ def gen_N(athletes_data):
         return {"p10": p(10), "p25": p(25), "p50": p(50), "p75": p(75), "p90": p(90)}
     
     norms = {}
-    metric_map = {'jh': 'cmjHeight', 'rsi': 'rsiMod', 'pp': 'peakPowerBM', 'brk': 'eccBrakingRFD'}
+    metric_map = {'jh': 'cmjHeight', 'rsi': 'rsiMod', 'pp': 'conImpulse', 'brk': 'eccBrakingRFD'}
     for g, data in groups.items():
         norms[g] = {}
         for mk, nk in metric_map.items():
@@ -941,7 +950,7 @@ def gen_PR(athletes_data):
         prev_sessions = s[1:]
         
         prs = []
-        metric_keys = [('jh', 'JH'), ('rsi', 'RSI'), ('pp', 'PP'), ('brk', 'BRK')]
+        metric_keys = [('jh', 'JH'), ('rsi', 'RSI'), ('pp', 'CI'), ('brk', 'BRK')]
         
         for mk, label in metric_keys:
             curr_val = latest.get(mk)
