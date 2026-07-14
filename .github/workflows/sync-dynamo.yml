@@ -1,9 +1,11 @@
 name: Sync DynaMo Data
 
-# API contract verified against the live public Swagger spec (2026-07-14).
-# Also fires on pushes that change dynamo_sync.py so sync fixes validate
-# themselves end-to-end; add a cron schedule once the first run is confirmed.
+# API contract verified against the live public Swagger spec (2026-07-14);
+# pipeline validated end-to-end on live data the same day.
+# Schedule is offset 3h from the ForceDecks sync (0 */6) so they never race.
 on:
+  schedule:
+    - cron: '0 3/6 * * *'
   push:
     paths:
       - 'dynamo_sync.py'
