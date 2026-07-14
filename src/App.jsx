@@ -2540,7 +2540,6 @@ const DYN_METRICS = [["External Rotation", "ER"], ["Internal Rotation", "IR"], [
 const DYN_STATS = [
   ["peakN", "Max Force", "N", 1, false, "Best-side peak force"],
   ["rfd", "RFD", "N/s", 0, false, "Best-side rate of force development"],
-  ["ttp", "Time to Peak", "s", 2, true, "Fastest-side time to peak force"],
 ];
 const DYN_LBS = (n) => (n / 4.44822).toFixed(1);
 
