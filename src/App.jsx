@@ -2423,7 +2423,7 @@ function DynMovement({ m }) {
 function DynamoReport({ athlete, onBack }) {
   const t = athlete.tests[0];
   const g = GROUPS[athlete.group];
-  const dob = athlete.dob ? new Date(athlete.dob + "T00:00:00").toLocaleDateString("en-US") : null;
+  const dob = athlete.dob ? new Date(athlete.dob.slice(0, 10) + "T00:00:00").toLocaleDateString("en-US") : null;
   const date = t && t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
   const shorten = (n) => n.replace(" (Abduction)", "").replace("Shoulder ", "");
   return (
