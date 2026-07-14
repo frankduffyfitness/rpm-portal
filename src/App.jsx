@@ -2361,6 +2361,9 @@ function VeloTrendingTab({ onSelect }) {
 const DYN_L = "#38BDF8";    // left limb
 const DYN_R = "#4FFFB0";    // right limb
 const DYN_RED = "#F97362";  // discomfort flag
+// RPM's standard DynaMo screen. Movements outside this list are rehab/RTP
+// protocol tests and render in their own separated section.
+const DYN_CORE = ["External Rotation", "Internal Rotation", "Grip Squeeze"];
 function dynFmt(n, d = 1) { return (n === null || n === undefined) ? "—" : Number(n).toFixed(d); }
 
 function DynSection({ title, subtitle, children }) {
@@ -2426,6 +2429,11 @@ function DynamoReport({ athlete, onBack }) {
   const dob = athlete.dob ? new Date(athlete.dob.slice(0, 10) + "T00:00:00").toLocaleDateString("en-US") : null;
   const date = t && t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
   const shorten = (n) => n.replace(" (Abduction)", "").replace("Shoulder ", "");
+  // RPM standard screen = shoulder ER/IR + grip. Anything else on the unit is
+  // a rehab / return-to-play protocol — shown separately, managed individually.
+  const isCore = (m) => DYN_CORE.includes(m.name);
+  const core = t.movements.filter(isCore);
+  const rehab = t.movements.filter((m) => !isCore(m));
   return (
     <div>
       <button onClick={onBack} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "0 0 12px" }}>{"←"} All athletes</button>
@@ -2434,30 +2442,48 @@ function DynamoReport({ athlete, onBack }) {
       <div style={{ fontSize: 12, color: "#8A9099", marginTop: 5 }}>{(g && g.label) || athlete.group}{dob ? " · DOB " + dob : ""} · {date}</div>
       <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>VALD DynaMo isometric testing · {t.label}</div>
 
-      <DynSection title="Peak Force" subtitle="The most force produced in each direction. This is the primary strength measure.">
-        {t.movements.map((m, i) => <DynMovement key={i} m={m} />)}
-      </DynSection>
+      {core.length > 0 && (
+        <DynSection title="Peak Force" subtitle="Shoulder ER/IR and grip — the RPM standard screen. The most force produced in each direction.">
+          {core.map((m, i) => <DynMovement key={i} m={m} />)}
+        </DynSection>
+      )}
 
-      <DynSection title="External : Internal Rotation Ratio" subtitle="Balance between the muscles that decelerate the arm (ER) and those that accelerate it (IR). Reviewed by clinicians for shoulder health.">
-        <div style={{ display: "flex", gap: 12 }}>
-          {[["Left arm", t.erIr.left], ["Right arm", t.erIr.right]].map(([lbl, v]) => (
-            <div key={lbl} style={{ flex: 1, textAlign: "center", padding: "12px 0", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{dynFmt(v, 2)}</div>
-              <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{lbl}</div>
-            </div>
-          ))}
+      {(t.erIr.left !== null || t.erIr.right !== null) && (
+        <DynSection title="External : Internal Rotation Ratio" subtitle="Balance between the muscles that decelerate the arm (ER) and those that accelerate it (IR). Reviewed by clinicians for shoulder health.">
+          <div style={{ display: "flex", gap: 12 }}>
+            {[["Left arm", t.erIr.left], ["Right arm", t.erIr.right]].map(([lbl, v]) => (
+              <div key={lbl} style={{ flex: 1, textAlign: "center", padding: "12px 0", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{dynFmt(v, 2)}</div>
+                <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{lbl}</div>
+              </div>
+            ))}
+          </div>
+        </DynSection>
+      )}
+
+      {core.length > 0 && (
+        <DynSection title="Rate of Force Development" subtitle="How quickly force builds (N/s). Higher values mean faster access to strength, key for explosive actions like throwing.">
+          <DynLRHead />
+          {core.map((m, i) => <DynLRRow key={i} label={shorten(m.name)} left={m.rfd[0]} right={m.rfd[1]} unit="N/s" dec={0} />)}
+        </DynSection>
+      )}
+
+      {core.length > 0 && (
+        <DynSection title="Time to Peak Force" subtitle="How long it took to reach maximum force. Shorter times reflect a quicker, more efficient neuromuscular response.">
+          <DynLRHead />
+          {core.map((m, i) => <DynLRRow key={i} label={shorten(m.name)} left={m.ttp[0]} right={m.ttp[1]} unit="s" dec={2} />)}
+        </DynSection>
+      )}
+
+      {rehab.length > 0 && (
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px dashed rgba(255,255,255,0.12)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#8A9099", textTransform: "uppercase" }}>Rehab / Return-to-Play Tests</div>
+          <div style={{ fontSize: 11, color: "#6B7280", marginTop: 3, lineHeight: 1.45 }}>Outside the standard ER/IR + grip screen — tested as part of an individual protocol and managed separately.</div>
+          <DynSection title="Peak Force" subtitle={null}>
+            {rehab.map((m, i) => <DynMovement key={i} m={m} />)}
+          </DynSection>
         </div>
-      </DynSection>
-
-      <DynSection title="Rate of Force Development" subtitle="How quickly force builds (N/s). Higher values mean faster access to strength, key for explosive actions like throwing.">
-        <DynLRHead />
-        {t.movements.map((m, i) => <DynLRRow key={i} label={shorten(m.name)} left={m.rfd[0]} right={m.rfd[1]} unit="N/s" dec={0} />)}
-      </DynSection>
-
-      <DynSection title="Time to Peak Force" subtitle="How long it took to reach maximum force. Shorter times reflect a quicker, more efficient neuromuscular response.">
-        <DynLRHead />
-        {t.movements.map((m, i) => <DynLRRow key={i} label={shorten(m.name)} left={m.ttp[0]} right={m.ttp[1]} unit="s" dec={2} />)}
-      </DynSection>
+      )}
 
       {t.discomfortNote && (
         <div style={{ marginTop: 16, padding: 14, background: "rgba(249,115,98,0.06)", border: "1px solid rgba(249,115,98,0.2)", borderRadius: 12 }}>
@@ -2484,10 +2510,11 @@ function DynamoRoster({ onSelect }) {
       {_DYNAMO.map((a, i) => {
         const g = GROUPS[a.group]; const t = a.tests[0];
         const date = t && t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+        const hasRtp = t && t.movements.some((m) => !DYN_CORE.includes(m.name));
         return (
           <div key={i} onClick={() => onSelect(a)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 8, cursor: "pointer" }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{a.name}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", display: "flex", alignItems: "center", gap: 8 }}>{a.name}{hasRtp && <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#FBBF24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 6, padding: "2px 6px" }}>RTP</span>}</div>
               <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{(g && g.label) || a.group} · {t ? t.type : ""} · {date}</div>
             </div>
             <div style={{ color: "#4A4F57", fontSize: 18 }}>{"›"}</div>

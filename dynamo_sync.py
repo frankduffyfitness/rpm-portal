@@ -196,8 +196,9 @@ MOVEMENT_DISPLAY = {
     "ExternalRotation": "External Rotation",
     "InternalRotation": "Internal Rotation",
 }
-MOVEMENT_ORDER = ["Shoulder Flexion", "Shoulder Extension", "Scaption (Abduction)",
-                  "External Rotation", "Internal Rotation"]
+# Core RPM screen (ER/IR + grip) sorts first; rehab/RTP movements follow.
+MOVEMENT_ORDER = ["External Rotation", "Internal Rotation", "Grip Squeeze",
+                  "Shoulder Flexion", "Shoulder Extension", "Scaption (Abduction)"]
 
 POSITION_DISPLAY = {
     "SupineLongLever":  "Supine, long lever",
