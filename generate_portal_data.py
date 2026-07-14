@@ -260,15 +260,17 @@ for pid, ath in fd['athletes'].items():
         
         jh = compute_session_best(test['trials'], 'jumpHeight')
         rsi = compute_session_best(test['trials'], 'rsiModified')
-        # 'pp' slot now carries CONCENTRIC IMPULSE (N·s), replacing relative
-        # peak power (2026-07-13, Frank's call — the gym programs off impulse).
-        # The base 'concentricImpulse' trial field stores the asymmetry value;
-        # the true total is Left + Right.
+        # 'pp' slot carries NET CONCENTRIC IMPULSE (N·s) — matching VALD Hub's
+        # headline "Concentric Impulse" number (Frank verified 239 for Christian
+        # Sanchez; L+R limb fields are GROSS impulse incl. bodyweight support,
+        # nearly 2x higher, and the base trial field stores the asym value).
+        # Net impulse = mass x takeoff velocity = m * sqrt(2*g*h), which
+        # reproduces VALD Hub's value exactly from jump height + bodyweight.
         ci_vals = []
         for tr in test['trials']:
-            l_, r_ = tr['metrics'].get('concentricImpulseLeft'), tr['metrics'].get('concentricImpulseRight')
-            if l_ is not None and r_ is not None:
-                ci_vals.append(l_ + r_)
+            jh_t, bw_t = tr['metrics'].get('jumpHeight'), tr['metrics'].get('bodyweightLbs')
+            if jh_t and bw_t:
+                ci_vals.append((bw_t * 0.45359) * (2 * 9.81 * jh_t * 0.0254) ** 0.5)
         pp = round(max(ci_vals), 1) if ci_vals else None
         brk = compute_session_brk_avg(test['trials'])
         bw = compute_session_avg(test['trials'], 'bodyweightLbs')
@@ -332,7 +334,7 @@ PCT_FROM_MEDIAN = {       # how far from the athlete's median = implausible
 ABS_BOUNDS = {            # hard sanity bounds; outside = sensor error, always drop
     'jh':  (2.0, 50.0),   # inches
     'rsi': (0.0, 5.0),    # RSI-mod realistically maxes well under 5
-    'pp':  (50.0, 900.0), # concentric impulse, N·s
+    'pp':  (30.0, 500.0), # net concentric impulse, N·s
     'bw':  (50.0, 400.0), # lbs — no RPM athlete is under 50 lb, so sub-50 = misread even at low session counts
 }                         # 'brk' intentionally omitted — too variable for a fixed bound
 
