@@ -106,7 +106,7 @@ def fetch_profiles_with_groups(token):
     for p in r.json().get("profiles", []):
         profiles[p["profileId"]] = {
             "name": f"{p.get('givenName','')} {p.get('familyName','')}".strip(),
-            "dob": p.get("dateOfBirth"),
+            "dob": (p.get("dateOfBirth") or "")[:10] or None,
             "groups": [],
         }
     gr = requests.get(f"{TENANTS_BASE}/groups", headers=H(token),
@@ -164,7 +164,10 @@ def fetch_dynamo_tests(token, modified_from):
 
 # ─── Display mapping ─────────────────────────────────────────────────────────
 def _decamel(s):
-    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", s or "").strip()
+    out = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", s or "").strip()
+    out = re.sub(r"^p(\d+) Degrees?", r"\1°", out)      # p90DegreesX -> 90° X
+    out = re.sub(r"(\d+) Degrees?", r"\1°", out)         # …90 Degrees… -> 90°
+    return out
 
 MOVEMENT_DISPLAY = {
     "Flexion":          "Shoulder Flexion",       # shoulder context
@@ -246,8 +249,12 @@ def build_portal(profiles, tests, annotations):
                     break
             if asym is None and pkL and pkR and max(pkL, pkR) > 0:
                 asym = round(abs(pkR - pkL) / max(pkL, pkR) * 100, 1)
-            note = "Symmetric" if (asym is not None and asym < 10) else \
-                   ("right side stronger" if (pkR or 0) >= (pkL or 0) else "left side stronger")
+            if pkL is None or pkR is None:
+                note = ""          # unilateral test — no L/R comparison
+            elif asym is not None and asym < 10:
+                note = "Symmetric"
+            else:
+                note = "right side stronger" if pkR >= pkL else "left side stronger"
             sessions[aid][date].append({
                 "name": movement_display(mv, t.get("bodyRegion")),
                 "position": position_display(t.get("position"), t.get("customPosition")),

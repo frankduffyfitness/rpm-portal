@@ -2414,7 +2414,7 @@ function DynMovement({ m }) {
         <div style={{ width: (100 - lp) + "%", background: DYN_R, opacity: strongerR ? 1 : 0.5 }} />
       </div>
       <div style={{ fontSize: 11, color: "#8A9099", marginTop: 6, textAlign: "center" }}>
-        {m.asymNote === "Symmetric" ? "Symmetric · " + dynFmt(m.asymPct) + "% difference" : dynFmt(m.asymPct) + "% · " + m.asymNote}
+        {!m.asymNote ? "Single-side test" : m.asymNote === "Symmetric" ? "Symmetric · " + dynFmt(m.asymPct) + "% difference" : dynFmt(m.asymPct) + "% · " + m.asymNote}
       </div>
     </div>
   );

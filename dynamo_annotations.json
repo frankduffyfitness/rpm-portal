@@ -1,0 +1,11 @@
+{
+  "Jason Peacock": {
+    "2026-07-13": {
+      "type": "Shoulder Strength Baseline",
+      "label": "Baseline assessment",
+      "discomfort": ["Shoulder Flexion", "Scaption (Abduction)", "External Rotation"],
+      "discomfortNote": "Jason reported discomfort during three movements: overhead flexion, external rotation, and scaption. Values for those movements may underrepresent his true capacity and should be read with that context in mind. We recommend reviewing these findings with his physical therapist.",
+      "planNote": "This baseline will be re-tested after Jason's course of care to measure progress objectively. RPM will share re-test reports in this same format so changes are easy to track side by side."
+    }
+  }
+}
