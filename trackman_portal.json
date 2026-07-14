@@ -1,5 +1,5 @@
 {
-  "lastSyncedAt": "2026-07-14T15:18:14Z",
+  "lastSyncedAt": "2026-07-14T16:57:34Z",
   "athletes": {
     "Darren Espinal": {
       "name": "Darren Espinal",
@@ -1468,6 +1468,16 @@
       "name": "Joe Hauser",
       "programUrl": "https://docs.google.com/spreadsheets/d/1EHTtq2poCNoo4lCHcJKQLzXCJ0vv-PCiBciaHoQoT0E/edit",
       "sessions": [
+        {
+          "date": "2026-07-14",
+          "peakVelo": 92.2,
+          "avgVelo": 91.3,
+          "sessionType": "Bullpen",
+          "notes": "Auto-added from TrackMan report",
+          "isFlagged": false,
+          "isSubmax": false,
+          "provisional": true
+        },
         {
           "date": "2026-07-10",
           "name": "Joe Hauser",
