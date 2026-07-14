@@ -154,3 +154,4 @@ if __name__ == "__main__":
         step("fatal", error=f"{e.__class__.__name__}: {e}")
     json.dump(result, open(OUT, "w"), indent=2, default=str)
     print(f"[probe] wrote {OUT}")
+# bump 1784053632 — re-fire probe to capture token scopes

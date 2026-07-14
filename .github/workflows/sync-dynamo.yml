@@ -1,16 +1,14 @@
 name: Sync DynaMo Data
 
-# Manual-dispatch only until the DynaMo API mapping is validated on a real run.
-# First run it with debug=true, download the dynamo-raw-debug artifact, confirm
-# the base URL + RESULT_KEYS in dynamo_sync.py, THEN add a schedule if desired.
+# API contract verified against the live public Swagger spec (2026-07-14).
+# Also fires on pushes that change dynamo_sync.py so sync fixes validate
+# themselves end-to-end; add a cron schedule once the first run is confirmed.
 on:
+  push:
+    paths:
+      - 'dynamo_sync.py'
   workflow_dispatch:
     inputs:
-      debug:
-        description: 'Debug (dump raw API response as an artifact, do not require valid mapping)'
-        required: false
-        default: 'true'
-        type: boolean
       full_sync:
         description: 'Full sync (re-pull all DynaMo tests from 2020)'
         required: false
@@ -43,28 +41,19 @@ jobs:
       - name: Run DynaMo sync
         run: |
           ARGS=""
-          [ "${{ github.event.inputs.debug }}" == "true" ] && ARGS="$ARGS --debug"
           [ "${{ github.event.inputs.full_sync }}" == "true" ] && ARGS="$ARGS --full"
+          # push-triggered runs do a full pull (cheap — DynaMo test counts are small)
+          [ "${{ github.event_name }}" == "push" ] && ARGS="--full"
           echo "python dynamo_sync.py $ARGS"
           python dynamo_sync.py $ARGS
 
-      - name: Upload raw debug (schema inspection)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dynamo-raw-debug
-          path: dynamo_raw_debug.json
-          if-no-files-found: ignore
-
       - name: Regenerate portal data
         run: |
-          APP_JSX=$(find . -name "App.jsx" -not -path "*/node_modules/*" | head -1)
-          python generate_portal_data.py forcedecks_portal.json "$APP_JSX"
-          if [ -f "App_updated.jsx" ]; then mv App_updated.jsx "$APP_JSX"; fi
+          python generate_portal_data.py forcedecks_portal.json src/App.jsx trackman_portal.json
+          if [ -f "App_updated.jsx" ]; then mv App_updated.jsx src/App.jsx; fi
 
       - name: Commit and push if changed
         run: |
-          rm -f dynamo_raw_debug.json
           git config user.name "RPM Auto-Sync"
           git config user.email "sync@rpmstrength.coach"
           git add -A
@@ -72,5 +61,6 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "🔄 DynaMo sync: $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git pull --rebase
             git push
           fi
