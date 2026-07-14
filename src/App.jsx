@@ -1755,7 +1755,7 @@ function VeloTab({ onSelect }) {
       })}
       
       <div style={{ marginTop: 16, padding: 16, background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{"\uD83D\uDCCA"} Group Benchmarks</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{"\uD83D\uDCCA"} Facility Benchmarks</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           {[["90th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p90],["75th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p75],["50th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p50],["25th", (VELO_NORMS[vGroup] || VELO_NORMS.all || {}).p25]].map(([l, v]) => (
             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 8 }}>
