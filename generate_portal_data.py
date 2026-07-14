@@ -103,6 +103,7 @@ GROUP_OVERRIDES = {
     "Matt Bowman": "pro",
     "Julian Minaya": "pro",
     "Mike Sirota": "pro",
+    "Mason Morello": "pro",
     # College pitchers
     "Joe Hauser": "col",
     "Michael Destefano": "col",
@@ -110,6 +111,7 @@ GROUP_OVERRIDES = {
     "Addison Hinz-Camarano": "col",
     "Zach Weinschel": "col",
     "Darren Espinal": "col",
+    "Jackson Mavrides": "col",
     # Middle school
     "Josh Miller": "ms",
     # Men's league
