@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-15T20:06:06.066936+00:00",
+    "syncDate": "2026-07-15T22:08:48.692826+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 20
+    "totalAthletes": 22
   },
   "athletes": {
     "Joey Muzio": {
@@ -3099,6 +3099,115 @@
           "erIr": {
             "left": null,
             "right": 0.77
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Brett Baek": {
+      "name": "Brett Baek",
+      "group": "hs",
+      "dob": "2010-04-07",
+      "tests": [
+        {
+          "date": "2026-07-15",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                217.6
+              ],
+              "peakLbs": [
+                null,
+                48.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                895
+              ],
+              "ttp": [
+                null,
+                1.58
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                206.3
+              ],
+              "peakLbs": [
+                null,
+                46.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                817
+              ],
+              "ttp": [
+                null,
+                0.4
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 1.05
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Christian Sanchez": {
+      "name": "Christian Sanchez",
+      "group": "hs",
+      "dob": "2008-06-09",
+      "tests": [
+        {
+          "date": "2026-07-15",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                161
+              ],
+              "peakLbs": [
+                null,
+                36.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                274
+              ],
+              "ttp": [
+                null,
+                1.68
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
