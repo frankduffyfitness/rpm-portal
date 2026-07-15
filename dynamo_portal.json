@@ -1,9 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-15T18:45:53.541366+00:00",
+    "syncDate": "2026-07-15T20:06:06.066936+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 20,
-    "note": "Reconstructed 2026-07-15 as the union of all historical syncs. The VALD DynaMo endpoint returns incomplete results on some full pulls, and --full previously rebuilt from scratch, deleting good data. Sync now unions only."
+    "totalAthletes": 20
   },
   "athletes": {
     "Joey Muzio": {
