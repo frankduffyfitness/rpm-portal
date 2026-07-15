@@ -50,6 +50,12 @@
       "forearmRaw": "12 7/8\"",
       "forearmMeters": 0.327025,
       "note": "Given as 'Mason Morella'; canonical portal name is Mason Morello."
+    },
+    "Matt Bowman": {
+      "throwingArm": "R",
+      "forearmInches": 11.375,
+      "forearmRaw": "11 3/8\"",
+      "forearmMeters": 0.288925
     }
   }
 }

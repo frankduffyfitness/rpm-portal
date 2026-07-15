@@ -3,6 +3,12 @@ name: Sync ForceDecks Data
 on:
   schedule:
     - cron: '0 */6 * * *'
+  # On-demand trigger: pushing a change to vald_sync.py (or this file) fires an
+  # incremental sync, so new tests can be pulled without waiting for the cron.
+  push:
+    paths:
+      - 'vald_sync.py'
+      - '.github/workflows/sync-forcedecks.yml'
   workflow_dispatch:
     inputs:
       full_sync:
