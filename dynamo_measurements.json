@@ -56,6 +56,72 @@
       "forearmInches": 11.375,
       "forearmRaw": "11 3/8\"",
       "forearmMeters": 0.288925
+    },
+    "Jordan Steiger": {
+      "throwingArm": "R",
+      "forearmInches": 10.25,
+      "forearmRaw": "10 1/4\"",
+      "forearmMeters": 0.26035
+    },
+    "Nikhil Parikh": {
+      "throwingArm": "L",
+      "forearmInches": 11.5,
+      "forearmRaw": "11 1/2\"",
+      "forearmMeters": 0.2921
+    },
+    "Eli Delgado": {
+      "throwingArm": "R",
+      "forearmInches": 10.5,
+      "forearmRaw": "10 1/2\"",
+      "forearmMeters": 0.2667
+    },
+    "Zach Powell": {
+      "throwingArm": "R",
+      "forearmInches": 10.375,
+      "forearmRaw": "10 3/8\"",
+      "forearmMeters": 0.263525
+    },
+    "Bobby Connolly": {
+      "throwingArm": "R",
+      "forearmInches": 10.0,
+      "forearmRaw": "10\"",
+      "forearmMeters": 0.254
+    },
+    "Gavin Laya-Vetell": {
+      "throwingArm": "R",
+      "forearmInches": 11.625,
+      "forearmRaw": "11 5/8\"",
+      "forearmMeters": 0.295275
+    },
+    "Ben Wallace": {
+      "throwingArm": "R",
+      "forearmInches": 11.8125,
+      "forearmRaw": "11 13/16\"",
+      "forearmMeters": 0.300038
+    },
+    "Thomas LoBello": {
+      "throwingArm": "R",
+      "forearmInches": 10.875,
+      "forearmRaw": "10 7/8\"",
+      "forearmMeters": 0.276225
+    },
+    "Patrick Rodriguez": {
+      "throwingArm": "R",
+      "forearmInches": 11.25,
+      "forearmRaw": "11 1/4\"",
+      "forearmMeters": 0.28575
+    },
+    "Christian Peralta": {
+      "throwingArm": "L",
+      "forearmInches": 11.0,
+      "forearmRaw": "11\"",
+      "forearmMeters": 0.2794
+    },
+    "Severino Napolitano": {
+      "throwingArm": "R",
+      "forearmInches": 11.375,
+      "forearmRaw": "11 3/8\"",
+      "forearmMeters": 0.288925
     }
   }
 }

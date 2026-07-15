@@ -44,7 +44,7 @@ Usage:
 import warnings
 warnings.filterwarnings("ignore")
 
-import os, sys, json, time, re, requests
+import os, sys, json, time, re, hashlib, requests
 from datetime import datetime, timezone
 from collections import defaultdict
 from zoneinfo import ZoneInfo
@@ -169,10 +169,14 @@ def group_code(vald_groups):
 def fetch_dynamo_tests(token, modified_from):
     """Paged fetch with rep summaries inline. Returns TestDTO list.
 
-    Deduped by test id: the paged endpoint can return the same test on more than
-    one page (observed 2026-07-15 — every 7/14+ test came back twice, producing
-    exact-duplicate movements downstream). Keyed on id so genuinely distinct
-    repeat tests are still kept."""
+    Deduped by full test CONTENT: the paged endpoint can return the same test on
+    more than one page (observed 2026-07-15 — every 7/14+ test came back twice,
+    producing exact-duplicate movements downstream).
+
+    NOT keyed on `id`: VALD reuses an id across the movements of one session, so
+    an id-based dedupe silently drops real tests (it cost Matt Bowman his IR and
+    two grips before this was caught). Hashing the whole payload only collapses
+    byte-identical repeats, which is exactly the pagination artifact."""
     log(f"Fetching DynaMo tests (modified from {modified_from[:10]})…")
     tests, seen, dupes, page = [], set(), 0, 1
     while True:
@@ -189,12 +193,12 @@ def fetch_dynamo_tests(token, modified_from):
         items = body.get("items", [])
         fresh = 0
         for it in items:
-            tid = it.get("id")
-            if tid and tid in seen:
+            sig = hashlib.md5(json.dumps(it, sort_keys=True, default=str)
+                              .encode()).hexdigest()
+            if sig in seen:
                 dupes += 1
                 continue
-            if tid:
-                seen.add(tid)
+            seen.add(sig)
             tests.append(it)
             fresh += 1
         total_pages = body.get("totalPages", 1)
@@ -204,7 +208,7 @@ def fetch_dynamo_tests(token, modified_from):
             break
         page += 1
     if dupes:
-        log(f"  NOTE: dropped {dupes} duplicate test id(s) returned across pages")
+        log(f"  NOTE: dropped {dupes} byte-identical duplicate test(s) across pages")
     log(f"Total DynaMo tests: {len(tests)}")
     return tests
 
