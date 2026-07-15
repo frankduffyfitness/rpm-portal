@@ -1263,7 +1263,7 @@ function RptHeader({ athlete, gi, title, sub, first }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <div style={{ fontSize: first ? 21 : 16, fontWeight: 800, color: RPT.navy }}>{athlete.name}</div>
-          <div style={{ fontSize: 10, color: RPT.gray }}>{gi.label}{FEM_SET.has(athlete.name) ? " \u00b7 Female Athletes" : ""} {"\u00b7"} Athlete Performance Report</div>
+          <div style={{ fontSize: 10, color: RPT.gray }}>{gi.label}{FEM_SET.has(athlete.name) ? " \u00b7 Female Athletes" : ""}{athlete.bw ? " \u00b7 " + athlete.bw + " lbs" : ""} {"\u00b7"} Athlete Performance Report</div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: RPT.orange }}>{title}</div>
