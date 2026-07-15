@@ -1,5 +1,5 @@
 {
-  "lastSyncedAt": "2026-07-15T14:30:12Z",
+  "lastSyncedAt": "2026-07-15T17:37:22Z",
   "athletes": {
     "Darren Espinal": {
       "name": "Darren Espinal",
@@ -817,6 +817,16 @@
       "programUrl": "https://docs.google.com/spreadsheets/d/1cI0_h3PvdbUDPSwXeKw9GWy5s--hkzBgAgN1xId04vM/edit",
       "sessions": [
         {
+          "date": "2026-07-15",
+          "peakVelo": 80.9,
+          "avgVelo": 79.9,
+          "sessionType": "Bullpen",
+          "notes": "Auto-added from TrackMan report",
+          "isFlagged": false,
+          "isSubmax": false,
+          "provisional": true
+        },
+        {
           "date": "2026-07-10",
           "name": "Nikhil Parikh",
           "peakVelo": 75.0,
@@ -868,6 +878,16 @@
       "name": "Michael Destefano",
       "programUrl": "https://docs.google.com/spreadsheets/d/1U6sJYqpo5rNkD7-uE3NHAZ7FPFLLTOxd0GD58YI_nEs/edit",
       "sessions": [
+        {
+          "date": "2026-07-15",
+          "peakVelo": 74.7,
+          "avgVelo": null,
+          "sessionType": "Bullpen",
+          "notes": "Auto-added from TrackMan report",
+          "isFlagged": false,
+          "isSubmax": false,
+          "provisional": true
+        },
         {
           "date": "2026-07-11",
           "name": "Michael Destefano",
