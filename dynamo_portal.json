@@ -2,7 +2,8 @@
   "meta": {
     "syncDate": "2026-07-15T18:45:53.541366+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 18
+    "totalAthletes": 20,
+    "note": "Reconstructed 2026-07-15 as the union of all historical syncs. The VALD DynaMo endpoint returns incomplete results on some full pulls, and --full previously rebuilt from scratch, deleting good data. Sync now unions only."
   },
   "athletes": {
     "Joey Muzio": {
@@ -277,6 +278,144 @@
                 2.92,
                 3.15
               ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Standing, 90/90",
+              "discomfort": false,
+              "peakN": [
+                104,
+                94.3
+              ],
+              "peakLbs": [
+                23.4,
+                21.2
+              ],
+              "asymPct": 9.3,
+              "asymNote": "Symmetric",
+              "rfd": [
+                280,
+                211
+              ],
+              "ttp": [
+                3.94,
+                5.36
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                646.2,
+                590.6
+              ],
+              "peakLbs": [
+                145.3,
+                132.8
+              ],
+              "asymPct": 8.6,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2609,
+                1748
+              ],
+              "ttp": [
+                2.47,
+                3.77
+              ]
+            },
+            {
+              "name": "Pronation",
+              "position": "90\u00b0 Elbow Flexion Wrist Neutral",
+              "discomfort": false,
+              "peakN": [
+                47.4,
+                null
+              ],
+              "peakLbs": [
+                10.7,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                120,
+                null
+              ],
+              "ttp": [
+                1.59,
+                null
+              ]
+            },
+            {
+              "name": "Elbow Extension",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                270.3,
+                249.9
+              ],
+              "peakLbs": [
+                60.8,
+                56.2
+              ],
+              "asymPct": 7.5,
+              "asymNote": "Symmetric",
+              "rfd": [
+                643,
+                454
+              ],
+              "ttp": [
+                1.92,
+                3.01
+              ]
+            },
+            {
+              "name": "Rotation",
+              "position": "Seated",
+              "discomfort": false,
+              "peakN": [
+                315.8,
+                null
+              ],
+              "peakLbs": [
+                71.0,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                1162,
+                null
+              ],
+              "ttp": [
+                3.59,
+                null
+              ]
+            },
+            {
+              "name": "Supination",
+              "position": "90\u00b0 Elbow Flexion Wrist Neutral",
+              "discomfort": false,
+              "peakN": [
+                58.2,
+                null
+              ],
+              "peakLbs": [
+                13.1,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                143,
+                null
+              ],
+              "ttp": [
+                1.18,
+                null
+              ]
             }
           ],
           "erIr": {
@@ -378,6 +517,75 @@
               "ttp": [
                 null,
                 3.24
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                233.7
+              ],
+              "peakLbs": [
+                null,
+                52.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                417
+              ],
+              "ttp": [
+                null,
+                2.58
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                576.6
+              ],
+              "peakLbs": [
+                null,
+                129.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1949
+              ],
+              "ttp": [
+                null,
+                0.66
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                551.7
+              ],
+              "peakLbs": [
+                null,
+                124.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1870
+              ],
+              "ttp": [
+                null,
+                0.76
               ]
             }
           ],
@@ -766,6 +974,236 @@
               "ttp": [
                 4.38,
                 1.88
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine Elbow90\u00b0",
+              "discomfort": false,
+              "peakN": [
+                247.7,
+                241.8
+              ],
+              "peakLbs": [
+                55.7,
+                54.4
+              ],
+              "asymPct": 2.4,
+              "asymNote": "Symmetric",
+              "rfd": [
+                437,
+                300
+              ],
+              "ttp": [
+                2.92,
+                3.81
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Standing Elbow90\u00b0",
+              "discomfort": false,
+              "peakN": [
+                null,
+                170.7
+              ],
+              "peakLbs": [
+                null,
+                38.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                632
+              ],
+              "ttp": [
+                null,
+                1.81
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Standing Elbow90\u00b0",
+              "discomfort": false,
+              "peakN": [
+                null,
+                168.6
+              ],
+              "peakLbs": [
+                null,
+                37.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                321
+              ],
+              "ttp": [
+                null,
+                2.69
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine Elbow90\u00b0",
+              "discomfort": false,
+              "peakN": [
+                177.2,
+                203.6
+              ],
+              "peakLbs": [
+                39.8,
+                45.8
+              ],
+              "asymPct": 13,
+              "asymNote": "right side stronger",
+              "rfd": [
+                532,
+                369
+              ],
+              "ttp": [
+                1.93,
+                3.54
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                662.9,
+                631.6
+              ],
+              "peakLbs": [
+                149.0,
+                142.0
+              ],
+              "asymPct": 4.7,
+              "asymNote": "Symmetric",
+              "rfd": [
+                1759,
+                1992
+              ],
+              "ttp": [
+                2.55,
+                2.77
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                667.3,
+                619.2
+              ],
+              "peakLbs": [
+                150.0,
+                139.2
+              ],
+              "asymPct": 7.2,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2229,
+                1473
+              ],
+              "ttp": [
+                2.24,
+                2.61
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                623,
+                647.3
+              ],
+              "peakLbs": [
+                140.1,
+                145.5
+              ],
+              "asymPct": 3.8,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2472,
+                1765
+              ],
+              "ttp": [
+                2.11,
+                3.09
+              ]
+            },
+            {
+              "name": "Supination",
+              "position": "90\u00b0 Elbow Flexion Wrist Neutral",
+              "discomfort": false,
+              "peakN": [
+                null,
+                65.2
+              ],
+              "peakLbs": [
+                null,
+                14.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                143
+              ],
+              "ttp": [
+                null,
+                0.91
+              ]
+            },
+            {
+              "name": "Lateral Flexion Right",
+              "position": "Standing",
+              "discomfort": false,
+              "peakN": [
+                114.2,
+                114.2
+              ],
+              "peakLbs": [
+                25.7,
+                25.7
+              ],
+              "asymPct": 0.0,
+              "asymNote": "Symmetric",
+              "rfd": [
+                226,
+                226
+              ],
+              "ttp": [
+                16.53,
+                16.53
+              ]
+            },
+            {
+              "name": "Pronation",
+              "position": "90\u00b0 Elbow Flexion Wrist Neutral",
+              "discomfort": false,
+              "peakN": [
+                null,
+                69.5
+              ],
+              "peakLbs": [
+                null,
+                15.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                185
+              ],
+              "ttp": [
+                null,
+                2.44
               ]
             }
           ],
@@ -1544,6 +1982,52 @@
                 null,
                 2.42
               ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                141.1
+              ],
+              "peakLbs": [
+                null,
+                31.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                643
+              ],
+              "ttp": [
+                null,
+                1.08
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                504.2
+              ],
+              "peakLbs": [
+                null,
+                113.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2049
+              ],
+              "ttp": [
+                null,
+                2.33
+              ]
             }
           ],
           "erIr": {
@@ -1827,6 +2311,52 @@
                 0.51,
                 0.93
               ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                151.3
+              ],
+              "peakLbs": [
+                null,
+                34.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                316
+              ],
+              "ttp": [
+                null,
+                4.29
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                153.5
+              ],
+              "peakLbs": [
+                null,
+                34.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                459
+              ],
+              "ttp": [
+                null,
+                4.37
+              ]
             }
           ],
           "erIr": {
@@ -1869,6 +2399,29 @@
               "ttp": [
                 null,
                 1.87
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                540.4
+              ],
+              "peakLbs": [
+                null,
+                121.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2424
+              ],
+              "ttp": [
+                null,
+                2.68
               ]
             }
           ],
@@ -2094,6 +2647,75 @@
                 2.69,
                 1.32
               ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                133,
+                109.9
+              ],
+              "peakLbs": [
+                29.9,
+                24.7
+              ],
+              "asymPct": 17.4,
+              "asymNote": "left side stronger",
+              "rfd": [
+                406,
+                432
+              ],
+              "ttp": [
+                2.9,
+                1.0
+              ]
+            },
+            {
+              "name": "Shoulder Flexion",
+              "position": "Supine, long lever",
+              "discomfort": true,
+              "peakN": [
+                61.4,
+                59.3
+              ],
+              "peakLbs": [
+                13.8,
+                13.3
+              ],
+              "asymPct": 3.4,
+              "asymNote": "Symmetric",
+              "rfd": [
+                121,
+                201
+              ],
+              "ttp": [
+                4.16,
+                3.21
+              ]
+            },
+            {
+              "name": "Scaption (Abduction)",
+              "position": "Supine",
+              "discomfort": true,
+              "peakN": [
+                56.0,
+                68.4
+              ],
+              "peakLbs": [
+                12.6,
+                15.4
+              ],
+              "asymPct": 18.1,
+              "asymNote": "right side stronger",
+              "rfd": [
+                158,
+                294
+              ],
+              "ttp": [
+                2.69,
+                1.32
+              ]
             }
           ],
           "erIr": {
@@ -2136,6 +2758,98 @@
               "ttp": [
                 null,
                 1.12
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                150.8
+              ],
+              "peakLbs": [
+                null,
+                33.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                285
+              ],
+              "ttp": [
+                null,
+                2.88
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                141.7
+              ],
+              "peakLbs": [
+                null,
+                31.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                385
+              ],
+              "ttp": [
+                null,
+                3.92
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                370.3
+              ],
+              "peakLbs": [
+                null,
+                83.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1204
+              ],
+              "ttp": [
+                null,
+                1.68
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                310.9
+              ],
+              "peakLbs": [
+                null,
+                69.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1352
+              ],
+              "ttp": [
+                null,
+                1.41
               ]
             }
           ],
@@ -2208,6 +2922,184 @@
           "erIr": {
             "left": null,
             "right": 0.69
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Alchi Santos": {
+      "name": "Alchi Santos",
+      "group": "stf",
+      "dob": "1999-09-03",
+      "tests": [
+        {
+          "date": "2026-07-11",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine Elbow90\u00b0",
+              "discomfort": false,
+              "peakN": [
+                212.2,
+                248.8
+              ],
+              "peakLbs": [
+                47.7,
+                55.9
+              ],
+              "asymPct": 14.7,
+              "asymNote": "right side stronger",
+              "rfd": [
+                506,
+                374
+              ],
+              "ttp": [
+                2.42,
+                5.64
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine Elbow90\u00b0",
+              "discomfort": false,
+              "peakN": [
+                179.9,
+                217.6
+              ],
+              "peakLbs": [
+                40.4,
+                48.9
+              ],
+              "asymPct": 17.3,
+              "asymNote": "right side stronger",
+              "rfd": [
+                607,
+                948
+              ],
+              "ttp": [
+                5.16,
+                6.57
+              ]
+            }
+          ],
+          "erIr": {
+            "left": 1.18,
+            "right": 1.14
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Zach Uysal": {
+      "name": "Zach Uysal",
+      "group": "col",
+      "dob": "2007-07-31",
+      "tests": [
+        {
+          "date": "2026-07-14",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                128.7
+              ],
+              "peakLbs": [
+                null,
+                28.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                185
+              ],
+              "ttp": [
+                null,
+                1.1
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                167
+              ],
+              "peakLbs": [
+                null,
+                37.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                332
+              ],
+              "ttp": [
+                null,
+                0.9
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                579.8
+              ],
+              "peakLbs": [
+                null,
+                130.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2129
+              ],
+              "ttp": [
+                null,
+                4.04
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                543.1
+              ],
+              "peakLbs": [
+                null,
+                122.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1299
+              ],
+              "ttp": [
+                null,
+                3.37
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.77
           },
           "discomfortNote": "",
           "planNote": ""

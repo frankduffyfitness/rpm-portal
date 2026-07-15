@@ -392,21 +392,53 @@ def load_state():
 
 
 def merge_existing(new_data):
-    """Incremental runs only re-fetch modified tests; keep existing athletes/
-    sessions that this run didn't see. Annotations re-apply on top either way."""
+    """Union this run's results into what we already have — never replace.
+
+    ALWAYS runs, including on --full. The VALD DynaMo endpoint returns
+    INCOMPLETE results on some full pulls (observed repeatedly 2026-07-14/15:
+    consecutive full syncs alternated between 17-19 athletes and 14-16, with
+    Alchi Santos and several of Tom Hackimer's ER tests appearing/vanishing).
+    A --full previously rebuilt from scratch, so a partial API response silently
+    deleted good data. Unioning makes the pipeline monotonic: a flaky response
+    can only add, never remove.
+
+    Trade-off: a test genuinely deleted in VALD persists here until purged by
+    hand. That is the safer failure direction for a coach-facing dashboard."""
     if not os.path.exists(OUTPUT_FILE):
         return new_data
     try:
         old = json.load(open(OUTPUT_FILE))
     except Exception:
         return new_data
+
+    def mv_key(m):
+        return (m.get("name"), m.get("position"), tuple(m.get("peakN") or []))
+
     merged = old.get("athletes", {})
     for name, ath in new_data["athletes"].items():
-        if name in merged:
-            have = {t["date"] for t in ath["tests"]}
-            ath["tests"].extend(t for t in merged[name]["tests"] if t["date"] not in have)
-            ath["tests"].sort(key=lambda t: t["date"], reverse=True)
-        merged[name] = ath
+        if name not in merged:
+            merged[name] = ath
+            continue
+        prev = merged[name]
+        by_date = {t["date"]: t for t in prev.get("tests", [])}
+        for t in ath.get("tests", []):
+            if t["date"] not in by_date:
+                by_date[t["date"]] = t
+                continue
+            # same session seen again: union movements, keep richer metadata
+            base = by_date[t["date"]]
+            seen = {mv_key(m) for m in base.get("movements", [])}
+            for m in t.get("movements", []):
+                if mv_key(m) not in seen:
+                    seen.add(mv_key(m))
+                    base.setdefault("movements", []).append(m)
+            for fld in ("erIr", "discomfortNote", "planNote", "type", "label"):
+                if t.get(fld) and not base.get(fld):
+                    base[fld] = t[fld]
+        prev["tests"] = sorted(by_date.values(), key=lambda x: x["date"], reverse=True)
+        prev["name"] = ath.get("name", prev.get("name"))
+        prev["group"] = ath.get("group", prev.get("group"))
+        prev["dob"] = ath.get("dob") or prev.get("dob")
     new_data["athletes"] = merged
     new_data["meta"]["totalAthletes"] = len(merged)
     return new_data
@@ -430,8 +462,9 @@ def main():
             log(f"WARNING: could not read {ANNOTATIONS_FILE}: {e}")
 
     data = build_portal(profiles, tests, annotations)
-    if not full:
-        data = merge_existing(data)
+    # union ALWAYS (see merge_existing): the API's full pulls are not reliably
+    # complete, so rebuilding from scratch loses data.
+    data = merge_existing(data)
     json.dump(data, open(OUTPUT_FILE, "w"), indent=2, default=str)
     json.dump({"lastModifiedUtc": max((t.get("modifiedDateUtc") or "") for t in tests),
                "lastSyncDate": datetime.now(timezone.utc).isoformat()},
