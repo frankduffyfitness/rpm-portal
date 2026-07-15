@@ -10,6 +10,8 @@
     "Frankie Muro":   { "throwingArm": "R", "forearmInches": 11.875, "forearmRaw": "11 7/8\"", "forearmMeters": 0.301625 },
     "Zachary Uysal":  { "throwingArm": "R", "forearmInches": 10.375, "forearmRaw": "10 3/8\"", "forearmMeters": 0.263525, "note": "Given as 'Zach Uysal'; canonical VALD name is Zachary Uysal." },
     "Frank Duffy":    { "throwingArm": "L", "forearmInches": 11.375, "forearmRaw": "11 3/8\"", "forearmMeters": 0.288925 },
-    "Connor Tam":     { "throwingArm": "R", "forearmInches": 11.5,   "forearmRaw": "11 1/2\"", "forearmMeters": 0.2921, "note": "Not yet in VALD data; will join once tested." }
+    "Connor Tam":     { "throwingArm": "R", "forearmInches": 11.5,   "forearmRaw": "11 1/2\"", "forearmMeters": 0.2921, "note": "Not yet in VALD data; will join once tested." },
+    "Liam Brower":    { "throwingArm": "R", "forearmInches": 11.875, "forearmRaw": "11 7/8\"", "forearmMeters": 0.301625, "note": "DynaMo test 2026-07-13 was Grip Squeeze only — no ER/IR, so no torque until a rotation test." },
+    "Mason Morello":  { "throwingArm": "R", "forearmInches": 12.875, "forearmRaw": "12 7/8\"", "forearmMeters": 0.327025, "note": "Given as 'Mason Morella'; canonical portal name is Mason Morello. Not yet DynaMo-tested." }
   }
 }
