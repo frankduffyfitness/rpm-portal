@@ -1263,7 +1263,7 @@ function RptHeader({ athlete, gi, title, sub, first }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <div style={{ fontSize: first ? 21 : 16, fontWeight: 800, color: RPT.navy }}>{athlete.name}</div>
-          <div style={{ fontSize: 10, color: RPT.gray }}>{gi.label}{FEM_SET.has(athlete.name) ? " \u00b7 Female Athletes" : ""}{athlete.bw ? " \u00b7 " + athlete.bw + " lbs" : ""} {"\u00b7"} Athlete Performance Report</div>
+          <div style={{ fontSize: 10, color: RPT.gray }}>{gi.label}{FEM_SET.has(athlete.name) ? " \u00b7 Female Athletes" : ""}{(athlete.bw && athlete.group !== "fem" && !FEM_SET.has(athlete.name)) ? " \u00b7 " + athlete.bw + " lbs" : ""} {"\u00b7"} Athlete Performance Report</div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: RPT.orange }}>{title}</div>
@@ -1313,6 +1313,8 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
   const tmr = veloAthlete ? (_TMR[veloAthlete.name] || []) : [];
   const bp = tmr[0] || null;
+  const isFemale = athlete.group === "fem" || FEM_SET.has(athlete.name);
+  const bw = BW_DATA[athlete.name];
   const sessDates = SESSION_DATES[athlete.name] || [];
   const hopDates = HOP_SESSION_DATES[athlete.name] || [];
 
@@ -1353,6 +1355,34 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{sessDates[0] || "\u2013"} {"\u2192"} {sessDates[sessDates.length - 1] || "\u2013"}</div>
           </div>
         </div>
+        {!isFemale && bw && bw.history.length >= 2 && (() => {
+          const h = bw.history, dts = bw.dates || [];
+          const mn = Math.min(...h) * 0.995, mx = Math.max(...h) * 1.005, rg = (mx - mn) || 1;
+          const W = 600, H = 40;
+          const pts = h.map((v, j) => ({ x: (j / Math.max(1, h.length - 1)) * W, y: H - ((v - mn) / rg) * H }));
+          const dPath = pts.map((pt, j) => (j === 0 ? "M" : "L") + pt.x.toFixed(1) + "," + pt.y.toFixed(1)).join(" ");
+          const aPath = dPath + " L" + W + "," + H + " L0," + H + " Z";
+          const ch = bw.change;
+          return (
+            <div style={{ marginTop: 10, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <div>
+                  <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>BODYWEIGHT</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{h[0]} {"\u2192"} {bw.current} lbs</div>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: ch > 0 ? "#16A34A" : ch < 0 ? "#DC2626" : RPT.gray }}>{ch > 0 ? "+" : ""}{ch} lbs</div>
+              </div>
+              <svg viewBox={"0 0 " + W + " " + H} style={{ display: "block", width: "100%", marginTop: 4 }}>
+                <path d={aPath} fill="rgba(27,42,68,0.07)" />
+                <path d={dPath} fill="none" stroke={RPT.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="4" fill={RPT.orange} />
+              </svg>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 7.5, color: RPT.lgray, marginTop: 1 }}>
+                <span>{dts[0]}</span><span>{dts[dts.length - 1]}</span>
+              </div>
+            </div>
+          );
+        })()}
         {offseason && offseason.sessions >= 2 && (
           <RptSection title={"PR Progress \u00b7 first session vs personal best"}>
             <RptProgressRows rows={[
