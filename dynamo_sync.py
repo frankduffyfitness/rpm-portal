@@ -167,9 +167,14 @@ def group_code(vald_groups):
 
 # ─── DynaMo tests ─────────────────────────────────────────────────────────────
 def fetch_dynamo_tests(token, modified_from):
-    """Paged fetch with rep summaries inline. Returns TestDTO list."""
+    """Paged fetch with rep summaries inline. Returns TestDTO list.
+
+    Deduped by test id: the paged endpoint can return the same test on more than
+    one page (observed 2026-07-15 — every 7/14+ test came back twice, producing
+    exact-duplicate movements downstream). Keyed on id so genuinely distinct
+    repeat tests are still kept."""
     log(f"Fetching DynaMo tests (modified from {modified_from[:10]})…")
-    tests, page = [], 1
+    tests, seen, dupes, page = [], set(), 0, 1
     while True:
         time.sleep(RATE_LIMIT_PAUSE)
         r = get_with_retry(f"{DYNAMO_BASE}/v2022q2/teams/{TENANT_ID}/tests",
@@ -182,12 +187,24 @@ def fetch_dynamo_tests(token, modified_from):
         r.raise_for_status()
         body = r.json()
         items = body.get("items", [])
-        tests.extend(items)
+        fresh = 0
+        for it in items:
+            tid = it.get("id")
+            if tid and tid in seen:
+                dupes += 1
+                continue
+            if tid:
+                seen.add(tid)
+            tests.append(it)
+            fresh += 1
         total_pages = body.get("totalPages", 1)
-        log(f"  page {page}/{total_pages}: +{len(items)} (total {len(tests)})")
+        log(f"  page {page}/{total_pages}: {len(items)} returned, +{fresh} new "
+            f"(total {len(tests)})")
         if page >= total_pages or not items:
             break
         page += 1
+    if dupes:
+        log(f"  NOTE: dropped {dupes} duplicate test id(s) returned across pages")
     log(f"Total DynaMo tests: {len(tests)}")
     return tests
 
@@ -308,6 +325,18 @@ def build_portal(profiles, tests, annotations):
         name = prof.get("name") or aid
         tests_out = []
         for date, movements in sorted(by_date.items(), reverse=True):
+            # Collapse exact duplicates (same movement, position and peak to
+            # 0.1 N). Two real efforts never match exactly — that's a double
+            # record, not a repeat test. Genuine repeats (different values,
+            # e.g. two Elbow Extension efforts) are preserved.
+            seen_mv, uniq = set(), []
+            for m in movements:
+                k = (m["name"], m.get("position"), tuple(m.get("peakN") or []))
+                if k in seen_mv:
+                    continue
+                seen_mv.add(k)
+                uniq.append(m)
+            movements = uniq
             movements.sort(key=lambda m: MOVEMENT_ORDER.index(m["name"])
                            if m["name"] in MOVEMENT_ORDER else 99)
             ann = (annotations.get(name, {}) or {}).get(date, {})
@@ -409,5 +438,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# sync trigger 2026-07-14 21:40 — pull Mason Morello DynaMo test
