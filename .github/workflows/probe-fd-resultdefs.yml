@@ -1,0 +1,37 @@
+name: Probe ForceDecks Result Definitions
+
+# Diagnostic: dumps the ForceDecks result-definition table so the numeric IDs
+# pinned in vald_sync.py can be verified by name (e.g. which RSI-modified
+# variant we're actually reading). Commits fd_result_definitions.json back.
+on:
+  push:
+    paths:
+      - 'fd_resultdefs.py'
+  workflow_dispatch:
+
+env:
+  VALD_CLIENT_ID: ${{ secrets.VALD_CLIENT_ID }}
+  VALD_CLIENT_SECRET: ${{ secrets.VALD_CLIENT_SECRET }}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Fetch result definitions
+        run: python fd_resultdefs.py
+      - name: Commit findings
+        run: |
+          git config user.name "RPM Auto-Sync"
+          git config user.email "sync@rpmstrength.coach"
+          git pull --rebase
+          git add fd_result_definitions.json
+          git commit -m "🔎 ForceDecks result definitions" || echo "no changes"
+          git push
