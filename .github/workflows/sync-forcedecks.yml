@@ -26,7 +26,10 @@ env:
 jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # A --full re-pull refetches trials for every test one-by-one (~16.3k
+    # requests). That measured ~120min and was being killed mid-run, so the
+    # sync never committed. GitHub's hosted-runner cap is 360.
+    timeout-minutes: 330
 
     steps:
       - name: Checkout repo
