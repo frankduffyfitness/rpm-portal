@@ -48,6 +48,12 @@ const FemBadge = ({ name, size }) => FEM_SET.has(name) ? (
 
 const LAST_UPDATED = "July 16, 2026";
 
+// Pro / Men's League are visiting or one-off testers who won't reach the
+// 5-session roster minimum, but Frank wants them browsable in standings +
+// profiles so RPM athletes can measure up. They still fall off automatically:
+// generate_portal_data.py drops anyone inactive past the 42-day ACTIVE_CUTOFF
+// before the roster is built, so a stale pro is gone within ~6 weeks.
+const ROSTER_MIN_EXEMPT = new Set(["pro", "ml"]);
 const ATHLETES = _A.map((a, i) => {
   const pb = _PB[i] || [];
   function bObj(off) { return pb[off] != null ? { jumpHeight: pb[off], rsi: pb[off+1], conImpulse: pb[off+2], eccBrakingRFD: pb[off+3] } : null; }
@@ -58,7 +64,7 @@ const ATHLETES = _A.map((a, i) => {
     best: { jumpHeight: a[12], rsi: a[13], conImpulse: a[14], eccBrakingRFD: a[15] },
     pb: { all: bObj(0), tm: bObj(4), lm: bObj(8), tw: bObj(12) },
   };
-}).filter(a => a.testCount >= 5 && new Date(a.latestDate) >= new Date("01/01/2026"));
+}).filter(a => (a.testCount >= 5 || ROSTER_MIN_EXEMPT.has(a.group)) && new Date(a.latestDate) >= new Date("01/01/2026"));
 
 const TRENDS = _T.map(t => ({
   name: t[0], group: t[1], sessions: t[2],
@@ -78,7 +84,7 @@ const HOP_ATHLETES = _HA.map((a, i) => {
     best: { rsi: a[12], ct: a[13], ft: a[14], pfbm: a[15] },
     pb: { all: bObj(0), tm: bObj(4), lm: bObj(8), tw: bObj(12) },
   };
-}).filter(a => a.testCount >= 5 && new Date(a.latestDate) >= new Date("01/01/2026"));
+}).filter(a => (a.testCount >= 5 || ROSTER_MIN_EXEMPT.has(a.group)) && new Date(a.latestDate) >= new Date("01/01/2026"));
 
 const HOP_NORMS = _HN;
 
