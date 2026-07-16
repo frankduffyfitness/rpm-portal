@@ -30,7 +30,11 @@ RATE_LIMIT_PAUSE = 0.05
 PORTAL_METRICS = {
     # CMJ metrics
     6553614: {"key": "jumpHeight",         "label": "Jump Height",         "unit": "in",   "scale": 1},
-    6553698: {"key": "rsiModified",        "label": "RSI-modified",        "unit": "m/s",  "scale": 0.01},
+    # RSI-modified (Imp-Mom) — the variant RPM reads in VALD Hub, and consistent
+    # with jumpHeight above (6553614 = "Jump Height (Imp-Mom) in Inches").
+    # 6553698 is plain "RSI-modified" (flight-time derived) — do not use.
+    # Names verified against GET /resultdefinitions (see fd_result_definitions.json).
+    6553733: {"key": "rsiModified",        "label": "RSI-modified (Imp-Mom)", "unit": "m/s", "scale": 0.01},
     6553604: {"key": "relativePower",      "label": "Relative Power",      "unit": "W/kg", "scale": 1},
     6553678: {"key": "brakingRFD",         "label": "Braking Ability",     "unit": "N/s",  "scale": 1},
     6553712: {"key": "concentricImpulse",  "label": "Concentric Impulse",  "unit": "N·s",  "scale": 1},

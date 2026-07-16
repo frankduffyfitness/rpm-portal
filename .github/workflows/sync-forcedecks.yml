@@ -52,11 +52,14 @@ jobs:
 
       - name: Run VALD Sync
         run: |
-          if [ "${{ github.event.inputs.full_sync }}" == "true" ]; then
-            python vald_sync.py --full
-          else
-            python vald_sync.py
-          fi
+          FULL=""
+          [ "${{ github.event.inputs.full_sync }}" == "true" ] && FULL="--full"
+          # A metric-definition change (e.g. swapping a result ID) needs a full
+          # re-pull: an incremental only ADDS new tests, leaving existing ones
+          # computed off the old metric. Put [full-sync] in the commit message.
+          if git log -1 --pretty=%B | grep -q '\[full-sync\]'; then FULL="--full"; fi
+          echo "running: python vald_sync.py $FULL"
+          python vald_sync.py $FULL
 
       - name: Generate portal data
         run: |
