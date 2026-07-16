@@ -55,14 +55,17 @@ jobs:
 
       - name: Run VALD Sync
         run: |
-          FULL=""
-          [ "${{ github.event.inputs.full_sync }}" == "true" ] && FULL="--full"
-          # A metric-definition change (e.g. swapping a result ID) needs a full
-          # re-pull: an incremental only ADDS new tests, leaving existing ones
-          # computed off the old metric. Put [full-sync] in the commit message.
-          if git log -1 --pretty=%B | grep -q '\[full-sync\]'; then FULL="--full"; fi
-          echo "running: python vald_sync.py $FULL"
-          python vald_sync.py $FULL
+          MSG="$(git log -1 --pretty=%B)"
+          ARGS=""
+          [ "${{ github.event.inputs.full_sync }}" == "true" ] && ARGS="--full"
+          # A metric-definition change needs a re-pull of existing tests (an
+          # incremental only ADDS new ones). [full-sync] re-pulls everything
+          # (>5.5h, usually too big). [refresh-cmj] re-pulls only CMJ tests
+          # (~half; parallel) and merges — use it for a CMJ-only metric like RSI.
+          echo "$MSG" | grep -q '\[full-sync\]' && ARGS="--full"
+          echo "$MSG" | grep -q '\[refresh-cmj\]' && ARGS="--refresh-cmj"
+          echo "running: python vald_sync.py $ARGS"
+          python vald_sync.py $ARGS
 
       - name: Generate portal data
         run: |

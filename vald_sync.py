@@ -11,6 +11,7 @@ del _lg
 import os, sys, json, time, requests
 from datetime import datetime, timezone
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 TENANT_ID = "3127f695-175f-4b63-8331-f1295a34cd51"
 AUTH_URL = "https://auth.prd.vald.com/oauth/token"
@@ -176,6 +177,117 @@ def fetch_trials_for_test(token, test_id):
         return []
 
 
+def fetch_trials_strict(token, test_id, tries=5):
+    """Like fetch_trials_for_test but RAISES on persistent failure instead of
+    returning []. Used by the CMJ refresh: a silently-empty result would make
+    build_portal_data drop that CMJ test entirely (data loss). Better to fail
+    the whole job — nothing gets committed — than to lose tests."""
+    url = f"{FORCEDECKS_BASE}/v2019q3/teams/{TENANT_ID}/tests/{test_id}/trials"
+    for attempt in range(tries):
+        try:
+            resp = requests.get(url, headers=H(token), timeout=30)
+            if resp.status_code == 429:
+                time.sleep(2 * (attempt + 1))
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        except requests.RequestException as e:
+            if attempt < tries - 1:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            raise RuntimeError(f"trials fetch failed for {test_id}: {e}")
+    raise RuntimeError(f"trials fetch: 429 budget exhausted for {test_id}")
+
+
+def fetch_all_trials_parallel(token, tests, workers=5):
+    """Fetch trials for many tests concurrently (bounded). Any worker error
+    propagates and aborts the run (strict). Modest worker count keeps VALD
+    rate-limiting manageable; the 429 backoff in fetch_trials_strict absorbs
+    the rest."""
+    out = {}
+    done = 0
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(fetch_trials_strict, token, t["testId"]): t["testId"]
+                for t in tests}
+        for f in as_completed(futs):
+            out[futs[f]] = f.result()  # re-raises any worker exception
+            done += 1
+            if done % 250 == 0:
+                log(f"  trials {done}/{len(tests)}")
+    return out
+
+
+def refresh_cmj():
+    """Re-fetch + re-extract ONLY CMJ tests and merge them into the existing
+    portal JSON, leaving Hop (HJ) / IMTP / everything else untouched. Used to
+    apply a CMJ-metric change (e.g. RSI-modified → Imp-Mom variant) without a
+    full 16k-test re-pull that can't finish in one CI job. RSI-modified only
+    exists on CMJ tests, so this is the minimal correct scope."""
+    log("=" * 50)
+    log("CMJ-only refresh (re-pull trials for CMJ tests)")
+    log("=" * 50)
+    if not os.path.exists(OUTPUT_FILE):
+        log(f"ERROR: {OUTPUT_FILE} missing — nothing to merge into.")
+        sys.exit(1)
+    token = authenticate()
+    profiles = fetch_profiles(token)
+    groups = fetch_groups(token)
+    attach_groups_to_profiles(token, profiles, groups)
+
+    all_tests = fetch_tests(token, "2020-01-01T00:00:00Z")
+    cmj = [t for t in all_tests if t.get("testType") == "CMJ"]
+    log(f"CMJ tests: {len(cmj)} of {len(all_tests)} total")
+    if not cmj:
+        log("No CMJ tests returned — aborting rather than wiping CMJ data.")
+        sys.exit(1)
+
+    trials_by_test = fetch_all_trials_parallel(token, cmj)
+    log(f"Fetched trials for {len(trials_by_test)} CMJ tests.")
+    new_data = build_portal_data(profiles, cmj, trials_by_test)  # CMJ-only athletes
+
+    with open(OUTPUT_FILE) as f:
+        existing = json.load(f)
+    existing, stats = merge_cmj(existing, new_data)
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(existing, f, separators=(',', ':'), default=str)
+    log("=" * 50)
+    log(f"CMJ REFRESH COMPLETE — dropped {stats['dropped']} old CMJ tests, added "
+        f"{stats['added']} fresh; {stats['totalTests']} total tests across "
+        f"{stats['totalAthletes']} athletes.")
+    log("=" * 50)
+
+
+def merge_cmj(existing, new_data):
+    """Replace every athlete's CMJ tests with the freshly-built ones; leave all
+    non-CMJ tests (Hop/IMTP/etc.) untouched. Pure + unit-testable."""
+    ath = existing.setdefault("athletes", {})
+    dropped = 0
+    for a in ath.values():
+        before = len(a.get("tests", []))
+        a["tests"] = [t for t in a.get("tests", []) if t.get("testType") != "CMJ"]
+        dropped += before - len(a["tests"])
+    added = 0
+    for pid, na in new_data["athletes"].items():
+        if pid not in ath:
+            ath[pid] = na
+        else:
+            ath[pid]["tests"].extend(na["tests"])
+            ath[pid]["tests"].sort(key=lambda t: t.get("date", ""), reverse=True)
+            ath[pid]["name"] = na.get("name") or ath[pid].get("name")
+            ath[pid]["dateOfBirth"] = na.get("dateOfBirth") or ath[pid].get("dateOfBirth")
+            ath[pid]["groups"] = na.get("groups") or ath[pid].get("groups")
+        added += len(na["tests"])
+    total_tests = sum(len(a["tests"]) for a in ath.values())
+    existing["meta"] = {
+        "syncDate": datetime.now(timezone.utc).isoformat(),
+        "totalAthletes": len(ath),
+        "totalTests": total_tests,
+        "totalTrials": new_data["meta"]["totalTrials"],
+    }
+    return existing, {"dropped": dropped, "added": added,
+                      "totalTests": total_tests, "totalAthletes": len(ath)}
+
+
 def process_trial(trial):
     """Extract the named portal metrics (CMJ + Hop) from a trial.
     L/R limbs get Left/Right suffixes."""
@@ -279,6 +391,8 @@ def save_sync_state(last_modified):
 
 
 def main():
+    if "--refresh-cmj" in sys.argv:
+        return refresh_cmj()
     full_sync = "--full" in sys.argv
     log("=" * 50)
     log("VALD ForceDecks → RPM Portal Sync")
