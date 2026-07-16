@@ -66,13 +66,16 @@ jobs:
 
       - name: Generate portal data
         run: |
-          APP_JSX=$(find . -name "App.jsx" -not -path "*/node_modules/*" | head -1)
-          if [ -z "$APP_JSX" ]; then
-            echo "ERROR: App.jsx not found in repo"
+          # Target src/App.jsx explicitly: a STALE root App.jsx also exists, and
+          # `find | head -1` could pick it (it lacks the _PR/_HD/_VELO markers),
+          # silently generating against the wrong file. Also pass trackman so the
+          # velo/_TMR arrays aren't regenerated empty.
+          APP_JSX=src/App.jsx
+          if [ ! -f "$APP_JSX" ]; then
+            echo "ERROR: $APP_JSX not found"
             exit 1
           fi
-          echo "Found App.jsx at: $APP_JSX"
-          python generate_portal_data.py forcedecks_portal.json "$APP_JSX"
+          python generate_portal_data.py forcedecks_portal.json "$APP_JSX" trackman_portal.json
           if [ -f "App_updated.jsx" ]; then
             mv App_updated.jsx "$APP_JSX"
             echo "Replaced $APP_JSX with updated data"
@@ -91,12 +94,31 @@ jobs:
         run: |
           git config user.name "RPM Auto-Sync"
           git config user.email "sync@rpmstrength.coach"
-          git add -A
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
           ATHLETES=$(python -c "import json; d=json.load(open('forcedecks_portal.json')); print(d['meta']['totalAthletes'])" 2>/dev/null || echo "?")
           TESTS=$(python -c "import json; d=json.load(open('forcedecks_portal.json')); print(d['meta']['totalTests'])" 2>/dev/null || echo "?")
-          git commit -m "🔄 ForceDecks sync: ${TIMESTAMP} (${ATHLETES} athletes, ${TESTS} tests)"
-          git push
+          # This used to be a bare `git commit && git push`, which is rejected if
+          # main moved during the run — throwing the whole sync away. A --full
+          # re-pull takes ~4h and the DynaMo/ForceDecks crons fire every 6h, so a
+          # collision is near-certain (it ate the 2026-07-15 RSI re-pull).
+          # Rebuild on top of current main instead of rebasing: the synced JSON is
+          # ours, and App.jsx / portal_data_arrays.js are pure functions of the
+          # JSONs, so regenerating after reset gives a conflict-free result.
+          mkdir -p /tmp/synced
+          cp forcedecks_portal.json vald_sync_state.json /tmp/synced/
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/synced/forcedecks_portal.json /tmp/synced/vald_sync_state.json .
+            python generate_portal_data.py forcedecks_portal.json src/App.jsx trackman_portal.json
+            if [ -f App_updated.jsx ]; then mv App_updated.jsx src/App.jsx; fi
+            git add -A
+            if git diff --cached --quiet; then echo "no changes after rebuild"; exit 0; fi
+            git commit -m "🔄 ForceDecks sync: ${TIMESTAMP} (${ATHLETES} athletes, ${TESTS} tests)"
+            if git push; then echo "pushed on attempt ${attempt}"; exit 0; fi
+            echo "push rejected (main moved) — rebuilding, attempt ${attempt}"
+          done
+          echo "ERROR: could not push after 3 attempts"; exit 1
 
       - name: Job summary
         if: always()
