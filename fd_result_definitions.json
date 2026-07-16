@@ -1,0 +1,4716 @@
+{
+  "ranAt": "2026-07-16T00:43:55.105823+00:00",
+  "total": 530,
+  "rsi_variants": [
+    {
+      "id": 13303819,
+      "name": "Best RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303820,
+      "name": "Best RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303830,
+      "name": "Mean RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303831,
+      "name": "Mean RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "BestNHops"
+    },
+    {
+      "id": 7340141,
+      "name": "Rebound RSI (Flight Time / Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340142,
+      "name": "Rebound RSI (JH(Flight Time) / Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 6553636,
+      "name": "RSI (Flight Time/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303852,
+      "name": "RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303841,
+      "name": "RSI (Flight/Contact Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553635,
+      "name": "RSI (JH (Flight Time)/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303853,
+      "name": "RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303842,
+      "name": "RSI (Jump Height/Contact Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553698,
+      "name": "RSI-modified",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553733,
+      "name": "RSI-modified (Imp-Mom)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340079,
+      "name": "Takeoff RSI-modified",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340080,
+      "name": "Takeoff RSI-modified (Imp-Mom)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13500417,
+      "name": "Total Excursion",
+      "unit": "mm",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Balance"
+    }
+  ],
+  "jump_height_variants": [
+    {
+      "id": 13303816,
+      "name": "Best Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303820,
+      "name": "Best RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "BestHop"
+    },
+    {
+      "id": 7340065,
+      "name": "First Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340066,
+      "name": "First Jump Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340067,
+      "name": "First Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340068,
+      "name": "First Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553607,
+      "name": "Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303849,
+      "name": "Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303838,
+      "name": "Jump Height (Flight Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553613,
+      "name": "Jump Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553608,
+      "name": "Jump Height (FT) Relative Landing RFD",
+      "unit": "N/s/cm",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553609,
+      "name": "Jump Height (FT) Relative Peak Landing Force",
+      "unit": "N/cm",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553610,
+      "name": "Jump Height (Imp-Dis)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553611,
+      "name": "Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553614,
+      "name": "Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303827,
+      "name": "Mean Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303831,
+      "name": "Mean RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "BestNHops"
+    },
+    {
+      "id": 7340127,
+      "name": "Rebound Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340128,
+      "name": "Rebound Jump Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340129,
+      "name": "Rebound Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340130,
+      "name": "Rebound Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 13303853,
+      "name": "RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303842,
+      "name": "RSI (Jump Height/Contact Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    }
+  ],
+  "imp_mom_anything": [
+    {
+      "id": 7340067,
+      "name": "First Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340068,
+      "name": "First Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553611,
+      "name": "Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553614,
+      "name": "Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340129,
+      "name": "Rebound Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340130,
+      "name": "Rebound Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 6553733,
+      "name": "RSI-modified (Imp-Mom)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340080,
+      "name": "Takeoff RSI-modified (Imp-Mom)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    }
+  ],
+  "pinned_now": {
+    "6553614": {
+      "portalKey": "jumpHeight",
+      "actualName": "Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1
+    },
+    "6553698": {
+      "portalKey": "rsiModified",
+      "actualName": "RSI-modified",
+      "unit": "m/s",
+      "scale": 0.01
+    },
+    "6553604": {
+      "portalKey": "relativePower",
+      "actualName": "Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1
+    },
+    "6553678": {
+      "portalKey": "brakingRFD",
+      "actualName": "Eccentric Braking RFD",
+      "unit": "N/s",
+      "scale": 1
+    },
+    "6553712": {
+      "portalKey": "concentricImpulse",
+      "actualName": "Concentric Impulse",
+      "unit": "N s",
+      "scale": 1
+    },
+    "6553703": {
+      "portalKey": "eccBrakingImpulse",
+      "actualName": "Eccentric Braking Impulse",
+      "unit": "N s",
+      "scale": 1
+    },
+    "6553685": {
+      "portalKey": "concPeakForce",
+      "actualName": "Concentric Peak Force",
+      "unit": "N",
+      "scale": 1
+    },
+    "655387": {
+      "portalKey": "bodyweightLbs",
+      "actualName": "Bodyweight in Pounds",
+      "unit": "lbs",
+      "scale": 2.20462
+    },
+    "13303830": {
+      "portalKey": "hopMeanRsi",
+      "actualName": "Mean RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1
+    },
+    "13303819": {
+      "portalKey": "hopRsi",
+      "actualName": "Best RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1
+    },
+    "13303814": {
+      "portalKey": "hopContactTime",
+      "actualName": "Best Contact Time",
+      "unit": "ms",
+      "scale": 1000
+    },
+    "13303815": {
+      "portalKey": "hopFlightTime",
+      "actualName": "Best Flight Time",
+      "unit": "ms",
+      "scale": 1000
+    },
+    "13303818": {
+      "portalKey": "hopPeakForce",
+      "actualName": "Best Peak Force",
+      "unit": "N",
+      "scale": 1
+    }
+  },
+  "all": [
+    {
+      "id": 13107230,
+      "name": "Absolute Impulse - 100ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13107231,
+      "name": "Absolute Impulse - 150ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13107232,
+      "name": "Absolute Impulse - 200ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13107228,
+      "name": "Absolute Impulse - 50ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13107229,
+      "name": "Absolute Impulse - 75ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553709,
+      "name": "Active Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303854,
+      "name": "Active Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553711,
+      "name": "Active Stiffness Index",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 655376,
+      "name": "Additional Load",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "None"
+    },
+    {
+      "id": 13500421,
+      "name": "Area of CoP Ellipse",
+      "unit": "mm\u00b2",
+      "scale": 1000000,
+      "decimals": 0,
+      "group": "Balance"
+    },
+    {
+      "id": 655361,
+      "name": "Athlete Standing Weight",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "General"
+    },
+    {
+      "id": 655363,
+      "name": "Auto Weight End",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "General"
+    },
+    {
+      "id": 655362,
+      "name": "Auto Weight Start",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "General"
+    },
+    {
+      "id": 720900,
+      "name": "Auto-detect Pre-Trial Quiet Period",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "None"
+    },
+    {
+      "id": 6553601,
+      "name": "Average Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303844,
+      "name": "Average Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303833,
+      "name": "Average Force Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 13303862,
+      "name": "Average Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303861,
+      "name": "Average Power Fatigue",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 13500424,
+      "name": "Balance Time",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Balance"
+    },
+    {
+      "id": 13107201,
+      "name": "Baseline Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13303821,
+      "name": "Best Active Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303811,
+      "name": "Best Average Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303859,
+      "name": "Best Average Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303814,
+      "name": "Best Contact Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303815,
+      "name": "Best Flight Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303810,
+      "name": "Best Hop Start/Landing",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303817,
+      "name": "Best Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303816,
+      "name": "Best Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303812,
+      "name": "Best Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303818,
+      "name": "Best Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303855,
+      "name": "Best Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303819,
+      "name": "Best RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303820,
+      "name": "Best RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "BestHop"
+    },
+    {
+      "id": 13303813,
+      "name": "Best Time to Peak Force",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "BestHop"
+    },
+    {
+      "id": 655386,
+      "name": "Bodyweight in Kilograms",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "General"
+    },
+    {
+      "id": 655387,
+      "name": "Bodyweight in Pounds",
+      "unit": "lbs",
+      "scale": 2.20462,
+      "decimals": 1,
+      "group": "General"
+    },
+    {
+      "id": 6553664,
+      "name": "Braking Phase Duration",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553670,
+      "name": "Braking Phase Duration:Concentric Duration",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553669,
+      "name": "Braking Phase Duration:Contraction Time",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 655385,
+      "name": "Chair Height",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 6553718,
+      "name": "CMJ Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553735,
+      "name": "Coefficient of Restitution",
+      "unit": "",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553657,
+      "name": "Concentric Duration",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553712,
+      "name": "Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434909,
+      "name": "Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553734,
+      "name": "Concentric Impulse (Abs) / BM",
+      "unit": "N s/kg",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553675,
+      "name": "Concentric Impulse-100ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553726,
+      "name": "Concentric Impulse-100ms:Concentric Impulse",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553674,
+      "name": "Concentric Impulse-50ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553762,
+      "name": "Concentric Impulse:Eccentric Deceleration Impulse Ratio",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553641,
+      "name": "Concentric Maximum RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553619,
+      "name": "Concentric Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434889,
+      "name": "Concentric Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553720,
+      "name": "Concentric Mean Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553759,
+      "name": "Concentric Mean Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553738,
+      "name": "Concentric Mean Instantaneous Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553739,
+      "name": "Concentric Mean Instantaneous Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553623,
+      "name": "Concentric Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434899,
+      "name": "Concentric Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553624,
+      "name": "Concentric Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434900,
+      "name": "Concentric Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 6553626,
+      "name": "Concentric Mean Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434893,
+      "name": "Concentric Mean Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 6553685,
+      "name": "Concentric Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434886,
+      "name": "Concentric Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 6553686,
+      "name": "Concentric Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434887,
+      "name": "Concentric Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13434896,
+      "name": "Concentric Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 6553634,
+      "name": "Concentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434891,
+      "name": "Concentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 6553763,
+      "name": "Concentric Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553637,
+      "name": "Concentric RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553638,
+      "name": "Concentric RFD - 100ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553639,
+      "name": "Concentric RFD - 200ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553640,
+      "name": "Concentric RFD - 50ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553649,
+      "name": "Concentric RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553692,
+      "name": "Concentric RPD",
+      "unit": "W/s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553696,
+      "name": "Concentric RPD - 100ms",
+      "unit": "W/s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553694,
+      "name": "Concentric RPD - 50ms",
+      "unit": "W/s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553693,
+      "name": "Concentric RPD / BM",
+      "unit": "W/s/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553697,
+      "name": "Concentric RPD-100ms / BM",
+      "unit": "W/s/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553695,
+      "name": "Concentric RPD-50ms / BM",
+      "unit": "W/s/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553642,
+      "name": "Concentric Time to Peak Force",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553605,
+      "name": "Contact Time",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303847,
+      "name": "Contact Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303836,
+      "name": "Contact Time Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553706,
+      "name": "Contact Trough",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553643,
+      "name": "Contraction Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553658,
+      "name": "Contraction Time:Eccentric Duration",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13500423,
+      "name": "CoP Range - Anterior-Posterior",
+      "unit": "mm",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Balance"
+    },
+    {
+      "id": 13500422,
+      "name": "CoP Range - Medial-Lateral",
+      "unit": "mm",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Balance"
+    },
+    {
+      "id": 655364,
+      "name": "Corrected Standing Weight",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 4,
+      "group": "General"
+    },
+    {
+      "id": 6553603,
+      "name": "Countermovement Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 1,
+      "name": "CoV",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "None"
+    },
+    {
+      "id": 6553731,
+      "name": "Displacement at Takeoff",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553652,
+      "name": "Drop Height",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340122,
+      "name": "Drop Height",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 6553654,
+      "name": "Drop Landing",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553719,
+      "name": "Drop Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340123,
+      "name": "Drop Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 13238273,
+      "name": "Duration of Trial",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "General"
+    },
+    {
+      "id": 6553667,
+      "name": "Eccentric Acceleration Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553767,
+      "name": "Eccentric Acceleration Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553703,
+      "name": "Eccentric Braking Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553678,
+      "name": "Eccentric Braking RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553679,
+      "name": "Eccentric Braking RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553680,
+      "name": "Eccentric Braking RFD-100ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553681,
+      "name": "Eccentric Braking RFD-100ms / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553704,
+      "name": "Eccentric Deceleration Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434901,
+      "name": "Eccentric Deceleration Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553730,
+      "name": "Eccentric Deceleration Impulse / BM",
+      "unit": "N s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553723,
+      "name": "Eccentric Deceleration Impulse:Concentric Impulse",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553672,
+      "name": "Eccentric Deceleration Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434911,
+      "name": "Eccentric Deceleration Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553756,
+      "name": "Eccentric Deceleration Mean Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553757,
+      "name": "Eccentric Deceleration Mean Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553770,
+      "name": "Eccentric Deceleration Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340108,
+      "name": "Eccentric Deceleration Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434913,
+      "name": "Eccentric Deceleration Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553769,
+      "name": "Eccentric Deceleration Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340107,
+      "name": "Eccentric Deceleration Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434914,
+      "name": "Eccentric Deceleration Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553771,
+      "name": "Eccentric Deceleration Mean Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340109,
+      "name": "Eccentric Deceleration Mean Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434915,
+      "name": "Eccentric Deceleration Mean Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553760,
+      "name": "Eccentric Deceleration Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434910,
+      "name": "Eccentric Deceleration Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553761,
+      "name": "Eccentric Deceleration Peak Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434912,
+      "name": "Eccentric Deceleration Peak Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553668,
+      "name": "Eccentric Deceleration Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553682,
+      "name": "Eccentric Deceleration RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434902,
+      "name": "Eccentric Deceleration RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553683,
+      "name": "Eccentric Deceleration RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434903,
+      "name": "Eccentric Deceleration RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 6553764,
+      "name": "Eccentric Deceleration:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553644,
+      "name": "Eccentric Duration",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553715,
+      "name": "Eccentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434908,
+      "name": "Eccentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553671,
+      "name": "Eccentric Mean Braking Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553620,
+      "name": "Eccentric Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434888,
+      "name": "Eccentric Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553621,
+      "name": "Eccentric Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434897,
+      "name": "Eccentric Mean Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553625,
+      "name": "Eccentric Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434898,
+      "name": "Eccentric Mean Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13434892,
+      "name": "Eccentric Mean Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 6553687,
+      "name": "Eccentric Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434885,
+      "name": "Eccentric Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553688,
+      "name": "Eccentric Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553702,
+      "name": "Eccentric Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434894,
+      "name": "Eccentric Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553722,
+      "name": "Eccentric Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434895,
+      "name": "Eccentric Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 6553724,
+      "name": "Eccentric Peak Power:Concentric Peak Power",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553701,
+      "name": "Eccentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434890,
+      "name": "Eccentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 6553716,
+      "name": "Eccentric Unloading Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553744,
+      "name": "Eccentric Unloading Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553747,
+      "name": "Eccentric Unloading Phase Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553748,
+      "name": "Eccentric Unloading Phase Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553749,
+      "name": "Eccentric Unloading Phase Mean Force / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553745,
+      "name": "Eccentric Unloading Phase RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553746,
+      "name": "Eccentric Unloading Phase RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553765,
+      "name": "Eccentric Unloading Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553750,
+      "name": "Eccentric Yielding Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553753,
+      "name": "Eccentric Yielding Phase Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553754,
+      "name": "Eccentric Yielding Phase Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553755,
+      "name": "Eccentric Yielding Phase Mean Force / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553751,
+      "name": "Eccentric Yielding Phase RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553752,
+      "name": "Eccentric Yielding Phase RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553766,
+      "name": "Eccentric Yielding Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553659,
+      "name": "Eccentric:Concentric Duration",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553622,
+      "name": "Eccentric:Concentric Mean Force Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 655378,
+      "name": "Effective Additional Load",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "General"
+    },
+    {
+      "id": 6553653,
+      "name": "Effective Drop",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6619139,
+      "name": "Effective Drop Height",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434904,
+      "name": "End of Eccentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 6619137,
+      "name": "End of Movement",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13631490,
+      "name": "End of Movement",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 720907,
+      "name": "End of Movement Threshold StdDevs",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 655381,
+      "name": "Exercise Length",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 655382,
+      "name": "Eyes Closed",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 655372,
+      "name": "Fatigue Hops/Reps",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Fatigue"
+    },
+    {
+      "id": 7340064,
+      "name": "First Flight Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340069,
+      "name": "First Flight Time:Contraction Time",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340065,
+      "name": "First Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340066,
+      "name": "First Jump Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340067,
+      "name": "First Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340068,
+      "name": "First Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13172738,
+      "name": "First Landing",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 7340034,
+      "name": "First Landing",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340075,
+      "name": "First Peak Net Takeoff Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13172737,
+      "name": "First Takeoff",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340033,
+      "name": "First Takeoff",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340039,
+      "name": "First Takeoff Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340040,
+      "name": "First Takeoff Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553606,
+      "name": "Flight Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303848,
+      "name": "Flight Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303837,
+      "name": "Flight Time Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553660,
+      "name": "Flight Time:Contraction Time",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553661,
+      "name": "FlightTime:Eccentric Duration",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13107242,
+      "name": "Force (Net of BW) at 100ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107243,
+      "name": "Force (Net of BW) at 150ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107244,
+      "name": "Force (Net of BW) at 200ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107241,
+      "name": "Force (Net of BW) at 50ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107205,
+      "name": "Force at 100ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107225,
+      "name": "Force at 100ms / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107206,
+      "name": "Force at 150ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107226,
+      "name": "Force at 150ms / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107207,
+      "name": "Force at 200ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107227,
+      "name": "Force at 200ms / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107204,
+      "name": "Force at 50ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107224,
+      "name": "Force at 50ms / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 6553673,
+      "name": "Force at Peak Power",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553713,
+      "name": "Force at Zero Velocity",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553732,
+      "name": "Force at Zero Velocity / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434905,
+      "name": "Hold Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 13303809,
+      "name": "Hop Takeoff",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "General"
+    },
+    {
+      "id": 655377,
+      "name": "Hop/Rep Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "General"
+    },
+    {
+      "id": 655374,
+      "name": "Hop/Rep Effective Mass",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "General"
+    },
+    {
+      "id": 655370,
+      "name": "Hop/Rep End",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "General"
+    },
+    {
+      "id": 655373,
+      "name": "Hop/Rep Integration End",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "General"
+    },
+    {
+      "id": 655371,
+      "name": "Hop/Rep Order",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "General"
+    },
+    {
+      "id": 655369,
+      "name": "Hop/Rep Start",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "General"
+    },
+    {
+      "id": 13238279,
+      "name": "Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13303850,
+      "name": "Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13107238,
+      "name": "Impulse (Net of BW) - 100ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107239,
+      "name": "Impulse (Net of BW) - 150ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107240,
+      "name": "Impulse (Net of BW) - 200ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107236,
+      "name": "Impulse (Net of BW) - 50ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107237,
+      "name": "Impulse (Net of BW) - 75ms",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13303839,
+      "name": "Impulse Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553607,
+      "name": "Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303849,
+      "name": "Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303838,
+      "name": "Jump Height (Flight Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553613,
+      "name": "Jump Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553608,
+      "name": "Jump Height (FT) Relative Landing RFD",
+      "unit": "N/s/cm",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553609,
+      "name": "Jump Height (FT) Relative Peak Landing Force",
+      "unit": "N/cm",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553610,
+      "name": "Jump Height (Imp-Dis)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553611,
+      "name": "Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553614,
+      "name": "Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553727,
+      "name": "Landing Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Landing"
+    },
+    {
+      "id": 6553647,
+      "name": "Landing Net Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 7340176,
+      "name": "Landing Net Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Landing"
+    },
+    {
+      "id": 6553612,
+      "name": "Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 7340177,
+      "name": "Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 13303845,
+      "name": "Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553728,
+      "name": "Landing RFD 50ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 13303834,
+      "name": "Landing RFD Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553768,
+      "name": "Landing Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553779,
+      "name": "Landing Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340185,
+      "name": "Landing Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 720905,
+      "name": "Low-Pass Filter (5Hz)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 6553691,
+      "name": "Lower-Limb Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434884,
+      "name": "Maximum Negative Displacement",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13303832,
+      "name": "Mean Active Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303822,
+      "name": "Mean Average Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303860,
+      "name": "Mean Average Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303825,
+      "name": "Mean Contact Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "BestNHops"
+    },
+    {
+      "id": 6553776,
+      "name": "Mean Drop Landing Acceleration",
+      "unit": "m/s\u00b2",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553690,
+      "name": "Mean Eccentric+Concentric Power:Time",
+      "unit": "W/s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303826,
+      "name": "Mean Flight Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13500426,
+      "name": "Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Balance"
+    },
+    {
+      "id": 13303828,
+      "name": "Mean Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303827,
+      "name": "Mean Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestNHops"
+    },
+    {
+      "id": 6553615,
+      "name": "Mean Landing Acceleration",
+      "unit": "m/s\u00b2",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553772,
+      "name": "Mean Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Landing"
+    },
+    {
+      "id": 7340184,
+      "name": "Mean Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Landing"
+    },
+    {
+      "id": 6553741,
+      "name": "Mean Landing Instantaneous Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553616,
+      "name": "Mean Landing Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 13303823,
+      "name": "Mean Landing RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "BestNHops"
+    },
+    {
+      "id": 6553617,
+      "name": "Mean Landing Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 13303829,
+      "name": "Mean Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303856,
+      "name": "Mean Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303830,
+      "name": "Mean RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13303831,
+      "name": "Mean RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13697060,
+      "name": "Mean Sitting Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697061,
+      "name": "Mean Sitting Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Functional"
+    },
+    {
+      "id": 13697029,
+      "name": "Mean Standing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697030,
+      "name": "Mean Standing Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Functional"
+    },
+    {
+      "id": 6553618,
+      "name": "Mean Takeoff Acceleration",
+      "unit": "m/s\u00b2",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 13303824,
+      "name": "Mean Time to Peak Force",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "BestNHops"
+    },
+    {
+      "id": 13500418,
+      "name": "Mean Velocity",
+      "unit": "mm/s",
+      "scale": 1000,
+      "decimals": 1,
+      "group": "Balance"
+    },
+    {
+      "id": 13500420,
+      "name": "Mean Velocity - Anterior-Posterior",
+      "unit": "mm/s",
+      "scale": 1000,
+      "decimals": 1,
+      "group": "Balance"
+    },
+    {
+      "id": 13500419,
+      "name": "Mean Velocity - Medial-Lateral",
+      "unit": "mm/s",
+      "scale": 1000,
+      "decimals": 1,
+      "group": "Balance"
+    },
+    {
+      "id": 6553663,
+      "name": "Minimum Eccentric Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13238274,
+      "name": "Minimum Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13434882,
+      "name": "Minimum Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553645,
+      "name": "Movement Start to Peak Force",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553742,
+      "name": "Movement Start to Peak Instantaneous Power",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553646,
+      "name": "Movement Start to Peak Power",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 720904,
+      "name": "Mvt. Force Threshold",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 720903,
+      "name": "Mvt. StdDev Threshold",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 13107219,
+      "name": "Net Force at 100ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107220,
+      "name": "Net Force at 150ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107221,
+      "name": "Net Force at 200ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107218,
+      "name": "Net Force at 50ms",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107217,
+      "name": "Net Peak Vertical Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 0,
+      "name": "No Result Selected",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 655368,
+      "name": "Number of Hops/Reps",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "General"
+    },
+    {
+      "id": 13238278,
+      "name": "Overall Average Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 6553676,
+      "name": "P1 Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553677,
+      "name": "P2 Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553725,
+      "name": "P2 Concentric Impulse:P1 Concentric Impulse",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553708,
+      "name": "Passive Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6619141,
+      "name": "Passive Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553710,
+      "name": "Passive Stiffness Index",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553707,
+      "name": "Peak Drive-Off Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553775,
+      "name": "Peak Drop Landing Acceleration",
+      "unit": "m/s\u00b2",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553650,
+      "name": "Peak Drop Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340138,
+      "name": "Peak Drop Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 6553774,
+      "name": "Peak Drop Landing Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553778,
+      "name": "Peak Drop Landing Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553777,
+      "name": "Peak Drop Landing Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13172743,
+      "name": "Peak First Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 13238276,
+      "name": "Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13434881,
+      "name": "Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 13303851,
+      "name": "Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303840,
+      "name": "Peak Force Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553705,
+      "name": "Peak Impact Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553736,
+      "name": "Peak Instantaneous Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553737,
+      "name": "Peak Instantaneous Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553627,
+      "name": "Peak Landing Acceleration",
+      "unit": "m/s\u00b2",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553628,
+      "name": "Peak Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 7340181,
+      "name": "Peak Landing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553689,
+      "name": "Peak Landing Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 7340182,
+      "name": "Peak Landing Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553758,
+      "name": "Peak Landing Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 7340183,
+      "name": "Peak Landing Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553740,
+      "name": "Peak Landing Instantaneous Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553629,
+      "name": "Peak Landing Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Landing"
+    },
+    {
+      "id": 6553630,
+      "name": "Peak Landing Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553780,
+      "name": "Peak Negative Landing Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 6553648,
+      "name": "Peak Net Takeoff Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553633,
+      "name": "Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303858,
+      "name": "Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553604,
+      "name": "Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303857,
+      "name": "Peak Power Fatigue",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 13697058,
+      "name": "Peak Sitting Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697059,
+      "name": "Peak Sitting Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Functional"
+    },
+    {
+      "id": 13697026,
+      "name": "Peak Standing Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697027,
+      "name": "Peak Standing Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Functional"
+    },
+    {
+      "id": 13697033,
+      "name": "Peak Standing RFD - 100ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697031,
+      "name": "Peak Standing RFD - 10ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697034,
+      "name": "Peak Standing RFD / BM - 100ms",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 13697032,
+      "name": "Peak Standing RFD / BM - 10ms",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Functional"
+    },
+    {
+      "id": 6553631,
+      "name": "Peak Takeoff Acceleration",
+      "unit": "m/s\u00b2",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13172744,
+      "name": "Peak Takeoff Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13107203,
+      "name": "Peak Vertical Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107245,
+      "name": "Peak Vertical Force (Net of BW)",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107223,
+      "name": "Peak Vertical Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13107233,
+      "name": "Peak Vertical Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 6553714,
+      "name": "Positive Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553717,
+      "name": "Positive Takeoff Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340078,
+      "name": "Positive Takeoff Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7405574,
+      "name": "Push Up Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434907,
+      "name": "Push Up Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 7405572,
+      "name": "Push Up Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7405573,
+      "name": "Push Up Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340113,
+      "name": "Rebound Active Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340114,
+      "name": "Rebound Active Stiffness Index",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340115,
+      "name": "Rebound Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340116,
+      "name": "Rebound Concentric Impulse (Abs) / BM",
+      "unit": "N s/kg",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340117,
+      "name": "Rebound Concentric Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340118,
+      "name": "Rebound Concentric Mean Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340143,
+      "name": "Rebound Concentric Mean Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340119,
+      "name": "Rebound Concentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340120,
+      "name": "Rebound Contact Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340131,
+      "name": "Rebound Contact Trough",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340121,
+      "name": "Rebound Countermovement Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340124,
+      "name": "Rebound Eccentric Duration",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340125,
+      "name": "Rebound Eccentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340126,
+      "name": "Rebound Flight Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340134,
+      "name": "Rebound Force at Zero Velocity",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340135,
+      "name": "Rebound Force at Zero Velocity / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340127,
+      "name": "Rebound Jump Height (Flight Time)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340128,
+      "name": "Rebound Jump Height (Flight Time) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340129,
+      "name": "Rebound Jump Height (Imp-Mom)",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340130,
+      "name": "Rebound Jump Height (Imp-Mom) in Inches",
+      "unit": "in",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340136,
+      "name": "Rebound Passive Stiffness",
+      "unit": "N/m",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340137,
+      "name": "Rebound Passive Stiffness Index",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340133,
+      "name": "Rebound Peak Drive-Off Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340132,
+      "name": "Rebound Peak Impact Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340139,
+      "name": "Rebound Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340140,
+      "name": "Rebound Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340141,
+      "name": "Rebound RSI (Flight Time / Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 7340142,
+      "name": "Rebound RSI (JH(Flight Time) / Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 13107215,
+      "name": "RFD - 100-150ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107235,
+      "name": "RFD - 100-200ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107211,
+      "name": "RFD - 100ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107216,
+      "name": "RFD - 150-200ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107212,
+      "name": "RFD - 150ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107213,
+      "name": "RFD - 200ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107234,
+      "name": "RFD - 250ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107208,
+      "name": "RFD - 30ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107214,
+      "name": "RFD - 50-100ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107209,
+      "name": "RFD - 50ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 13107210,
+      "name": "RFD - 75ms",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Performance"
+    },
+    {
+      "id": 6553636,
+      "name": "RSI (Flight Time/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303852,
+      "name": "RSI (Flight/Contact Time)",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303841,
+      "name": "RSI (Flight/Contact Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553635,
+      "name": "RSI (JH (Flight Time)/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303853,
+      "name": "RSI (Jump Height/Contact Time)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303842,
+      "name": "RSI (Jump Height/Contact Time) Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553698,
+      "name": "RSI-modified",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553733,
+      "name": "RSI-modified (Imp-Mom)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 2,
+      "name": "SD",
+      "unit": "",
+      "scale": 1,
+      "decimals": 3,
+      "group": "None"
+    },
+    {
+      "id": 13172740,
+      "name": "Second Landing",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 7340036,
+      "name": "Second Landing",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 13172739,
+      "name": "Second Takeoff",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340035,
+      "name": "Second Takeoff",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Rebound"
+    },
+    {
+      "id": 655384,
+      "name": "Secondary Task",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 13434906,
+      "name": "Squat Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Performance"
+    },
+    {
+      "id": 720906,
+      "name": "Stabilisation Threshold StdDevs",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 13631491,
+      "name": "Stabilised",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 6619140,
+      "name": "Stability Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553662,
+      "name": "Start of Braking Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553602,
+      "name": "Start of Concentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13434883,
+      "name": "Start of Concentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 6553665,
+      "name": "Start of Eccentric Deceleration Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13172741,
+      "name": "Start of First Concentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 655367,
+      "name": "Start of Integration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 720902,
+      "name": "Start of Integration Offset",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 720901,
+      "name": "Start of Integration Type",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 655365,
+      "name": "Start of Movement",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13631489,
+      "name": "Start of Movement",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 655366,
+      "name": "Start of Movement Detection Threshold",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 655380,
+      "name": "Start of Movement StdDev Period End",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 655379,
+      "name": "Start of Movement StdDev Period Start",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 720898,
+      "name": "Start of Movement Threshold",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 2,
+      "group": "None"
+    },
+    {
+      "id": 720909,
+      "name": "Start of Movement Threshold",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 720911,
+      "name": "Start of Movement Threshold Percent",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 720899,
+      "name": "Start of Movement Threshold StdDevs",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "None"
+    },
+    {
+      "id": 720910,
+      "name": "Start of Movement Threshold StdDevs",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 720897,
+      "name": "Start of Movement Type",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 720908,
+      "name": "Start of Movement Type",
+      "unit": "",
+      "scale": 1,
+      "decimals": 3,
+      "group": "None"
+    },
+    {
+      "id": 7340112,
+      "name": "Start of Rebound Concentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Rebound"
+    },
+    {
+      "id": 13172742,
+      "name": "Start of Second Concentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13697056,
+      "name": "Start of Sit",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 7340049,
+      "name": "Start of Takeoff Braking Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340037,
+      "name": "Start of Takeoff Concentric Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340050,
+      "name": "Start of Takeoff Eccentric Deceleration Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13107222,
+      "name": "Start Time to 80% Net Peak Force",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 13107202,
+      "name": "Start Time to Peak Force",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 13303843,
+      "name": "Stiffness Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 6553773,
+      "name": "Take-off Momentum",
+      "unit": "kg m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340110,
+      "name": "Take-off Momentum",
+      "unit": "kg m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340041,
+      "name": "Takeoff Concentric Duration",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340042,
+      "name": "Takeoff Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340099,
+      "name": "Takeoff Concentric Impulse:Eccentric Deceleration Impulse Ratio",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340043,
+      "name": "Takeoff Concentric Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340044,
+      "name": "Takeoff Concentric Mean Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340096,
+      "name": "Takeoff Concentric Mean Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340045,
+      "name": "Takeoff Concentric Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340046,
+      "name": "Takeoff Concentric Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340076,
+      "name": "Takeoff Concentric Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340077,
+      "name": "Takeoff Concentric Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340047,
+      "name": "Takeoff Concentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340102,
+      "name": "Takeoff Concentric Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340048,
+      "name": "Takeoff Contraction Time",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340038,
+      "name": "Takeoff Countermovement Depth",
+      "unit": "cm",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340100,
+      "name": "Takeoff Eccentric Acceleration Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340106,
+      "name": "Takeoff Eccentric Acceleration Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340051,
+      "name": "Takeoff Eccentric Braking Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340052,
+      "name": "Takeoff Eccentric Braking Impulse / BM",
+      "unit": "N s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340053,
+      "name": "Takeoff Eccentric Deceleration Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340054,
+      "name": "Takeoff Eccentric Deceleration Impulse / BM",
+      "unit": "N s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340093,
+      "name": "Takeoff Eccentric Deceleration Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340094,
+      "name": "Takeoff Eccentric Deceleration Mean Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340095,
+      "name": "Takeoff Eccentric Deceleration Mean Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340097,
+      "name": "Takeoff Eccentric Deceleration Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340098,
+      "name": "Takeoff Eccentric Deceleration Peak Force / BW",
+      "unit": "",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340101,
+      "name": "Takeoff Eccentric Deceleration Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340055,
+      "name": "Takeoff Eccentric Deceleration RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340056,
+      "name": "Takeoff Eccentric Deceleration RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340103,
+      "name": "Takeoff Eccentric Deceleration:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340057,
+      "name": "Takeoff Eccentric Duration",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340058,
+      "name": "Takeoff Eccentric Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340059,
+      "name": "Takeoff Eccentric Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340060,
+      "name": "Takeoff Eccentric Peak Power",
+      "unit": "W",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340061,
+      "name": "Takeoff Eccentric Peak Power / BM",
+      "unit": "W/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340062,
+      "name": "Takeoff Eccentric Peak Velocity",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340063,
+      "name": "Takeoff Eccentric Unloading Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340081,
+      "name": "Takeoff Eccentric Unloading Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340084,
+      "name": "Takeoff Eccentric Unloading Phase Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340085,
+      "name": "Takeoff Eccentric Unloading Phase Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340086,
+      "name": "Takeoff Eccentric Unloading Phase Mean Force / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340082,
+      "name": "Takeoff Eccentric Unloading Phase RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340083,
+      "name": "Takeoff Eccentric Unloading Phase RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340104,
+      "name": "Takeoff Eccentric Unloading Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340087,
+      "name": "Takeoff Eccentric Yielding Phase Duration",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340090,
+      "name": "Takeoff Eccentric Yielding Phase Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340091,
+      "name": "Takeoff Eccentric Yielding Phase Mean Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340092,
+      "name": "Takeoff Eccentric Yielding Phase Mean Force / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340088,
+      "name": "Takeoff Eccentric Yielding Phase RFD",
+      "unit": "N/s",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340089,
+      "name": "Takeoff Eccentric Yielding Phase RFD / BM",
+      "unit": "N/s/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340105,
+      "name": "Takeoff Eccentric Yielding Phase:Contraction Time Ratio",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340070,
+      "name": "Takeoff Force at Zero Velocity",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340071,
+      "name": "Takeoff Force at Zero Velocity / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340072,
+      "name": "Takeoff P1 Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340073,
+      "name": "Takeoff P2 Concentric Impulse",
+      "unit": "N s",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340074,
+      "name": "Takeoff P2 Concentric Impulse:P1 Concentric Impulse",
+      "unit": "",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553632,
+      "name": "Takeoff Peak Force",
+      "unit": "N",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553684,
+      "name": "Takeoff Peak Force / BM",
+      "unit": "N/kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340079,
+      "name": "Takeoff RSI-modified",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 7340080,
+      "name": "Takeoff RSI-modified (Imp-Mom)",
+      "unit": "m/s",
+      "scale": 0.01,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553666,
+      "name": "Time to Braking Phase",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13238275,
+      "name": "Time to Minimum Force",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13238277,
+      "name": "Time to Peak Force",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Performance"
+    },
+    {
+      "id": 13303846,
+      "name": "Time to Peak Force",
+      "unit": "ms",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13303835,
+      "name": "Time to Peak Force Fatigue",
+      "unit": "%",
+      "scale": 1,
+      "decimals": 1,
+      "group": "Fatigue"
+    },
+    {
+      "id": 13697028,
+      "name": "Time to Peak Standing Force",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 13697057,
+      "name": "Time to Sit",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 6553656,
+      "name": "Time to Stabilisation",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553729,
+      "name": "Time to Stabilisation",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Landing"
+    },
+    {
+      "id": 13697025,
+      "name": "Time to Stand",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Functional"
+    },
+    {
+      "id": 655375,
+      "name": "Top N",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 13238280,
+      "name": "Total Contact Time",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 3,
+      "group": "Performance"
+    },
+    {
+      "id": 13500417,
+      "name": "Total Excursion",
+      "unit": "mm",
+      "scale": 1000,
+      "decimals": 0,
+      "group": "Balance"
+    },
+    {
+      "id": 6553699,
+      "name": "Total Work",
+      "unit": "J",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Takeoff"
+    },
+    {
+      "id": 13500425,
+      "name": "Unbalanced Count",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "Balance"
+    },
+    {
+      "id": 655383,
+      "name": "Unstable Surface",
+      "unit": "",
+      "scale": 1,
+      "decimals": 0,
+      "group": "None"
+    },
+    {
+      "id": 7405569,
+      "name": "Upper Bodyweight",
+      "unit": "kg",
+      "scale": 1,
+      "decimals": 1,
+      "group": "General"
+    },
+    {
+      "id": 7405571,
+      "name": "Upper Bodyweight End",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "General"
+    },
+    {
+      "id": 7405570,
+      "name": "Upper Bodyweight Start",
+      "unit": "s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "General"
+    },
+    {
+      "id": 6553700,
+      "name": "Velocity at Peak Power",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553651,
+      "name": "Vertical Velocity at Contact",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6619138,
+      "name": "Vertical Velocity at Contact",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    },
+    {
+      "id": 6553655,
+      "name": "Vertical Velocity at Takeoff",
+      "unit": "m/s",
+      "scale": 1,
+      "decimals": 2,
+      "group": "Takeoff"
+    }
+  ]
+}
