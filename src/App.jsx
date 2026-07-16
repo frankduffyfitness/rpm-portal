@@ -1309,6 +1309,15 @@ function RptFooter({ page, total, label }) {
 
 function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend }) {
   const gi = GROUPS[athlete.group];
+  // Some groups (Pro, Men's League) have no norm cohort — no athlete in them
+  // clears the 5-session bar in gen_N. When that happens `norms[group]` is
+  // undefined and we fall back to the facility-wide pool; label it honestly as
+  // "All Athletes" instead of claiming e.g. "vs Pro", and suppress the group
+  // rank (a rank "of Pro" is meaningless with no pro cohort).
+  const hasCmjNorms = !!norms[athlete.group];
+  const hasHopNorms = !!(hopNorms && hopAthlete && hopNorms[hopAthlete.group]);
+  const cmpCmj = hasCmjNorms ? gi.label : "All Athletes";
+  const cmpHop = hasHopNorms ? gi.label : "All Athletes";
   const n = norms[athlete.group] || norms.all;
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
   const tmr = veloAthlete ? (_TMR[veloAthlete.name] || []) : [];
@@ -1335,7 +1344,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
       <div className="rpt-page" style={pageStyle}>
         <RptHeader athlete={athlete} gi={gi} first
           title="COUNTERMOVEMENT JUMP" sub={"ForceDecks \u00b7 " + athlete.testCount + " sessions \u00b7 last " + athlete.latestDate} />
-        <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + gi.label}>
+        <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + cmpCmj}>
           <RptMetricRow label="Jump Height" desc="How high the athlete jumps. The headline measure of lower-body power."
             value={athlete.cmj.jumpHeight + '\u0022'} best={athlete.best.jumpHeight + '\u0022'} pct={cP(athlete.cmj.jumpHeight, n.cmjHeight)} />
           <RptMetricRow label="RSI-modified" desc="Jump height relative to time on the ground. Explosiveness per second of effort."
@@ -1348,7 +1357,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
           <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
             <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>GROUP RANK (JUMP)</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{fmtRank(jhRank, jhRankG.length)}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{hasCmjNorms ? fmtRank(jhRank, jhRankG.length) : "–"}</div>
           </div>
           <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
             <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>TESTING WINDOW</div>
@@ -1393,7 +1402,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             ]} />
           </RptSection>
         )}
-        <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + gi.label} />
+        <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + cmpCmj} />
       </div>
 
       {/* ── PAGE 2: HOP ── */}
@@ -1401,7 +1410,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         <div className="rpt-page" style={pageStyle}>
           <RptHeader athlete={athlete} gi={gi}
             title="REPEATED HOP TEST" sub={"ForceDecks \u00b7 " + hopAthlete.testCount + " sessions \u00b7 last " + hopAthlete.latestDate} />
-          <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + gi.label}>
+          <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + cmpHop}>
             <RptMetricRow label="Hop RSI" desc="Flight time divided by contact time. The key measure of reactive, elastic ability."
               value={hopAthlete.hop.rsi} best={hopAthlete.best.rsi} pct={cP(hopAthlete.hop.rsi, hn.rsi)} />
             <RptMetricRow label="Flight Time" desc="Time in the air between hops. Longer flight means more force in less ground time."
@@ -1428,7 +1437,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
               ]} />
             </RptSection>
           )}
-          <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + gi.label} />
+          <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + cmpHop} />
         </div>
       )}
 
