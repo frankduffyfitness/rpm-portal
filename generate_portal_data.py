@@ -15,6 +15,16 @@ CURRENT_JSX = sys.argv[2] if len(sys.argv) > 2 else "App.jsx"
 TRACKMAN_JSON = sys.argv[3] if len(sys.argv) > 3 else "trackman_portal.json"
 ACTIVE_CUTOFF = datetime.now() - timedelta(days=42)
 MIN_SESSIONS = 5
+# Pro / Men's League are visiting or one-off testers who rarely reach 5 sessions,
+# so the normal MIN_SESSIONS gate zeroes those groups out — no "vs Pro" benchmark.
+# Let them feed their group's norms with as few as 1 session (Frank, 2026-07-16:
+# "good for guys to see how they stack up against the pro athletes"). Still gated
+# to >=3 contributing athletes so the percentile isn't degenerate; when the pros
+# go stale (>6wk) the group drops out and ReportView falls back to "vs All
+# Athletes" on its own.
+NORM_RELAXED_GROUPS = {"pro", "ml"}
+NORM_RELAXED_MIN_SESSIONS = 1
+NORM_RELAXED_MIN_ATHLETES = 3
 HISTORY_LEN = 8  # last 8 sessions for sparklines
 
 # ─── Hop test metric keys ───────────────────────────────────────────────────
@@ -898,24 +908,34 @@ def gen_SD(athletes_data):
 def gen_N(athletes_data):
     """Group norms: percentiles for each metric per group."""
     groups = defaultdict(lambda: {'jh': [], 'rsi': [], 'pp': [], 'brk': []})
-    
+    counts = defaultdict(int)  # athletes contributing per group (for the relaxed gate)
+
     for ath in athletes_data:
         s = ath['sessions']
-        if len(s) < MIN_SESSIONS:
+        g = ath['group']
+        min_sess = NORM_RELAXED_MIN_SESSIONS if g in NORM_RELAXED_GROUPS else MIN_SESSIONS
+        if len(s) < min_sess:
             continue
         latest = s[0]
         if latest['date'] < ACTIVE_CUTOFF:
             continue
-        
-        g = ath['group']
+
         # Female athletes feed the 'fem' norms IN ADDITION to their school
         # group's — dual membership, so "vs Female Athletes" comparisons work.
-        targets = ['all', g] + (['fem'] if is_female(ath['name']) and g != 'fem' else [])
+        # A relaxed athlete (pro/ml under MIN_SESSIONS) feeds ONLY its own group,
+        # never 'all'/'fem' — so existing "vs All Athletes" percentiles are
+        # byte-for-byte unchanged.
+        if len(s) >= MIN_SESSIONS:
+            targets = ['all', g] + (['fem'] if is_female(ath['name']) and g != 'fem' else [])
+        else:
+            targets = [g]
+        for t in targets:
+            counts[t] += 1
         for m in ('jh', 'rsi', 'pp', 'brk'):
             if latest[m]:
                 for t in targets:
                     groups[t][m].append(latest[m])
-    
+
     def pctiles(vals):
         if len(vals) < 3:
             return {"p10": 0, "p25": 0, "p50": 0, "p75": 0, "p90": 0}
@@ -932,10 +952,14 @@ def gen_N(athletes_data):
     norms = {}
     metric_map = {'jh': 'cmjHeight', 'rsi': 'rsiMod', 'pp': 'conImpulse', 'brk': 'eccBrakingRFD'}
     for g, data in groups.items():
-        norms[g] = {}
-        for mk, nk in metric_map.items():
-            norms[g][nk] = pctiles(data[mk])
-    
+        # Relaxed groups (pro/ml) must have >=3 contributing athletes AND >=3
+        # samples per metric, or the percentile is degenerate and the UI would
+        # show a broken "vs Pro" button. Non-relaxed groups keep prior behavior.
+        if g in NORM_RELAXED_GROUPS and (counts[g] < NORM_RELAXED_MIN_ATHLETES
+                or any(len(data[mk]) < 3 for mk in metric_map)):
+            continue
+        norms[g] = {nk: pctiles(data[mk]) for mk, nk in metric_map.items()}
+
     return norms
 
 
@@ -1098,17 +1122,25 @@ def gen_HT(hop_athletes_data):
 def gen_HN(hop_athletes_data):
     """Hop group norms: percentiles for each metric per group."""
     groups = defaultdict(lambda: {'rsi': [], 'ct': [], 'ft': [], 'pfbm': []})
+    counts = defaultdict(int)
 
     for ath in hop_athletes_data:
         s = ath['sessions']
-        if len(s) < MIN_SESSIONS:
+        g = ath['group']
+        min_sess = NORM_RELAXED_MIN_SESSIONS if g in NORM_RELAXED_GROUPS else MIN_SESSIONS
+        if len(s) < min_sess:
             continue
         latest = s[0]
         if latest['date'] < ACTIVE_CUTOFF:
             continue
-        g = ath['group']
         # Dual membership: female athletes also feed the 'fem' hop norms.
-        targets = ['all', g] + (['fem'] if is_female(ath['name']) and g != 'fem' else [])
+        # Relaxed athletes (pro/ml under MIN_SESSIONS) feed only their own group.
+        if len(s) >= MIN_SESSIONS:
+            targets = ['all', g] + (['fem'] if is_female(ath['name']) and g != 'fem' else [])
+        else:
+            targets = [g]
+        for t in targets:
+            counts[t] += 1
         for m in ('rsi', 'ct', 'ft', 'pfbm'):
             v = latest.get(m)
             if v:
@@ -1131,9 +1163,10 @@ def gen_HN(hop_athletes_data):
     norms = {}
     metric_map = {'rsi': 'rsi', 'ct': 'ct', 'ft': 'ft', 'pfbm': 'pfbm'}
     for g, data in groups.items():
-        norms[g] = {}
-        for mk, nk in metric_map.items():
-            norms[g][nk] = pctiles(data[mk])
+        if g in NORM_RELAXED_GROUPS and (counts[g] < NORM_RELAXED_MIN_ATHLETES
+                or any(len(data[mk]) < 3 for mk in metric_map)):
+            continue
+        norms[g] = {nk: pctiles(data[mk]) for mk, nk in metric_map.items()}
     return norms
 
 
