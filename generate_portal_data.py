@@ -1470,7 +1470,9 @@ def gen_DYNAMO():
     meas = _load_dynamo_meas()
     out = []
     for name, a in (data.get("athletes") or {}).items():
-        arm = (meas.get(a.get("name", name)) or {}).get("forearmMeters")
+        am = meas.get(a.get("name", name)) or {}
+        arm = am.get("forearmMeters")
+        throw_arm = am.get("throwingArm")  # "L"/"R" — clinically relevant side for the ER:IR board
         tests = a.get("tests", [])
         for t in tests:
             for mv in t.get("movements", []):
@@ -1483,6 +1485,7 @@ def gen_DYNAMO():
             "name": a.get("name", name),
             "group": a.get("group", "hs"),
             "dob": a.get("dob"),
+            "arm": throw_arm,
             "tests": tests,
         })
     out.sort(key=lambda x: x["name"].split()[-1] if x["name"] else "")
