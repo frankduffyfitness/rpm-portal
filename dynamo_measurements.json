@@ -122,6 +122,13 @@
       "forearmInches": 11.375,
       "forearmRaw": "11 3/8\"",
       "forearmMeters": 0.288925
+    },
+    "Joey Frazzetta": {
+      "throwingArm": "R",
+      "forearmInches": 10.875,
+      "forearmRaw": "10 7/8\"",
+      "forearmMeters": 0.276225,
+      "note": "Not yet DynaMo-tested; joins when tested."
     }
   }
 }
