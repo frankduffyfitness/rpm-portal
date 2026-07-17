@@ -110,6 +110,8 @@ def is_excluded(name):
 # Keep this for athletes whose VALD group is wrong or who aren't yet in VALD.
 GROUP_OVERRIDES = {
     "Nick Padilla": "pro",
+    "Cade Winquest": "pro",
+    "Pete Hansen": "pro",
     "Matt Bowman": "pro",
     "Julian Minaya": "pro",
     "Mike Sirota": "pro",
@@ -122,6 +124,7 @@ GROUP_OVERRIDES = {
     "Zach Weinschel": "col",
     "Darren Espinal": "col",
     "Jackson Mavrides": "col",
+    "Severino Napolitano": "col",
     # Middle school
     "Josh Miller": "ms",
     # Men's league
@@ -1360,8 +1363,57 @@ _HT = gen_HT(hop_athletes_data)
 _HN = gen_HN(hop_athletes_data)
 _HD = gen_HD(hop_athletes_data)
 
+def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
+    """Derive velo sessions (peak + average fastball) straight from the bullpen
+    reports, so velo stays current from the TrackMan data alone — no master-sheet
+    dependency — and so bullpen-only pitchers (no coach velo rows yet) still get a
+    card. For an (athlete, date) already present the master sheet wins; bullpen-only
+    dates are added and bullpen-only athletes are created. Fastball = the session's
+    Fastball type, else Sinker; peak = its max velo, avg = its average velo. Bullpen
+    session type is always "Pitching practice" (TrackMan has no effort label), so
+    these count as max-effort toward BOTH peak and average — exclude a specific
+    session via VELO_MANUAL_EXCLUSIONS or a master-sheet row if it wasn't."""
+    if trackman_data is None:
+        trackman_data = {"athletes": {}}
+    if not os.path.exists(reports_path):
+        return trackman_data
+    try:
+        rep = json.load(open(reports_path))
+    except Exception:
+        return trackman_data
+    aths = trackman_data.setdefault("athletes", {})
+    added = 0
+    for name, r in (rep.get("athletes") or {}).items():
+        ath = aths.setdefault(name, {"sessions": []})
+        have = {s["date"] for s in ath["sessions"]}
+        for s in r.get("sessions", []):
+            if s["date"] in have:
+                continue
+            types = s.get("types", [])
+            fb = (next((t for t in types if t.get("name") == "Fastball"), None)
+                  or next((t for t in types if t.get("name") == "Sinker"), None))
+            peak = (fb or {}).get("veloMax") or max((t.get("veloMax") or 0 for t in types), default=0)
+            if not peak:
+                continue
+            avg = (fb or {}).get("veloAvg")
+            ath["sessions"].append({
+                "date": s["date"],
+                "peakVelo": round(peak, 1),
+                "avgVelo": round(avg, 1) if avg else None,
+                "sessionType": "Bullpen",
+                "notes": "From TrackMan bullpen",
+                "isFlagged": False,
+                "isSubmax": False,
+            })
+            added += 1
+        ath["sessions"].sort(key=lambda x: x["date"], reverse=True)
+    if added:
+        print(f"  Velo: +{added} session(s) derived from TrackMan bullpens", flush=True)
+    return trackman_data
+
 # Velo (Trackman) array — pulls existing pitcher classifications from _VELO/_A/_HA in the
 # current App.jsx so groups don't reset on every sync.
+trackman = _merge_bullpen_velo(trackman)
 _velo_groups = _velo_extract_groups_from_jsx(jsx)
 _VELO = gen_VELO(trackman, _velo_groups, VELO_MANUAL_EXCLUSIONS)
 
