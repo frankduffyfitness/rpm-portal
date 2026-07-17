@@ -51,6 +51,17 @@ PORTAL_METRICS = {
 }
 PORTAL_METRIC_IDS = set(PORTAL_METRICS.keys())
 
+# Per-hop repeat results (Takeoff group, isRepeatResult=True). Averaging these
+# over ALL hops in a set gives the WHOLE-SET mean that VALD Hub headlines.
+# VALD's own "Mean RSI" (13303830) is the mean of only the best N hops, so it
+# reads high (e.g. 3.04 vs the whole-set 2.86 Hub shows). CT/FT come in seconds.
+HOP_REPEAT_IDS = {
+    "rsi": 13303852,   # RSI (Flight/Contact Time) per hop — ratio
+    "ct":  13303847,   # Contact Time per hop — seconds
+    "ft":  13303848,   # Flight Time per hop — seconds
+    "pf":  13303851,   # Peak Force per hop (limb "Trial" = L+R total) — N
+}
+
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
@@ -288,6 +299,76 @@ def merge_cmj(existing, new_data):
                       "totalTests": total_tests, "totalAthletes": len(ath)}
 
 
+def refresh_hop():
+    """Re-fetch + re-extract ONLY HJ (hop) tests and merge into the portal JSON,
+    leaving CMJ / IMTP / everything else untouched. Used to backfill the
+    whole-set-mean hop fields (hopSetMean*) that match VALD Hub, without a full
+    16k-test re-pull. Hop metrics only live on HJ tests — minimal correct scope."""
+    log("=" * 50)
+    log("HOP-only refresh (re-pull trials for HJ tests)")
+    log("=" * 50)
+    if not os.path.exists(OUTPUT_FILE):
+        log(f"ERROR: {OUTPUT_FILE} missing — nothing to merge into.")
+        sys.exit(1)
+    token = authenticate()
+    profiles = fetch_profiles(token)
+    groups = fetch_groups(token)
+    attach_groups_to_profiles(token, profiles, groups)
+
+    all_tests = fetch_tests(token, "2020-01-01T00:00:00Z")
+    hj = [t for t in all_tests if t.get("testType") == "HJ"]
+    log(f"HJ tests: {len(hj)} of {len(all_tests)} total")
+    if not hj:
+        log("No HJ tests returned — aborting rather than wiping Hop data.")
+        sys.exit(1)
+
+    trials_by_test = fetch_all_trials_parallel(token, hj)
+    log(f"Fetched trials for {len(trials_by_test)} HJ tests.")
+    new_data = build_portal_data(profiles, hj, trials_by_test)  # HJ-only athletes
+
+    with open(OUTPUT_FILE) as f:
+        existing = json.load(f)
+    existing, stats = merge_hop(existing, new_data)
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(existing, f, separators=(',', ':'), default=str)
+    log("=" * 50)
+    log(f"HOP REFRESH COMPLETE — dropped {stats['dropped']} old HJ tests, added "
+        f"{stats['added']} fresh; {stats['totalTests']} total tests across "
+        f"{stats['totalAthletes']} athletes.")
+    log("=" * 50)
+
+
+def merge_hop(existing, new_data):
+    """Replace every athlete's HJ tests with the freshly-built ones; leave all
+    non-HJ tests (CMJ/IMTP/etc.) untouched. Mirrors merge_cmj."""
+    ath = existing.setdefault("athletes", {})
+    dropped = 0
+    for a in ath.values():
+        before = len(a.get("tests", []))
+        a["tests"] = [t for t in a.get("tests", []) if t.get("testType") != "HJ"]
+        dropped += before - len(a["tests"])
+    added = 0
+    for pid, na in new_data["athletes"].items():
+        if pid not in ath:
+            ath[pid] = na
+        else:
+            ath[pid]["tests"].extend(na["tests"])
+            ath[pid]["tests"].sort(key=lambda t: t.get("date", ""), reverse=True)
+            ath[pid]["name"] = na.get("name") or ath[pid].get("name")
+            ath[pid]["dateOfBirth"] = na.get("dateOfBirth") or ath[pid].get("dateOfBirth")
+            ath[pid]["groups"] = na.get("groups") or ath[pid].get("groups")
+        added += len(na["tests"])
+    total_tests = sum(len(a["tests"]) for a in ath.values())
+    existing["meta"] = {
+        "syncDate": datetime.now(timezone.utc).isoformat(),
+        "totalAthletes": len(ath),
+        "totalTests": total_tests,
+        "totalTrials": new_data["meta"]["totalTrials"],
+    }
+    return existing, {"dropped": dropped, "added": added,
+                      "totalTests": total_tests, "totalAthletes": len(ath)}
+
+
 def process_trial(trial):
     """Extract the named portal metrics (CMJ + Hop) from a trial.
     L/R limbs get Left/Right suffixes."""
@@ -315,6 +396,32 @@ def process_trial(trial):
             key = f"{meta['key']}Right"
 
         metrics[key] = display_value
+
+    # Whole-set hop means: average every hop in this set (matches VALD Hub).
+    # Unlike the best-N means above, this includes the athlete's weaker hops.
+    perhop = {k: [] for k in HOP_REPEAT_IDS}
+    for result in trial.get("results", []):
+        rid = result.get("resultId")
+        if rid is None:
+            rid = result.get("definition", {}).get("id")
+        if result.get("limb") not in (None, "Trial"):
+            continue  # per-hop L/R splits — the "Trial" value is the L+R total
+        v = result.get("value")
+        if v is None:
+            continue
+        for k, want in HOP_REPEAT_IDS.items():
+            if rid == want:
+                perhop[k].append(v)
+    if perhop["rsi"]:
+        _mean = lambda xs: sum(xs) / len(xs)
+        metrics["hopSetHops"] = len(perhop["rsi"])
+        metrics["hopSetMeanRsi"] = round(_mean(perhop["rsi"]), 2)
+        if perhop["ct"]:
+            metrics["hopSetMeanCt"] = round(_mean(perhop["ct"]) * 1000, 2)  # s → ms
+        if perhop["ft"]:
+            metrics["hopSetMeanFt"] = round(_mean(perhop["ft"]) * 1000, 2)  # s → ms
+        if perhop["pf"]:
+            metrics["hopSetMeanPeakForce"] = round(_mean(perhop["pf"]), 2)   # N (L+R)
 
     # Calculate asymmetry percentages for L/R metrics
     for base_key in ["concentricImpulse", "eccBrakingImpulse", "concPeakForce"]:
@@ -393,6 +500,8 @@ def save_sync_state(last_modified):
 def main():
     if "--refresh-cmj" in sys.argv:
         return refresh_cmj()
+    if "--refresh-hop" in sys.argv:
+        return refresh_hop()
     full_sync = "--full" in sys.argv
     log("=" * 50)
     log("VALD ForceDecks → RPM Portal Sync")

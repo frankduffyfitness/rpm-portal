@@ -32,9 +32,9 @@ HISTORY_LEN = 8  # last 8 sessions for sparklines
 # RSI displayed on the portal is VALD's "Mean RSI" (averaged across hops within a
 # trial), to match VALD Hub's headline number. hopRsi (single-best-hop) is also
 # captured but is no longer used as the displayed metric.
-HOP_RSI_KEY        = "hopMeanRsi"       # Mean RSI (FT/CT averaged over hops) — ratio
-HOP_CT_KEY         = "hopContactTime"   # Best Contact Time — milliseconds
-HOP_FT_KEY         = "hopFlightTime"    # Best Flight Time — milliseconds
+HOP_RSI_KEY        = "hopSetMeanRsi"    # Whole-set mean RSI over ALL hops — matches VALD Hub
+HOP_CT_KEY         = "hopSetMeanCt"     # Whole-set mean Contact Time — milliseconds
+HOP_FT_KEY         = "hopSetMeanFt"     # Whole-set mean Flight Time — milliseconds
 HOP_PEAK_FORCE_KEY = "hopPeakForce"     # Best Peak Force — Newtons
 HOP_TEST_TYPE      = "HJ"               # primary hop test type to process
 G = 9.81
@@ -528,13 +528,13 @@ for pid, ath in fd['athletes'].items():
         bw_vals = [tr['metrics'].get('bodyweightLbs') for tr in test['trials']]
         bw_vals = [v for v in bw_vals if v is not None]
         bw = round(sum(bw_vals) / len(bw_vals), 2) if bw_vals else None
-        # True PFBM = (PeakForceLeft + PeakForceRight) / (BW_kg × g), giving body-weight units.
-        # NOTE: VALD's bare `hopPeakForce` field is L/R asymmetry %, not Newtons — don't use it.
-        pfL = m.get('hopPeakForceLeft')
-        pfR = m.get('hopPeakForceRight')
-        if pfL is not None and pfR is not None and bw:
+        # True PFBM = whole-set mean peak force (L+R total, averaged over all hops)
+        # / (BW_kg × g), giving body-weight units — consistent with the whole-set
+        # RSI/CT/FT above. NOTE: VALD's bare `hopPeakForce` field is L/R asymmetry %.
+        pf = m.get('hopSetMeanPeakForce')
+        if pf is not None and bw:
             bw_kg = bw / LB_PER_KG
-            pfbm = round((pfL + pfR) / (bw_kg * G), 2)
+            pfbm = round(pf / (bw_kg * G), 2)
         else:
             pfbm = None
 
@@ -1454,6 +1454,70 @@ def _load_dynamo_meas():
         return (json.load(open(DYNAMO_MEAS_JSON)) or {}).get("athletes", {})
     except Exception:
         return {}
+def _merge_bilateral_dynamo(movements):
+    """VALD sometimes records one athlete's two arms as SEPARATE single-side
+    tests (e.g. ER-left and ER-right land as two entries, each with one side
+    null). Combine same (movement, position) entries whose non-null sides are
+    disjoint into one bilateral row so reports show L/R together and the ER:IR
+    ratio can be computed on both sides. Genuine repeats — the same side
+    appearing twice — are a real double-effort and left untouched."""
+    from collections import OrderedDict
+    FIELDS = ("peakN", "peakLbs", "rfd", "ttp", "torqueNm")
+    groups = OrderedDict()
+    for mv in movements:
+        groups.setdefault((mv.get("name"), mv.get("position")), []).append(mv)
+    out = []
+    for grp in groups.values():
+        if len(grp) == 1:
+            out.append(grp[0]); continue
+        base = {k: [None, None] for k in FIELDS}
+        conflict = False
+        for mv in grp:
+            for k in FIELDS:
+                arr = mv.get(k) or [None, None]
+                for i in (0, 1):
+                    v = arr[i] if i < len(arr) else None
+                    if v is None:
+                        continue
+                    if base[k][i] is not None:
+                        conflict = True  # same side twice → genuine repeat
+                    else:
+                        base[k][i] = v
+        if conflict:
+            out.extend(grp); continue
+        m = dict(grp[0])
+        for k in FIELDS:
+            if any(v is not None for v in base[k]):
+                m[k] = base[k]
+            else:
+                m.pop(k, None)
+        m["discomfort"] = any(mv.get("discomfort") for mv in grp)
+        pkL, pkR = base["peakN"]
+        if pkL is not None and pkR is not None and max(pkL, pkR) > 0:
+            asym = round(abs(pkR - pkL) / max(pkL, pkR) * 100, 1)
+            m["asymPct"] = asym
+            m["asymNote"] = ("Symmetric" if asym < 10 else
+                             ("right side stronger" if pkR >= pkL else "left side stronger"))
+        out.append(m)
+    return out
+
+def _fill_erir(test):
+    """After the bilateral merge, fill any missing ER:IR side from the merged
+    ER/IR peaks. VALD's own stored ratios stay authoritative (never overwritten)."""
+    movements = test.get("movements", [])
+    er = next((m for m in movements if m.get("name") == "External Rotation"), None)
+    ir = next((m for m in movements if m.get("name") == "Internal Rotation"), None)
+    if not (er and ir):
+        return
+    ratio = test.get("erIr") or {"left": None, "right": None}
+    for side, i in (("left", 0), ("right", 1)):
+        if ratio.get(side) is None:
+            e = (er.get("peakN") or [None, None])[i]
+            n = (ir.get("peakN") or [None, None])[i]
+            if e and n:
+                ratio[side] = round(e / n, 2)
+    test["erIr"] = ratio
+
 def gen_DYNAMO():
     """_DYNAMO: [{name, group, dob, tests:[...]}] for the password-gated DynaMo
     page. Joins raw force (dynamo_portal.json, from the VALD DynaMo API) with the
@@ -1475,12 +1539,14 @@ def gen_DYNAMO():
         throw_arm = am.get("throwingArm")  # "L"/"R" — clinically relevant side for the ER:IR board
         tests = a.get("tests", [])
         for t in tests:
-            for mv in t.get("movements", []):
+            t["movements"] = _merge_bilateral_dynamo(t.get("movements", []))
+            for mv in t["movements"]:
                 pk = mv.get("peakN")
                 if arm and mv.get("name") in DYNAMO_TORQUE_MOVES and pk:
                     mv["torqueNm"] = [round(v * arm, 1) if v is not None else None for v in pk]
                 else:
                     mv.pop("torqueNm", None)  # stale/ineligible → drop
+            _fill_erir(t)
         out.append({
             "name": a.get("name", name),
             "group": a.get("group", "hs"),
