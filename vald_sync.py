@@ -37,7 +37,12 @@ PORTAL_METRICS = {
     # Names verified against GET /resultdefinitions (see fd_result_definitions.json).
     6553733: {"key": "rsiModified",        "label": "RSI-modified (Imp-Mom)", "unit": "m/s", "scale": 0.01},
     6553604: {"key": "relativePower",      "label": "Relative Power",      "unit": "W/kg", "scale": 1},
-    6553678: {"key": "brakingRFD",         "label": "Braking Ability",     "unit": "N/s",  "scale": 1},
+    # Braking slot = Eccentric Deceleration Mean Force / BW (id 6553757), a ×BW
+    # multiple. Replaced Eccentric Braking RFD (6553678) 2026-07-17: RFD is a rate
+    # and measured ~11% between-trial CV vs ~4% for this mean force — far steadier
+    # for tracking training adaptation, and legible to parents ("braked at 1.9×BW").
+    # Native to Hub (the 7340* "Takeoff" twin is empty). See rpm-portal memory.
+    6553757: {"key": "brakingForceBW",     "label": "Ecc Braking Force / BW", "unit": "×BW", "scale": 1},
     6553712: {"key": "concentricImpulse",  "label": "Concentric Impulse",  "unit": "N·s",  "scale": 1},
     6553703: {"key": "eccBrakingImpulse",  "label": "Ecc Braking Impulse", "unit": "N·s",  "scale": 1},
     6553685: {"key": "concPeakForce",      "label": "Conc Peak Force",     "unit": "N",    "scale": 1},

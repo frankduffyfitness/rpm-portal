@@ -214,15 +214,12 @@ def compute_session_best(trials, metric_key):
     return round(max(vals), 2) if vals else None
 
 def compute_session_brk_avg(trials):
-    """Average of (Left + Right) braking RFD across all trials."""
-    vals = []
-    for tr in trials:
-        m = tr['metrics']
-        bl = m.get('brakingRFDLeft')
-        br = m.get('brakingRFDRight')
-        if bl is not None and br is not None:
-            vals.append(abs(bl) + abs(br))
-    return round(sum(vals) / len(vals)) if vals else None
+    """Session braking value = mean of Eccentric Deceleration Mean Force / BW
+    (×BW) across all trials. A reliable per-trial mean force (not a rate), so the
+    session average is a stable, parent-legible read on eccentric braking."""
+    vals = [tr['metrics'].get('brakingForceBW') for tr in trials]
+    vals = [v for v in vals if v is not None]
+    return round(sum(vals) / len(vals), 2) if vals else None
 
 def compute_session_asym(trials, base_key):
     """Average asymmetry for a metric across trials. Returns (pct, dominant_side, left_val, right_val)."""
