@@ -1363,6 +1363,7 @@ _HT = gen_HT(hop_athletes_data)
 _HN = gen_HN(hop_athletes_data)
 _HD = gen_HD(hop_athletes_data)
 
+FB_FAMILY = ("Fastball", "Sinker", "Cutter")  # fastball family — all count toward peak FB velo
 def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
     """Derive velo sessions (peak + average fastball) straight from the bullpen
     reports, so velo stays current from the TrackMan data alone — no master-sheet
@@ -1389,13 +1390,17 @@ def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
         for s in r.get("sessions", []):
             if s["date"] in have:
                 continue
+            # Peak FB velo = the hardest pitch in the FASTBALL FAMILY (4-seam,
+            # sinker, cutter) — e.g. Cade popped a 95 sinker above his 94 four-seam.
+            # Average = the primary (most-thrown) fastball type's average velo.
             types = s.get("types", [])
-            fb = (next((t for t in types if t.get("name") == "Fastball"), None)
-                  or next((t for t in types if t.get("name") == "Sinker"), None))
-            peak = (fb or {}).get("veloMax") or max((t.get("veloMax") or 0 for t in types), default=0)
-            if not peak:
-                continue
-            avg = (fb or {}).get("veloAvg")
+            fam = [t for t in types if t.get("name") in FB_FAMILY]
+            peaks = [t.get("veloMax") for t in fam if t.get("veloMax")]
+            if not peaks:
+                continue  # no fastball-family pitch this session — no FB velo to record
+            peak = max(peaks)
+            primary = max(fam, key=lambda t: t.get("count") or 0)
+            avg = primary.get("veloAvg")
             ath["sessions"].append({
                 "date": s["date"],
                 "peakVelo": round(peak, 1),
