@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-17T05:47:50.543653+00:00",
+    "syncDate": "2026-07-17T10:54:16.601086+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 28
+    "totalAthletes": 31
   },
   "athletes": {
     "Joey Muzio": {
@@ -3749,6 +3749,250 @@
               "ttp": [
                 null,
                 1.73
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                177.7,
+                null
+              ],
+              "peakLbs": [
+                39.9,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                791,
+                null
+              ],
+              "ttp": [
+                1.56,
+                null
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                165.3,
+                null
+              ],
+              "peakLbs": [
+                37.2,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                806,
+                null
+              ],
+              "ttp": [
+                2.36,
+                null
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                136.8
+              ],
+              "peakLbs": [
+                null,
+                30.8
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                795
+              ],
+              "ttp": [
+                null,
+                2.98
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Joe Hauser": {
+      "name": "Joe Hauser",
+      "group": "col",
+      "dob": "2004-07-23",
+      "tests": [
+        {
+          "date": "2026-07-16",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                200.9
+              ],
+              "peakLbs": [
+                null,
+                45.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1544
+              ],
+              "ttp": [
+                null,
+                1.62
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                239.1
+              ],
+              "peakLbs": [
+                null,
+                53.8
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1017
+              ],
+              "ttp": [
+                null,
+                2.69
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.84
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Justin Garcia": {
+      "name": "Justin Garcia",
+      "group": "hs",
+      "dob": "2009-07-03",
+      "tests": [
+        {
+          "date": "2026-07-16",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                156.2
+              ],
+              "peakLbs": [
+                null,
+                35.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                585
+              ],
+              "ttp": [
+                null,
+                1.61
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                224.6
+              ],
+              "peakLbs": [
+                null,
+                50.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                427
+              ],
+              "ttp": [
+                null,
+                1.86
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.7
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Michael Cataldo": {
+      "name": "Michael Cataldo",
+      "group": "hs",
+      "dob": "2011-09-18",
+      "tests": [
+        {
+          "date": "2026-07-16",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Knee Extension",
+              "position": "Seated",
+              "discomfort": false,
+              "peakN": [
+                244,
+                231
+              ],
+              "peakLbs": [
+                54.9,
+                51.9
+              ],
+              "asymPct": 5.3,
+              "asymNote": "Symmetric",
+              "rfd": [
+                395,
+                422
+              ],
+              "ttp": [
+                2.92,
+                3.56
               ]
             }
           ],
