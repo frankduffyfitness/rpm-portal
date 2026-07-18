@@ -1362,226 +1362,320 @@ function RptFooter({ page, total, label }) {
 
 // Light-theme L/R table for the DynaMo report page (mirrors the standalone
 // DynaMo card, restyled onto the white report sheet with the RPT palette).
-function RptDynRows({ rows, unit, dec }) {
-  const num = (v) => (v === null || v === undefined) ? "–" : Number(v).toFixed(dec);
+// ── Evaluation report styling (ported from the branded eval-report design) ──
+// Injected once inside #report-content so it applies in the live modal AND in
+// the print window (the print handler copies innerHTML, so the <style> travels
+// with it). Classes are rc-prefixed to avoid colliding with the portal.
+const RC_CSS = `
+.rc-top{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:2px solid #1B2A44;padding-bottom:12px}
+.rc-top img{height:30px;width:auto}
+.rc-eyebrow{font-size:9.5px;font-weight:800;letter-spacing:1.8px;color:#DD5228;text-transform:uppercase}
+.rc-aname{font-size:27px;font-weight:800;margin-top:6px;letter-spacing:-.5px;color:#1B2A44}
+.rc-ameta{font-size:11px;color:#5B6470;margin-top:3px}
+.rc-cohort{font-size:9.5px;color:#98A0AA;margin-top:10px}
+.rc-cohort b{color:#5B6470}
+.rc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:12px}
+.rc-solo{grid-template-columns:1fr}
+.rc-card{border:1px solid #E3E6EA;border-radius:10px;padding:13px 15px}
+.rc-card.rc-full{margin-top:13px}
+.rc-ctitle{font-size:13px;font-weight:800;color:#1B2A44}
+.rc-csub{font-size:8.5px;color:#98A0AA;margin-top:1px;margin-bottom:2px}
+.rc-mrow{display:grid;grid-template-columns:1fr auto;grid-template-areas:'name val' 'desc pct' 'bar bar';column-gap:8px;row-gap:1px;padding:8px 0;border-bottom:1px solid #E3E6EA}
+.rc-mrow:last-child{border-bottom:none}
+.rc-mname{grid-area:name;font-size:11px;font-weight:800;align-self:end;color:#1B2A44}
+.rc-mval{grid-area:val;font-size:15px;font-weight:800;text-align:right;white-space:nowrap;align-self:end;color:#1B2A44}
+.rc-mval .rc-u{font-size:8.5px;color:#98A0AA;font-weight:700}
+.rc-mdesc{grid-area:desc;font-size:7.5px;color:#98A0AA;line-height:1.35;padding-right:6px}
+.rc-mpct{grid-area:pct;text-align:right;font-size:12px;font-weight:800;white-space:nowrap;align-self:start}
+.rc-mpct .rc-ord{font-size:8px}
+.rc-ptier{font-size:7.5px;font-weight:700}
+.rc-mbar{grid-area:bar;margin-top:5px}
+.rc-track{position:relative;height:6px;background:#EEF0F3;border-radius:3px}
+.rc-tick{position:absolute;top:0;width:1px;height:100%;background:#DDE1E6}
+.rc-fill{position:absolute;left:0;top:0;height:100%;border-radius:3px;overflow:hidden}
+.rc-grad{height:100%;background:linear-gradient(90deg,#C0392B 0%,#E8A13D 50%,#1B7F4B 100%)}
+.rc-prog{display:grid;grid-template-columns:1fr auto auto;column-gap:8px;padding:6px 0;border-bottom:1px solid #E3E6EA;font-size:10.5px;align-items:baseline}
+.rc-prog:last-child{border-bottom:none}
+.rc-prog-lab{font-weight:700;color:#1B2A44}
+.rc-prog-val{color:#5B6470;text-align:right;white-space:nowrap}
+.rc-prog-chg{text-align:right;font-weight:800;min-width:50px}
+.rc-bw-top{display:flex;justify-content:space-between;align-items:flex-end}
+.rc-bw-big{font-size:15px;font-weight:800;color:#1B2A44}
+.rc-bw-chg{font-size:14px;font-weight:800}
+.rc-bw-dates{display:flex;justify-content:space-between;font-size:7.5px;color:#98A0AA;margin-top:2px}
+.rc-dyn-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px}
+.rc-dyn-head{display:flex;align-items:baseline;gap:6px}
+.rc-dyn-name{font-size:11.5px;font-weight:800;color:#1B2A44}
+.rc-dyn-pos{font-size:8px;color:#98A0AA}
+.rc-dyn-vals{display:flex;justify-content:space-between;align-items:baseline;margin:5px 0 4px}
+.rc-dyn-l{font-size:13px;font-weight:800;color:#1B2A44}
+.rc-dyn-r{font-size:13px;font-weight:800;color:#DD5228;text-align:right}
+.rc-dyn-lb{font-size:8px;color:#98A0AA;font-weight:600;margin:0 4px}
+.rc-dyn-l .rc-u,.rc-dyn-r .rc-u{font-size:8px;color:#98A0AA;font-weight:700}
+.rc-dyn-track{display:flex;height:5px;border-radius:3px;overflow:hidden;background:#EEF0F3}
+.rc-dyn-fl{background:#1B2A44}
+.rc-dyn-fr{background:#DD5228}
+.rc-dyn-asym{font-size:8.5px;color:#5B6470;text-align:center;margin-top:4px}
+.rc-dyn-sub{font-size:8px;color:#98A0AA;text-align:center;margin-top:3px}
+.rc-ratio-wrap{display:flex;gap:10px;margin-top:12px;align-items:center}
+.rc-ratio-box{flex:1;text-align:center;background:#F4F5F7;border-radius:8px;padding:9px 6px}
+.rc-ratio-box.rc-throw{outline:2px solid #DD5228}
+.rc-ratio-num{font-size:22px;font-weight:800}
+.rc-ratio-lab{font-size:9px;color:#5B6470;margin-top:1px}
+.rc-ratio-tag{font-size:7px;font-weight:800;letter-spacing:.4px;color:#DD5228;text-transform:uppercase}
+.rc-ratio-side{flex:1.5}
+.rc-ratio-side b{font-size:10.5px;color:#1B2A44}
+.rc-ratio-note{font-size:8px;color:#98A0AA;margin-top:3px;line-height:1.4}
+.rc-foot{font-size:8px;color:#98A0AA;text-align:center;padding:10px 0 2px;line-height:1.55;margin-top:14px;border-top:1px solid #E3E6EA}
+`;
+
+const rcTier = (p) => p >= 90 ? "Elite" : p >= 75 ? "Above Average" : p >= 50 ? "Average" : p >= 25 ? "Developing" : "Building";
+const rcOrd = (p) => ["th", "st", "nd", "rd"][(p % 100 - 20) % 10] || ["th", "st", "nd", "rd"][p % 100] || "th";
+
+function RcMetric({ name, val, unit, desc, pct }) {
+  const p = Math.max(0, Math.min(99, Math.round(pct)));
+  const gradW = (100 / Math.max(p, 1)) * 100;
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead><tr>{["Movement", "Left", "Right"].map((h, i) => (
-        <th key={i} style={{ padding: "4px 6px", textAlign: i ? "right" : "left", fontSize: 8, textTransform: "uppercase", letterSpacing: 0.4, color: RPT.gray, background: RPT.thbg, borderBottom: "1px solid " + RPT.line }}>{h}</th>
-      ))}</tr></thead>
-      <tbody>{rows.map((r, i) => (
-        <tr key={i}>
-          <td style={{ padding: "5px 6px", fontSize: 10.5, borderBottom: "1px solid " + RPT.line }}>
-            <span style={{ fontWeight: 700, color: RPT.navy }}>{r.label}</span>
-            {r.sub ? <span style={{ color: RPT.lgray }}>{"  "}{r.sub}</span> : null}
-          </td>
-          {[r.left, r.right].map((v, j) => (
-            <td key={j} style={{ padding: "5px 6px", textAlign: "right", fontSize: 10.5, fontWeight: 700, color: RPT.navy, borderBottom: "1px solid " + RPT.line }}>
-              {num(v)}<span style={{ color: RPT.lgray, fontWeight: 400 }}>{unit ? " " + unit : ""}</span>
-            </td>
-          ))}
-        </tr>
-      ))}</tbody>
-    </table>
+    <div className="rc-mrow">
+      <div className="rc-mname">{name}</div>
+      <div className="rc-mval">{val}{unit ? <span className="rc-u"> {unit}</span> : null}</div>
+      <div className="rc-mdesc">{desc}</div>
+      <div className="rc-mpct" style={{ color: rptBandColor(p) }}>{p}<span className="rc-ord">{rcOrd(p)}</span> <span className="rc-ptier">{rcTier(p)}</span></div>
+      <div className="rc-mbar"><div className="rc-track">
+        <span className="rc-tick" style={{ left: "25%" }} /><span className="rc-tick" style={{ left: "50%" }} /><span className="rc-tick" style={{ left: "75%" }} />
+        <div className="rc-fill" style={{ width: p + "%" }}><div className="rc-grad" style={{ width: gradW + "%" }} /></div>
+      </div></div>
+    </div>
+  );
+}
+
+// One DynaMo rotation column (External or Internal Rotation): bilateral peak +
+// bar + asymmetry + torque/RFD sub-line. Degrades cleanly to single-side data.
+function RcDynMove({ m }) {
+  if (!m) return null;
+  const L = m.peakN ? m.peakN[0] : null, R = m.peakN ? m.peakN[1] : null;
+  const Llb = m.peakLbs ? m.peakLbs[0] : null, Rlb = m.peakLbs ? m.peakLbs[1] : null;
+  const tot = (L || 0) + (R || 0);
+  const lPct = tot > 0 ? Math.round(L / tot * 100) : (L != null ? 100 : 0);
+  const tq = m.torqueNm || [], rf = m.rfd || [];
+  const hasTq = tq[0] != null || tq[1] != null, hasRf = rf[0] != null || rf[1] != null;
+  return (
+    <div>
+      <div className="rc-dyn-head"><span className="rc-dyn-name">{m.name.replace("Shoulder ", "")}</span><span className="rc-dyn-pos">{m.position}</span></div>
+      <div className="rc-dyn-vals">
+        <div className="rc-dyn-l">{dynFmt(L, 1)} <span className="rc-u">N</span><span className="rc-dyn-lb">{dynFmt(Llb, 1)} lb L</span></div>
+        <div className="rc-dyn-r"><span className="rc-dyn-lb">R {dynFmt(Rlb, 1)} lb</span> {dynFmt(R, 1)} <span className="rc-u">N</span></div>
+      </div>
+      <div className="rc-dyn-track"><div className="rc-dyn-fl" style={{ width: lPct + "%" }} /><div className="rc-dyn-fr" style={{ width: (100 - lPct) + "%" }} /></div>
+      <div className="rc-dyn-asym">{!m.asymNote ? "Single-side test" : m.asymNote === "Symmetric" ? "Symmetric · " + dynFmt(m.asymPct, 1) + "%" : dynFmt(m.asymPct, 1) + "% · " + m.asymNote}</div>
+      {(hasTq || hasRf) && (
+        <div className="rc-dyn-sub">
+          {hasTq ? "Torque · " + dynFmt(tq[0], 1) + " N·m L / " + dynFmt(tq[1], 1) + " N·m R" : ""}
+          {hasTq && hasRf ? "  •  " : ""}
+          {hasRf ? "RFD · " + dynFmt(rf[0], 0) + " / " + dynFmt(rf[1], 0) + " N/s" : ""}
+        </div>
+      )}
+    </div>
   );
 }
 
 function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend, dynamo }) {
   // Identity: the report can be seeded from any tab, so the CMJ athlete may be
-  // absent (a TrackMan-only pitcher). Fall back through the sources that exist
-  // so the header, group label and page framing still resolve.
+  // absent (a TrackMan-only pitcher). Fall back through the sources that exist.
   const idSrc = athlete || veloAthlete || dynamo || hopAthlete || {};
   const id = { name: idSrc.name, group: idSrc.group, bw: athlete ? athlete.bw : undefined };
   const gi = GROUPS[id.group] || {};
-  // Some groups (Pro, Men's League) have no norm cohort — no athlete in them
-  // clears the 5-session bar in gen_N. When that happens `norms[group]` is
-  // undefined and we fall back to the facility-wide pool; label it honestly as
-  // "All Athletes" instead of claiming e.g. "vs Pro", and suppress the group
-  // rank (a rank "of Pro" is meaningless with no pro cohort).
   const hasCmjNorms = athlete ? !!norms[athlete.group] : false;
   const hasHopNorms = !!(hopNorms && hopAthlete && hopNorms[hopAthlete.group]);
-  const cmpCmj = hasCmjNorms ? gi.label : "All Athletes";
-  const cmpHop = hasHopNorms ? gi.label : "All Athletes";
+  const cohortName = (hasCmjNorms || hasHopNorms) ? ("RPM " + gi.label + " athletes") : "all RPM athletes";
   const n = athlete ? (norms[athlete.group] || norms.all) : null;
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
   const tmr = veloAthlete ? (_TMR[veloAthlete.name] || []) : [];
   const bp = tmr[0] || null;
   const isFemale = id.group === "fem" || FEM_SET.has(id.name);
-  const bw = athlete ? BW_DATA[athlete.name] : null;
-  const sessDates = athlete ? (SESSION_DATES[athlete.name] || []) : [];
-  const hopDates = hopAthlete ? (HOP_SESSION_DATES[hopAthlete.name] || []) : [];
+  const bw = athlete && !isFemale ? BW_DATA[athlete.name] : null;
 
-  // DynaMo (VALD shoulder strength): its own report page when the athlete has a
-  // core screen (ER/IR + grip). Rehab-only movements never build a page.
+  // DynaMo (VALD shoulder strength) — the ER/IR rotator screen, on page 1.
   const dynTest = dynamo && dynamo.tests && dynamo.tests[0];
   const dynCore = dynTest ? dynTest.movements.filter(m => DYN_CORE.includes(m.name)) : [];
-  const dynTorque = dynCore.filter(m => Array.isArray(m.torqueNm) && (m.torqueNm[0] != null || m.torqueNm[1] != null));
-  const hasDyn = dynCore.length > 0;
+  const dynER = dynCore.find(m => m.name === "External Rotation");
+  const dynIR = dynCore.find(m => m.name === "Internal Rotation");
+  const hasDyn = !!(dynTest && (dynER || dynIR));
+  const dynArm = dynamo && dynamo.arm === "L" ? "Left" : dynamo && dynamo.arm === "R" ? "Right" : null;
+  const dynDate = dynTest && dynTest.date ? new Date(dynTest.date + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
+  const dob = dynamo && dynamo.dob ? new Date(dynamo.dob.slice(0, 10) + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : null;
 
-  const pages = (athlete ? 1 : 0) + (hasDyn ? 1 : 0) + (hopAthlete && hn ? 1 : 0) + (veloAthlete ? 1 : 0);
-  let pageNo = 0;
-  const pageStyle = { fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 660, margin: "0 auto 28px", padding: "26px 28px", color: "#1a1a1a", background: "#fff", boxShadow: "0 1px 6px rgba(0,0,0,0.12)" };
-
-  const fmtRank = (rank, total) => rank ? rank + " of " + total + " " + gi.label : "\u2013";
-  // PR progress: first-ever session vs personal best (per metric)
   const prChg = (first, best) => (first && best ? Math.round(((best - first) / Math.abs(first)) * 1000) / 10 : 0);
-  const jhRankG = athlete ? ATHLETES.filter(a => a.group === athlete.group) : [];
-  const jhRank = athlete ? jhRankG.filter(a => a.best.jumpHeight > athlete.best.jumpHeight).length + 1 : 0;
-  const dynDate = dynTest && dynTest.date ? new Date(dynTest.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+
+  // CMJ metric cards
+  const cmjRows = athlete ? [
+    { name: "Jump Height", val: athlete.cmj.jumpHeight + "″", desc: "How high the athlete jumps. The headline measure of lower-body power.", pct: cP(athlete.cmj.jumpHeight, n.cmjHeight) },
+    { name: "RSI-modified", val: athlete.cmj.rsi, desc: "Jump height relative to time on the ground. Explosiveness per second of effort.", pct: cP(athlete.cmj.rsi, n.rsiMod) },
+    { name: "Concentric Impulse", val: athlete.cmj.conImpulse, unit: "N·s", desc: "Total drive applied through the push-off. Closely tied to takeoff velocity.", pct: cP(athlete.cmj.conImpulse, n.conImpulse) },
+    { name: "Eccentric Braking Force", val: athlete.cmj.eccBrakingRFD.toFixed(2), unit: "×BW", desc: "How forcefully the body absorbs and reverses the dip in a jump, relative to bodyweight. Reflects eccentric loading; built by strength training." + (athlete.cmj.depth ? " This jump: ~" + Math.round(athlete.cmj.depth) + " cm countermovement dip." : ""), pct: cP(athlete.cmj.eccBrakingRFD, n.eccBrakingRFD) },
+  ] : [];
+  const hopRows = (hopAthlete && hn) ? [
+    { name: "Reactive Strength Index", val: hopAthlete.hop.rsi, desc: "Flight time divided by contact time. How efficiently ground contact turns into explosive hops.", pct: cP(hopAthlete.hop.rsi, hn.rsi) },
+    { name: "Contact Time", val: hopAthlete.hop.ct, unit: "ms", desc: "Time on the ground between hops. Shorter contact with maintained height shows better stiffness.", pct: cP(hopAthlete.hop.ct, hn.ct, true) },
+    { name: "Flight Time", val: hopAthlete.hop.ft, unit: "ms", desc: "Time in the air between hops. Longer flight means more force in less ground time.", pct: cP(hopAthlete.hop.ft, hn.ft) },
+    ...(hopAthlete.hop.pfbm ? [{ name: "Relative Peak Force", val: hopAthlete.hop.pfbm, unit: "N/BW", desc: "Peak ground force divided by bodyweight. Force output in a very short window.", pct: cP(hopAthlete.hop.pfbm, hn.pfbm) }] : []),
+  ] : [];
+
+  // Progress (first session -> personal best)
+  const progRows = [];
+  if (athlete && offseason && offseason.sessions >= 2) {
+    progRows.push({ lab: "Jump Height", first: offseason.jhFirst, best: athlete.best.jumpHeight, unit: "″", chg: prChg(offseason.jhFirst, athlete.best.jumpHeight) });
+    progRows.push({ lab: "RSI-modified", first: offseason.rsiFirst, best: athlete.best.rsi, unit: "", chg: prChg(offseason.rsiFirst, athlete.best.rsi) });
+    progRows.push({ lab: "Concentric Impulse", first: offseason.ppFirst, best: athlete.best.conImpulse, unit: "", chg: prChg(offseason.ppFirst, athlete.best.conImpulse) });
+  }
+  if (hopAthlete && hopTrend && hopTrend.sessions >= 2) {
+    progRows.push({ lab: "Hop RSI", first: hopTrend.rsi_first, best: hopAthlete.best.rsi, unit: "", chg: prChg(hopTrend.rsi_first, hopAthlete.best.rsi) });
+    progRows.push({ lab: "Contact Time", first: hopTrend.ct_first, best: hopAthlete.best.ct, unit: " ms", chg: prChg(hopTrend.ct_first, hopAthlete.best.ct), invert: true });
+  }
+  const hasProg = progRows.length > 0;
+  const hasBw = !!(bw && bw.history && bw.history.length >= 2);
+  const hasProgRow = hasProg || hasBw;
+
+  const hasStrength = athlete || (hopAthlete && hn) || hasDyn;
+  const pages = (hasStrength ? 1 : 0) + (veloAthlete ? 1 : 0);
+  const pageStyle = { fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", maxWidth: 720, margin: "0 auto 28px", padding: "22px 26px", color: "#1B2A44", background: "#fff", boxShadow: "0 1px 6px rgba(0,0,0,0.12)" };
+
+  const Foot = ({ dyn }) => (
+    <div className="rc-foot">RPM Strength {"·"} Queens, NY &nbsp;|&nbsp; Data: VALD ForceDecks{dyn ? " + DynaMo" : ""} &nbsp;|&nbsp; Generated {LAST_UPDATED} &nbsp;|&nbsp; Percentiles vs {cohortName}.</div>
+  );
 
   return (
-    <div id="report-content" style={{ background: "#F0F1F3", padding: "18px 0" }}>
+    <div id="report-content" style={{ background: "#EDEEF1", padding: "18px 0" }}>
+      <style>{RC_CSS}</style>
 
-      {/* ── PAGE 1: CMJ (only when ForceDecks CMJ data exists) ── */}
-      {athlete && (
-      <div className="rpt-page" style={pageStyle}>
-        <RptHeader athlete={id} gi={gi} first
-          title="COUNTERMOVEMENT JUMP" sub={"ForceDecks \u00b7 " + athlete.testCount + " sessions \u00b7 last " + athlete.latestDate} />
-        <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + cmpCmj}>
-          <RptMetricRow label="Jump Height" desc="How high the athlete jumps. The headline measure of lower-body power."
-            value={athlete.cmj.jumpHeight + '\u0022'} best={athlete.best.jumpHeight + '\u0022'} pct={cP(athlete.cmj.jumpHeight, n.cmjHeight)} />
-          <RptMetricRow label="RSI-modified" desc="Jump height relative to time on the ground. Explosiveness per second of effort."
-            value={athlete.cmj.rsi} best={athlete.best.rsi} pct={cP(athlete.cmj.rsi, n.rsiMod)} />
-          <RptMetricRow label="Concentric Impulse" desc="Total drive applied through the push-off. Closely tied to takeoff velocity."
-            value={athlete.cmj.conImpulse + " N\u00b7s"} best={athlete.best.conImpulse + " N\u00b7s"} pct={cP(athlete.cmj.conImpulse, n.conImpulse)} />
-          <RptMetricRow label="Eccentric Braking Force" desc={"How forcefully the body absorbs and reverses the dip in a jump, relative to bodyweight. Reflects eccentric loading and stretch-shortening quality; built by strength training." + (athlete.cmj.depth ? " This jump: ~" + Math.round(athlete.cmj.depth) + " cm countermovement dip." : "")}
-            value={athlete.cmj.eccBrakingRFD.toFixed(2) + "× BW"} best={athlete.best.eccBrakingRFD.toFixed(2) + "× BW"} pct={cP(athlete.cmj.eccBrakingRFD, n.eccBrakingRFD)} />
-          {athlete.cmj.adjBrk && athlete.cmj.depth ? (
-            <div style={{ fontSize: 9, color: RPT.lgray, padding: "2px 0 0", lineHeight: 1.4 }}>
-              Depth-adjusted braking: <b style={{ color: RPT.navy }}>{athlete.cmj.adjBrk.toFixed(2)}× BW</b> (normalized to a 31 cm dip, using this athlete&rsquo;s own depth trend, so a change in jump strategy doesn&rsquo;t read as a strength change).
+      {/* ── SHEET 1: Strength evaluation (CMJ + Hop + Progress + DynaMo) ── */}
+      {hasStrength && (
+        <div className="rpt-page" style={pageStyle}>
+          <div className="rc-top">
+            <div>
+              <div className="rc-eyebrow">Athlete Evaluation Report</div>
+              <div className="rc-aname">{id.name}</div>
+              <div className="rc-ameta">{gi.label}{FEM_SET.has(id.name) ? " · Female Athletes" : ""}{dob ? " · DOB " + dob : ""}{(id.bw && !isFemale) ? " · " + id.bw + " lb" : ""}</div>
             </div>
-          ) : null}
-        </RptSection>
-        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-          <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
-            <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>GROUP RANK (JUMP)</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{hasCmjNorms ? fmtRank(jhRank, jhRankG.length) : "–"}</div>
+            <img src={RPM_LOGO_DARK} alt="RPM Strength" />
           </div>
-          <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
-            <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>TESTING WINDOW</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{sessDates[0] || "\u2013"} {"\u2192"} {sessDates[sessDates.length - 1] || "\u2013"}</div>
-          </div>
-        </div>
-        {!isFemale && bw && bw.history.length >= 2 && (() => {
-          const h = bw.history, dts = bw.dates || [];
-          const mn = Math.min(...h) * 0.995, mx = Math.max(...h) * 1.005, rg = (mx - mn) || 1;
-          const W = 600, H = 40;
-          const pts = h.map((v, j) => ({ x: (j / Math.max(1, h.length - 1)) * W, y: H - ((v - mn) / rg) * H }));
-          const dPath = pts.map((pt, j) => (j === 0 ? "M" : "L") + pt.x.toFixed(1) + "," + pt.y.toFixed(1)).join(" ");
-          const aPath = dPath + " L" + W + "," + H + " L0," + H + " Z";
-          const ch = bw.change;
-          return (
-            <div style={{ marginTop: 10, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <div>
-                  <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>BODYWEIGHT</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{h[0]} {"\u2192"} {bw.current} lbs</div>
+          <div className="rc-cohort">Percentiles rank against <b>{cohortName}</b>. Colors: <b style={{ color: "#C0392B" }}>building</b> {"→"} <b style={{ color: "#B7791F" }}>average</b> {"→"} <b style={{ color: "#1B7F4B" }}>strong</b>. Bar = 0 to 99th percentile.</div>
+
+          {(cmjRows.length > 0 || hopRows.length > 0) && (
+            <div className={"rc-grid2" + ((cmjRows.length > 0) !== (hopRows.length > 0) ? " rc-solo" : "")}>
+              {cmjRows.length > 0 && (
+                <div className="rc-card">
+                  <div className="rc-ctitle">Countermovement Jump</div>
+                  <div className="rc-csub">Lower-body explosive power {"·"} VALD ForceDecks</div>
+                  {cmjRows.map((r, i) => <RcMetric key={i} {...r} />)}
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: ch > 0 ? "#16A34A" : ch < 0 ? "#DC2626" : RPT.gray }}>{ch > 0 ? "+" : ""}{ch} lbs</div>
-              </div>
-              <svg viewBox={"0 0 " + W + " " + H} style={{ display: "block", width: "100%", marginTop: 4 }}>
-                <path d={aPath} fill="rgba(27,42,68,0.07)" />
-                <path d={dPath} fill="none" stroke={RPT.navy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="4" fill={RPT.orange} />
-              </svg>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 7.5, color: RPT.lgray, marginTop: 1 }}>
-                <span>{dts[0]}</span><span>{dts[dts.length - 1]}</span>
-              </div>
+              )}
+              {hopRows.length > 0 && (
+                <div className="rc-card">
+                  <div className="rc-ctitle">Hop Test {"—"} Reactive Strength</div>
+                  <div className="rc-csub">Reactive strength over repeated hops {"·"} VALD ForceDecks</div>
+                  {hopRows.map((r, i) => <RcMetric key={i} {...r} />)}
+                </div>
+              )}
             </div>
-          );
-        })()}
-        {offseason && offseason.sessions >= 2 && (
-          <RptSection title={"PR Progress \u00b7 first session vs personal best"}>
-            <RptProgressRows rows={[
-              { label: "Jump Height", first: offseason.jhFirst, last: athlete.best.jumpHeight, change: prChg(offseason.jhFirst, athlete.best.jumpHeight), unit: '\u0022' },
-              { label: "RSI-modified", first: offseason.rsiFirst, last: athlete.best.rsi, change: prChg(offseason.rsiFirst, athlete.best.rsi), unit: "" },
-              { label: "Concentric Impulse", first: offseason.ppFirst, last: athlete.best.conImpulse, change: prChg(offseason.ppFirst, athlete.best.conImpulse), unit: " N\u00b7s" },
-              { label: "Ecc Braking Force", first: offseason.brkFirst, last: athlete.best.eccBrakingRFD, change: prChg(offseason.brkFirst, athlete.best.eccBrakingRFD), unit: "×BW" },
-            ]} />
-          </RptSection>
-        )}
-        <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + cmpCmj} />
-      </div>
-
-      )}
-
-      {/* ── PAGE: DYNAMO SHOULDER STRENGTH ── */}
-      {hasDyn && (
-        <div className="rpt-page" style={pageStyle}>
-          <RptHeader athlete={id} gi={gi}
-            title="DYNAMO SHOULDER" sub={"VALD DynaMo · " + (dynTest.type || "Assessment") + (dynDate ? " · " + dynDate : "")} />
-          <RptSection title={"Peak Force · Shoulder ER/IR & Grip"}>
-            <div style={{ fontSize: 9, color: RPT.lgray, margin: "-2px 0 6px", lineHeight: 1.4 }}>The most force produced in each direction (N). Single-side tests show one column.</div>
-            <RptDynRows unit="N" dec={0} rows={dynCore.map(m => ({ label: m.name.replace("Shoulder ", "").replace(" (Abduction)", ""), sub: m.position, left: m.peakN ? m.peakN[0] : null, right: m.peakN ? m.peakN[1] : null }))} />
-          </RptSection>
-          {dynTorque.length > 0 && (
-            <RptSection title="Rotational Torque · ER / IR">
-              <div style={{ fontSize: 9, color: RPT.lgray, margin: "-2px 0 6px", lineHeight: 1.4 }}>Force through the forearm lever (N·m). The rotational demand the shoulder controls when throwing.</div>
-              <RptDynRows unit={"N·m"} dec={1} rows={dynTorque.map(m => ({ label: m.name.replace("Shoulder ", ""), left: m.torqueNm[0], right: m.torqueNm[1] }))} />
-            </RptSection>
           )}
-          {dynTest.erIr && (dynTest.erIr.left != null || dynTest.erIr.right != null) && (
-            <RptSection title="External : Internal Rotation Ratio">
-              <div style={{ fontSize: 9, color: RPT.lgray, margin: "-2px 0 8px", lineHeight: 1.4 }}>Balance between the muscles that decelerate the arm (ER) and accelerate it (IR). Clinicians watch this for shoulder health; near 1.0 is balanced.</div>
-              <div style={{ display: "flex", gap: 12 }}>
-                {[["Left arm", dynTest.erIr.left], ["Right arm", dynTest.erIr.right]].map(([lbl, v]) => (
-                  <div key={lbl} style={{ flex: 1, textAlign: "center", padding: "12px 0", border: "1px solid " + RPT.line, borderRadius: 8 }}>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: RPT.navy }}>{v == null ? "–" : Number(v).toFixed(2)}</div>
-                    <div style={{ fontSize: 10, color: RPT.gray, marginTop: 2 }}>{lbl}</div>
+
+          {/* Progress PR + bodyweight sparkline (sits above DynaMo) */}
+          {hasProgRow && (
+            <div className={"rc-grid2" + (hasProg !== hasBw ? " rc-solo" : "")} style={{ marginTop: 13 }}>
+              {hasProg && (
+                <div className="rc-card">
+                  <div className="rc-ctitle">Progress {"·"} PR Tracker</div>
+                  <div className="rc-csub">First tested session {"→"} personal best</div>
+                  {progRows.map((r, i) => {
+                    const up = r.invert ? r.chg < 0 : r.chg > 0;
+                    const col = r.chg === 0 ? "#5B6470" : up ? "#1B7F4B" : "#C0392B";
+                    return (
+                      <div key={i} className="rc-prog">
+                        <div className="rc-prog-lab">{r.lab}</div>
+                        <div className="rc-prog-val">{r.first}{r.unit} {"→"} <b style={{ color: "#1B2A44" }}>{r.best}{r.unit}</b></div>
+                        <div className="rc-prog-chg" style={{ color: col }}>{r.chg > 0 ? "+" : ""}{Number(r.chg).toFixed(1)}%</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {hasBw && (() => {
+                const h = bw.history, dts = bw.dates || [];
+                const mn = Math.min(...h) * 0.995, mx = Math.max(...h) * 1.005, rg = (mx - mn) || 1;
+                const W = 600, H = 46;
+                const pts = h.map((v, j) => ({ x: (j / Math.max(1, h.length - 1)) * W, y: H - ((v - mn) / rg) * H }));
+                const dPath = pts.map((pt, j) => (j === 0 ? "M" : "L") + pt.x.toFixed(1) + "," + pt.y.toFixed(1)).join(" ");
+                const aPath = dPath + " L" + W + "," + H + " L0," + H + " Z";
+                const ch = bw.change;
+                return (
+                  <div className="rc-card">
+                    <div className="rc-ctitle">Bodyweight</div>
+                    <div className="rc-csub">Tracked across every testing session</div>
+                    <div className="rc-bw-top">
+                      <div className="rc-bw-big">{h[0]} {"→"} {bw.current} lbs</div>
+                      <div className="rc-bw-chg" style={{ color: ch > 0 ? "#16A34A" : ch < 0 ? "#DC2626" : "#5B6470" }}>{ch > 0 ? "+" : ""}{ch} lbs</div>
+                    </div>
+                    <svg viewBox={"0 0 " + W + " " + H} style={{ display: "block", width: "100%", marginTop: 6 }}>
+                      <path d={aPath} fill="rgba(27,42,68,0.07)" />
+                      <path d={dPath} fill="none" stroke="#1B2A44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="4" fill="#DD5228" />
+                    </svg>
+                    <div className="rc-bw-dates"><span>{dts[0]}</span><span>{dts[dts.length - 1]}</span></div>
                   </div>
-                ))}
-              </div>
-            </RptSection>
-          )}
-          <RptFooter page={++pageNo} total={pages} label={"Data: VALD DynaMo · isometric shoulder screen"} />
-        </div>
-      )}
-
-      {/* ── PAGE 2: HOP ── */}
-      {hopAthlete && hn && (
-        <div className="rpt-page" style={pageStyle}>
-          <RptHeader athlete={id} gi={gi}
-            title="REPEATED HOP TEST" sub={"ForceDecks \u00b7 " + hopAthlete.testCount + " sessions \u00b7 last " + hopAthlete.latestDate} />
-          <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + cmpHop}>
-            <RptMetricRow label="Hop RSI" desc="Flight time divided by contact time. The key measure of reactive, elastic ability."
-              value={hopAthlete.hop.rsi} best={hopAthlete.best.rsi} pct={cP(hopAthlete.hop.rsi, hn.rsi)} />
-            <RptMetricRow label="Flight Time" desc="Time in the air between hops. Longer flight means more force in less ground time."
-              value={hopAthlete.hop.ft + " ms"} best={hopAthlete.best.ft + " ms"} pct={cP(hopAthlete.hop.ft, hn.ft)} />
-            <RptMetricRow label="Contact Time" desc="Time on the ground between hops. Shorter contact with maintained height shows better stiffness."
-              value={hopAthlete.hop.ct + " ms"} best={hopAthlete.best.ct + " ms"} pct={cP(hopAthlete.hop.ct, hn.ct, true)} />
-            {hopAthlete.hop.pfbm ? (
-              <RptMetricRow label="Relative Peak Force" desc="Peak ground force divided by bodyweight. Force output in a very short window."
-                value={hopAthlete.hop.pfbm + " N/BW"} best={hopAthlete.best.pfbm + " N/BW"} pct={cP(hopAthlete.hop.pfbm, hn.pfbm)} />
-            ) : null}
-          </RptSection>
-          <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-            <div style={{ flex: 1, border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 10px" }}>
-              <div style={{ fontSize: 8, color: RPT.lgray, letterSpacing: 0.5 }}>TESTING WINDOW</div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: RPT.navy }}>{hopDates[0] || "\u2013"} {"\u2192"} {hopDates[hopDates.length - 1] || "\u2013"}</div>
+                );
+              })()}
             </div>
-          </div>
-          {hopTrend && hopTrend.sessions >= 2 && (
-            <RptSection title={"PR Progress \u00b7 first session vs personal best"}>
-              <RptProgressRows rows={[
-                { label: "Hop RSI", first: hopTrend.rsi_first, last: hopAthlete.best.rsi, change: prChg(hopTrend.rsi_first, hopAthlete.best.rsi), unit: "" },
-                { label: "Flight Time", first: hopTrend.ft_first, last: hopAthlete.best.ft, change: prChg(hopTrend.ft_first, hopAthlete.best.ft), unit: " ms" },
-                { label: "Contact Time", first: hopTrend.ct_first, last: hopAthlete.best.ct, change: prChg(hopTrend.ct_first, hopAthlete.best.ct), unit: " ms", invert: true },
-              ]} />
-            </RptSection>
           )}
-          <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + cmpHop} />
+
+          {/* DynaMo shoulder strength (pushed below progress) */}
+          {hasDyn && (
+            <div className="rc-card rc-full">
+              <div className="rc-ctitle">DynaMo Shoulder Strength</div>
+              <div className="rc-csub">Isometric rotator-cuff testing{dynArm ? " · throwing arm: " + dynArm : ""} {"·"} VALD DynaMo{dynDate ? " · " + dynDate : ""}</div>
+              <div className="rc-dyn-grid">
+                <RcDynMove m={dynER} />
+                <RcDynMove m={dynIR} />
+              </div>
+              {dynTest.erIr && (dynTest.erIr.left != null || dynTest.erIr.right != null) && (
+                <div className="rc-ratio-wrap">
+                  <div className={"rc-ratio-box" + (dynArm === "Left" ? " rc-throw" : "")}>
+                    {dynArm === "Left" ? <div className="rc-ratio-tag">Throwing arm</div> : null}
+                    <div className="rc-ratio-num" style={{ color: dynArm === "Left" ? "#DD5228" : "#1B2A44" }}>{dynTest.erIr.left == null ? "–" : Number(dynTest.erIr.left).toFixed(2)}</div>
+                    <div className="rc-ratio-lab">Left arm</div>
+                  </div>
+                  <div className={"rc-ratio-box" + (dynArm === "Right" ? " rc-throw" : "")}>
+                    {dynArm === "Right" ? <div className="rc-ratio-tag">Throwing arm</div> : null}
+                    <div className="rc-ratio-num" style={{ color: dynArm === "Right" ? "#DD5228" : "#1B2A44" }}>{dynTest.erIr.right == null ? "–" : Number(dynTest.erIr.right).toFixed(2)}</div>
+                    <div className="rc-ratio-lab">Right arm</div>
+                  </div>
+                  <div className="rc-ratio-side">
+                    <b>External : Internal Rotation Ratio</b>
+                    <div className="rc-ratio-note">Balance between the muscles that decelerate the arm (ER) and those that accelerate it (IR). A ratio near or above 1.00 indicates external rotators keeping pace {"—"} shown for clinical reference, reviewed by the athlete{"’"}s care team, not a diagnosis.</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <Foot dyn={hasDyn} />
         </div>
       )}
 
-      {/* ── PAGE 3: TRACKMAN ── */}
+      {/* ── SHEET 2: TrackMan pitching ── */}
       {veloAthlete && (
         <div className="rpt-page" style={pageStyle}>
-          <RptHeader athlete={id} gi={gi}
-            title="TRACKMAN PITCHING" sub={veloAthlete.sessions + " velo sessions \u00b7 last " + veloAthlete.latestDate} />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 4 }}>
+          <div className="rc-top">
+            <div>
+              <div className="rc-eyebrow">Pitching Report {"·"} TrackMan</div>
+              <div className="rc-aname">{id.name}</div>
+              <div className="rc-ameta">{gi.label} {"·"} {veloAthlete.sessions} velo sessions {"·"} last {veloAthlete.latestDate}</div>
+            </div>
+            <img src={RPM_LOGO_DARK} alt="RPM Strength" />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 12 }}>
             {[["PEAK FB EVER", veloAthlete.peakEver + " mph"], ["AVG PEAK", veloAthlete.avgPeak + " mph"],
               ["LATEST PEAK", veloAthlete.latestPeak + " mph"],
-              ["PERCENTILE", (() => { const p = veloPct(veloAthlete.peakEver); return p + (["th","st","nd","rd"][(p%100-20)%10] || ["th","st","nd","rd"][p%100] || "th"); })()]].map(([l, v], i) => (
+              ["PERCENTILE", (() => { const p = veloPct(veloAthlete.peakEver); return p + rcOrd(p); })()]].map(([l, v], i) => (
               <div key={i} style={{ border: "1px solid " + RPT.line, borderRadius: 8, padding: "8px 6px", textAlign: "center" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: i === 3 ? rptBandColor(veloPct(veloAthlete.peakEver)) : RPT.navy }}>{v}</div>
                 <div style={{ fontSize: 7.5, color: RPT.lgray, letterSpacing: 0.4, marginTop: 2 }}>{l}</div>
@@ -1591,7 +1685,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
           <div style={{ marginTop: 8 }}><RptPctBar pct={veloPct(veloAthlete.peakEver)} /></div>
           <div style={{ fontSize: 8.5, color: RPT.lgray, marginTop: 2 }}>Peak fastball percentile among {VELO_ATHLETES.length} active RPM pitchers.</div>
           {bp && (<>
-            <RptSection title={"Latest Bullpen \u00b7 " + bp.df + " \u00b7 " + bp.st + " \u00b7 " + bp.tot + " pitches" + (bp.note ? " \u00b7 " + bp.note : "")}>
+            <RptSection title={"Latest Bullpen · " + bp.df + " · " + bp.st + " · " + bp.tot + " pitches" + (bp.note ? " · " + bp.note : "")}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead><tr>{["Pitch", "#", "Use", "Avg", "Max", "IVB", "HB", "Spin", "Eff"].map((h, i) => (
                   <th key={i} style={{ padding: "4px 6px", textAlign: i > 0 ? "right" : "left", fontSize: 8, textTransform: "uppercase", color: RPT.gray, background: RPT.thbg, borderBottom: "1px solid " + RPT.line }}>{h}</th>
@@ -1601,9 +1695,9 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
                     <td style={{ padding: "4px 6px", fontSize: 10.5, fontWeight: 700, color: RPT.navy, borderBottom: "1px solid " + RPT.line }}>
                       <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: pColor(t[0]), marginRight: 5, verticalAlign: "middle" }} />{t[0]}
                     </td>
-                    {[t[1], Math.round((t[1] / bp.tot) * 100) + "%", t[2] != null ? t[2].toFixed(1) : "\u2013", t[3] != null ? t[3].toFixed(1) : "\u2013",
-                      t[4] != null ? t[4].toFixed(1) : "\u2013", t[5] != null ? t[5].toFixed(1) : "\u2013", t[6] != null ? t[6] : "\u2013",
-                      t[10] != null ? t[10] + "%" : "\u2013"].map((v, j) => (
+                    {[t[1], Math.round((t[1] / bp.tot) * 100) + "%", t[2] != null ? t[2].toFixed(1) : "–", t[3] != null ? t[3].toFixed(1) : "–",
+                      t[4] != null ? t[4].toFixed(1) : "–", t[5] != null ? t[5].toFixed(1) : "–", t[6] != null ? t[6] : "–",
+                      t[10] != null ? t[10] + "%" : "–"].map((v, j) => (
                       <td key={j} style={{ padding: "4px 6px", textAlign: "right", fontSize: 10.5, color: "#1a1a1a", borderBottom: "1px solid " + RPT.line }}>{v}</td>
                     ))}
                   </tr>
@@ -1612,7 +1706,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
             </RptSection>
             <div style={{ display: "flex", gap: 14, marginTop: 10 }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, fontWeight: 800, color: RPT.navy, marginBottom: 4 }}>Pitch Movement <span style={{ fontWeight: 400, color: RPT.lgray }}>(pitcher{"\u2019"}s view)</span></div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: RPT.navy, marginBottom: 4 }}>Pitch Movement <span style={{ fontWeight: 400, color: RPT.lgray }}>(pitcher{"’"}s view)</span></div>
                 <MovementPlot session={bp} light />
               </div>
               <div style={{ flex: 1 }}>
@@ -1640,7 +1734,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
               ))}
             </div>
           </RptSection>
-          <RptFooter page={++pageNo} total={pages} label="Data: TrackMan" />
+          <div className="rc-foot">RPM Strength {"·"} Queens, NY &nbsp;|&nbsp; Data: TrackMan &nbsp;|&nbsp; Generated {LAST_UPDATED} &nbsp;|&nbsp; rpmstrength.coach</div>
         </div>
       )}
     </div>
