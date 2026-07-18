@@ -3090,13 +3090,16 @@ export default function App() {
       const doc = w.document, srcEl = doc.getElementById("src");
       srcEl.style.background = "#fff"; srcEl.style.padding = "0";
       const rpts = Array.from(doc.querySelectorAll(".rpt-page"));
-      const PAGE = 1056, PAD = 42, USABLE = PAGE - 2 * PAD;
+      // Letter @96dpi with zero @page margin: 816w × 1056h. PAD is the sheet's
+      // own inner margin.
+      const PAGE = 1056, PAGE_W = 816, PAD = 42, USABLE = PAGE - 2 * PAD;
       rpts.forEach((p, i) => {
         p.style.boxShadow = "none"; p.style.margin = "0 auto";
-        const h = p.getBoundingClientRect().height;
-        // Scale UP as well as down (capped 1.3x) so lighter pages fill the sheet
-        // instead of leaving a dead bottom third.
-        const z = Math.min(1.3, USABLE / h);
+        const h = p.getBoundingClientRect().height, w = p.getBoundingClientRect().width;
+        // Scale to fill the sheet, but never past the page's width (a sparse
+        // sheet would otherwise scale up until it clips off the right edge) —
+        // cap by height, by width, and at 1.3x.
+        const z = Math.min(1.3, USABLE / h, (PAGE_W - 2 * PAD) / w);
         const wrap = doc.createElement("div");
         wrap.style.boxSizing = "border-box";
         wrap.style.height = (PAGE / z) + "px";
