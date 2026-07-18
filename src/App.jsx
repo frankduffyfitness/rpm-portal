@@ -166,7 +166,46 @@ const _DYNAMO = [{"name":"Brett Baek","group":"hs","dob":"2010-04-07","arm":null
 // Simple in-app password gate (soft: this is a static site, data still ships in the bundle).
 const DYNAMO_PASSWORD = "VALD";
 
+// ── Unified report join ──────────────────────────────────────────────────────
+// One athlete is spelled four different ways across the four data sources
+// (ForceDecks CMJ/Hop, TrackMan velo, VALD DynaMo). To build ONE report from any
+// entry point we resolve every source through a canonical key: normalize
+// (lowercase, strip apostrophes — straight AND curly — periods, collapse
+// whitespace) then fold known spelling clusters onto a single canonical name.
+const normName = (s) => (s || "").toLowerCase().replace(/[’‘'`.]/g, "").replace(/\s+/g, " ").trim();
+// Each row lists every spelling of one person seen across the four sources.
+const NAME_CLUSTERS = [
+  ["Pat Rodriguez", "Patrick Rodriguez"],
+  ["Rob Romero", "Robert Romero"],
+  ["Zach Uysal", "Zachary Uysal"],
+];
+const _CANON = {};
+for (const group of NAME_CLUSTERS) {
+  const canon = normName(group[0]);
+  for (const n of group) _CANON[normName(n)] = canon;
+}
+const canonName = (s) => { const k = normName(s); return _CANON[k] || k; };
 
+const CMJ_BY_CANON = Object.fromEntries(ATHLETES.map(a => [canonName(a.name), a]));
+const HOP_BY_CANON = Object.fromEntries(HOP_ATHLETES.map(a => [canonName(a.name), a]));
+const VELO_BY_CANON = Object.fromEntries(VELO_ATHLETES.map(v => [canonName(v.name), v]));
+const DYNAMO_BY_CANON = Object.fromEntries(_DYNAMO.map(d => [canonName(d.name), d]));
+const OFFSEASON_BY_CANON = Object.fromEntries(OFFSEASON.map(o => [canonName(o.name), o]));
+const HOPTREND_BY_CANON = Object.fromEntries(HOP_TRENDS.map(t => [canonName(t.name), t]));
+
+// Resolve every data source for one athlete by name, from any entry point
+// (CMJ/Hop tab seeds a ForceDecks name; the velo tab seeds a TrackMan name).
+function resolveReportData(name) {
+  const c = canonName(name);
+  return {
+    athlete: CMJ_BY_CANON[c] || null,
+    hopAthlete: HOP_BY_CANON[c] || null,
+    veloAthlete: VELO_BY_CANON[c] || null,
+    dynamo: DYNAMO_BY_CANON[c] || null,
+    offseason: OFFSEASON_BY_CANON[c] || null,
+    hopTrend: HOPTREND_BY_CANON[c] || null,
+  };
+}
 
 const GROUP_NORMS = _N;
 
@@ -1321,42 +1360,82 @@ function RptFooter({ page, total, label }) {
   );
 }
 
-function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend }) {
-  const gi = GROUPS[athlete.group];
+// Light-theme L/R table for the DynaMo report page (mirrors the standalone
+// DynaMo card, restyled onto the white report sheet with the RPT palette).
+function RptDynRows({ rows, unit, dec }) {
+  const num = (v) => (v === null || v === undefined) ? "–" : Number(v).toFixed(dec);
+  return (
+    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <thead><tr>{["Movement", "Left", "Right"].map((h, i) => (
+        <th key={i} style={{ padding: "4px 6px", textAlign: i ? "right" : "left", fontSize: 8, textTransform: "uppercase", letterSpacing: 0.4, color: RPT.gray, background: RPT.thbg, borderBottom: "1px solid " + RPT.line }}>{h}</th>
+      ))}</tr></thead>
+      <tbody>{rows.map((r, i) => (
+        <tr key={i}>
+          <td style={{ padding: "5px 6px", fontSize: 10.5, borderBottom: "1px solid " + RPT.line }}>
+            <span style={{ fontWeight: 700, color: RPT.navy }}>{r.label}</span>
+            {r.sub ? <span style={{ color: RPT.lgray }}>{"  "}{r.sub}</span> : null}
+          </td>
+          {[r.left, r.right].map((v, j) => (
+            <td key={j} style={{ padding: "5px 6px", textAlign: "right", fontSize: 10.5, fontWeight: 700, color: RPT.navy, borderBottom: "1px solid " + RPT.line }}>
+              {num(v)}<span style={{ color: RPT.lgray, fontWeight: 400 }}>{unit ? " " + unit : ""}</span>
+            </td>
+          ))}
+        </tr>
+      ))}</tbody>
+    </table>
+  );
+}
+
+function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseason, hopTrend, dynamo }) {
+  // Identity: the report can be seeded from any tab, so the CMJ athlete may be
+  // absent (a TrackMan-only pitcher). Fall back through the sources that exist
+  // so the header, group label and page framing still resolve.
+  const idSrc = athlete || veloAthlete || dynamo || hopAthlete || {};
+  const id = { name: idSrc.name, group: idSrc.group, bw: athlete ? athlete.bw : undefined };
+  const gi = GROUPS[id.group] || {};
   // Some groups (Pro, Men's League) have no norm cohort — no athlete in them
   // clears the 5-session bar in gen_N. When that happens `norms[group]` is
   // undefined and we fall back to the facility-wide pool; label it honestly as
   // "All Athletes" instead of claiming e.g. "vs Pro", and suppress the group
   // rank (a rank "of Pro" is meaningless with no pro cohort).
-  const hasCmjNorms = !!norms[athlete.group];
+  const hasCmjNorms = athlete ? !!norms[athlete.group] : false;
   const hasHopNorms = !!(hopNorms && hopAthlete && hopNorms[hopAthlete.group]);
   const cmpCmj = hasCmjNorms ? gi.label : "All Athletes";
   const cmpHop = hasHopNorms ? gi.label : "All Athletes";
-  const n = norms[athlete.group] || norms.all;
+  const n = athlete ? (norms[athlete.group] || norms.all) : null;
   const hn = hopNorms ? (hopNorms[(hopAthlete || {}).group] || hopNorms.all) : null;
   const tmr = veloAthlete ? (_TMR[veloAthlete.name] || []) : [];
   const bp = tmr[0] || null;
-  const isFemale = athlete.group === "fem" || FEM_SET.has(athlete.name);
-  const bw = BW_DATA[athlete.name];
-  const sessDates = SESSION_DATES[athlete.name] || [];
-  const hopDates = HOP_SESSION_DATES[athlete.name] || [];
+  const isFemale = id.group === "fem" || FEM_SET.has(id.name);
+  const bw = athlete ? BW_DATA[athlete.name] : null;
+  const sessDates = athlete ? (SESSION_DATES[athlete.name] || []) : [];
+  const hopDates = hopAthlete ? (HOP_SESSION_DATES[hopAthlete.name] || []) : [];
 
-  const pages = 1 + (hopAthlete && hn ? 1 : 0) + (veloAthlete ? 1 : 0);
+  // DynaMo (VALD shoulder strength): its own report page when the athlete has a
+  // core screen (ER/IR + grip). Rehab-only movements never build a page.
+  const dynTest = dynamo && dynamo.tests && dynamo.tests[0];
+  const dynCore = dynTest ? dynTest.movements.filter(m => DYN_CORE.includes(m.name)) : [];
+  const dynTorque = dynCore.filter(m => Array.isArray(m.torqueNm) && (m.torqueNm[0] != null || m.torqueNm[1] != null));
+  const hasDyn = dynCore.length > 0;
+
+  const pages = (athlete ? 1 : 0) + (hasDyn ? 1 : 0) + (hopAthlete && hn ? 1 : 0) + (veloAthlete ? 1 : 0);
   let pageNo = 0;
   const pageStyle = { fontFamily: "system-ui, -apple-system, sans-serif", maxWidth: 660, margin: "0 auto 28px", padding: "26px 28px", color: "#1a1a1a", background: "#fff", boxShadow: "0 1px 6px rgba(0,0,0,0.12)" };
 
   const fmtRank = (rank, total) => rank ? rank + " of " + total + " " + gi.label : "\u2013";
   // PR progress: first-ever session vs personal best (per metric)
   const prChg = (first, best) => (first && best ? Math.round(((best - first) / Math.abs(first)) * 1000) / 10 : 0);
-  const jhRankG = ATHLETES.filter(a => a.group === athlete.group);
-  const jhRank = jhRankG.filter(a => a.best.jumpHeight > athlete.best.jumpHeight).length + 1;
+  const jhRankG = athlete ? ATHLETES.filter(a => a.group === athlete.group) : [];
+  const jhRank = athlete ? jhRankG.filter(a => a.best.jumpHeight > athlete.best.jumpHeight).length + 1 : 0;
+  const dynDate = dynTest && dynTest.date ? new Date(dynTest.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
 
   return (
     <div id="report-content" style={{ background: "#F0F1F3", padding: "18px 0" }}>
 
-      {/* ── PAGE 1: CMJ ── */}
+      {/* ── PAGE 1: CMJ (only when ForceDecks CMJ data exists) ── */}
+      {athlete && (
       <div className="rpt-page" style={pageStyle}>
-        <RptHeader athlete={athlete} gi={gi} first
+        <RptHeader athlete={id} gi={gi} first
           title="COUNTERMOVEMENT JUMP" sub={"ForceDecks \u00b7 " + athlete.testCount + " sessions \u00b7 last " + athlete.latestDate} />
         <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + cmpCmj}>
           <RptMetricRow label="Jump Height" desc="How high the athlete jumps. The headline measure of lower-body power."
@@ -1424,10 +1503,44 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
         <RptFooter page={++pageNo} total={pages} label={"Data: VALD ForceDecks \u00b7 percentiles vs " + cmpCmj} />
       </div>
 
+      )}
+
+      {/* ── PAGE: DYNAMO SHOULDER STRENGTH ── */}
+      {hasDyn && (
+        <div className="rpt-page" style={pageStyle}>
+          <RptHeader athlete={id} gi={gi}
+            title="DYNAMO SHOULDER" sub={"VALD DynaMo · " + (dynTest.type || "Assessment") + (dynDate ? " · " + dynDate : "")} />
+          <RptSection title={"Peak Force · Shoulder ER/IR & Grip"}>
+            <div style={{ fontSize: 9, color: RPT.lgray, margin: "-2px 0 6px", lineHeight: 1.4 }}>The most force produced in each direction (N). Single-side tests show one column.</div>
+            <RptDynRows unit="N" dec={0} rows={dynCore.map(m => ({ label: m.name.replace("Shoulder ", "").replace(" (Abduction)", ""), sub: m.position, left: m.peakN ? m.peakN[0] : null, right: m.peakN ? m.peakN[1] : null }))} />
+          </RptSection>
+          {dynTorque.length > 0 && (
+            <RptSection title="Rotational Torque · ER / IR">
+              <div style={{ fontSize: 9, color: RPT.lgray, margin: "-2px 0 6px", lineHeight: 1.4 }}>Force through the forearm lever (N·m). The rotational demand the shoulder controls when throwing.</div>
+              <RptDynRows unit={"N·m"} dec={1} rows={dynTorque.map(m => ({ label: m.name.replace("Shoulder ", ""), left: m.torqueNm[0], right: m.torqueNm[1] }))} />
+            </RptSection>
+          )}
+          {dynTest.erIr && (dynTest.erIr.left != null || dynTest.erIr.right != null) && (
+            <RptSection title="External : Internal Rotation Ratio">
+              <div style={{ fontSize: 9, color: RPT.lgray, margin: "-2px 0 8px", lineHeight: 1.4 }}>Balance between the muscles that decelerate the arm (ER) and accelerate it (IR). Clinicians watch this for shoulder health; near 1.0 is balanced.</div>
+              <div style={{ display: "flex", gap: 12 }}>
+                {[["Left arm", dynTest.erIr.left], ["Right arm", dynTest.erIr.right]].map(([lbl, v]) => (
+                  <div key={lbl} style={{ flex: 1, textAlign: "center", padding: "12px 0", border: "1px solid " + RPT.line, borderRadius: 8 }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: RPT.navy }}>{v == null ? "–" : Number(v).toFixed(2)}</div>
+                    <div style={{ fontSize: 10, color: RPT.gray, marginTop: 2 }}>{lbl}</div>
+                  </div>
+                ))}
+              </div>
+            </RptSection>
+          )}
+          <RptFooter page={++pageNo} total={pages} label={"Data: VALD DynaMo · isometric shoulder screen"} />
+        </div>
+      )}
+
       {/* ── PAGE 2: HOP ── */}
       {hopAthlete && hn && (
         <div className="rpt-page" style={pageStyle}>
-          <RptHeader athlete={athlete} gi={gi}
+          <RptHeader athlete={id} gi={gi}
             title="REPEATED HOP TEST" sub={"ForceDecks \u00b7 " + hopAthlete.testCount + " sessions \u00b7 last " + hopAthlete.latestDate} />
           <RptSection title={"Metrics \u0026 Percentiles \u00b7 vs " + cmpHop}>
             <RptMetricRow label="Hop RSI" desc="Flight time divided by contact time. The key measure of reactive, elastic ability."
@@ -1463,7 +1576,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
       {/* ── PAGE 3: TRACKMAN ── */}
       {veloAthlete && (
         <div className="rpt-page" style={pageStyle}>
-          <RptHeader athlete={athlete} gi={gi}
+          <RptHeader athlete={id} gi={gi}
             title="TRACKMAN PITCHING" sub={veloAthlete.sessions + " velo sessions \u00b7 last " + veloAthlete.latestDate} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 4 }}>
             {[["PEAK FB EVER", veloAthlete.peakEver + " mph"], ["AVG PEAK", veloAthlete.avgPeak + " mph"],
@@ -2868,6 +2981,47 @@ export default function App() {
   const [isDynamo] = useState(() => { try { return /dynamo/i.test(window.location.hash); } catch (e) { return false; } });
   if (isDynamo) return <DynamoPage />;
 
+  // Shared print: every .rpt-page prints as exactly one letter sheet, measured
+  // and zoom-fitted individually. Used by both report entry points (CMJ/Hop tab
+  // and velo tab) so a report is identical no matter which tab saved it.
+  const printRptPages = () => {
+    const el = document.getElementById("report-content");
+    if (!el) return;
+    const w = window.open("", "_blank");
+    w.document.write("<html><head><title>RPM Strength Report</title><style>body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{border-collapse:collapse;} @media print{@page{size:letter;margin:0;}}</style></head><body><div id=" + JSON.stringify("src") + ">" + el.innerHTML + "</div></body></html>");
+    w.document.close();
+    // Zero @page margin removes the browser's header/footer; each sheet carries
+    // its own padding.
+    setTimeout(() => {
+      const doc = w.document, srcEl = doc.getElementById("src");
+      srcEl.style.background = "#fff"; srcEl.style.padding = "0";
+      const rpts = Array.from(doc.querySelectorAll(".rpt-page"));
+      const PAGE = 1056, PAD = 42, USABLE = PAGE - 2 * PAD;
+      rpts.forEach((p, i) => {
+        p.style.boxShadow = "none"; p.style.margin = "0 auto";
+        const h = p.getBoundingClientRect().height;
+        // Scale UP as well as down (capped 1.3x) so lighter pages fill the sheet
+        // instead of leaving a dead bottom third.
+        const z = Math.min(1.3, USABLE / h);
+        const wrap = doc.createElement("div");
+        wrap.style.boxSizing = "border-box";
+        wrap.style.height = (PAGE / z) + "px";
+        wrap.style.paddingTop = (PAD / z) + "px";
+        wrap.style.overflow = "hidden";
+        wrap.style.zoom = String(z);
+        if (i < rpts.length - 1) wrap.style.pageBreakAfter = "always";
+        // Pin the footer to the bottom edge of the sheet.
+        p.style.display = "flex"; p.style.flexDirection = "column";
+        p.style.boxSizing = "border-box";
+        p.style.height = (USABLE / z) + "px";
+        if (p.lastElementChild) p.lastElementChild.style.marginTop = "auto";
+        p.parentNode.insertBefore(wrap, p);
+        wrap.appendChild(p);
+      });
+      w.print();
+    }, 300);
+  };
+
   const eG = cmpG || sel.group;
   const norms = GROUP_NORMS[eG] || GROUP_NORMS.all;
   const gi = GROUPS[eG];
@@ -3030,75 +3184,21 @@ export default function App() {
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#fff", overflowY: "auto" }}>
           <div style={{ position: "sticky", top: 0, background: "#fff", borderBottom: "1px solid #eee", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 1001 }}>
             <button onClick={() => setShowReport(false)} style={{ border: "none", background: "none", fontSize: 14, cursor: "pointer", color: "#666", fontWeight: 600 }}>{"\u2190"} Back</button>
-            <button onClick={() => {
-              const el = document.getElementById("report-content");
-              const w = window.open("", "_blank");
-              w.document.write("<html><head><title>RPM Strength Report</title><style>body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:13px;} th{background:#f5f5f5;font-weight:700;font-size:11px;text-transform:uppercase;color:#666;} .pg{box-sizing:border-box;overflow:hidden;} @media print{@page{size:letter;margin:0;}}</style></head><body><div id=" + JSON.stringify("src") + ">" + el.innerHTML + "</div></body></html>");
-              w.document.close();
-              // Each .rpt-page prints as exactly one sheet: measured and
-              // zoom-fitted individually. Zero @page margin removes the
-              // browser's header/footer; each sheet carries its own padding.
-              setTimeout(() => {
-                const doc = w.document, srcEl = doc.getElementById("src");
-                srcEl.style.background = "#fff"; srcEl.style.padding = "0";
-                const rpts = Array.from(doc.querySelectorAll(".rpt-page"));
-                const PAGE = 1056, PAD = 42, USABLE = PAGE - 2 * PAD;
-                rpts.forEach((p, i) => {
-                  p.style.boxShadow = "none"; p.style.margin = "0 auto";
-                  const h = p.getBoundingClientRect().height;
-                  // Scale UP as well as down (capped 1.3x) so lighter pages
-                  // fill the sheet instead of leaving a dead bottom third.
-                  const z = Math.min(1.3, USABLE / h);
-                  const wrap = doc.createElement("div");
-                  wrap.style.boxSizing = "border-box";
-                  wrap.style.height = (PAGE / z) + "px";
-                  wrap.style.paddingTop = (PAD / z) + "px";
-                  wrap.style.overflow = "hidden";
-                  wrap.style.zoom = String(z);
-                  if (i < rpts.length - 1) wrap.style.pageBreakAfter = "always";
-                  // Pin the footer to the bottom edge of the sheet.
-                  p.style.display = "flex"; p.style.flexDirection = "column";
-                  p.style.boxSizing = "border-box";
-                  p.style.height = (USABLE / z) + "px";
-                  if (p.lastElementChild) p.lastElementChild.style.marginTop = "auto";
-                  p.parentNode.insertBefore(wrap, p);
-                  wrap.appendChild(p);
-                });
-                w.print();
-              }, 300);
-            }} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
+            <button onClick={printRptPages} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
           </div>
-          <ReportView
-            athlete={sel}
-            norms={GROUP_NORMS}
-            hopAthlete={HOP_ATHLETES.find(a => a.name === sel.name)}
-            hopNorms={HOP_NORMS}
-            veloAthlete={VELO_BY_NAME[sel.name] || null}
-            offseason={OFFSEASON.find(o => o.name === sel.name)}
-            hopTrend={HOP_TRENDS.find(t => t.name === sel.name)}
-          />
+          <ReportView {...resolveReportData(sel.name)} norms={GROUP_NORMS} hopNorms={HOP_NORMS} />
         </div>
       )}
       {showVeloReport && veloSel && (
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#fff", overflowY: "auto" }}>
           <div style={{ position: "sticky", top: 0, background: "#fff", borderBottom: "1px solid #eee", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 1001 }}>
             <button onClick={() => setShowVeloReport(false)} style={{ border: "none", background: "none", fontSize: 14, cursor: "pointer", color: "#666", fontWeight: 600 }}>{"\u2190"} Back</button>
-            <button onClick={() => {
-              const el = document.getElementById("report-content");
-              const w = window.open("", "_blank");
-              w.document.write("<html><head><title>RPM Strength Pitching Report</title><style>body{margin:0;padding:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;} table{width:100%;border-collapse:collapse;margin:8px 0;} th,td{padding:5px 8px;text-align:left;border-bottom:1px solid #e0e0e0;font-size:12px;} th{background:#f5f5f5;font-weight:700;font-size:10px;text-transform:uppercase;color:#666;} @media print{@page{size:letter;margin:0;} body{padding:0.4in !important;}}</style></head><body>" + el.innerHTML + "</body></html>");
-              w.document.close();
-              // Fit to ONE page: usable letter height at 0.4in margins ~= 980px.
-              // Scale the whole body down when the report is taller than that.
-              setTimeout(() => {
-                const h = w.document.body.scrollHeight;
-                const target = 960;
-                if (h > target) w.document.body.style.zoom = String(Math.max(0.55, target / h));
-                w.print();
-              }, 300);
-            }} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
+            <button onClick={printRptPages} style={{ border: "none", background: "#111", color: "#fff", padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Print / Save PDF</button>
           </div>
-          <TrackManReportView athlete={veloSel} />
+          {/* Unified report from the velo tab: resolve CMJ/Hop/DynaMo by name so a
+              pitcher's whole card is identical to the CMJ/Hop tab download, and a
+              TrackMan-only pitcher (no CMJ row) still renders cleanly. */}
+          <ReportView {...resolveReportData(veloSel.name)} norms={GROUP_NORMS} hopNorms={HOP_NORMS} />
         </div>
       )}
     </div>
