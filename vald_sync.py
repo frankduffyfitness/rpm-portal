@@ -43,6 +43,7 @@ PORTAL_METRICS = {
     # for tracking training adaptation, and legible to parents ("braked at 1.9×BW").
     # Native to Hub (the 7340* "Takeoff" twin is empty). See rpm-portal memory.
     6553757: {"key": "brakingForceBW",     "label": "Ecc Braking Force / BW", "unit": "×BW", "scale": 1},
+    6553603: {"key": "cmDepth",            "label": "Countermovement Depth", "unit": "cm", "scale": 1},  # signed (neg = deeper); context for braking
     6553712: {"key": "concentricImpulse",  "label": "Concentric Impulse",  "unit": "N·s",  "scale": 1},
     6553703: {"key": "eccBrakingImpulse",  "label": "Ecc Braking Impulse", "unit": "N·s",  "scale": 1},
     6553685: {"key": "concPeakForce",      "label": "Conc Peak Force",     "unit": "N",    "scale": 1},

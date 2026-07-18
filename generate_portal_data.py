@@ -286,6 +286,8 @@ for pid, ath in fd['athletes'].items():
         pp = round(max(ci_vals), 1) if ci_vals else None
         brk = compute_session_brk_avg(test['trials'])
         bw = compute_session_avg(test['trials'], 'bodyweightLbs')
+        depth_raw = compute_session_avg(test['trials'], 'cmDepth')  # signed cm (neg = deeper)
+        depth = round(abs(depth_raw), 1) if depth_raw else None      # store as positive cm for display
         
         # Asymmetry
         con_asym, con_dom, con_l, con_r = compute_session_asym(test['trials'], 'concentricImpulse')
@@ -295,7 +297,7 @@ for pid, ath in fd['athletes'].items():
         sessions.append({
             'date': dt,
             'date_str': dt.strftime('%m/%d/%Y'),
-            'jh': jh, 'rsi': rsi, 'pp': pp, 'brk': brk, 'bw': bw,
+            'jh': jh, 'rsi': rsi, 'pp': pp, 'brk': brk, 'bw': bw, 'depth': depth,
             'con_asym': con_asym, 'con_dom': con_dom, 'con_l': con_l, 'con_r': con_r,
             'ecc_asym': ecc_asym, 'ecc_dom': ecc_dom,
             'cpf_asym': cpf_asym, 'cpf_dom': cpf_dom,
@@ -583,8 +585,30 @@ def _latest_valid(sessions, key):
     return None
 
 
+REF_DEPTH = 31.0  # cm — facility-median countermovement depth; reference for depth-adjusting braking
+def _depth_adj_brk(sessions):
+    """Depth-adjusted latest braking (coach view): normalize the latest session's
+    braking force to REF_DEPTH using the athlete's OWN braking-vs-depth slope, so a
+    change in dip strategy doesn't read as a strength change (see Rob Stingone). A
+    per-athlete detrend — the only thing that removes the confound, since it points
+    different directions for different athletes. Falls back to raw braking when
+    there's too little data / depth variation to fit a reliable slope."""
+    pts = [(x['depth'], x['brk']) for x in sessions if x.get('depth') and x.get('brk')]
+    latest = next((x for x in sessions if x.get('depth') and x.get('brk')), None)
+    if not latest:
+        return None
+    if len(pts) >= 5:
+        ds = [p[0] for p in pts]; bs = [p[1] for p in pts]
+        md = sum(ds) / len(ds); mb = sum(bs) / len(bs)
+        var = sum((d - md) ** 2 for d in ds)
+        if var > 5:  # enough depth spread to trust a slope
+            slope = sum((d - md) * (b - mb) for d, b in pts) / var
+            return round(latest['brk'] - slope * (latest['depth'] - REF_DEPTH), 2)
+    return latest['brk']
+
 def gen_A(athletes_data):
-    """_A: [name, initials, group, bw, testCount, latestDate, jh, rsi, pp, brk, jhHist, rsiHist, bestJH, bestRSI, bestPP, bestBRK]"""
+    """_A: [name, initials, group, bw, testCount, latestDate, jh, rsi, pp, brk, jhHist, rsiHist,
+            bestJH, bestRSI, bestPP, bestBRK, jhHist_d, rsiHist_d, depth(cm), adjBrk(×BW @ ref depth)]"""
     rows = []
     for ath in athletes_data:
         s = ath['sessions']
@@ -622,11 +646,15 @@ def gen_A(athletes_data):
         best_pp = round(max(all_pp), 1) if all_pp else 0
         best_brk = max(all_brk) if all_brk else 0
         
+        depth_v = _latest_valid(s, 'depth')
+        depth = round(depth_v, 1) if depth_v else 0
+        adj_brk = _depth_adj_brk(s) or 0
+
         rows.append([
             ath['name'], ath['initials'], ath['group'], bw, test_count, latest_date,
             jh, rsi, pp, brk, jh_hist, rsi_hist,
             best_jh, best_rsi, best_pp, best_brk,
-            jh_hist_d, rsi_hist_d
+            jh_hist_d, rsi_hist_d, depth, adj_brk
         ])
     
     return rows
