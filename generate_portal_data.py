@@ -62,6 +62,13 @@ VELO_SUBMAX_TYPES = {"Low Effort", "Rehab"}   # excluded from "best ever" math
 # Manual session exclusions for velo (mirror HOP_MANUAL_EXCLUSIONS pattern).
 # Athletes -> list of session dates (YYYY-MM-DD) to skip entirely.
 VELO_MANUAL_EXCLUSIONS = {}
+# Re-label a bullpen-derived session (TrackMan has no effort field, so a submax
+# bullpen imports as a max-effort "Bullpen"). (athlete, YYYY-MM-DD) -> label; a
+# label in VELO_SUBMAX_TYPES (e.g. "Low Effort") also marks it submax so it drops
+# out of best/avg/trend but still shows in history.
+VELO_BULLPEN_LABELS = {
+    ("Ben Wallace", "2026-07-16"): "Low Effort",
+}
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
 
@@ -1417,23 +1424,30 @@ def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
                 continue
             # Peak FB velo = the hardest pitch in the FASTBALL FAMILY (4-seam,
             # sinker, cutter) — e.g. Cade popped a 95 sinker above his 94 four-seam.
-            # Average = the primary (most-thrown) fastball type's average velo.
             types = s.get("types", [])
             fam = [t for t in types if t.get("name") in FB_FAMILY]
             peaks = [t.get("veloMax") for t in fam if t.get("veloMax")]
             if not peaks:
                 continue  # no fastball-family pitch this session — no FB velo to record
             peak = max(peaks)
-            primary = max(fam, key=lambda t: t.get("count") or 0)
-            avg = primary.get("veloAvg")
+            # Average FB velo = the primary TRUE fastball (four-seam, else sinker),
+            # NOT the most-thrown family member. A cutter counts for peak but is a
+            # distinct, slower pitch that must not stand in for average fastball
+            # velo (Jaylen Cruz threw more cutters than four-seams, so his avg read
+            # his 79.6 cutter instead of his 85.3 fastball). Cutter drives avg only
+            # if it's the session's only fastball-family pitch.
+            true_fb = [t for t in fam if t.get("name") in ("Fastball", "Sinker")]
+            avg_src = max(true_fb or fam, key=lambda t: t.get("count") or 0)
+            avg = avg_src.get("veloAvg")
+            label = VELO_BULLPEN_LABELS.get((name, s["date"]), "Bullpen")
             ath["sessions"].append({
                 "date": s["date"],
                 "peakVelo": round(peak, 1),
                 "avgVelo": round(avg, 1) if avg else None,
-                "sessionType": "Bullpen",
+                "sessionType": label,
                 "notes": "From TrackMan bullpen",
                 "isFlagged": False,
-                "isSubmax": False,
+                "isSubmax": label in VELO_SUBMAX_TYPES,
             })
             added += 1
         ath["sessions"].sort(key=lambda x: x["date"], reverse=True)
