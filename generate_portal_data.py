@@ -7,6 +7,16 @@ import json, sys, os
 from datetime import datetime, timedelta
 from collections import defaultdict
 import statistics
+from decimal import Decimal, ROUND_HALF_UP
+
+def r1u(x):
+    """Round to 1 decimal, HALF-UP, to match VALD Hub. Python's round() is
+    banker's rounding AND reads e.g. 24.15 as the float 24.1499… so it rounds
+    DOWN to 24.1; VALD (and the coaches) round 24.15 → 24.2. str(x) recovers the
+    intended 2-decimal reading before we re-round."""
+    if x is None:
+        return None
+    return float(Decimal(str(x)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -625,7 +635,7 @@ def gen_A(athletes_data):
         latest_date = latest['date_str']
         bw_v, jh_v, rsi_v, pp_v, brk_v = (_latest_valid(s, k) for k in ('bw', 'jh', 'rsi', 'pp', 'brk'))
         bw = round(bw_v, 1) if bw_v else 0
-        jh = round(jh_v, 1) if jh_v else 0
+        jh = r1u(jh_v) if jh_v else 0
         rsi = round(rsi_v, 2) if rsi_v else 0
         pp = round(pp_v, 1) if pp_v else 0
         brk = brk_v or 0
@@ -633,7 +643,7 @@ def gen_A(athletes_data):
         # History (last 8 sessions, oldest to newest)
         hist = s[:HISTORY_LEN]
         hist.reverse()
-        jh_hist = [round(h['jh'], 1) for h in hist if h['jh'] is not None]
+        jh_hist = [r1u(h['jh']) for h in hist if h['jh'] is not None]
         rsi_hist = [round(h['rsi'], 2) for h in hist if h['rsi'] is not None]
         # Dates paired 1:1 with each (filtered) history above — the profile
         # sparklines previously indexed the athlete's FULL session-date list,
@@ -648,7 +658,7 @@ def gen_A(athletes_data):
         all_pp = [h['pp'] for h in s if h['pp'] is not None]
         all_brk = [h['brk'] for h in s if h['brk'] is not None]
         
-        best_jh = round(max(all_jh), 1) if all_jh else 0
+        best_jh = r1u(max(all_jh)) if all_jh else 0
         best_rsi = round(max(all_rsi), 2) if all_rsi else 0
         best_pp = round(max(all_pp), 1) if all_pp else 0
         best_brk = max(all_brk) if all_brk else 0
@@ -732,8 +742,8 @@ def gen_T(athletes_data):
                 return round((new - old) / abs(old) * 100, 1)
             return 0
         
-        jh_f = round(first['jh'], 1) if first['jh'] else 0
-        jh_l = round(last['jh'], 1) if last['jh'] else 0
+        jh_f = r1u(first['jh']) if first['jh'] else 0
+        jh_l = r1u(last['jh']) if last['jh'] else 0
         rsi_f = round(first['rsi'], 2) if first['rsi'] else 0
         rsi_l = round(last['rsi'], 2) if last['rsi'] else 0
         pp_f = round(first['pp'], 1) if first['pp'] else 0
@@ -771,8 +781,8 @@ def gen_WM(athletes_data):
         if curr['date'] < week_ago:
             continue
         
-        jh_c = round(curr['jh'], 1) if curr['jh'] else 0
-        jh_p = round(prev['jh'], 1) if prev['jh'] else 0
+        jh_c = r1u(curr['jh']) if curr['jh'] else 0
+        jh_p = r1u(prev['jh']) if prev['jh'] else 0
         rsi_c = round(curr['rsi'], 2) if curr['rsi'] else 0
         rsi_p = round(prev['rsi'], 2) if prev['rsi'] else 0
         
@@ -846,8 +856,8 @@ def gen_OS(athletes_data):
                 return round((new - old) / abs(old) * 100, 1)
             return 0
         
-        jf = round(first['jh'], 1) if first['jh'] else 0
-        jl = round(last['jh'], 1) if last['jh'] else 0
+        jf = r1u(first['jh']) if first['jh'] else 0
+        jl = r1u(last['jh']) if last['jh'] else 0
         rf = round(first['rsi'], 2) if first['rsi'] else 0
         rl = round(last['rsi'], 2) if last['rsi'] else 0
         pf = round(first['pp'], 1) if first['pp'] else 0
