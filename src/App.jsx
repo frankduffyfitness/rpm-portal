@@ -366,7 +366,7 @@ function MC({ metricKey, value, unit, norms, sparkData, sparkColor, bestValue, o
 
 function PR({ metrics, gc }) {
   const [hover, setHover] = useState(null);
-  const s = 220, cx = 110, cy = 110, r = 80;
+  const s = 220, cx = 110, cy = 110, r = 80, pad = 22;  // pad = horizontal room so side axis labels (e.g. "Brake") aren't clipped at the SVG edge
   const pcts = metrics.map(m => cP(m.value, m.norms, m.invert)); const n = metrics.length, st = 360 / n;
   const p2 = (a, rd) => ({ x: cx + rd * Math.cos((a - 90) * Math.PI / 180), y: cy + rd * Math.sin((a - 90) * Math.PI / 180) });
   const pts = pcts.map((p, i) => p2(i * st, (Math.min(p, 100) / 100) * r));
@@ -375,7 +375,7 @@ function PR({ metrics, gc }) {
   function handleHover(e) {
     const svg = e.currentTarget;
     const rect = svg.getBoundingClientRect();
-    const mx = (e.clientX - rect.left) / rect.width * s;
+    const mx = (e.clientX - rect.left) / rect.width * (s + 2 * pad) - pad;
     const my = (e.clientY - rect.top) / rect.height * s;
     let closest = null;
     let minDist = 30;
@@ -389,7 +389,7 @@ function PR({ metrics, gc }) {
 
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
-      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} onMouseMove={handleHover} onMouseLeave={() => setHover(null)} onTouchMove={(e) => { const t = e.touches[0]; handleHover({ currentTarget: e.currentTarget, clientX: t.clientX, clientY: t.clientY }); }} onTouchEnd={() => setHover(null)} style={{ touchAction: "none" }}>
+      <svg width={s + 2 * pad} height={s} viewBox={`${-pad} 0 ${s + 2 * pad} ${s}`} onMouseMove={handleHover} onMouseLeave={() => setHover(null)} onTouchMove={(e) => { const t = e.touches[0]; handleHover({ currentTarget: e.currentTarget, clientX: t.clientX, clientY: t.clientY }); }} onTouchEnd={() => setHover(null)} style={{ touchAction: "none" }}>
         <defs><linearGradient id="rf3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={gc} stopOpacity="0.3" /><stop offset="100%" stopColor={gc} stopOpacity="0.05" /></linearGradient></defs>
         {[.25, .5, .75, 1].map((ring, i) => <polygon key={i} points={Array.from({ length: n }, (_, j) => { const pt = p2(j * st, r * ring); return `${pt.x},${pt.y}`; }).join(" ")} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />)}
         {Array.from({ length: n }, (_, i) => { const pt = p2(i * st, r); return <line key={i} x1={cx} y1={cy} x2={pt.x} y2={pt.y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />; })}
