@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-21T05:57:12.322835+00:00",
+    "syncDate": "2026-07-21T11:14:00.479949+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 35
+    "totalAthletes": 36
   },
   "athletes": {
     "Joey Muzio": {
@@ -4568,6 +4568,49 @@
           "erIr": {
             "left": null,
             "right": 1.1
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Tanner Gola": {
+      "name": "Tanner Gola",
+      "group": "hs",
+      "dob": "2009-07-12",
+      "tests": [
+        {
+          "date": "2026-07-20",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                116.4
+              ],
+              "peakLbs": [
+                null,
+                26.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                680
+              ],
+              "ttp": [
+                null,
+                1.78
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
