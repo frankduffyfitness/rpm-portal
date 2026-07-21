@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-21T16:36:33.155945+00:00",
+    "syncDate": "2026-07-21T22:08:36.860626+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 36
+    "totalAthletes": 37
   },
   "athletes": {
     "Joey Muzio": {
@@ -733,6 +733,29 @@
               "ttp": [
                 null,
                 2.16
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                143.8
+              ],
+              "peakLbs": [
+                null,
+                32.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                817
+              ],
+              "ttp": [
+                null,
+                1.61
               ]
             }
           ],
@@ -4605,6 +4628,49 @@
               "ttp": [
                 null,
                 1.78
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Jay Delgadillo": {
+      "name": "Jay Delgadillo",
+      "group": "hs",
+      "dob": "2009-09-28",
+      "tests": [
+        {
+          "date": "2026-07-21",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                643,
+                471.8
+              ],
+              "peakLbs": [
+                144.6,
+                106.1
+              ],
+              "asymPct": 26.6,
+              "asymNote": "left side stronger",
+              "rfd": [
+                2763,
+                3000
+              ],
+              "ttp": [
+                1.26,
+                0.76
               ]
             }
           ],
