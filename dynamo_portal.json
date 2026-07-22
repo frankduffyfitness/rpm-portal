@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-07-22T16:27:04.401049+00:00",
+    "syncDate": "2026-07-22T22:11:59.150640+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 37
   },
@@ -2878,6 +2878,42 @@
       "group": "hs",
       "dob": "2010-10-30",
       "tests": [
+        {
+          "date": "2026-07-22",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Shoulder Flexion",
+              "position": "Supine, long lever",
+              "discomfort": false,
+              "peakN": [
+                69,
+                64.1
+              ],
+              "peakLbs": [
+                15.5,
+                14.4
+              ],
+              "asymPct": 7.1,
+              "asymNote": "Symmetric",
+              "rfd": [
+                222,
+                221
+              ],
+              "ttp": [
+                2.26,
+                2.02
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-07-13",
           "type": "Shoulder Strength Baseline",
