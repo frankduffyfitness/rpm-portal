@@ -152,6 +152,11 @@ const VELO_ATHLETES = _VELO.map(v => ({
   trend: v[15],
 }));
 const VELO_BY_NAME = Object.fromEntries(VELO_ATHLETES.map(v => [v.name, v]));
+// Velo "trending" threshold: a peak-velo move smaller than this (mph) is
+// session-to-session noise, not a trend (e.g. 74.7 → 74.9).
+const VELO_TREND_MIN = 1.0;
+// Groups that actually have velo pitchers, for the velo trending group filter.
+const VELO_GROUP_SET = new Set(["all", ...VELO_ATHLETES.map(v => v.group)]);
 // TrackMan/velo names differ from ForceDecks names for a few pitchers, so their
 // report card never found its bullpen data. Bridge the ForceDecks spelling → velo
 // row (both directions) so TrackMan attaches regardless of which spelling the
@@ -2555,13 +2560,16 @@ function VeloProfile({ athlete, onBack, onReport }) {
   );
 }
 
-function VeloTrendingTab({ onSelect }) {
-  const sorted_by_trend = [...VELO_ATHLETES].filter(a => a.sessions >= 3).sort((a, b) => b.trend - a.trend);
-  const gainers = sorted_by_trend.filter(a => a.trend > 0).slice(0, 10);
-  const decliners = sorted_by_trend.filter(a => a.trend < 0).sort((a, b) => a.trend - b.trend).slice(0, 10);
+function VeloTrendingTab({ filterGroup, onSelect }) {
+  const pool = (filterGroup && filterGroup !== "all") ? VELO_ATHLETES.filter(a => a.group === filterGroup) : VELO_ATHLETES;
+  const sorted_by_trend = [...pool].filter(a => a.sessions >= 3).sort((a, b) => b.trend - a.trend);
+  // Only a peak-velo move of at least VELO_TREND_MIN mph counts as trending;
+  // smaller swings are session-to-session noise.
+  const gainers = sorted_by_trend.filter(a => a.trend >= VELO_TREND_MIN).slice(0, 10);
+  const decliners = sorted_by_trend.filter(a => a.trend <= -VELO_TREND_MIN).sort((a, b) => a.trend - b.trend).slice(0, 10);
   
   // New peak PRs - athletes whose latest peak equals their peak ever
-  const newPRs = VELO_ATHLETES.filter(a => a.sessions >= 2 && a.latestPeak === a.peakEver).map(a => {
+  const newPRs = pool.filter(a => a.sessions >= 2 && a.latestPeak === a.peakEver).map(a => {
     const prevPeak = a.peakHistory.length >= 2 ? Math.max(...a.peakHistory.slice(0, -1)) : null;
     return { ...a, prevPeak };
   });
@@ -2570,7 +2578,7 @@ function VeloTrendingTab({ onSelect }) {
     <div style={{ padding: "0 16px" }}>
       <div style={{ textAlign: "center", marginBottom: 20 }}>
         <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{"\u26BE"} Velo Trends</div>
-        <div style={{ fontSize: 11, color: "#6B7280" }}>{VELO_ATHLETES.length} pitchers · TrackMan</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>{pool.length} pitchers · TrackMan</div>
       </div>
 
       {newPRs.length > 0 && (
@@ -2593,7 +2601,7 @@ function VeloTrendingTab({ onSelect }) {
         </div>
       )}
 
-      <div style={{ marginBottom: 20 }}>
+      {gainers.length > 0 && (<div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 10 }}>{"\u2191"} Gaining Velo</div>
         {gainers.map((a, i) => (
           <div key={a.name} onClick={() => onSelect && onSelect(a.name)} style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", marginBottom: 4,
@@ -2609,7 +2617,7 @@ function VeloTrendingTab({ onSelect }) {
             <div style={{ fontSize: 16, fontWeight: 800, color: "#4FFFB0" }}>+{a.trend} mph</div>
           </div>
         ))}
-      </div>
+      </div>)}
 
       {decliners.length > 0 && (
         <div style={{ marginBottom: 20 }}>
@@ -2625,6 +2633,9 @@ function VeloTrendingTab({ onSelect }) {
             </div>
           ))}
         </div>
+      )}
+      {gainers.length === 0 && decliners.length === 0 && newPRs.length === 0 && (
+        <div style={{ textAlign: "center", color: "#6B7280", fontSize: 12, padding: "24px 0" }}>No velo trends of {VELO_TREND_MIN} mph or more in this group yet.</div>
       )}
     </div>
   );
@@ -3258,11 +3269,11 @@ export default function App() {
         {tab === "profile" && testType === "velo" && !veloProfileSearch && veloSel && (
           <VeloProfile athlete={veloSel} onBack={() => setVeloProfileSearch(true)} onReport={() => setShowVeloReport(true)} />
         )}
-        {tab !== "home" && (tab === "standings" || tab === "trending") && testType !== "velo" && (
+        {tab !== "home" && (tab === "trending" || (tab === "standings" && testType !== "velo")) && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Filter by group</div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-              {Object.entries(GROUPS).map(([key, g]) => { if (!GROUP_NORMS[key]) return null; const isA = standG === key; return (<button key={key} onClick={() => setStandG(key)} style={{ padding: "7px 10px", border: `1px solid ${isA ? g.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: isA ? `${g.color}15` : "rgba(255,255,255,0.02)", color: isA ? g.color : "#6B7280" }}>{g.shortLabel}</button>); })}
+              {Object.entries(GROUPS).map(([key, g]) => { if (testType === "velo" ? !VELO_GROUP_SET.has(key) : !GROUP_NORMS[key]) return null; const isA = standG === key; return (<button key={key} onClick={() => setStandG(key)} style={{ padding: "7px 10px", border: `1px solid ${isA ? g.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: isA ? `${g.color}15` : "rgba(255,255,255,0.02)", color: isA ? g.color : "#6B7280" }}>{g.shortLabel}</button>); })}
             </div>
           </div>
         )}
@@ -3271,7 +3282,7 @@ export default function App() {
         {tab === "standings" && testType === "velo" && <VeloTab  onSelect={(name) => { const a = VELO_ATHLETES.find(x => x.name === name); if (a) { setVeloSel(a); setTestType("velo"); setVeloProfileSearch(false); setProfileSearch(true); setHopProfileSearch(true); setTab("profile"); setTimeout(() => window.scrollTo(0, 0), 50); }}} />}
         {tab === "trending" && testType === "cmj" && <TrendingTab filterGroup={standG} onSelect={(name) => { const a = ATHLETES.find(x => x.name === name); if (a) { setSel(a); setCmpG(null); setTestType("cmj"); setProfileSearch(false); setHopProfileSearch(true); setVeloProfileSearch(true); setTab("profile"); setTimeout(() => window.scrollTo(0, 0), 50); }}} />}
         {tab === "trending" && testType === "hop" && <HopTrendingTab filterGroup={standG} onSelect={(name) => { const a = HOP_ATHLETES.find(x => x.name === name); if (a) { setHopSel(a); setHopCmpG(null); setTestType("hop"); setHopProfileSearch(false); setProfileSearch(true); setVeloProfileSearch(true); setTab("profile"); setTimeout(() => window.scrollTo(0, 0), 50); }}} />}
-        {tab === "trending" && testType === "velo" && <VeloTrendingTab onSelect={(name) => { const a = VELO_ATHLETES.find(x => x.name === name); if (a) { setVeloSel(a); setTestType("velo"); setVeloProfileSearch(false); setProfileSearch(true); setHopProfileSearch(true); setTab("profile"); setTimeout(() => window.scrollTo(0, 0), 50); }}} />}
+        {tab === "trending" && testType === "velo" && <VeloTrendingTab filterGroup={standG} onSelect={(name) => { const a = VELO_ATHLETES.find(x => x.name === name); if (a) { setVeloSel(a); setTestType("velo"); setVeloProfileSearch(false); setProfileSearch(true); setHopProfileSearch(true); setTab("profile"); setTimeout(() => window.scrollTo(0, 0), 50); }}} />}
       </div>
       <button onClick={() => { setHopProfileSearch(true); window.scrollTo(0,0); }} style={{ border: "none", background: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", padding: "4px 0 8px 16px" }}>{"\u2190"} Change Athlete</button>
           <div style={{ position: "sticky", bottom: 0, padding: "12px 20px 20px", background: "linear-gradient(0deg, #0A0C10 60%, transparent)", textAlign: "center" }}>
