@@ -3226,7 +3226,6 @@ export default function App() {
   const brkRank = groupAthletes.filter(a => a.best.eccBrakingRFD > sel.best.eccBrakingRFD).length + 1;
   const sortByLast = (a, b) => a.name.split(" ").slice(-1)[0].localeCompare(b.name.split(" ").slice(-1)[0]);
   const filtered = search.length > 0 ? ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).sort(sortByLast).slice(0, 25) : [...ATHLETES].sort(sortByLast).slice(0, 25);
-  const rm = [{ sl: "Jump", value: cmj.jumpHeight, norms: norms.cmjHeight, unit: '"' }, { sl: "RSI", value: cmj.rsi, norms: norms.rsiMod }, { sl: "Impulse", value: cmj.conImpulse, norms: norms.conImpulse, unit: " N\u00b7s" }, { sl: "Brake", value: cmj.eccBrakingRFD, norms: norms.eccBrakingRFD, unit: "×BW" }];
 
   return (<>
     <style>{"@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap'); @media print { body * { visibility: hidden; } #report-content, #report-content * { visibility: visible; } #report-content { position: absolute; left: 0; top: 0; width: 100%; } }"}</style>
@@ -3310,13 +3309,6 @@ export default function App() {
             <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Compare against</div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
               {Object.entries(GROUPS).map(([key, g]) => { if (!GROUP_NORMS[key]) return null; const isA = eG === key; return (<button key={key} onClick={() => setCmpG(key)} style={{ padding: "7px 10px", border: `1px solid ${isA ? g.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: isA ? `${g.color}15` : "rgba(255,255,255,0.02)", color: isA ? g.color : "#6B7280" }}>{g.shortLabel}</button>); })}
-            </div>
-          </div>
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "18px 12px 12px", marginBottom: 16, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#8A8F98", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 2 }}>Performance Profile vs. <span style={{ color: gi.color, fontWeight: 700 }}>{gi.label}</span></div>
-            <div style={{ display: "flex", justifyContent: "center" }}><PR metrics={rm} gc={gi.color} /></div>
-            <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 2 }}>
-              {[{ l: "< 25th", c: "#FF4D4D" }, { l: "25-50", c: "#FFB020" }, { l: "50-75", c: "#60A5FA" }, { l: "75+", c: "#4FFFB0" }].map(x => (<div key={x.l} style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 7, height: 7, borderRadius: "50%", background: x.c }} /><span style={{ fontSize: 9, color: "#6B7280" }}>{x.l}</span></div>))}
             </div>
           </div>
           <PhysCard name={sel.name} gc={gi.color} giLabel={gi.label} norms={norms} />
