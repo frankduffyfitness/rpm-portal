@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-07-23T11:17:12.470371+00:00",
+    "syncDate": "2026-07-23T16:40:50.176586+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 37
   },
@@ -2905,6 +2905,52 @@
                 2.26,
                 2.02
               ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                157.3,
+                161.6
+              ],
+              "peakLbs": [
+                35.4,
+                36.3
+              ],
+              "asymPct": 2.7,
+              "asymNote": "Symmetric",
+              "rfd": [
+                411,
+                501
+              ],
+              "ttp": [
+                2.65,
+                2.58
+              ]
+            },
+            {
+              "name": "Shoulder Extension",
+              "position": "Prone, long lever",
+              "discomfort": false,
+              "peakN": [
+                86.7,
+                86.2
+              ],
+              "peakLbs": [
+                19.5,
+                19.4
+              ],
+              "asymPct": 0.6,
+              "asymNote": "Symmetric",
+              "rfd": [
+                368,
+                237
+              ],
+              "ttp": [
+                3.51,
+                2.08
+              ]
             }
           ],
           "erIr": {
@@ -4753,6 +4799,29 @@
               "ttp": [
                 0.56,
                 0.71
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                231.6,
+                154.6
+              ],
+              "peakLbs": [
+                52.1,
+                34.8
+              ],
+              "asymPct": 33.2,
+              "asymNote": "left side stronger",
+              "rfd": [
+                654,
+                574
+              ],
+              "ttp": [
+                2.66,
+                2.72
               ]
             }
           ],
