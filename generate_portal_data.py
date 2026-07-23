@@ -770,6 +770,25 @@ def gen_T(athletes_data):
 
 # ─── Generate _WM Array (Weekly Movers) ─────────────────────────────────────
 
+# Physicality metrics that ride the trending sections as a trailing per-row
+# dict {key: [prev, curr, change%]} — appended so existing positional indices
+# never shift. bw is included (weight-gain tracking) but PRs skip it.
+PHY_TREND_ROUND = {'pp': 1, 'ci100': 1, 'pkw': 0, 'pkwbm': 1, 'cmpbm': 1, 'bw': 1}
+def _tr_round(k, v):
+    if v is None:
+        return 0
+    return round(v) if PHY_TREND_ROUND[k] == 0 else round(v, PHY_TREND_ROUND[k])
+def _tr_chg(old, new):
+    return round((new - old) / abs(old) * 100, 1) if old else 0
+def _tr_dict(prev_sess, curr_sess, keys=('pp', 'ci100', 'pkw', 'pkwbm', 'cmpbm', 'bw')):
+    out = {}
+    for k in keys:
+        p = _tr_round(k, prev_sess.get(k))
+        c = _tr_round(k, curr_sess.get(k))
+        out[k] = [p, c, _tr_chg(p, c)]
+    return out
+
+
 def gen_WM(athletes_data):
     """_WM: [name, initials, group, jhPrev, jhCurr, jhChange%, rsiPrev, rsiCurr, rsiChange%, prevDate, currDate]"""
     week_ago = datetime.now() - timedelta(days=7)
@@ -799,6 +818,7 @@ def gen_WM(athletes_data):
             ath['name'], ath['initials'], ath['group'],
             jh_p, jh_c, jh_chg, rsi_p, rsi_c, rsi_chg,
             prev['date_str'], curr['date_str'],
+            _tr_dict(prev, curr),
         ])
     
     return rows
@@ -839,7 +859,14 @@ def gen_MH(athletes_data):
         jh_chg = round((tm_jh - lm_jh) / lm_jh * 100, 1) if lm_jh else 0
         rsi_chg = round((tm_rsi - lm_rsi) / lm_rsi * 100, 1) if lm_rsi else 0
         
-        rows.append([ath['name'], ath['initials'], ath['group'], lm_jh, tm_jh, jh_chg, lm_rsi, tm_rsi, rsi_chg])
+        md = {}
+        for k in ('pp', 'ci100', 'pkw', 'pkwbm', 'cmpbm', 'bw'):
+            tv = [x[k] for x in tm if x.get(k) is not None]
+            lv = [x[k] for x in lm if x.get(k) is not None]
+            ta = _tr_round(k, sum(tv) / len(tv)) if tv else 0
+            la = _tr_round(k, sum(lv) / len(lv)) if lv else 0
+            md[k] = [la, ta, _tr_chg(la, ta)]
+        rows.append([ath['name'], ath['initials'], ath['group'], lm_jh, tm_jh, jh_chg, lm_rsi, tm_rsi, rsi_chg, md])
     
     return rows
 
@@ -875,6 +902,7 @@ def gen_OS(athletes_data):
             ath['name'], ath['initials'], ath['group'], len(s),
             jf, jl, chg(jf, jl), rf, rl, chg(rf, rl),
             pf, pl, chg(pf, pl), bf, bl, chg(bf, bl),
+            _tr_dict(first, last, ('ci100', 'pkw', 'pkwbm', 'cmpbm', 'bw')),
         ])
     
     return rows
@@ -1036,7 +1064,8 @@ def gen_PR(athletes_data):
         prev_sessions = s[1:]
         
         prs = []
-        metric_keys = [('jh', 'JH'), ('rsi', 'RSI'), ('pp', 'CI'), ('brk', 'BRK')]
+        metric_keys = [('jh', 'JH'), ('rsi', 'RSI'), ('pp', 'CI'), ('brk', 'BRK'),
+                       ('ci100', 'CI100'), ('pkw', 'PKW'), ('pkwbm', 'PKWBM'), ('cmpbm', 'CMPBM')]
         
         for mk, label in metric_keys:
             curr_val = latest.get(mk)
