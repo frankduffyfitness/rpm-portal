@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-23T16:40:50.176586+00:00",
+    "syncDate": "2026-07-23T22:10:21.016578+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 37
+    "totalAthletes": 39
   },
   "athletes": {
     "Joey Muzio": {
@@ -122,6 +122,42 @@
       "group": "stf",
       "dob": "1993-11-20",
       "tests": [
+        {
+          "date": "2026-07-23",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                715.3,
+                null
+              ],
+              "peakLbs": [
+                160.8,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                3307,
+                null
+              ],
+              "ttp": [
+                3.36,
+                null
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-07-18",
           "type": "Shoulder Strength Baseline",
@@ -4828,6 +4864,115 @@
           "erIr": {
             "left": null,
             "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Connor Tam": {
+      "name": "Connor Tam",
+      "group": "col",
+      "dob": "2006-08-07",
+      "tests": [
+        {
+          "date": "2026-07-23",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                504.2,
+                538.2
+              ],
+              "peakLbs": [
+                113.3,
+                121.0
+              ],
+              "asymPct": 6.3,
+              "asymNote": "Symmetric",
+              "rfd": [
+                3027,
+                2985
+              ],
+              "ttp": [
+                1.75,
+                1.53
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Ricky Falcon": {
+      "name": "Ricky Falcon",
+      "group": "stf",
+      "dob": "2005-04-09",
+      "tests": [
+        {
+          "date": "2026-07-23",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                194.4
+              ],
+              "peakLbs": [
+                null,
+                43.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                675
+              ],
+              "ttp": [
+                null,
+                2.18
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                193.9
+              ],
+              "peakLbs": [
+                null,
+                43.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                548
+              ],
+              "ttp": [
+                null,
+                3.12
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 1.0
           },
           "discomfortNote": "",
           "planNote": ""
