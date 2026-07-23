@@ -680,7 +680,6 @@ function StandingsTab({ filterGroup, onSelect }) {
     jumpHeight: { label: "Jump Height", unit: '"', key: "jumpHeight", icon: "\u26A1", color: "#4FFFB0", desc: "How high the athlete jumps from a standing position. The #1 indicator of lower-body power and explosiveness." },
     rsi: { label: "RSI-mod", unit: "", key: "rsi", icon: "\u23F1", color: "#FF6B6B", desc: "Jump height divided by time to produce it. Measures how quickly an athlete can be explosive." },
     conImpulse: { label: "Con. Impulse", unit: " N\u00b7s", key: "conImpulse", color: "#60A5FA", desc: "Total net force applied through the push-off over time. The gym\u2019s primary drive metric." },
-    eccBrakingRFD: { label: "Braking Force", unit: "×BW", key: "eccBrakingRFD", color: "#FFB020", desc: "Average force the body produces to absorb and reverse the dip in a jump, relative to bodyweight. Reflects eccentric loading and stretch-shortening quality; built by strength training." },
   };
   const cfg = cfgs[metric];
   const sorted = useMemo(() => {
@@ -3227,7 +3226,6 @@ export default function App() {
   const jhRank = groupAthletes.filter(a => a.best.jumpHeight > sel.best.jumpHeight).length + 1;
   const rsiRank = groupAthletes.filter(a => a.best.rsi > sel.best.rsi).length + 1;
   const ppRank = groupAthletes.filter(a => a.best.conImpulse > sel.best.conImpulse).length + 1;
-  const brkRank = groupAthletes.filter(a => a.best.eccBrakingRFD > sel.best.eccBrakingRFD).length + 1;
   const sortByLast = (a, b) => a.name.split(" ").slice(-1)[0].localeCompare(b.name.split(" ").slice(-1)[0]);
   const filtered = search.length > 0 ? ATHLETES.filter(a => a.name.toLowerCase().includes(search.toLowerCase())).sort(sortByLast).slice(0, 25) : [...ATHLETES].sort(sortByLast).slice(0, 25);
 
@@ -3332,13 +3330,6 @@ export default function App() {
               {pl && pl[6] != null && <MC metricKey="conMeanPowerBM" value={pl[6]} unit="W/kg" norms={norms.conMeanPowerBM} bestValue={pb && pb.cmpbm} sparkColor="#2DD4BF" {...sp("cmpbm")} />}
             </>);
           })()}
-          <MC metricKey="eccBrakingRFD" value={cmj.eccBrakingRFD} unit="×BW" norms={norms.eccBrakingRFD} bestValue={sel.best.eccBrakingRFD} rank={brkRank} rankTotal={groupCount} rankLabel={groupLabel} />
-          {cmj.depth ? (
-            <div style={{ fontSize: 10, color: "#8A8F98", margin: "-6px 2px 16px", lineHeight: 1.5 }}>
-              Braking depends on jump strategy: this jump used a <b style={{ color: "#B8BDC4" }}>~{Math.round(cmj.depth)} cm</b> countermovement dip.
-              {cmj.adjBrk ? <> Depth-adjusted braking (normalized to a 31 cm dip using this athlete&rsquo;s own depth trend): <b style={{ color: "#B8BDC4" }}>{cmj.adjBrk.toFixed(2)}&times; BW</b> — a change in dip strategy won&rsquo;t read as a strength change.</> : null}
-            </div>
-          ) : null}
           <AsymmetrySection athleteName={sel.name} />
         <BodyweightChart athleteName={sel.name} group={sel.group} />
         <Insights athlete={sel} norms={norms} groupLabel={gi.label} />
