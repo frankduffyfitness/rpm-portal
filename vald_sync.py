@@ -45,6 +45,12 @@ PORTAL_METRICS = {
     6553757: {"key": "brakingForceBW",     "label": "Ecc Braking Force / BW", "unit": "×BW", "scale": 1},
     6553603: {"key": "cmDepth",            "label": "Countermovement Depth", "unit": "cm", "scale": 1},  # signed (neg = deeper); context for braking
     6553712: {"key": "concentricImpulse",  "label": "Concentric Impulse",  "unit": "N·s",  "scale": 1},
+    # Physicality radar additions (2026-07-23): absolute peak power, mean power
+    # relative to bodymass, and early-drive impulse in the first 100ms of the
+    # concentric. 6553* family = the populated CMJ ids (7340* twins are empty).
+    6553633: {"key": "peakPower",          "label": "Peak Power",          "unit": "W",    "scale": 1},
+    6553624: {"key": "conMeanPowerBM",     "label": "Conc Mean Power / BM","unit": "W/kg", "scale": 1},
+    6553675: {"key": "conImpulse100",      "label": "Conc Impulse-100ms",  "unit": "N·s",  "scale": 1},
     6553703: {"key": "eccBrakingImpulse",  "label": "Ecc Braking Impulse", "unit": "N·s",  "scale": 1},
     6553685: {"key": "concPeakForce",      "label": "Conc Peak Force",     "unit": "N",    "scale": 1},
      655387: {"key": "bodyweightLbs",      "label": "Bodyweight",          "unit": "lbs",  "scale": 2.20462},

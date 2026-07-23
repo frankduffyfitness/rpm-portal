@@ -305,6 +305,11 @@ for pid, ath in fd['athletes'].items():
         bw = compute_session_avg(test['trials'], 'bodyweightLbs')
         depth_raw = compute_session_avg(test['trials'], 'cmDepth')  # signed cm (neg = deeper)
         depth = round(abs(depth_raw), 1) if depth_raw else None      # store as positive cm for display
+        # Physicality-radar metrics (pinned in vald_sync 2026-07-23):
+        pkw = compute_session_best(test['trials'], 'peakPower')          # W
+        pkwbm = compute_session_best(test['trials'], 'relativePower')    # W/kg (Peak Power / BM)
+        cmpbm = compute_session_best(test['trials'], 'conMeanPowerBM')   # W/kg
+        ci100 = compute_session_best(test['trials'], 'conImpulse100')    # N·s in first 100ms
         
         # Asymmetry
         con_asym, con_dom, con_l, con_r = compute_session_asym(test['trials'], 'concentricImpulse')
@@ -315,6 +320,7 @@ for pid, ath in fd['athletes'].items():
             'date': dt,
             'date_str': dt.strftime('%m/%d/%Y'),
             'jh': jh, 'rsi': rsi, 'pp': pp, 'brk': brk, 'bw': bw, 'depth': depth,
+            'pkw': pkw, 'pkwbm': pkwbm, 'cmpbm': cmpbm, 'ci100': ci100,
             'con_asym': con_asym, 'con_dom': con_dom, 'con_l': con_l, 'con_r': con_r,
             'ecc_asym': ecc_asym, 'ecc_dom': ecc_dom,
             'cpf_asym': cpf_asym, 'cpf_dom': cpf_dom,
@@ -952,7 +958,8 @@ def gen_SD(athletes_data):
 
 def gen_N(athletes_data):
     """Group norms: percentiles for each metric per group."""
-    groups = defaultdict(lambda: {'jh': [], 'rsi': [], 'pp': [], 'brk': []})
+    groups = defaultdict(lambda: {'jh': [], 'rsi': [], 'pp': [], 'brk': [],
+                                  'bw': [], 'pkw': [], 'pkwbm': [], 'cmpbm': [], 'ci100': []})
     counts = defaultdict(int)  # athletes contributing per group (for the relaxed gate)
 
     for ath in athletes_data:
@@ -976,7 +983,7 @@ def gen_N(athletes_data):
             targets = [g]
         for t in targets:
             counts[t] += 1
-        for m in ('jh', 'rsi', 'pp', 'brk'):
+        for m in ('jh', 'rsi', 'pp', 'brk', 'bw', 'pkw', 'pkwbm', 'cmpbm', 'ci100'):
             if latest[m]:
                 for t in targets:
                     groups[t][m].append(latest[m])
@@ -995,13 +1002,19 @@ def gen_N(athletes_data):
         return {"p10": p(10), "p25": p(25), "p50": p(50), "p75": p(75), "p90": p(90)}
     
     norms = {}
-    metric_map = {'jh': 'cmjHeight', 'rsi': 'rsiMod', 'pp': 'conImpulse', 'brk': 'eccBrakingRFD'}
+    metric_map = {'jh': 'cmjHeight', 'rsi': 'rsiMod', 'pp': 'conImpulse', 'brk': 'eccBrakingRFD',
+                  # Physicality radar (2026-07-23). Percentile of bodyweight is the LSU
+                  # chart's own convention (mass = physicality axis, not shown for fem).
+                  'bw': 'bodyweight', 'pkw': 'peakPower', 'pkwbm': 'peakPowerBM',
+                  'cmpbm': 'conMeanPowerBM', 'ci100': 'conImpulse100'}
     for g, data in groups.items():
         # Relaxed groups (pro/ml) must have >=3 contributing athletes AND >=3
         # samples per metric, or the percentile is degenerate and the UI would
         # show a broken "vs Pro" button. Non-relaxed groups keep prior behavior.
+        # Relaxed gate checks only the original four metrics — the physicality
+        # additions may be thin on older tests and must not knock out a group.
         if g in NORM_RELAXED_GROUPS and (counts[g] < NORM_RELAXED_MIN_ATHLETES
-                or any(len(data[mk]) < 3 for mk in metric_map)):
+                or any(len(data[mk]) < 3 for mk in ('jh', 'rsi', 'pp', 'brk'))):
             continue
         norms[g] = {nk: pctiles(data[mk]) for mk, nk in metric_map.items()}
 
@@ -1396,6 +1409,41 @@ _ASY = gen_ASY(athletes_data)
 _BW = gen_BW(athletes_data)
 _SD = gen_SD(athletes_data)
 _N = gen_N(athletes_data)
+
+
+# ─── Physicality radar (LSU-style percentile chart, 2026-07-23) ──────────────
+# Per-athlete LATEST + FIRST-session values for the 8 radar metrics, in the
+# order the App's PHY_METRICS expects:
+#   bw, jh, conImpulse('pp'), conImpulse100, peakPower, peakPowerBM, conMeanPowerBM, rsi
+# The dashed radar overlay = the athlete's first tested value per metric (same
+# first-vs-latest framing as PR Progress).
+def gen_PHY(athletes_data):
+    PHY_KEYS = ('bw', 'jh', 'pp', 'ci100', 'pkw', 'pkwbm', 'cmpbm', 'rsi')
+    def rnd(k, v):
+        if v is None:
+            return None
+        if k == 'jh':
+            return r1u(v)
+        if k == 'rsi':
+            return round(v, 2)
+        if k == 'pkw':
+            return round(v)
+        return round(v, 1)
+    def first_valid(sessions, key):
+        for h in reversed(sessions):   # sessions are newest→oldest
+            if h.get(key) is not None:
+                return h[key]
+        return None
+    out = []
+    for ath in athletes_data:
+        s = ath['sessions']
+        latest = [rnd(k, _latest_valid(s, k)) for k in PHY_KEYS]
+        first = [rnd(k, first_valid(s, k)) for k in PHY_KEYS]
+        if all(v is None for v in latest):
+            continue
+        out.append([ath['name'], latest, first, len(s)])
+    return out
+_PHY = gen_PHY(athletes_data)
 _PR = gen_PR(athletes_data)
 
 # Hop test arrays
@@ -1680,6 +1728,7 @@ print(f"  _ASY: {len(_ASY)} asymmetry", flush=True)
 print(f"  _BW:  {len(_BW)} bodyweight", flush=True)
 print(f"  _SD:  {len(_SD)} session dates", flush=True)
 print(f"  _N:   {len(_N)} groups", flush=True)
+print(f"  _PHY: {len(_PHY)} physicality rows", flush=True)
 print(f"  _PR:  {len(_PR)} new PRs", flush=True)
 print(f"  _HA:  {len(_HA)} hop athletes", flush=True)
 print(f"  _HPB: {len(_HPB)} hop personal bests", flush=True)
@@ -1710,6 +1759,7 @@ output_lines.append(f"const _ASY = {json.dumps(_ASY, separators=(',', ':'))};")
 output_lines.append(f"const _BW = {json.dumps(_BW, separators=(',', ':'))};")
 output_lines.append(f"const _SD = {json.dumps(_SD, separators=(',', ':'))};")
 output_lines.append(f"const _N = {json.dumps(_N, separators=(',', ':'))};")
+output_lines.append(f"const _PHY = {json.dumps(_PHY, separators=(',', ':'))};")
 output_lines.append(f"const _PR = {json.dumps(_PR, separators=(',', ':'))};")
 output_lines.append(f"const _HA = {json.dumps(_HA, separators=(',', ':'))};")
 output_lines.append(f"const _HPB = {json.dumps(_HPB, separators=(',', ':'))};")
@@ -1736,7 +1786,7 @@ jsx = re.sub(r'const LAST_UPDATED = ".*?";', f'const LAST_UPDATED = "{today_str}
 # Find where each const is defined and replace it
 replacements = {
     '_A': _A, '_T': _T, '_PB': _PB, '_WM': _WM, '_MH': _MH,
-    '_OS': _OS, '_ASY': _ASY, '_BW': _BW, '_SD': _SD, '_N': _N, '_PR': _PR,
+    '_OS': _OS, '_ASY': _ASY, '_BW': _BW, '_SD': _SD, '_N': _N, '_PR': _PR, '_PHY': _PHY,
 }
 replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _HD})
 replacements.update({'_VELO': _VELO})
