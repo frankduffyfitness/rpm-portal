@@ -406,6 +406,13 @@ def process_trial(trial):
             key = f"{meta['key']}Left"
         elif limb == "Right":
             key = f"{meta['key']}Right"
+        elif limb == "Asym":
+            # Keep the asymmetry entry OUT of the bare key: VALD emits up to
+            # four limb rows per result (Trial/Left/Right/Asym) and Asym comes
+            # last, so it silently overwrote the Trial value for any metric
+            # with limb splits. Caught 2026-07-23: Concentric Impulse-100ms
+            # showed 11.4 N·s (the asym %) instead of 241.0 (the Hub value).
+            key = f"{meta['key']}Asym"
 
         metrics[key] = display_value
 
