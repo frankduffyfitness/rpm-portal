@@ -234,6 +234,7 @@ const MI = {
   cmjHeight: { title: "Jump Height", desc: "How high you jump from a standing position. The #1 indicator of lower-body power and explosiveness. Directly correlates with sprint speed, lateral quickness, and on-field athleticism.", icon: "\u26A1" },
   rsiMod: { title: "Reactive Strength Index", desc: "Jump height divided by how long it took to produce it. Measures how QUICKLY you can be explosive \u2014 not just how strong you are, but how fast you can use that strength.", icon: "\u23F1" },
   conImpulse: { title: "Concentric Impulse", desc: "The total net force applied through the entire push-off, over time (Newton-seconds). It captures the whole drive off the ground rather than a single instant, and is closely tied to takeoff velocity.", icon: "\uD83D\uDCAA" },
+  bodyweight: { title: "Bodyweight", desc: "The athlete\u2019s bodyweight from the force plates at their latest session, ranked against the comparison group. Mass is part of the physicality picture \u2014 more athlete moving at the same speed is more force.", icon: "\u2696\uFE0F" },
   conImpulse100: { title: "Con. Impulse @100ms", desc: "The net drive produced in the FIRST 100 milliseconds of the push-off. Early-drive explosiveness \u2014 how much of the jump is won right at the turnaround.", icon: "\u26A1" },
   peakPower: { title: "Peak Power", desc: "The highest instantaneous power output (Watts) during the push-off \u2014 force times velocity at its peak. The raw engine-size number.", icon: "\uD83D\uDD0B" },
   peakPowerBM: { title: "Peak Power / BM", desc: "Peak power divided by bodymass (W/kg). Engine size relative to the athlete\u2019s own weight \u2014 the number that transfers to sprinting and jumping.", icon: "\u2696" },
@@ -3314,6 +3315,10 @@ export default function App() {
             </div>
           </div>
           <PhysCard name={sel.name} gc={gi.color} giLabel={gi.label} norms={norms} />
+          {!FEM_SET.has(sel.name) && BW_DATA[sel.name] && sel.bw ? (
+            <MC metricKey="bodyweight" value={sel.bw} unit="lbs" norms={norms.bodyweight} sparkColor="#E0E0E0"
+              sparkData={BW_DATA[sel.name].history} sparkDates={BW_DATA[sel.name].dates} sparkUnit=" lbs" />
+          ) : null}
           <MC metricKey="cmjHeight" value={cmj.jumpHeight} unit='"' norms={norms.cmjHeight} sparkData={sel.jhHistory} sparkColor="#4FFFB0" bestValue={sel.best.jumpHeight} sparkDates={sel.jhHistoryDates} sparkUnit='"' rank={jhRank} rankTotal={groupCount} rankLabel={groupLabel} />
           <MC metricKey="rsiMod" value={cmj.rsi} unit="" norms={norms.rsiMod} sparkData={sel.rsiHistory} sparkColor="#FF6B6B" bestValue={sel.best.rsi} sparkDates={sel.rsiHistoryDates} rank={rsiRank} rankTotal={groupCount} rankLabel={groupLabel} />
           {(() => {
@@ -3331,7 +3336,6 @@ export default function App() {
             </>);
           })()}
           <AsymmetrySection athleteName={sel.name} />
-        <BodyweightChart athleteName={sel.name} group={sel.group} />
         <Insights athlete={sel} norms={norms} groupLabel={gi.label} />
           
         
