@@ -1434,6 +1434,10 @@ def gen_PHY(athletes_data):
             if h.get(key) is not None:
                 return h[key]
         return None
+    # Sparkline histories for the profile metric cards: last HISTORY_LEN
+    # sessions (oldest→newest), nulls dropped with dates kept aligned per
+    # metric — same pattern as _A's jh/rsi histories.
+    HIST_KEYS = ('pp', 'ci100', 'pkw', 'pkwbm', 'cmpbm')
     out = []
     for ath in athletes_data:
         s = ath['sessions']
@@ -1441,7 +1445,17 @@ def gen_PHY(athletes_data):
         first = [rnd(k, first_valid(s, k)) for k in PHY_KEYS]
         if all(v is None for v in latest):
             continue
-        out.append([ath['name'], latest, first, len(s)])
+        recent = s[:HISTORY_LEN][::-1]   # oldest→newest window
+        hist = {}
+        for k in HIST_KEYS:
+            vals = [rnd(k, h[k]) for h in recent if h.get(k) is not None]
+            dts = [h['date_str'] for h in recent if h.get(k) is not None]
+            hist[k] = [vals, dts]
+        best = {}
+        for k in ('ci100', 'pkw', 'pkwbm', 'cmpbm'):
+            allv = [h[k] for h in s if h.get(k) is not None]
+            best[k] = rnd(k, max(allv)) if allv else None
+        out.append([ath['name'], latest, first, len(s), hist, best])
     return out
 _PHY = gen_PHY(athletes_data)
 _PR = gen_PR(athletes_data)
