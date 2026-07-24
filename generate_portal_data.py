@@ -1064,7 +1064,9 @@ def gen_PR(athletes_data):
         prev_sessions = s[1:]
         
         prs = []
-        metric_keys = [('jh', 'JH'), ('rsi', 'RSI'), ('pp', 'CI'), ('brk', 'BRK'),
+        # PR-able metrics = the profile page's physicality set (braking removed
+        # from the portal UI 2026-07-23/24; bodyweight deliberately not a "PR").
+        metric_keys = [('jh', 'JH'), ('rsi', 'RSI'), ('pp', 'CI'),
                        ('ci100', 'CI100'), ('pkw', 'PKW'), ('pkwbm', 'PKWBM'), ('cmpbm', 'CMPBM')]
         
         for mk, label in metric_keys:
