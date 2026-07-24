@@ -695,22 +695,36 @@ function StandingsTab({ filterGroup, onSelect }) {
     jumpHeight: { label: "Jump Height", unit: '"', key: "jumpHeight", icon: "\u26A1", color: "#4FFFB0", desc: "How high the athlete jumps from a standing position. The #1 indicator of lower-body power and explosiveness." },
     rsi: { label: "RSI-mod", unit: "", key: "rsi", icon: "\u23F1", color: "#FF6B6B", desc: "Jump height divided by time to produce it. Measures how quickly an athlete can be explosive." },
     conImpulse: { label: "Con. Impulse", unit: " N\u00b7s", key: "conImpulse", color: "#60A5FA", desc: "Total net force applied through the push-off over time. The gym\u2019s primary drive metric." },
+    ci100: { label: "Imp. @100ms", unit: " N\u00b7s", src: "phy", phyKey: "ci100", color: "#A78BFA", desc: "Net drive produced in the first 100 milliseconds of the push-off. Early-drive explosiveness \u2014 all-time best." },
+    pkw: { label: "Peak Power", unit: " W", src: "phy", phyKey: "pkw", color: "#FFB020", desc: "Highest instantaneous power output during the push-off \u2014 all-time best." },
+    pkwbm: { label: "Pk Pwr/BM", unit: " W/kg", src: "phy", phyKey: "pkwbm", color: "#38BDF8", desc: "Peak power per kilogram of bodymass \u2014 the number that transfers to sprinting and jumping. All-time best." },
+    cmpbm: { label: "Mean Pwr/BM", unit: " W/kg", src: "phy", phyKey: "cmpbm", color: "#2DD4BF", desc: "Average concentric power per kilogram of bodymass \u2014 all-time best." },
+    bw: { label: "Bodyweight", unit: " lbs", src: "bw", color: "#E0E0E0", desc: "Latest force-plate bodyweight. Mass is part of the physicality picture." },
   };
   const cfg = cfgs[metric];
+  // Period bests (_PB) only exist for the original three metrics; the
+  // physicality additions rank all-time (bodyweight: latest session).
+  const hasPeriods = !cfg.src;
+  const phyVal = (a) => {
+    const r = PHY_BY_NAME[a.name];
+    return r && r[5] && r[5][cfg.phyKey] != null ? r[5][cfg.phyKey] : null;
+  };
   const sorted = useMemo(() => {
     let list = filterGroup === "all" ? [...ATHLETES] : ATHLETES.filter(a => a.group === filterGroup || (filterGroup === "fem" && FEM_SET.has(a.name)));
-    if (period !== "all") {
+    if (cfg.src === "bw") list = list.filter(a => !FEM_SET.has(a.name) && a.bw);
+    if (cfg.src === "phy") list = list.filter(a => phyVal(a) != null);
+    if (!cfg.src && period !== "all") {
       list = list.filter(a => a.pb[period] != null);
     }
-    list.sort((a, b) => {
-      const aVal = period === "all" ? a.best[cfg.key] : (a.pb[period] ? a.pb[period][cfg.key] : 0);
-      const bVal = period === "all" ? b.best[cfg.key] : (b.pb[period] ? b.pb[period][cfg.key] : 0);
-      return bVal - aVal;
-    });
+    const val = (a) => cfg.src === "phy" ? phyVal(a) : cfg.src === "bw" ? a.bw
+      : (period === "all" ? a.best[cfg.key] : (a.pb[period] ? a.pb[period][cfg.key] : 0));
+    list.sort((a, b) => val(b) - val(a));
     return list;
   }, [metric, filterGroup, period]);
 
   function getVal(a) {
+    if (cfg.src === "phy") return phyVal(a);
+    if (cfg.src === "bw") return a.bw;
     if (period === "all") return a.best[cfg.key];
     return a.pb[period] ? a.pb[period][cfg.key] : 0;
   }
@@ -719,12 +733,12 @@ function StandingsTab({ filterGroup, onSelect }) {
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 16, flexWrap: "wrap" }}>
         {Object.entries(cfgs).map(([k, v]) => (
-          <button key={k} onClick={() => setMetric(k)} style={{ padding: "7px 10px", border: `1px solid ${metric === k ? v.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: metric === k ? `${v.color}15` : "rgba(255,255,255,0.02)", color: metric === k ? v.color : "#6B7280" }}>{v.label}</button>
+          <button key={k} onClick={() => { setMetric(k); if (cfgs[k].src) setPeriod("all"); }} style={{ padding: "7px 10px", border: `1px solid ${metric === k ? v.color : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: metric === k ? `${v.color}15` : "rgba(255,255,255,0.02)", color: metric === k ? v.color : "#6B7280" }}>{v.label}</button>
         ))}
       </div>
       <div style={{ fontSize: 11, color: "#8A8F98", lineHeight: 1.5, marginBottom: 14, padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10, borderLeft: `3px solid ${cfg.color}` }}>{cfg.desc}</div>
       <div style={{ display: "flex", gap: 5, marginBottom: 16 }}>
-        {Object.entries(periods).map(([k, v]) => (
+        {hasPeriods && Object.entries(periods).map(([k, v]) => (
           <button key={k} onClick={() => setPeriod(k)} style={{ padding: "7px 10px", border: `1px solid ${period === k ? "#C084FC" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: period === k ? "rgba(192,132,252,0.12)" : "rgba(255,255,255,0.02)", color: period === k ? "#C084FC" : "#6B7280" }}>{v}</button>
         ))}
       </div>
