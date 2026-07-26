@@ -46,7 +46,7 @@ const FemBadge = ({ name, size }) => FEM_SET.has(name) ? (
     verticalAlign: "middle", display: "inline-block" }}>FEM</span>
 ) : null;
 
-const LAST_UPDATED = "July 25, 2026";
+const LAST_UPDATED = "July 26, 2026";
 
 // Pro / Men's League are visiting or one-off testers who won't reach the
 // 5-session roster minimum, but Frank wants them browsable in standings +
