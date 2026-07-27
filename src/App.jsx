@@ -2393,15 +2393,22 @@ function BullpenBreakdown({ name }) {
           <div style={{ fontSize: 9, color: "#4A4F57", fontWeight: 700, letterSpacing: 1 }}>TRACKMAN</div>
         </div>
         <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 12 }}>{s.df} {"·"} {s.st}{s.note ? <span style={{ color: "#FFB020", fontWeight: 700 }}> {"·"} {s.note}</span> : null}</div>
-        <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4, marginBottom: 12 }}>
-          {sessions.map((x, i) => (
-            <button key={i} onClick={() => setSi(i)} style={{
-              padding: "5px 12px", borderRadius: 14, border: "none", cursor: "pointer",
-              fontSize: 10, fontWeight: 700, whiteSpace: "nowrap",
-              background: i === si ? "rgba(79,255,176,0.14)" : "rgba(255,255,255,0.04)",
-              color: i === si ? "#4FFFB0" : "#6B7280",
-            }}>{x.d}</button>
-          ))}
+        {/* Session picker: chips overflowed once athletes piled up 6+ bullpens,
+            so it's a dropdown — each entry reads "date — Max FB velo". */}
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <select value={si} onChange={(e) => setSi(Number(e.target.value))} style={{
+            width: "100%", padding: "9px 34px 9px 12px", borderRadius: 10, cursor: "pointer",
+            fontSize: 12, fontWeight: 700, appearance: "none", WebkitAppearance: "none",
+            background: "rgba(255,255,255,0.04)", color: "#4FFFB0",
+            border: "1px solid rgba(79,255,176,0.25)", outline: "none",
+          }}>
+            {sessions.map((x, i) => {
+              const famMax = Math.max(...x.types.filter((t) => ["Fastball", "Sinker", "Cutter"].includes(t[0])).map((t) => t[3] || 0), 0);
+              const fbMax = famMax || Math.max(...x.types.map((t) => t[3] || 0), 0);
+              return <option key={i} value={i} style={{ background: "#1A1D24", color: "#E0E0E0" }}>{x.df} — Max FB {fbMax.toFixed(1)}</option>;
+            })}
+          </select>
+          <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#4FFFB0", fontSize: 10 }}>{"\u25BC"}</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
           {[["PITCHES", s.tot], ["TYPES", s.types.length], ["TOP VELO", topVelo.toFixed(1)],
