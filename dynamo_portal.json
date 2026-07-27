@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-27T17:04:34.426486+00:00",
+    "syncDate": "2026-07-27T22:13:40.733573+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 40
+    "totalAthletes": 42
   },
   "athletes": {
     "Joey Muzio": {
@@ -4531,6 +4531,65 @@
       "dob": "2011-08-24",
       "tests": [
         {
+          "date": "2026-07-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                164.8,
+                168.6
+              ],
+              "peakLbs": [
+                37.0,
+                37.9
+              ],
+              "asymPct": 2.3,
+              "asymNote": "Symmetric",
+              "rfd": [
+                674,
+                1012
+              ],
+              "ttp": [
+                1.57,
+                2.43
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                145.4,
+                147
+              ],
+              "peakLbs": [
+                32.7,
+                33.0
+              ],
+              "asymPct": 1.1,
+              "asymNote": "Symmetric",
+              "rfd": [
+                848,
+                680
+              ],
+              "ttp": [
+                3.33,
+                2.0
+              ]
+            }
+          ],
+          "erIr": {
+            "left": 1.13,
+            "right": 1.15
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-07-16",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -5082,6 +5141,65 @@
       "dob": "2009-07-12",
       "tests": [
         {
+          "date": "2026-07-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                186.9
+              ],
+              "peakLbs": [
+                null,
+                42.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                580
+              ],
+              "ttp": [
+                null,
+                2.8
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                171.3
+              ],
+              "peakLbs": [
+                null,
+                38.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                843
+              ],
+              "ttp": [
+                null,
+                1.84
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 1.09
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-07-20",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -5538,6 +5656,230 @@
           "erIr": {
             "left": null,
             "right": 1.12
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Michael Destefano": {
+      "name": "Michael Destefano",
+      "group": "hs",
+      "dob": "2007-02-11",
+      "tests": [
+        {
+          "date": "2026-07-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                153
+              ],
+              "peakLbs": [
+                null,
+                34.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1038
+              ],
+              "ttp": [
+                null,
+                1.67
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                113.7
+              ],
+              "peakLbs": [
+                null,
+                25.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                775
+              ],
+              "ttp": [
+                null,
+                1.49
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                378.4
+              ],
+              "peakLbs": [
+                null,
+                85.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2356
+              ],
+              "ttp": [
+                null,
+                1.72
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                392.5
+              ],
+              "peakLbs": [
+                null,
+                88.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2235
+              ],
+              "ttp": [
+                null,
+                3.2
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 1.35
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Angelo Nunes": {
+      "name": "Angelo Nunes",
+      "group": "col",
+      "dob": "2006-08-16",
+      "tests": [
+        {
+          "date": "2026-07-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                185.3
+              ],
+              "peakLbs": [
+                null,
+                41.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                869
+              ],
+              "ttp": [
+                null,
+                12.25
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                221.9
+              ],
+              "peakLbs": [
+                null,
+                49.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                627
+              ],
+              "ttp": [
+                null,
+                2.87
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                510.1
+              ],
+              "peakLbs": [
+                null,
+                114.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2852
+              ],
+              "ttp": [
+                null,
+                2.79
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                471.3
+              ],
+              "peakLbs": [
+                null,
+                106.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2483
+              ],
+              "ttp": [
+                null,
+                1.29
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.84
           },
           "discomfortNote": "",
           "planNote": ""
