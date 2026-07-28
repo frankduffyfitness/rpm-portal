@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/coachportal", "destination": "/index.html" }
+  ]
+}

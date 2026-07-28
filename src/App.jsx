@@ -1354,7 +1354,7 @@ function LandingPage({ onEnter, onSelectAthlete }) {
       
 
 
-      <button onClick={() => { window.location.hash = "dynamo"; window.location.reload(); }} style={{
+      <button onClick={() => { window.location.href = "/coachportal"; }} style={{
         display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 18px",
         border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, cursor: "pointer",
         fontSize: 12, fontWeight: 600, background: "rgba(255,255,255,0.03)", color: "#8A8F98",
@@ -3268,7 +3268,49 @@ function VmOverview({ rows, onPick }) {
   );
 }
 
-function VmFlags({ rows, onPick }) {
+// ── Flag-list rosters: collapsible, alphabetical by last name ────────────────
+// "George Cancel Jr" files under Cancel — a trailing suffix never drives the
+// sort; ties among brothers break on first name.
+const vmSplitName = (n) => {
+  const parts = n.trim().split(/\s+/);
+  let i = parts.length - 1;
+  while (i > 0 && /^(jr|sr|ii|iii|iv|v)\.?$/i.test(parts[i])) i--;
+  return [parts.slice(0, i).join(" "), parts.slice(i).join(" ")];
+};
+
+function VmGroupList({ title, caption, rows, right, open, onToggle, onPick, dim }) {
+  const sorted = [...rows].sort((a, b) => {
+    const [ga, la] = vmSplitName(a.name), [gb, lb] = vmSplitName(b.name);
+    return la.localeCompare(lb) || ga.localeCompare(gb);
+  });
+  return (
+    <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, marginBottom: 10, overflow: "hidden" }}>
+      <button onClick={onToggle} aria-expanded={open} style={{ width: "100%", display: "flex", alignItems: "center", gap: 7, padding: "12px 12px", border: "none", background: "none", cursor: "pointer", textAlign: "left", fontFamily: "inherit" }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: dim ? "#6B7280" : "#8A8F98" }}>{title}</span>
+        <span style={{ fontSize: 10, fontWeight: 800, color: "#4A4F57" }}>{sorted.length}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" style={{ marginLeft: "auto", flexShrink: 0, transform: open ? "rotate(180deg)" : "none", transition: "transform 0.18s" }}>
+          <path d="M2 3.5 L5 6.5 L8 3.5" stroke="#6B7280" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open && (<div>
+        <div style={{ fontSize: 10, color: dim ? "#4A4F57" : "#6B7280", lineHeight: 1.5, padding: "0 12px 9px" }}>{caption}</div>
+        {sorted.map((r) => {
+          const [given, last] = vmSplitName(r.name);
+          const gi = GROUPS[r.group] || {};
+          return (
+            <div key={r.name} onClick={() => onPick(r)} style={{ display: "flex", alignItems: "baseline", gap: 6, padding: "8px 12px", borderTop: "1px solid rgba(255,255,255,0.04)", cursor: "pointer" }}>
+              <span style={{ fontSize: 12, color: dim ? "#5B6470" : "#8A8F98" }}>{given}{given ? " " : ""}<span style={{ fontWeight: 700, color: dim ? "#8A8F98" : "#E0E0E0" }}>{last}</span></span>
+              <span style={{ fontSize: 9, color: gi.color || "#6B7280" }}>{gi.shortLabel || r.group}</span>
+              <span style={{ marginLeft: "auto", fontSize: 9, color: "#6B7280", flexShrink: 0 }}>{right(r)}</span>
+            </div>
+          );
+        })}
+      </div>)}
+    </div>
+  );
+}
+
+function VmFlags({ rows, onPick, openLists, onToggleList }) {
   const eligible = rows.filter(r => !r.thin && r.sessions >= 5);
   const flagged = eligible.filter(r => Math.abs(r.residA) > VM_BAND).sort((a, b) => b.residA - a.residA);
   const onModel = eligible.filter(r => Math.abs(r.residA) <= VM_BAND);
@@ -3305,22 +3347,18 @@ function VmFlags({ rows, onPick }) {
         })}
         {!flagged.length && <div style={{ padding: 20, fontSize: 11, color: "#6B7280", textAlign: "center" }}>No pitcher is currently outside the noise band.</div>}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#8A8F98", marginBottom: 6 }}>On model, as expected</div>
-      <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, marginBottom: 10 }}>Inside {"±"}{VM_BAND} mph the difference is indistinguishable from noise, so no number is shown.</div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-        {onModel.map(r => (
-          <span key={r.name} onClick={() => onPick(r)} style={{ fontSize: 10, color: "#8A8F98", background: "rgba(255,255,255,0.04)", borderRadius: 8, padding: "5px 9px", cursor: "pointer" }}>{r.name} <span style={{ color: "#4A4F57" }}>{r.sessions}s</span></span>
-        ))}
-      </div>
-      {thin.length > 0 && (<>
-        <div style={{ fontSize: 11, fontWeight: 700, color: "#6B7280", marginBottom: 6 }}>Thin data</div>
-        <div style={{ fontSize: 10, color: "#4A4F57", lineHeight: 1.5, marginBottom: 10 }}>Under 5 sessions, or no velo in 90 days. Residuals here are not reliable yet.</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {thin.map(r => (
-            <span key={r.name} onClick={() => onPick(r)} style={{ fontSize: 10, color: "#5B6470", background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 9px", cursor: "pointer" }}>{r.name} <span style={{ color: "#FFB020" }}>thin</span></span>
-          ))}
-        </div>
-      </>)}
+      {onModel.length > 0 && (
+        <VmGroupList title="On model, as expected"
+          caption={`Inside ±${VM_BAND} mph the difference is indistinguishable from noise, so no number is shown.`}
+          rows={onModel} right={(r) => `${r.sessions} sess`}
+          open={openLists.model} onToggle={() => onToggleList("model")} onPick={onPick} />
+      )}
+      {thin.length > 0 && (
+        <VmGroupList dim title="Thin data"
+          caption="Under 5 sessions, or no velo in 90 days. Residuals here are not reliable yet."
+          rows={thin} right={(r) => (r.sessions < 5 ? `${r.sessions} sess` : "no recent velo")}
+          open={openLists.thin} onToggle={() => onToggleList("thin")} onPick={onPick} />
+      )}
     </div>
   );
 }
@@ -3453,6 +3491,10 @@ function VmAthleteCard({ r, onBack }) {
 function VeloModelSection() {
   const [view, setView] = useState("overview");
   const [pick, setPick] = useState(null);
+  // Roster panels live here, not in VmFlags, so an open panel survives the
+  // trip to an athlete card and back.
+  const [openLists, setOpenLists] = useState({ model: false, thin: false });
+  const onToggleList = (k) => setOpenLists(s => ({ ...s, [k]: !s[k] }));
   const rows = VM_ROWS;
   if (!rows.length) return <div style={{ fontSize: 12, color: "#6B7280", textAlign: "center", padding: 40 }}>No fitted pitchers yet. Regenerate the portal data to fill the model.</div>;
   if (pick) return <VmAthleteCard r={pick} onBack={() => setPick(null)} />;
@@ -3464,7 +3506,7 @@ function VeloModelSection() {
           <button key={k} onClick={() => setView(k)} style={{ padding: "7px 12px", border: "1px solid " + (view === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: view === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: view === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
         ))}
       </div>
-      {view === "overview" ? <VmOverview rows={rows} onPick={open} /> : <VmFlags rows={rows} onPick={open} />}
+      {view === "overview" ? <VmOverview rows={rows} onPick={open} /> : <VmFlags rows={rows} onPick={open} openLists={openLists} onToggleList={onToggleList} />}
     </div>
   );
 }
@@ -3485,7 +3527,7 @@ function DynamoPage() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <div style={{ height: 40 }} />
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-        <img src={RPM_LOGO} alt="RPM Strength" title="Back to Athlete Portal" onClick={() => { window.location.hash = ""; window.location.reload(); }} style={{ height: 30, width: "auto", cursor: "pointer" }} />
+        <img src={RPM_LOGO} alt="RPM Strength" title="Back to Athlete Portal" onClick={() => { window.location.href = "/"; }} style={{ height: 30, width: "auto", cursor: "pointer" }} />
         <div style={{ width: 1, height: 22, background: "rgba(255,255,255,0.12)" }} />
         <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>DynaMo</div>
         <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#4FFFB0", background: "rgba(79,255,176,0.1)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 6, padding: "2px 6px" }}>STAFF</div>
@@ -3536,7 +3578,9 @@ export default function App() {
   const [showVeloReport, setShowVeloReport] = useState(false);
   const [hopCmpG, setHopCmpG] = useState(null);
   const [standG, setStandG] = useState("all");
-  const [isDynamo] = useState(() => { try { return /dynamo/i.test(window.location.hash); } catch (e) { return false; } });
+  // Coach's portal lives at /coachportal (rewrite in vercel.json); the old
+  // #dynamo hash keeps working so existing staff bookmarks don't break.
+  const [isDynamo] = useState(() => { try { return /^\/coachportal\/?$/i.test(window.location.pathname) || /dynamo/i.test(window.location.hash); } catch (e) { return false; } });
   if (isDynamo) return <DynamoPage />;
 
   // Shared print: every .rpt-page prints as exactly one letter sheet, measured
