@@ -342,6 +342,81 @@ def merge_cmj(existing, new_data):
                       "totalTests": total_tests, "totalAthletes": len(ath)}
 
 
+def merge_ppu(existing, new_data):
+    """Replace every athlete's PPU tests with the freshly-built ones; leave all
+    other test types untouched. Mirrors merge_cmj. Pure + unit-testable."""
+    ath = existing.setdefault("athletes", {})
+    dropped = 0
+    for a in ath.values():
+        before = len(a.get("tests", []))
+        a["tests"] = [t for t in a.get("tests", []) if t.get("testType") != "PPU"]
+        dropped += before - len(a["tests"])
+    added = 0
+    for pid, na in new_data["athletes"].items():
+        if pid not in ath:
+            ath[pid] = na
+        else:
+            ath[pid]["tests"].extend(na["tests"])
+            ath[pid]["tests"].sort(key=lambda t: t.get("date", ""), reverse=True)
+            ath[pid]["name"] = na.get("name") or ath[pid].get("name")
+            ath[pid]["dateOfBirth"] = na.get("dateOfBirth") or ath[pid].get("dateOfBirth")
+            ath[pid]["groups"] = na.get("groups") or ath[pid].get("groups")
+        added += len(na["tests"])
+    total_tests = sum(len(a["tests"]) for a in ath.values())
+    existing["meta"] = {
+        "syncDate": datetime.now(timezone.utc).isoformat(),
+        "totalAthletes": len(ath),
+        "totalTests": total_tests,
+        "totalTrials": new_data["meta"]["totalTrials"],
+    }
+    return existing, {"dropped": dropped, "added": added,
+                      "totalTests": total_tests, "totalAthletes": len(ath)}
+
+
+def count_legacy_ppu(existing):
+    """PPU tests ingested before the 2026-07-28 metric mapping (ffdf113) lack
+    flightTime/contractionTime/ppuRsi. Date-bounded so a future test that
+    genuinely lacks a metric can never trigger a refetch loop."""
+    stale = 0
+    for a in existing.get("athletes", {}).values():
+        for t in a.get("tests", []):
+            if (t.get("testType") == "PPU"
+                    and (t.get("date") or "")[:10] < "2026-07-28"
+                    and t.get("trials")
+                    and not any("flightTime" in (tr.get("metrics") or {})
+                                for tr in t["trials"])):
+                stale += 1
+    return stale
+
+
+def heal_legacy_ppu(token, profiles):
+    """Self-healing PPU backfill: when legacy PPU tests are missing the new
+    metrics, re-pull ONLY the PPU tests (a handful of API calls) and merge
+    them in. Runs on every sync; a no-op once the store has converged."""
+    if not os.path.exists(OUTPUT_FILE):
+        return
+    with open(OUTPUT_FILE) as f:
+        existing = json.load(f)
+    stale = count_legacy_ppu(existing)
+    if not stale:
+        return
+    log(f"PPU self-heal: {stale} legacy PPU test(s) missing new metrics; re-pulling all PPU tests...")
+    all_tests = fetch_tests(token, "2020-01-01T00:00:00Z")
+    ppu = [t for t in all_tests if t.get("testType") == "PPU"]
+    if not ppu:
+        log("PPU self-heal: no PPU tests returned; skipping rather than wiping PPU data.")
+        return
+    trials_by_test = fetch_all_trials_parallel(token, ppu)
+    new_data = build_portal_data(profiles, ppu, trials_by_test)
+    with open(OUTPUT_FILE) as f:
+        existing = json.load(f)
+    existing, stats = merge_ppu(existing, new_data)
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(existing, f, separators=(',', ':'), default=str)
+    log(f"PPU self-heal complete: replaced {stats['dropped']} legacy with "
+        f"{stats['added']} fresh PPU tests.")
+
+
 def refresh_hop():
     """Re-fetch + re-extract ONLY HJ (hop) tests and merge into the portal JSON,
     leaving CMJ / IMTP / everything else untouched. Used to backfill the
@@ -576,6 +651,12 @@ def main():
     profiles = fetch_profiles(token)
     groups = fetch_groups(token)
     attach_groups_to_profiles(token, profiles, groups)
+    # Runs before the no-new-tests early return so convergence never waits on
+    # unrelated test activity. Failure here must never sink the main sync.
+    try:
+        heal_legacy_ppu(token, profiles)
+    except Exception as ex:
+        log(f"PPU self-heal skipped ({ex}); will retry next sync.")
     modified_from = "2020-01-01T00:00:00Z" if full_sync else load_sync_state()
     if full_sync:
         log("Full sync requested.")
