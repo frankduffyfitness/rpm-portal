@@ -1795,11 +1795,15 @@ def _vm_norm(s):
 def gen_VM(fd_data, trackman_data, dynamo_list):
     """_VM: model constants + per-athlete rows
     [name, group, ci, rsi, erRfd|null, velo, sessions, lastVelo, predA, residA,
-     predB|null, residB|null, thin]
-    ci = best-rep physics-estimate concentric impulse, bw_kg*sqrt(2gh)*1.006
-    (validated vs the leaderboard metric at r=0.992+; the API trial field is a
-    different quantity and does NOT reproduce the fit). rsi = best rep.
+     predB|null, residB|null, thin, bwLbs|null]
+    ci = best-rep measured concentric impulse (trials[].metrics.concentricImpulse,
+    net N.s, matches the fit table exactly); athletes with no measured value fall
+    back to the physics estimate bw_kg*sqrt(2gh)*1.006, same as fit_model.py
+    ("prefer measured CI; fall back to the validated physics estimate", r=0.992+
+    vs measured). rsi = best rep.
     erRfd = per-test max populated side, mean across tests, N/s -> lbs/s.
+    bwLbs = current bodyweight for the what-if card's projector slider: mean of
+    the last 5 CMJ test weights (the test's weight field is kg, x LB_PER_KG).
     Excludes Staff and EXCLUDE_ATHLETES. Rankings use residA only; residB is
     card detail (never mix A and B residuals in one list)."""
     import math
@@ -1843,20 +1847,29 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
         tv = velo.get(k)
         if not tv:
             continue
-        ci = rsi = 0.0
+        ci_meas = ci_est = rsi = 0.0
+        cmj_weights = []  # (date, kg) per CMJ test, for current bodyweight
         for t in ath.get("tests", []):
             if t.get("testType") != "CMJ":
                 continue
+            if t.get("weight"):
+                cmj_weights.append((t.get("date") or "", t["weight"]))
             for tr in t.get("trials", []):
                 m = tr.get("metrics", {})
+                if m.get("concentricImpulse"):
+                    ci_meas = max(ci_meas, m["concentricImpulse"])
                 jh, bw = m.get("jumpHeight"), m.get("bodyweightLbs")
                 if jh and bw:
-                    ci = max(ci, (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006)
+                    ci_est = max(ci_est, (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006)
                 r = m.get("rsiModified")
                 if r:
                     rsi = max(rsi, r)
+        ci = ci_meas or ci_est  # per-athlete fallback, mirroring fit_model.py
         if not ci or not rsi:
             continue
+        # Current bodyweight (lbs) = mean of the last 5 CMJ test weights (kg).
+        last5 = [w for _, w in sorted(cmj_weights)[-5:]]
+        bw_lbs = round(sum(last5) / len(last5) * LB_PER_KG, 1) if last5 else None
         pred_a = VM_A[0] + VM_A[1] * ci + VM_A[2] * rsi
         resid_a = tv["v"] - pred_a
         e = er.get(k)
@@ -1873,7 +1886,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             _vm_norm(name), grp, round(ci, 1), round(rsi, 2),
             round(e, 1) if e else None, round(tv["v"], 1), tv["n"], tv["last"][:10],
             round(pred_a, 1), round(resid_a, 1),
-            round(pred_b, 1) if pred_b is not None else None, resid_b, thin,
+            round(pred_b, 1) if pred_b is not None else None, resid_b, thin, bw_lbs,
         ])
     rows.sort(key=lambda r: -r[9])
     return {"a": list(VM_A), "b": list(VM_B), "rmse": VM_RMSE, "r2": VM_R2,
