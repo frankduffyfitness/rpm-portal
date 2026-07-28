@@ -1795,7 +1795,13 @@ def _vm_norm(s):
 def gen_VM(fd_data, trackman_data, dynamo_list):
     """_VM: model constants + per-athlete rows
     [name, group, ci, rsi, erRfd|null, velo, sessions, lastVelo, predA, residA,
-     predB|null, residB|null, thin, bwLbs|null]
+     predB|null, residB|null, thin, bwLbs|null,
+     velo6w|null, sess6w, ci6w|null, rsi6w|null, pred6w|null, resid6w|null,
+     status, lastCmj|null]
+    Indices 14-21 are CURRENT FORM: the same coefficients scored on inputs from
+    the last 42 days only (Frank, 2026-07-28: a February peak must not drive a
+    July flag). status "current" needs 3+ window sessions and a window CMJ;
+    everything else is "stale" and the UI shows dates instead of a residual.
     ci = best-rep measured concentric impulse (trials[].metrics.concentricImpulse,
     net N.s, matches the fit table exactly); athletes with no measured value fall
     back to the physics estimate bw_kg*sqrt(2gh)*1.006, same as fit_model.py
@@ -1807,6 +1813,19 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
     Excludes Staff and EXCLUDE_ATHLETES. Rankings use residA only; residB is
     card detail (never mix A and B residuals in one list)."""
     import math
+    from datetime import timedelta
+
+    # Current-form window: scoring inputs from the last 6 weeks only. Slides
+    # automatically with every sync run. Coefficients stay fitted on all
+    # history (n=81); refitting on the window alone was tested and is worse.
+    VM_WINDOW_DAYS = 42
+    cutoff = (datetime.now() - timedelta(days=VM_WINDOW_DAYS)).strftime("%Y-%m-%d")
+
+    def _target(peaks):
+        if VM_TARGET == "max":
+            return peaks[0]
+        top3 = sorted(peaks[:3])  # "t3": median of the top-3 session peaks
+        return top3[len(top3) // 2]
 
     velo = {}
     for nm, a in ((trackman_data or {}).get("athletes") or {}).items():
@@ -1816,12 +1835,10 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             continue
         elig = [x for x in sess if not x.get("isSubmax") and not x.get("isFlagged")] or sess
         peaks = sorted((x["peakVelo"] for x in elig), reverse=True)
-        if VM_TARGET == "max":
-            target = peaks[0]
-        else:  # "t3": median of the top-3 session peaks
-            top3 = sorted(peaks[:3])
-            target = top3[len(top3) // 2]
-        velo[k] = {"v": target, "n": len(sess), "last": max(x["date"] for x in sess)}
+        recent = [x for x in elig if (x.get("date") or "")[:10] >= cutoff]
+        peaks6 = sorted((x["peakVelo"] for x in recent), reverse=True)
+        velo[k] = {"v": _target(peaks), "n": len(sess), "last": max(x["date"] for x in sess),
+                   "v6": _target(peaks6) if peaks6 else None, "n6": len(recent)}
 
     er = {}
     for a in dynamo_list:
@@ -1848,23 +1865,37 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
         if not tv:
             continue
         ci_meas = ci_est = rsi = 0.0
+        ci6_meas = ci6_est = rsi6 = 0.0
+        last_cmj = None
         cmj_weights = []  # (date, kg) per CMJ test, for current bodyweight
         for t in ath.get("tests", []):
             if t.get("testType") != "CMJ":
                 continue
+            t_date = (t.get("date") or "")[:10]
+            in_window = t_date >= cutoff
+            if t_date:
+                last_cmj = max(last_cmj, t_date) if last_cmj else t_date
             if t.get("weight"):
                 cmj_weights.append((t.get("date") or "", t["weight"]))
             for tr in t.get("trials", []):
                 m = tr.get("metrics", {})
                 if m.get("concentricImpulse"):
                     ci_meas = max(ci_meas, m["concentricImpulse"])
+                    if in_window:
+                        ci6_meas = max(ci6_meas, m["concentricImpulse"])
                 jh, bw = m.get("jumpHeight"), m.get("bodyweightLbs")
                 if jh and bw:
-                    ci_est = max(ci_est, (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006)
+                    est = (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006
+                    ci_est = max(ci_est, est)
+                    if in_window:
+                        ci6_est = max(ci6_est, est)
                 r = m.get("rsiModified")
                 if r:
                     rsi = max(rsi, r)
+                    if in_window:
+                        rsi6 = max(rsi6, r)
         ci = ci_meas or ci_est  # per-athlete fallback, mirroring fit_model.py
+        ci6 = ci6_meas or ci6_est
         if not ci or not rsi:
             continue
         # Current bodyweight (lbs) = mean of the last 5 CMJ test weights (kg).
@@ -1882,11 +1913,22 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
         except Exception:
             days = 9999
         thin = 1 if (tv["n"] < 5 or days > 90) else 0
+        # Current form: the last 6 weeks scored with the all-time coefficients.
+        v6, n6 = tv.get("v6"), tv.get("n6", 0)
+        pred6 = resid6 = None
+        if v6 is not None and ci6 and rsi6:
+            pred6 = VM_A[0] + VM_A[1] * ci6 + VM_A[2] * rsi6
+            resid6 = round(v6 - pred6, 1)
+        status = "current" if (n6 >= 3 and resid6 is not None) else "stale"
         rows.append([
             _vm_norm(name), grp, round(ci, 1), round(rsi, 2),
             round(e, 1) if e else None, round(tv["v"], 1), tv["n"], tv["last"][:10],
             round(pred_a, 1), round(resid_a, 1),
             round(pred_b, 1) if pred_b is not None else None, resid_b, thin, bw_lbs,
+            round(v6, 1) if v6 is not None else None, n6,
+            round(ci6, 1) if ci6 else None, round(rsi6, 2) if rsi6 else None,
+            round(pred6, 1) if pred6 is not None else None, resid6,
+            status, last_cmj,
         ])
     rows.sort(key=lambda r: -r[9])
     return {"a": list(VM_A), "b": list(VM_B), "rmse": VM_RMSE, "r2": VM_R2,
