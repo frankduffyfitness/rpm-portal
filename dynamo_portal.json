@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-07-27T22:13:40.733573+00:00",
+    "syncDate": "2026-07-28T05:54:32.853813+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 42
   },
@@ -5664,7 +5664,7 @@
     },
     "Michael Destefano": {
       "name": "Michael Destefano",
-      "group": "hs",
+      "group": "col",
       "dob": "2007-02-11",
       "tests": [
         {
