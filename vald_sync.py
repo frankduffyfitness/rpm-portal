@@ -63,6 +63,37 @@ PORTAL_METRICS = {
 }
 PORTAL_METRIC_IDS = set(PORTAL_METRICS.keys())
 
+# ─── PPU (Plyometric Push Up) metrics — kept ONLY on PPU tests ───────────────
+# Scoped like the hop set: Flight/Contraction Time are generic Takeoff-group
+# ids that also exist on jump tests, where we don't keep them. Wire units for
+# the time metrics are unverified (the hop twins arrive in SECONDS despite ms
+# catalog labels), so _ppu_norm() normalizes defensively instead of trusting a
+# fixed scale. Ids verified against fd_result_definitions.json.
+PPU_METRICS = {
+    6553606: {"key": "flightTime",      "label": "Flight Time",                 "unit": "ms"},
+    6553643: {"key": "contractionTime", "label": "Contraction Time",            "unit": "ms"},
+    7405572: {"key": "pushUpHeight",    "label": "Push Up Height (Flight Time)","unit": "cm"},
+    6553637: {"key": "conRfd",          "label": "Concentric RFD",              "unit": "N/s"},
+    6553678: {"key": "eccBrakingRfd",   "label": "Eccentric Braking RFD",       "unit": "N/s"},
+    7405574: {"key": "pushUpDepth",     "label": "Push Up Depth",               "unit": "cm"},
+    6553686: {"key": "concPeakForceBM", "label": "Concentric Peak Force / BM",  "unit": "N/kg"},
+}
+PPU_METRIC_IDS = set(PPU_METRICS.keys())
+
+
+def _ppu_norm(key, value):
+    """Wire-unit defense for PPU metrics. Times: seconds → ms when value < 10
+    (real PPU times are 100-3000 ms). Lengths: metres → cm when value < 1
+    (real heights/depths are 5-60 cm). Identity when values already arrive in
+    display units, so a future wire change cannot double-scale."""
+    if value is None:
+        return None
+    if key in ("flightTime", "contractionTime") and 0 < value < 10:
+        return value * 1000.0
+    if key in ("pushUpHeight", "pushUpDepth") and 0 < value < 1:
+        return value * 100.0
+    return value
+
 # Per-hop repeat results (Takeoff group, isRepeatResult=True). Averaging these
 # over ALL hops in a set gives the WHOLE-SET mean that VALD Hub headlines.
 # VALD's own "Mean RSI" (13303830) is the mean of only the best N hops, so it
@@ -381,8 +412,8 @@ def merge_hop(existing, new_data):
                       "totalTests": total_tests, "totalAthletes": len(ath)}
 
 
-def process_trial(trial):
-    """Extract the named portal metrics (CMJ + Hop) from a trial.
+def process_trial(trial, test_type=""):
+    """Extract the named portal metrics (CMJ + Hop + PPU) from a trial.
     L/R limbs get Left/Right suffixes."""
     metrics = {}
 
@@ -392,13 +423,16 @@ def process_trial(trial):
         if result_id is None:
             result_id = result.get("definition", {}).get("id")
 
-        if result_id not in PORTAL_METRIC_IDS:
+        is_ppu_metric = test_type == "PPU" and result_id in PPU_METRIC_IDS
+        if result_id not in PORTAL_METRIC_IDS and not is_ppu_metric:
             continue
 
         value = result.get("value")
         limb = result.get("limb", "Trial")
-        meta = PORTAL_METRICS[result_id]
-        scale = meta["scale"]
+        meta = PPU_METRICS[result_id] if is_ppu_metric else PORTAL_METRICS[result_id]
+        scale = meta.get("scale", 1)
+        if is_ppu_metric:
+            value = _ppu_norm(meta["key"], value)
         display_value = round(value * scale, 2) if value is not None else None
 
         key = meta["key"]
@@ -413,8 +447,21 @@ def process_trial(trial):
             # with limb splits. Caught 2026-07-23: Concentric Impulse-100ms
             # showed 11.4 N·s (the asym %) instead of 241.0 (the Hub value).
             key = f"{meta['key']}Asym"
+        elif limb not in (None, "Trial"):
+            # Same overwrite class, generalized (2026-07-28): any limb label we
+            # don't recognize gets suffixed so it can never clobber the Trial
+            # total. Bare key stays reserved for Trial/None rows only.
+            key = f"{meta['key']}{limb}"
 
         metrics[key] = display_value
+
+    # RPM-computed PPU reactive ratio: VALD defines no RSI metric for the PPU
+    # test type (confirmed in Hub, 2026-07-28), so we derive flight/contraction
+    # ourselves. Label as RPM-computed anywhere athlete-facing.
+    if test_type == "PPU":
+        ft, ct = metrics.get("flightTime"), metrics.get("contractionTime")
+        if ft and ct:
+            metrics["ppuRsi"] = round(ft / ct, 3)
 
     # Whole-set hop means: average every hop in this set (matches VALD Hub).
     # Unlike the best-N means above, this includes the athlete's weaker hops.
@@ -471,7 +518,7 @@ def build_portal_data(profiles, tests, trials_by_test):
         raw_trials = trials_by_test.get(tid, [])
         trials = []
         for t in raw_trials:
-            metrics = process_trial(t)
+            metrics = process_trial(t, test_type=test.get("testType", ""))
             if metrics:  # only keep trials that have at least one portal metric
                 trials.append({
                     "limb": t.get("limb", ""),
