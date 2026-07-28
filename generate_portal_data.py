@@ -1757,6 +1757,131 @@ def gen_DYNAMO():
     return out
 _DYNAMO = gen_DYNAMO()
 
+
+# ─── Velo Model (2026-07-27 refit) ───────────────────────────────────────────
+# Cross-sectional model of peak fastball velocity from CMJ (+ optional DynaMo
+# ER RFD). Coefficients come from the 2026-07-27 refit in ~/Desktop/Pitch Model
+# (fit_model.py, n=81 / n=26, leave-one-out validated). The residual is the
+# product: actual minus predicted, read against the ±RMSE noise floor.
+# All aggregation rules mirror SKILL.md; do not change without re-validating
+# against athlete_table_<date>.csv.
+VM_A = (49.7784, 0.099611, 9.433266)              # velo = a0 + a1*CI + a2*RSI
+VM_B = (41.8141, 0.068449, 11.978324, 3.185650)   # ... + b3*ln(ER_RFD lbs/s)
+VM_RMSE = 4.4
+VM_R2 = 0.56
+# Velo target: max Peak FB across sessions. The top-3-median target ("t3")
+# validated slightly better in the refit; flip only with coach sign-off.
+VM_TARGET = "max"
+# Names spelled differently across ForceDecks / Dynamo / Trackman (SKILL.md).
+VM_ALIASES = {
+    "Patrick Rodriguez": "Pat Rodriguez",
+    "Robert Romero": "Rob Romero",
+    "Zach Uysal": "Zachary Uysal",
+    "Bob Billiams": "Rob Williams",
+    "GLV": "Gavin Laya-Vetell",
+    "IRP": "Isaiah Rubin-Patel",
+    "Isaac Santana": "Issac Santana",
+    "Zachary Weinschel": "Zach Weinschel",
+    "George Cancel": "George Cancel Jr",
+}
+
+def _vm_norm(s):
+    import unicodedata
+    s = unicodedata.normalize("NFKC", str(s or "")).replace("\u2019", "'").strip()
+    s = " ".join(s.split())
+    return VM_ALIASES.get(s, s)
+
+
+def gen_VM(fd_data, trackman_data, dynamo_list):
+    """_VM: model constants + per-athlete rows
+    [name, group, ci, rsi, erRfd|null, velo, sessions, lastVelo, predA, residA,
+     predB|null, residB|null, thin]
+    ci = best-rep physics-estimate concentric impulse, bw_kg*sqrt(2gh)*1.006
+    (validated vs the leaderboard metric at r=0.992+; the API trial field is a
+    different quantity and does NOT reproduce the fit). rsi = best rep.
+    erRfd = per-test max populated side, mean across tests, N/s -> lbs/s.
+    Excludes Staff and EXCLUDE_ATHLETES. Rankings use residA only; residB is
+    card detail (never mix A and B residuals in one list)."""
+    import math
+
+    velo = {}
+    for nm, a in ((trackman_data or {}).get("athletes") or {}).items():
+        k = _vm_norm(nm)
+        sess = [x for x in a.get("sessions", []) if x.get("peakVelo") is not None]
+        if not sess:
+            continue
+        elig = [x for x in sess if not x.get("isSubmax") and not x.get("isFlagged")] or sess
+        peaks = sorted((x["peakVelo"] for x in elig), reverse=True)
+        if VM_TARGET == "max":
+            target = peaks[0]
+        else:  # "t3": median of the top-3 session peaks
+            top3 = sorted(peaks[:3])
+            target = top3[len(top3) // 2]
+        velo[k] = {"v": target, "n": len(sess), "last": max(x["date"] for x in sess)}
+
+    er = {}
+    for a in dynamo_list:
+        k = _vm_norm(a.get("name"))
+        per_test = []
+        for t in a.get("tests", []):
+            sides = [v for m in t.get("movements", []) if m.get("name") == "External Rotation"
+                     for v in (m.get("rfd") or []) if v is not None]
+            if sides:
+                per_test.append(max(sides))
+        if per_test:
+            er[k] = (sum(per_test) / len(per_test)) / 4.448  # N/s -> lbs/s
+
+    rows = []
+    for pid, ath in fd_data["athletes"].items():
+        name = ath.get("name")
+        if not name or is_excluded(name):
+            continue
+        grp = get_group(name, ath.get("groups"))
+        if grp == "stf":
+            continue
+        k = _vm_norm(name)
+        tv = velo.get(k)
+        if not tv:
+            continue
+        ci = rsi = 0.0
+        for t in ath.get("tests", []):
+            if t.get("testType") != "CMJ":
+                continue
+            for tr in t.get("trials", []):
+                m = tr.get("metrics", {})
+                jh, bw = m.get("jumpHeight"), m.get("bodyweightLbs")
+                if jh and bw:
+                    ci = max(ci, (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006)
+                r = m.get("rsiModified")
+                if r:
+                    rsi = max(rsi, r)
+        if not ci or not rsi:
+            continue
+        pred_a = VM_A[0] + VM_A[1] * ci + VM_A[2] * rsi
+        resid_a = tv["v"] - pred_a
+        e = er.get(k)
+        pred_b = resid_b = None
+        if e and e > 0:
+            pred_b = VM_B[0] + VM_B[1] * ci + VM_B[2] * rsi + VM_B[3] * math.log(e)
+            resid_b = round(tv["v"] - pred_b, 1)
+        try:
+            days = (datetime.now() - datetime.strptime(tv["last"][:10], "%Y-%m-%d")).days
+        except Exception:
+            days = 9999
+        thin = 1 if (tv["n"] < 5 or days > 90) else 0
+        rows.append([
+            _vm_norm(name), grp, round(ci, 1), round(rsi, 2),
+            round(e, 1) if e else None, round(tv["v"], 1), tv["n"], tv["last"][:10],
+            round(pred_a, 1), round(resid_a, 1),
+            round(pred_b, 1) if pred_b is not None else None, resid_b, thin,
+        ])
+    rows.sort(key=lambda r: -r[9])
+    return {"a": list(VM_A), "b": list(VM_B), "rmse": VM_RMSE, "r2": VM_R2,
+            "target": VM_TARGET, "rows": rows}
+
+
+_VM = gen_VM(fd, trackman, _DYNAMO)
+
 # Female-athlete name list for the UI (exact data-spelling strings, so
 # FEM_SET.has(a.name) matches even quirks like "Francesca  Albergo").
 _FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
@@ -1781,6 +1906,7 @@ print(f"  _VELO: {len(_VELO)} pitchers (trackman {'loaded' if trackman else 'MIS
 print(f"  _TMR: {len(_TMR)} pitchers with bullpen reports "
       f"({sum(len(v) for v in _TMR.values())} sessions)", flush=True)
 print(f"  _DYNAMO: {len(_DYNAMO)} athletes with DynaMo tests", flush=True)
+print(f"  _VM:  {len(_VM['rows'])} velo-model rows", flush=True)
 print(f"  _FEM: {len(_FEM)} female athletes labeled", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
@@ -1814,6 +1940,7 @@ output_lines.append(f"const _HD = {json.dumps(_HD, separators=(',', ':'))};")
 output_lines.append(f"const _VELO = {json.dumps(_VELO, separators=(',', ':'))};")
 output_lines.append(f"const _TMR = {json.dumps(_TMR, separators=(',', ':'))};")
 output_lines.append(f"const _DYNAMO = {json.dumps(_DYNAMO, separators=(',', ':'))};")
+output_lines.append(f"const _VM = {json.dumps(_VM, separators=(',', ':'))};")
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
@@ -1837,6 +1964,7 @@ replacements.update({'_HA': _HA, '_HPB': _HPB, '_HT': _HT, '_HN': _HN, '_HD': _H
 replacements.update({'_VELO': _VELO})
 replacements.update({'_TMR': _TMR})
 replacements.update({'_DYNAMO': _DYNAMO})
+replacements.update({'_VM': _VM})
 replacements.update({'_FEM': _FEM})
 
 new_jsx = jsx
