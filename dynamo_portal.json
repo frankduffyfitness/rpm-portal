@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-07-29T11:31:10.144354+00:00",
+    "syncDate": "2026-07-29T16:27:00.223476+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 47
   },
@@ -914,6 +914,42 @@
       "group": "stf",
       "dob": "1994-06-28",
       "tests": [
+        {
+          "date": "2026-07-29",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Rotation",
+              "position": "Seated",
+              "discomfort": false,
+              "peakN": [
+                209.4,
+                177
+              ],
+              "peakLbs": [
+                47.1,
+                39.8
+              ],
+              "asymPct": 15.5,
+              "asymNote": "left side stronger",
+              "rfd": [
+                735,
+                1601
+              ],
+              "ttp": [
+                0.6,
+                0.73
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-07-24",
           "type": "Shoulder Strength Baseline",
