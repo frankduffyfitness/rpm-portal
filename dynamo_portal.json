@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-07-29T16:27:00.223476+00:00",
+    "syncDate": "2026-07-29T16:59:32.764171+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 47
+    "totalAthletes": 48
   },
   "athletes": {
     "Joey Muzio": {
@@ -10,6 +10,134 @@
       "group": "hs",
       "dob": "2010-11-15",
       "tests": [
+        {
+          "date": "2026-07-29",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                167
+              ],
+              "peakLbs": [
+                null,
+                37.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                506
+              ],
+              "ttp": [
+                null,
+                2.33
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Seated",
+              "discomfort": false,
+              "peakN": [
+                260.7,
+                210.6
+              ],
+              "peakLbs": [
+                58.6,
+                47.3
+              ],
+              "asymPct": 19.2,
+              "asymNote": "left side stronger",
+              "rfd": [
+                1175,
+                332
+              ],
+              "ttp": [
+                3.66,
+                3.3
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                123.9
+              ],
+              "peakLbs": [
+                null,
+                27.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                163
+              ],
+              "ttp": [
+                null,
+                4.38
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                426.5
+              ],
+              "peakLbs": [
+                null,
+                95.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1658
+              ],
+              "ttp": [
+                null,
+                0.88
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                433.5
+              ],
+              "peakLbs": [
+                null,
+                97.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2524
+              ],
+              "ttp": [
+                null,
+                3.26
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.79
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-07-14",
           "type": "Shoulder Strength Baseline",
@@ -3102,6 +3230,111 @@
       "dob": "2010-10-30",
       "tests": [
         {
+          "date": "2026-07-29",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                113.7,
+                128.2
+              ],
+              "peakLbs": [
+                25.6,
+                28.8
+              ],
+              "asymPct": 11.3,
+              "asymNote": "right side stronger",
+              "rfd": [
+                459,
+                527
+              ],
+              "ttp": [
+                2.52,
+                2.14
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                141.1,
+                167
+              ],
+              "peakLbs": [
+                31.7,
+                37.5
+              ],
+              "asymPct": 15.5,
+              "asymNote": "right side stronger",
+              "rfd": [
+                679,
+                616
+              ],
+              "ttp": [
+                2.46,
+                2.25
+              ]
+            },
+            {
+              "name": "Shoulder Flexion",
+              "position": "Supine, long lever",
+              "discomfort": false,
+              "peakN": [
+                71.7,
+                72.2
+              ],
+              "peakLbs": [
+                16.1,
+                16.2
+              ],
+              "asymPct": 0.7,
+              "asymNote": "Symmetric",
+              "rfd": [
+                242,
+                248
+              ],
+              "ttp": [
+                2.04,
+                2.47
+              ]
+            },
+            {
+              "name": "Shoulder Extension",
+              "position": "Prone, long lever",
+              "discomfort": false,
+              "peakN": [
+                125,
+                97.5
+              ],
+              "peakLbs": [
+                28.1,
+                21.9
+              ],
+              "asymPct": 22,
+              "asymNote": "left side stronger",
+              "rfd": [
+                248,
+                422
+              ],
+              "ttp": [
+                2.14,
+                1.12
+              ]
+            }
+          ],
+          "erIr": {
+            "left": 0.81,
+            "right": 0.77
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-07-22",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -5704,6 +5937,42 @@
       "dob": "2007-02-11",
       "tests": [
         {
+          "date": "2026-07-29",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Rotation",
+              "position": "Seated",
+              "discomfort": false,
+              "peakN": [
+                296.4,
+                393
+              ],
+              "peakLbs": [
+                66.6,
+                88.3
+              ],
+              "asymPct": 24.6,
+              "asymNote": "right side stronger",
+              "rfd": [
+                2573,
+                3703
+              ],
+              "ttp": [
+                0.22,
+                0.17
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-07-27",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -6545,6 +6814,72 @@
           "erIr": {
             "left": null,
             "right": 1.34
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Julian Minaya": {
+      "name": "Julian Minaya",
+      "group": "pro",
+      "dob": "2001-10-14",
+      "tests": [
+        {
+          "date": "2026-07-29",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                216
+              ],
+              "peakLbs": [
+                null,
+                48.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1111
+              ],
+              "ttp": [
+                null,
+                1.75
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                223
+              ],
+              "peakLbs": [
+                null,
+                50.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1296
+              ],
+              "ttp": [
+                null,
+                1.38
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.97
           },
           "discomfortNote": "",
           "planNote": ""
