@@ -503,3 +503,5 @@ if __name__ == "__main__":
 # sync trigger 2026-07-16 — pull latest DynaMo test
 
 # sync trigger 2026-07-30 — pull new trunk rotation tests
+
+# sync trigger 2026-07-30 pm — pull new VALD Hub data
