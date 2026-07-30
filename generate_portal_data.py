@@ -155,7 +155,7 @@ GROUP_OVERRIDES = {
 # and match the Female Athletes filter. Matching collapses whitespace (the
 # VALD data has e.g. "Francesca  Albergo" with a double space).
 FEMALE_ATHLETES = {
-    "Francesca Albergo", "Nicole Berinato", "Victoria Barrientos",
+    "Alanna Behler", "Francesca Albergo", "Nicole Berinato", "Victoria Barrientos",
     "Grace Bekios", "Bella Cafasso", "Sophia Conrath", "Barbara DiMaria",
     "Niki Eckert", "Samantha Hartwig", "Aryanna Hernandez", "Tiana Hernandez",
     "Lyla Kondel", "Amber Mangold", "Scarlett Molina", "Diem Nenadich",
