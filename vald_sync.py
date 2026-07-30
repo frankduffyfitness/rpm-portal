@@ -777,3 +777,5 @@ if __name__ == "__main__":
 # sync trigger 2026-07-15 — pull Sam Unger 5th session
 
 # sync trigger 2026-07-15 15:45 — pull Pete Hansen / Cade Winquest CMJ
+
+# sync trigger 2026-07-30 — pull new PPU + trunk rotation tests
