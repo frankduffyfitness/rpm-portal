@@ -45,7 +45,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os, sys, json, time, re, hashlib, requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from zoneinfo import ZoneInfo
 
@@ -386,9 +386,15 @@ def build_portal(profiles, tests, annotations):
 # ─── State + merge ───────────────────────────────────────────────────────────
 def load_state():
     try:
-        return json.load(open(STATE_FILE)).get("lastModifiedUtc", "2020-01-01T00:00:00Z")
+        wm = json.load(open(STATE_FILE)).get("lastModifiedUtc", "")
     except (FileNotFoundError, json.JSONDecodeError):
-        return "2020-01-01T00:00:00Z"
+        wm = ""
+    # An empty watermark must never reach the API. Observed 2026-07-30: the
+    # stored watermark was "" (the API's test objects carry no modifiedDateUtc,
+    # so max() wrote an empty string), modifiedFromUTC="" returned a partial
+    # set, and the 7/29 evening trunk-rotation tests were silently skipped.
+    # Empty -> full pull; merge_existing unions, so full pulls are safe.
+    return wm if wm else "2020-01-01T00:00:00Z"
 
 
 def merge_existing(new_data):
@@ -466,7 +472,23 @@ def main():
     # complete, so rebuilding from scratch loses data.
     data = merge_existing(data)
     json.dump(data, open(OUTPUT_FILE, "w"), indent=2, default=str)
-    json.dump({"lastModifiedUtc": max((t.get("modifiedDateUtc") or "") for t in tests),
+    def _modified(t):
+        return (t.get("modifiedDateUtc") or t.get("modifiedUtc")
+                or t.get("lastModifiedUtc") or "")
+    new_wm = max((_modified(t) for t in tests), default="")
+    if new_wm:
+        # Back off 48h so late-uploading devices can never be skipped; the
+        # union merge makes re-fetching the overlap free.
+        try:
+            _dt = datetime.fromisoformat(new_wm.replace("Z", "+00:00")) - timedelta(hours=48)
+            new_wm = _dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            pass
+    else:
+        # No usable modified field on this API version: force the next run to
+        # a full pull rather than persisting a poisoned watermark.
+        new_wm = "2020-01-01T00:00:00Z"
+    json.dump({"lastModifiedUtc": new_wm,
                "lastSyncDate": datetime.now(timezone.utc).isoformat()},
               open(STATE_FILE, "w"), indent=2)
     log(f"Wrote {OUTPUT_FILE}: {data['meta']['totalAthletes']} athletes, "
