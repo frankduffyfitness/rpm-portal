@@ -3509,6 +3509,81 @@ function VmAthleteCard({ r, onBack }) {
   );
 }
 
+function VmSandboxCard() {
+  // Eval-day sandbox: a hypothetical pitcher, linked to nobody. The coach sets
+  // a prospect's tested numbers, pins them as the baseline, then slides to
+  // project. Nothing here is saved anywhere.
+  const pad = (rng, frac, floor) => {
+    const span = rng[1] - rng[0];
+    return [Math.max(rng[0] - span * frac, floor), rng[1] + span * frac];
+  };
+  const ciB = pad(VM_RANGE.ci, 0.15, 40), rsiB = pad(VM_RANGE.rsi, 0.15, 0.1), erB = pad(VM_RANGE.erRfd, 0.15, 10);
+  const med = (k, fb) => {
+    const v = VM_ROWS.map(r => r[k]).filter(x => x != null).sort((a, b) => a - b);
+    return v.length ? v[Math.floor(v.length / 2)] : fb;
+  };
+  const d0 = {
+    ci: Math.round(med("ci", 230)), rsi: Math.round(med("rsi", 0.75) * 100) / 100,
+    er: Math.round(med("erRfd", 150)), bw: Math.round(med("bw", 180)),
+  };
+  // The pinned baseline: what the delta line and the bodyweight coupling are
+  // measured against. Starts at roster medians.
+  const [pin, setPin] = useState(d0);
+  const [useB, setUseB] = useState(false);
+  const [bw, setBw] = useState(d0.bw);
+  const [ciBase, setCiBase] = useState(d0.ci);
+  const bwAdj = VM_CI_PER_LB * (bw - pin.bw);
+  const ci = Math.min(Math.max(ciBase + bwAdj, ciB[0]), ciB[1]);
+  const setCi = (v) => setCiBase(v - bwAdj);
+  const [rsi, setRsi] = useState(d0.rsi);
+  const [er, setEr] = useState(d0.er);
+
+  const livePred = useB ? vmPredB(ci, rsi, er) : vmPredA(ci, rsi);
+  const pinPred = useB ? vmPredB(pin.ci, pin.rsi, pin.er) : vmPredA(pin.ci, pin.rsi);
+  const delta = Math.round(livePred - pinPred);
+  const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
+    (useB && (er < VM_RANGE.erRfd[0] || er > VM_RANGE.erRfd[1]));
+  const pinned = Math.abs(ci - pin.ci) < 1 && Math.abs(rsi - pin.rsi) < 0.01 &&
+    Math.abs(bw - pin.bw) < 1 && (!useB || Math.abs(er - pin.er) < 1);
+  const card = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 16px", marginBottom: 12 };
+
+  return (
+    <div>
+      <div style={card}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>Hypothetical pitcher</div>
+        <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14, lineHeight: 1.5 }}>
+          For evals: set a pitcher&rsquo;s tested numbers, tap Pin as baseline, then slide to project. Linked to nobody, saved nowhere.
+        </div>
+        <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={setCi} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
+        <VmSlider label="RSI-modified" unit="" value={rsi} onChange={setRsi} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
+        <button onClick={() => setUseB(v => !v)} style={{ marginBottom: 12, padding: "6px 10px", border: "1px solid " + (useB ? "#4FFFB0" : "rgba(255,255,255,0.08)"), borderRadius: 8, background: useB ? "rgba(79,255,176,0.12)" : "none", color: useB ? "#4FFFB0" : "#6B7280", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>
+          {useB ? "Using Model B (arm test included)" : "Add arm test (Model B)"}
+        </button>
+        {useB && <VmSlider label="ER RFD" unit="lbs/s" value={er} onChange={setEr} min={erB[0]} max={erB[1]} fit={VM_RANGE.erRfd} step={1} dec={0} />}
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 4 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
+          <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility&rsquo;s measured rate. It never moves RSI.</div>
+          <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={setBw} min={120} max={280} step={1} dec={0} sub={`baseline ${Math.round(pin.bw)}`} />
+          <div style={{ fontSize: 9.5, color: "#6B7280", lineHeight: 1.55, marginTop: -6 }}>Holds only if you keep your jump. Gaining weight while jump height drops more than about 0.4 cm per pound nets zero.</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 12, textAlign: "center" }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{Math.round(livePred)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {Math.round(VM_BAND)}</span></div>
+          <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph)</div>
+          {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
+          {!pinned && <div style={{ fontSize: 11, color: "#B8BDC4", marginTop: 6 }}>{delta > 0 ? "+" : ""}{delta} mph vs the pinned baseline ({Math.round(pinPred)}).</div>}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <button onClick={() => { setPin({ ci, rsi, er, bw }); setCiBase(ci); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(79,255,176,0.4)", borderRadius: 10, background: "rgba(79,255,176,0.08)", color: "#4FFFB0", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Pin as baseline</button>
+          <button onClick={() => { setBw(pin.bw); setCiBase(pin.ci); setRsi(pin.rsi); setEr(pin.er); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, background: "none", color: "#6B7280", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Reset to baseline</button>
+        </div>
+        <div style={{ fontSize: 9.5, color: "#4A4F57", lineHeight: 1.55, marginTop: 12 }}>
+          The model is cross-sectional: it says what athletes who test at a number typically throw, not a guarantee that training the input adds the output. Month-over-month data within the same athlete currently shows about half the cross-sectional slope.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function VeloModelSection() {
   const [view, setView] = useState("overview");
   const [pick, setPick] = useState(null);
@@ -3526,11 +3601,13 @@ function VeloModelSection() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
-        {[["overview", "Overview"], ["flags", "Flag list"]].map(([k, l]) => (
+        {[["overview", "Overview"], ["flags", "Flag list"], ["sandbox", "What-if sandbox"]].map(([k, l]) => (
           <button key={k} onClick={() => setView(k)} style={{ padding: "7px 12px", border: "1px solid " + (view === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: view === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: view === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
         ))}
       </div>
-      {view === "overview" ? <VmOverview rows={curRows} onPick={open} /> : <VmFlags rows={rows} onPick={open} openLists={openLists} onToggleList={onToggleList} />}
+      {view === "overview" ? <VmOverview rows={curRows} onPick={open} />
+        : view === "sandbox" ? <VmSandboxCard />
+        : <VmFlags rows={rows} onPick={open} openLists={openLists} onToggleList={onToggleList} />}
     </div>
   );
 }
