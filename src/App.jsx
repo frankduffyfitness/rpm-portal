@@ -3810,7 +3810,8 @@ function DynamoPage() {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState(false);
   const [sel, setSel] = useState(null);
-  const [dynTab, setDynTab] = useState("standings");
+  const [dynTab, setDynTab] = useState("dynamo");
+  const [dynSub, setDynSub] = useState("standings");
   const submit = (e) => {
     e.preventDefault();
     if (pw === DYNAMO_PASSWORD) { setOk(true); setErr(false); try { sessionStorage.setItem("dyn_ok", "1"); } catch (e) {} }
@@ -3841,17 +3842,24 @@ function DynamoPage() {
       </form>
     );
   }
-  const open = (a) => { setSel(a); setDynTab("athletes"); window.scrollTo(0, 0); };
+  const open = (a) => { setSel(a); setDynTab("dynamo"); setDynSub("athletes"); window.scrollTo(0, 0); };
   return shell(<>
     <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3 }}>
-      {[["standings", "🏆 Standings"], ["trending", "📈 Trending"], ["athletes", "👤 Athletes"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"]].map(([k, l]) => (
-        <button key={k} onClick={() => { setDynTab(k); if (k !== "athletes") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
+      {[["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"]].map(([k, l]) => (
+        <button key={k} onClick={() => { setDynTab(k); if (k !== "dynamo") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
           background: dynTab === k ? "rgba(79,255,176,0.12)" : "transparent", color: dynTab === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
       ))}
     </div>
-    {dynTab === "standings" && <DynamoStandings onSelect={open} />}
-    {dynTab === "trending" && <DynamoTrending onSelect={open} />}
-    {dynTab === "athletes" && (sel ? <DynamoReport athlete={sel} onBack={() => setSel(null)} /> : <DynamoRoster onSelect={(a) => open(a)} />)}
+    {dynTab === "dynamo" && <>
+      <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
+        {[["standings", "🏆 Standings"], ["trending", "📈 Trending"], ["athletes", "👤 Athletes"]].map(([k, l]) => (
+          <button key={k} onClick={() => { setDynSub(k); if (k !== "athletes") setSel(null); window.scrollTo(0, 0); }} style={{ padding: "7px 12px", border: "1px solid " + (dynSub === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: dynSub === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: dynSub === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
+        ))}
+      </div>
+      {dynSub === "standings" && <DynamoStandings onSelect={open} />}
+      {dynSub === "trending" && <DynamoTrending onSelect={open} />}
+      {dynSub === "athletes" && (sel ? <DynamoReport athlete={sel} onBack={() => setSel(null)} /> : <DynamoRoster onSelect={(a) => open(a)} />)}
+    </>}
     {dynTab === "model" && <VeloModelSection />}
     {dynTab === "arsenal" && <ArsenalSection />}
   </>);
