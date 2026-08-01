@@ -44,6 +44,10 @@ def main(path):
             first = str(row[1] or "").strip()
             if not last and not first:
                 continue
+            # Each sheet ends with a "Total" row: facility-wide daily headcounts,
+            # not an athlete. (Those are the only numeric cells in the sheets.)
+            if "total" in (last.lower(), first.lower()):
+                continue
             name = f"{first} {last}".strip()
             for i, ds in enumerate(dates):
                 if ds is None or 2 + i >= len(row):
