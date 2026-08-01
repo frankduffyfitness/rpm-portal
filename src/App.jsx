@@ -1397,14 +1397,14 @@ function ConsistencyCard({ name }) {
   });
   const total = months.reduce((a, m) => a + m.n, 0);
   const avg = Math.round((total / months.length) * 10) / 10;
-  const shade = (c) => c >= 3 ? "#4FFFB0" : c === 2 ? "rgba(79,255,176,0.6)" : "rgba(79,255,176,0.3)";
+  const shade = () => "rgba(79,255,176,0.8)";
   return (
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 16, marginBottom: 14 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 2 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{"🗓"} Consistency</div>
         <div style={{ fontSize: 10.5, fontWeight: 700, color: "#4FFFB0" }}>{total} days {"·"} avg {avg}/mo</div>
       </div>
-      <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 12 }}>Every day in the building, last {months.length} month{months.length === 1 ? "" : "s"}: testing days and checked-in training days. Brighter = more tests that day.</div>
+      <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 12 }}>Every day in the building, last {months.length} month{months.length === 1 ? "" : "s"}: testing days and checked-in training days.</div>
       {months.map(({ k, days, n, tests }) => (
         <div key={k} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
           <div style={{ width: 42, fontSize: 9.5, fontWeight: 600, color: "#8A8F98", flexShrink: 0 }}>{label(k)}</div>
