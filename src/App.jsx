@@ -3824,7 +3824,7 @@ function DynamoPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <img src={RPM_LOGO} alt="RPM Strength" title="Back to Athlete Portal" onClick={() => { window.location.href = "/"; }} style={{ height: 30, width: "auto", cursor: "pointer" }} />
         <div style={{ width: 1, height: 22, background: "rgba(255,255,255,0.12)" }} />
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>DynaMo</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Coach Portal</div>
         <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#4FFFB0", background: "rgba(79,255,176,0.1)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 6, padding: "2px 6px" }}>STAFF</div>
       </div>
       {child}
@@ -3835,7 +3835,7 @@ function DynamoPage() {
     return shell(
       <form onSubmit={submit} style={{ marginTop: 44, textAlign: "center" }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Staff access</div>
-        <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 18, lineHeight: 1.5 }}>Enter the password to view DynaMo shoulder-strength data.</div>
+        <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 18, lineHeight: 1.5 }}>Enter the password to view the coach dashboard: DynaMo, Velo Model, and Arsenal.</div>
         <input type="password" value={pw} autoFocus onChange={(e) => { setPw(e.target.value); setErr(false); }} placeholder="Password" style={{ width: "100%", maxWidth: 280, padding: "12px 14px", border: "1px solid " + (err ? "#F97362" : "rgba(255,255,255,0.1)"), borderRadius: 10, background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, outline: "none", textAlign: "center", boxSizing: "border-box" }} />
         <div><button type="submit" style={{ marginTop: 14, padding: "11px 30px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Unlock</button></div>
         {err && <div style={{ fontSize: 12, color: "#F97362", marginTop: 12 }}>Incorrect password.</div>}
