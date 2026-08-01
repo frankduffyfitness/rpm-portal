@@ -90,6 +90,18 @@ PORTAL_METRICS = {
     13303830: {"key": "hopMeanRsi",        "label": "Hop Mean RSI (FT/CT)","unit": "ratio","scale": 1},
     13303819: {"key": "hopRsi",            "label": "Hop RSI (FT/CT)",     "unit": "ratio","scale": 1},
     13303814: {"key": "hopContactTime",    "label": "Hop Contact Time",    "unit": "ms",   "scale": 1000},
+    # ── 2026-08-01 hop sweep: 10 pre-registered HJ candidates (BestHop set-level
+    # aggregates + Fatigue family). Screened vs velo residual after [refresh-hop].
+    13303821: {"key": "bestActiveStiffness", "label": "Best Active Stiffness", "unit": "N/m", "scale": 1},
+    13303812: {"key": "bestLandingRfd",    "label": "Best Landing RFD",      "unit": "N/s", "scale": 1},
+    13303813: {"key": "bestTimeToPF",      "label": "Best Time to Peak Force", "unit": "ms", "scale": 1000},
+    13303817: {"key": "bestImpulse",       "label": "Best Impulse",          "unit": "N s", "scale": 1},
+    13303811: {"key": "bestAvgForce",      "label": "Best Average Force",    "unit": "N",   "scale": 1},
+    13303855: {"key": "bestPeakPower",     "label": "Best Peak Power",       "unit": "W",   "scale": 1},
+    13303816: {"key": "bestJumpHeightFT",  "label": "Best Jump Height (FT)", "unit": "cm",  "scale": 1},
+    13303841: {"key": "rsiFatigue",        "label": "RSI Fatigue",           "unit": "%",   "scale": 1},
+    13303840: {"key": "peakForceFatigue",  "label": "Peak Force Fatigue",    "unit": "%",   "scale": 1},
+    13303843: {"key": "stiffnessFatigue",  "label": "Stiffness Fatigue",     "unit": "%",   "scale": 1},
     13303815: {"key": "hopFlightTime",     "label": "Hop Flight Time",     "unit": "ms",   "scale": 1000},
     13303818: {"key": "hopPeakForce",      "label": "Hop Peak Force",      "unit": "N",    "scale": 1},
 }

@@ -64,6 +64,7 @@ jobs:
           # (~half; parallel) and merges — use it for a CMJ-only metric like RSI.
           echo "$MSG" | grep -q '\[full-sync\]' && ARGS="--full"
           echo "$MSG" | grep -q '\[refresh-cmj\]' && ARGS="--refresh-cmj"
+          echo "$MSG" | grep -q '\[refresh-hop\]' && ARGS="--refresh-hop"
           echo "running: python vald_sync.py $ARGS"
           python vald_sync.py $ARGS
 
