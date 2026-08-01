@@ -1943,6 +1943,57 @@ _FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
               {ath['name'] for ath in hop_athletes_data if is_female(ath['name'])} |
               {r[0] for r in _VELO if is_female(r[0])})
 
+# ─── Consistency calendar: _CONS ─────────────────────────────────────────────
+# name -> [["YYYY-MM", packed], ...] newest month first. packed = concatenated
+# "ddc" triplets: day-of-month (2 digits) + tests that day (1 digit, capped 9).
+# ANY ForceDecks test counts as a day in the building. Window = trailing 13
+# calendar months; months inside an athlete's span with zero visits are kept
+# (the gaps ARE the consistency story). Same-name duplicate profiles merge.
+_cons_names = ({a['name'] for a in athletes_data} |
+               {a['name'] for a in hop_athletes_data})
+_now = datetime.now()
+_wy, _wm = _now.year, _now.month
+for _ in range(12):
+    _wm -= 1
+    if _wm == 0:
+        _wy, _wm = _wy - 1, 12
+_win_key = f"{_wy:04d}-{_wm:02d}"
+
+_cons_days = {}   # name -> {"YYYY-MM-DD": test count}
+for _pid, _ath in fd['athletes'].items():
+    _nm = _ath.get('name')
+    if _nm not in _cons_names:
+        continue
+    _acc = _cons_days.setdefault(_nm, {})
+    for _t in _ath.get('tests', []):
+        _ds = (_t.get('date') or '')[:10]
+        if len(_ds) == 10 and _ds[:7] >= _win_key:
+            _acc[_ds] = _acc.get(_ds, 0) + 1
+
+_CONS = {}
+for _nm, _acc in _cons_days.items():
+    if not _acc:
+        continue
+    _bym = {}
+    for _ds, _c in _acc.items():
+        _bym.setdefault(_ds[:7], []).append((int(_ds[8:10]), min(_c, 9)))
+    _first = min(_bym)
+    _out = []
+    _y, _m = _now.year, _now.month
+    while len(_out) < 13:
+        _key = f"{_y:04d}-{_m:02d}"
+        if _key < _first or _key < _win_key:
+            break
+        _days = sorted(_bym.get(_key, []))
+        _out.append([_key, ''.join(f"{d:02d}{c}" for d, c in _days)])
+        _m -= 1
+        if _m == 0:
+            _y, _m = _y - 1, 12
+    _CONS[_nm] = _out
+
+print(f"  _CONS: {len(_CONS)} athletes with attendance calendars "
+      f"({sum(len(v) for v in _CONS.values())} month rows)", flush=True)
+
 print(f"  _A:   {len(_A)} athletes", flush=True)
 print(f"  _PB:  {len(_PB)} entries", flush=True)
 print(f"  _T:   {len(_T)} trends", flush=True)
@@ -1997,6 +2048,7 @@ output_lines.append(f"const _TMR = {json.dumps(_TMR, separators=(',', ':'))};")
 output_lines.append(f"const _DYNAMO = {json.dumps(_DYNAMO, separators=(',', ':'))};")
 output_lines.append(f"const _VM = {json.dumps(_VM, separators=(',', ':'))};")
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
+output_lines.append(f"const _CONS = {json.dumps(_CONS, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -2021,6 +2073,7 @@ replacements.update({'_TMR': _TMR})
 replacements.update({'_DYNAMO': _DYNAMO})
 replacements.update({'_VM': _VM})
 replacements.update({'_FEM': _FEM})
+replacements.update({'_CONS': _CONS})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
