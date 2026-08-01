@@ -65,6 +65,27 @@ PORTAL_METRICS = {
     6553703: {"key": "eccBrakingImpulse",  "label": "Ecc Braking Impulse", "unit": "N·s",  "scale": 1},
     6553685: {"key": "concPeakForce",      "label": "Conc Peak Force",     "unit": "N",    "scale": 1},
      655387: {"key": "bodyweightLbs",      "label": "Bodyweight",          "unit": "lbs",  "scale": 2.20462},
+    # ── 2026-08-01 metric sweep: 18 pre-registered candidates (timing/velocity/
+    # force-at-event/stiffness/landing/RFD). Screened vs velo residual after the
+    # [refresh-cmj] backfill; verdicts in the velo-model notes. Additive only.
+    6553643: {"key": "contractionTime",   "label": "Contraction Time", "unit": "ms", "scale": 1000},
+    6553657: {"key": "concDuration",      "label": "Concentric Duration", "unit": "ms", "scale": 1000},
+    6553664: {"key": "brakingPhaseDur",   "label": "Braking Phase Duration", "unit": "ms", "scale": 1000},
+    6553668: {"key": "eccDecelPhaseDur",  "label": "Ecc Deceleration Phase Duration", "unit": "s", "scale": 1},
+    6553642: {"key": "concTimeToPF",      "label": "Conc Time to Peak Force", "unit": "ms", "scale": 1000},
+    6553660: {"key": "ftCtRatio",         "label": "Flight Time:Contraction Time", "unit": "", "scale": 1},
+    6553634: {"key": "concPeakVelo",      "label": "Concentric Peak Velocity", "unit": "m/s", "scale": 1},
+    6553701: {"key": "eccPeakVelo",       "label": "Eccentric Peak Velocity", "unit": "m/s", "scale": 1},
+    6553713: {"key": "forceAtZeroV",      "label": "Force at Zero Velocity", "unit": "N", "scale": 1},
+    6553673: {"key": "forceAtPeakPower",  "label": "Force at Peak Power", "unit": "N", "scale": 1},
+    6553718: {"key": "cmjStiffness",      "label": "CMJ Stiffness", "unit": "N/m", "scale": 1},
+    6553709: {"key": "activeStiffness",   "label": "Active Stiffness", "unit": "N/m", "scale": 1},
+    6553612: {"key": "landingRfd",        "label": "Landing RFD", "unit": "N/s", "scale": 1},
+    6553647: {"key": "landingPeakForceBM", "label": "Landing Net Peak Force / BM", "unit": "N/kg", "scale": 1},
+    6553727: {"key": "landingImpulse",    "label": "Landing Impulse", "unit": "N s", "scale": 1},
+    6553768: {"key": "landingStiffness",  "label": "Landing Stiffness", "unit": "N/m", "scale": 1},
+    6553682: {"key": "eccDecelRfd",       "label": "Ecc Deceleration RFD", "unit": "N/s", "scale": 1},
+    6553641: {"key": "concMaxRfd",        "label": "Conc Maximum RFD", "unit": "N/s", "scale": 1},
     # HJ (Hop Jump) metrics — VALD returns CT/FT in seconds, scale ×1000 to ms
     13303830: {"key": "hopMeanRsi",        "label": "Hop Mean RSI (FT/CT)","unit": "ratio","scale": 1},
     13303819: {"key": "hopRsi",            "label": "Hop RSI (FT/CT)",     "unit": "ratio","scale": 1},
