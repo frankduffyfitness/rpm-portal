@@ -17,6 +17,17 @@ TENANT_ID = "3127f695-175f-4b63-8331-f1295a34cd51"
 AUTH_URL = "https://auth.prd.vald.com/oauth/token"
 FORCEDECKS_BASE = "https://prd-use-api-extforcedecks.valdperformance.com"
 PROFILES_BASE = "https://prd-use-api-externalprofile.valdperformance.com"
+
+# VALD profile-name typos -> portal-canonical spelling (mirrors dynamo_sync's
+# NAME_ALIASES). Applied wherever a profile becomes an athlete name, so adding
+# an entry re-canonicalizes the whole store on the next sync run.
+NAME_ALIASES = {
+    "Alex Rodriquez": "Alex Rodriguez",   # VALD typo (missing g), 2026-08-01
+}
+
+def profile_name(profile):
+    n = f"{profile.get('givenName', '')} {profile.get('familyName', '')}".strip()
+    return NAME_ALIASES.get(n, n)
 TENANTS_BASE = "https://prd-use-api-externaltenants.valdperformance.com"
 AUTH_AUDIENCE = "vald-api-external"
 CLIENT_ID = os.environ.get("VALD_CLIENT_ID", "jOvajkmerTNoNt1wV4xrtgEizdBCt8Va")
@@ -586,7 +597,7 @@ def build_portal_data(profiles, tests, trials_by_test):
         tid = test["testId"]
         profile = profiles.get(pid, {})
         ath = athletes[pid]
-        ath["name"] = f"{profile.get('givenName', '')} {profile.get('familyName', '')}".strip()
+        ath["name"] = profile_name(profile)
         ath["dateOfBirth"] = profile.get("dateOfBirth")
         ath["groups"] = profile.get("groups", [])
 
@@ -737,7 +748,7 @@ def main():
             for pid, profile in profiles.items():
                 if pid in existing_athletes and pid not in new_athletes:
                     existing_athletes[pid]["groups"] = profile.get("groups", [])
-                    existing_athletes[pid]["name"] = f"{profile.get('givenName','')} {profile.get('familyName','')}".strip() or existing_athletes[pid]["name"]
+                    existing_athletes[pid]["name"] = profile_name(profile) or existing_athletes[pid]["name"]
             total_tests = sum(len(a["tests"]) for a in existing_athletes.values())
             portal_data = {
                 "meta": {
