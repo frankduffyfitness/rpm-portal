@@ -1946,9 +1946,10 @@ _FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
 # ─── Consistency calendar: _CONS ─────────────────────────────────────────────
 # name -> [["YYYY-MM", packed], ...] newest month first. packed = concatenated
 # "ddc" triplets: day-of-month (2 digits) + tests that day (1 digit, capped 9).
-# ANY ForceDecks test counts as a day in the building. Window = trailing 13
-# calendar months; months inside an athlete's span with zero visits are kept
-# (the gaps ARE the consistency story). Same-name duplicate profiles merge.
+# ANY ForceDecks test OR DynaMo movement counts as a day in the building (some
+# athletes come in and only do shoulder work). Window = trailing 13 calendar
+# months; months inside an athlete's span with zero visits are kept (the gaps
+# ARE the consistency story). Same-name duplicate profiles merge.
 _cons_names = ({a['name'] for a in athletes_data} |
                {a['name'] for a in hop_athletes_data})
 _now = datetime.now()
@@ -1969,6 +1970,60 @@ for _pid, _ath in fd['athletes'].items():
         _ds = (_t.get('date') or '')[:10]
         if len(_ds) == 10 and _ds[:7] >= _win_key:
             _acc[_ds] = _acc.get(_ds, 0) + 1
+
+# DynaMo days count too — some athletes come in and only do shoulder work.
+# Each movement tested that day adds one "test" to the day's intensity.
+if os.path.exists(DYNAMO_JSON):
+    try:
+        _dyn_ath = json.load(open(DYNAMO_JSON)).get('athletes') or {}
+    except Exception:
+        _dyn_ath = {}
+    for _nm, _da in _dyn_ath.items():
+        if _nm not in _cons_names:
+            continue
+        _acc = _cons_days.setdefault(_nm, {})
+        for _t in _da.get('tests', []):
+            _ds = (_t.get('date') or '')[:10]
+            if len(_ds) == 10 and _ds[:7] >= _win_key:
+                _acc[_ds] = _acc.get(_ds, 0) + max(1, len(_t.get('movements') or []))
+
+# Manually-tracked attendance (attendance_manual.json, from attendance_import.py
+# run against Frank's "RPM Baseball Attendance" workbook): covers days with no
+# ForceDecks/DynaMo data at all. A checked-in day with no tests shows as the
+# lightest shade (count 1); it never inflates days that already have tests.
+ATTENDANCE_ALIASES = {
+    "zachary uysal": "Zach Uysal",
+    "alannah behler": "Alanna  Behler",   # sheet spelling is CORRECT; VALD store typo until Frank's Hub fix propagates
+    "collin leavy": "Colin Leavy",
+    "joe frazzetta": "Joey Frazzetta",
+    "joe muzio": "Joey Muzio",
+}
+if os.path.exists('attendance_manual.json'):
+    try:
+        _att = json.load(open('attendance_manual.json'))
+    except Exception:
+        _att = {}
+    _cons_lookup = {" ".join(n.split()).lower(): n for n in _cons_names}
+    _att_unmatched = set()
+    _att_days_added = 0
+    for _nm, _dates in _att.items():
+        _norm = " ".join(_nm.split()).lower()
+        # Alias first, but fall back to a direct match if the alias target has
+        # gone stale (e.g. the store spelling gets fixed at the source later).
+        _canon = ATTENDANCE_ALIASES.get(_norm)
+        if _canon not in _cons_names:
+            _canon = _cons_lookup.get(_norm)
+        if not _canon:
+            _att_unmatched.add(_nm)
+            continue
+        _acc = _cons_days.setdefault(_canon, {})
+        for _ds in _dates:
+            if len(_ds) == 10 and _ds[:7] >= _win_key:
+                if _ds not in _acc:
+                    _att_days_added += 1
+                _acc[_ds] = max(_acc.get(_ds, 0), 1)
+    print(f"  _CONS: manual attendance added {_att_days_added} test-free days "
+          f"({len(_att_unmatched)} sheet names not in portal)", flush=True)
 
 _CONS = {}
 for _nm, _acc in _cons_days.items():
