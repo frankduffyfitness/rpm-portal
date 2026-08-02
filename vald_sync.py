@@ -879,3 +879,5 @@ if __name__ == "__main__":
 # hop re-pull after round-2 source deletions 2026-08-02
 
 # cmj re-pull after rep-level Hub deletions (integrity sweep) 2026-08-02
+
+# hop re-pull, round-3 isolated reps deleted 2026-08-02
