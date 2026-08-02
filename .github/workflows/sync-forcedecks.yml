@@ -1,5 +1,9 @@
 name: Sync ForceDecks Data
 
+concurrency:
+  group: forcedecks-sync
+  cancel-in-progress: false
+
 on:
   schedule:
     - cron: '0 */6 * * *'
@@ -62,9 +66,11 @@ jobs:
           # incremental only ADDS new ones). [full-sync] re-pulls everything
           # (>5.5h, usually too big). [refresh-cmj] re-pulls only CMJ tests
           # (~half; parallel) and merges — use it for a CMJ-only metric like RSI.
-          echo "$MSG" | grep -q '\[full-sync\]' && ARGS="--full"
-          echo "$MSG" | grep -q '\[refresh-cmj\]' && ARGS="--refresh-cmj"
-          echo "$MSG" | grep -q '\[refresh-hop\]' && ARGS="--refresh-hop"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "$MSG" | grep -q '\[full-sync\]' && ARGS="--full"
+            echo "$MSG" | grep -q '\[refresh-cmj\]' && ARGS="--refresh-cmj"
+            echo "$MSG" | grep -q '\[refresh-hop\]' && ARGS="--refresh-hop"
+          fi
           echo "running: python vald_sync.py $ARGS"
           set -o pipefail
           python vald_sync.py $ARGS 2>&1 | tee sync_run.log
@@ -130,10 +136,16 @@ jobs:
         run: |
           git config user.name "RPM Sync Bot"
           git config user.email "sync@rpmstrength.coach"
-          tail -c 100000 sync_run.log > sync_failure.log
-          git add sync_failure.log
-          git commit -m "Sync failure log (auto)"
-          for i in 1 2 3; do git push && break || { git pull --rebase; }; done
+          tail -c 100000 sync_run.log > /tmp/sync_failure.log
+          git checkout -- . || true
+          git clean -fd || true
+          for i in 1 2 3; do
+            git fetch origin main && git reset --hard origin/main
+            cp /tmp/sync_failure.log sync_failure.log
+            git add sync_failure.log
+            git commit -m "Sync failure log (auto)"
+            git push && break
+          done
 
       - name: Job summary
         if: always()
