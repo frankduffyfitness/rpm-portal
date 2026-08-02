@@ -845,3 +845,5 @@ if __name__ == "__main__":
 # hop re-pull after source-verified deletions 2026-08-02
 
 # slim cmj re-pull (drop stored limb variants) 2026-08-02
+
+# hop re-pull after round-2 source deletions 2026-08-02
