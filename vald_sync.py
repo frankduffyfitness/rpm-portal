@@ -841,3 +841,5 @@ if __name__ == "__main__":
 # sync trigger 2026-07-30 pm — pull new VALD Hub data
 
 # refresh-hop reproduce trigger 2026-08-02
+
+# hop re-pull after source-verified deletions 2026-08-02
