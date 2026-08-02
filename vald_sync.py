@@ -229,8 +229,17 @@ def fetch_tests(token, modified_from="2020-01-01T00:00:00Z"):
     page = 0
     while True:
         time.sleep(RATE_LIMIT_PAUSE)
-        resp = requests.get(f"{FORCEDECKS_BASE}/tests", headers=H(token),
-            params={"tenantId": TENANT_ID, "modifiedFromUtc": cursor}, timeout=30)
+        # VALD quota is 25 calls per 5s shared across endpoints; full-history
+        # pagination (~350 pages) trips it under load. Back off and retry on
+        # 429 instead of dying (bit both [refresh-hop] runs, 2026-08-02).
+        for attempt in range(6):
+            resp = requests.get(f"{FORCEDECKS_BASE}/tests", headers=H(token),
+                params={"tenantId": TENANT_ID, "modifiedFromUtc": cursor}, timeout=30)
+            if resp.status_code != 429:
+                break
+            wait = 6 + attempt * 4
+            log(f"  Tests page rate-limited (429); waiting {wait}s...")
+            time.sleep(wait)
         if resp.status_code == 204:
             log(f"  No new data (HTTP 204)")
             break
