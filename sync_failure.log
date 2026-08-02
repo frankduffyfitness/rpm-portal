@@ -1,0 +1,37 @@
+[01:53:55] ==================================================
+[01:53:55] HOP-only refresh (re-pull trials for HJ tests)
+[01:53:55] ==================================================
+[01:53:55] Authenticating with VALD...
+[01:53:55] Authenticated! Token valid for 24h.
+[01:53:55] Fetching profiles...
+[01:53:56] Total profiles: 302
+[01:53:56] Fetching groups...
+[01:53:56] Total groups: 6 (College, Female Athletes, High School, Middle School, Pro, Staff)
+[01:53:56] Fetching group memberships...
+[01:53:57]   College: 79 members
+[01:53:57]   Female Athletes: 20 members
+[01:53:57]   High School: 152 members
+[01:53:58]   Middle School: 39 members
+[01:53:58]   Pro: 8 members
+[01:53:59]   Staff: 19 members
+[01:53:59] Fetching tests (modified from 2020-01-01)...
+[01:54:01]   Tests page 1: 50 (total: 50, through 2025-08-01)
+[01:54:02]   Tests page 2: 50 (total: 100, through 2025-08-04)
+[01:54:02]   Tests page 3: 50 (total: 150, through 2025-08-04)
+[01:54:03]   Tests page 4: 50 (total: 200, through 2025-08-05)
+[01:54:03]   Tests page 5: 50 (total: 250, through 2025-08-05)
+[01:54:03]   ERROR: API returned 429: API calls quota exceeded! maximum admitted 25 per 5s.
+Traceback (most recent call last):
+  File "/home/runner/work/rpm-portal/rpm-portal/vald_sync.py", line 824, in <module>
+    main()
+  File "/home/runner/work/rpm-portal/rpm-portal/vald_sync.py", line 694, in main
+    return refresh_hop()
+           ^^^^^^^^^^^^^
+  File "/home/runner/work/rpm-portal/rpm-portal/vald_sync.py", line 480, in refresh_hop
+    all_tests = fetch_tests(token, "2020-01-01T00:00:00Z")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/rpm-portal/rpm-portal/vald_sync.py", line 239, in fetch_tests
+    resp.raise_for_status()
+  File "/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://prd-use-api-extforcedecks.valdperformance.com/tests?tenantId=3127f695-175f-4b63-8331-f1295a34cd51&modifiedFromUtc=2025-08-05T17%3A44%3A09.072Z
