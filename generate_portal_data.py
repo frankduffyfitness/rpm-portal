@@ -138,6 +138,10 @@ GROUP_OVERRIDES = {
     "Michael Destefano": "col",
     "Shea O'Sullivan": "col",
     "Addison Hinz-Camarano": "col",
+    # Starts college September 2026 (Frank, 2026-08-02): rank with the
+    # college pool from now on. Blind stuff-slot and arsenal grade use the
+    # college board too.
+    "Rob Stingone": "col",
     "Zach Weinschel": "col",
     "Darren Espinal": "col",
     "Jackson Mavrides": "col",
