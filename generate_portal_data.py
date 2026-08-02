@@ -1797,7 +1797,11 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
     [name, group, ci, rsi, erRfd|null, velo, sessions, lastVelo, predA, residA,
      predB|null, residB|null, thin, bwLbs|null,
      velo6w|null, sess6w, ci6w|null, rsi6w|null, pred6w|null, resid6w|null,
-     status, lastCmj|null]
+     status, lastCmj|null, bestCiDate|null, bestRsiDate|null]
+    Indices 22-23 are the session dates the LIFETIME-BEST ci and rsi were set
+    (stale-engine badge, 2026-08-02: an all-time prediction leaning on an old
+    best can flag an athlete who has since declined; Cellilli and Persichilli's
+    under-flags were traced to >180d-old bests. UI computes the age).
     Indices 14-21 are CURRENT FORM: the same coefficients scored on inputs from
     the last 42 days only (Frank, 2026-07-28: a February peak must not drive a
     July flag). status "current" needs 3+ window sessions and a window CMJ;
@@ -1866,6 +1870,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             continue
         ci_meas = ci_est = rsi = 0.0
         ci6_meas = ci6_est = rsi6 = 0.0
+        ci_meas_d = ci_est_d = rsi_d = None  # session date of each lifetime best
         last_cmj = None
         cmj_weights = []  # (date, kg) per CMJ test, for current bodyweight
         for t in ath.get("tests", []):
@@ -1880,21 +1885,25 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             for tr in t.get("trials", []):
                 m = tr.get("metrics", {})
                 if m.get("concentricImpulse"):
-                    ci_meas = max(ci_meas, m["concentricImpulse"])
+                    if m["concentricImpulse"] > ci_meas:
+                        ci_meas, ci_meas_d = m["concentricImpulse"], t_date or None
                     if in_window:
                         ci6_meas = max(ci6_meas, m["concentricImpulse"])
                 jh, bw = m.get("jumpHeight"), m.get("bodyweightLbs")
                 if jh and bw:
                     est = (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006
-                    ci_est = max(ci_est, est)
+                    if est > ci_est:
+                        ci_est, ci_est_d = est, t_date or None
                     if in_window:
                         ci6_est = max(ci6_est, est)
                 r = m.get("rsiModified")
                 if r:
-                    rsi = max(rsi, r)
+                    if r > rsi:
+                        rsi, rsi_d = r, t_date or None
                     if in_window:
                         rsi6 = max(rsi6, r)
         ci = ci_meas or ci_est  # per-athlete fallback, mirroring fit_model.py
+        ci_date = ci_meas_d if ci_meas else ci_est_d  # date follows the source used
         ci6 = ci6_meas or ci6_est
         if not ci or not rsi:
             continue
@@ -1928,7 +1937,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             round(v6, 1) if v6 is not None else None, n6,
             round(ci6, 1) if ci6 else None, round(rsi6, 2) if rsi6 else None,
             round(pred6, 1) if pred6 is not None else None, resid6,
-            status, last_cmj,
+            status, last_cmj, ci_date, rsi_d,
         ])
     rows.sort(key=lambda r: -r[9])
     return {"a": list(VM_A), "b": list(VM_B), "rmse": VM_RMSE, "r2": VM_R2,
