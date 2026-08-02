@@ -843,3 +843,5 @@ if __name__ == "__main__":
 # refresh-hop reproduce trigger 2026-08-02
 
 # hop re-pull after source-verified deletions 2026-08-02
+
+# slim cmj re-pull (drop stored limb variants) 2026-08-02
