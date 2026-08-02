@@ -66,7 +66,18 @@ jobs:
           echo "$MSG" | grep -q '\[refresh-cmj\]' && ARGS="--refresh-cmj"
           echo "$MSG" | grep -q '\[refresh-hop\]' && ARGS="--refresh-hop"
           echo "running: python vald_sync.py $ARGS"
-          python vald_sync.py $ARGS
+          set -o pipefail
+          python vald_sync.py $ARGS 2>&1 | tee sync_run.log
+
+      - name: Preserve failure log
+        if: failure()
+        run: |
+          git config user.name "RPM Sync Bot"
+          git config user.email "sync@rpmstrength.coach"
+          tail -c 100000 sync_run.log > sync_failure.log
+          git add sync_failure.log
+          git commit -m "Sync failure log (auto)"
+          for i in 1 2 3; do git push && break || { git pull --rebase; }; done
 
       - name: Generate portal data
         run: |
