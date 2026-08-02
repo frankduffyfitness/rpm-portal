@@ -68,40 +68,40 @@ PORTAL_METRICS = {
     # ── 2026-08-01 metric sweep: 18 pre-registered candidates (timing/velocity/
     # force-at-event/stiffness/landing/RFD). Screened vs velo residual after the
     # [refresh-cmj] backfill; verdicts in the velo-model notes. Additive only.
-    6553643: {"key": "contractionTime",   "label": "Contraction Time", "unit": "ms", "scale": 1000},
-    6553657: {"key": "concDuration",      "label": "Concentric Duration", "unit": "ms", "scale": 1000},
-    6553664: {"key": "brakingPhaseDur",   "label": "Braking Phase Duration", "unit": "ms", "scale": 1000},
-    6553668: {"key": "eccDecelPhaseDur",  "label": "Ecc Deceleration Phase Duration", "unit": "s", "scale": 1},
-    6553642: {"key": "concTimeToPF",      "label": "Conc Time to Peak Force", "unit": "ms", "scale": 1000},
-    6553660: {"key": "ftCtRatio",         "label": "Flight Time:Contraction Time", "unit": "", "scale": 1},
-    6553634: {"key": "concPeakVelo",      "label": "Concentric Peak Velocity", "unit": "m/s", "scale": 1},
-    6553701: {"key": "eccPeakVelo",       "label": "Eccentric Peak Velocity", "unit": "m/s", "scale": 1},
-    6553713: {"key": "forceAtZeroV",      "label": "Force at Zero Velocity", "unit": "N", "scale": 1},
-    6553673: {"key": "forceAtPeakPower",  "label": "Force at Peak Power", "unit": "N", "scale": 1},
-    6553718: {"key": "cmjStiffness",      "label": "CMJ Stiffness", "unit": "N/m", "scale": 1},
-    6553709: {"key": "activeStiffness",   "label": "Active Stiffness", "unit": "N/m", "scale": 1},
-    6553612: {"key": "landingRfd",        "label": "Landing RFD", "unit": "N/s", "scale": 1},
-    6553647: {"key": "landingPeakForceBM", "label": "Landing Net Peak Force / BM", "unit": "N/kg", "scale": 1},
-    6553727: {"key": "landingImpulse",    "label": "Landing Impulse", "unit": "N s", "scale": 1},
-    6553768: {"key": "landingStiffness",  "label": "Landing Stiffness", "unit": "N/m", "scale": 1},
-    6553682: {"key": "eccDecelRfd",       "label": "Ecc Deceleration RFD", "unit": "N/s", "scale": 1},
-    6553641: {"key": "concMaxRfd",        "label": "Conc Maximum RFD", "unit": "N/s", "scale": 1},
+    6553643: {"key": "contractionTime",   "label": "Contraction Time", "unit": "ms", "scale": 1000, "trialOnly": True},
+    6553657: {"key": "concDuration",      "label": "Concentric Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
+    6553664: {"key": "brakingPhaseDur",   "label": "Braking Phase Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
+    6553668: {"key": "eccDecelPhaseDur",  "label": "Ecc Deceleration Phase Duration", "unit": "s", "scale": 1, "trialOnly": True},
+    6553642: {"key": "concTimeToPF",      "label": "Conc Time to Peak Force", "unit": "ms", "scale": 1000, "trialOnly": True},
+    6553660: {"key": "ftCtRatio",         "label": "Flight Time:Contraction Time", "unit": "", "scale": 1, "trialOnly": True},
+    6553634: {"key": "concPeakVelo",      "label": "Concentric Peak Velocity", "unit": "m/s", "scale": 1, "trialOnly": True},
+    6553701: {"key": "eccPeakVelo",       "label": "Eccentric Peak Velocity", "unit": "m/s", "scale": 1, "trialOnly": True},
+    6553713: {"key": "forceAtZeroV",      "label": "Force at Zero Velocity", "unit": "N", "scale": 1, "trialOnly": True},
+    6553673: {"key": "forceAtPeakPower",  "label": "Force at Peak Power", "unit": "N", "scale": 1, "trialOnly": True},
+    6553718: {"key": "cmjStiffness",      "label": "CMJ Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
+    6553709: {"key": "activeStiffness",   "label": "Active Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
+    6553612: {"key": "landingRfd",        "label": "Landing RFD", "unit": "N/s", "scale": 1, "trialOnly": True},
+    6553647: {"key": "landingPeakForceBM", "label": "Landing Net Peak Force / BM", "unit": "N/kg", "scale": 1, "trialOnly": True},
+    6553727: {"key": "landingImpulse",    "label": "Landing Impulse", "unit": "N s", "scale": 1, "trialOnly": True},
+    6553768: {"key": "landingStiffness",  "label": "Landing Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
+    6553682: {"key": "eccDecelRfd",       "label": "Ecc Deceleration RFD", "unit": "N/s", "scale": 1, "trialOnly": True},
+    6553641: {"key": "concMaxRfd",        "label": "Conc Maximum RFD", "unit": "N/s", "scale": 1, "trialOnly": True},
     # HJ (Hop Jump) metrics — VALD returns CT/FT in seconds, scale ×1000 to ms
     13303830: {"key": "hopMeanRsi",        "label": "Hop Mean RSI (FT/CT)","unit": "ratio","scale": 1},
     13303819: {"key": "hopRsi",            "label": "Hop RSI (FT/CT)",     "unit": "ratio","scale": 1},
     13303814: {"key": "hopContactTime",    "label": "Hop Contact Time",    "unit": "ms",   "scale": 1000},
     # ── 2026-08-01 hop sweep: 10 pre-registered HJ candidates (BestHop set-level
     # aggregates + Fatigue family). Screened vs velo residual after [refresh-hop].
-    13303821: {"key": "bestActiveStiffness", "label": "Best Active Stiffness", "unit": "N/m", "scale": 1},
-    13303812: {"key": "bestLandingRfd",    "label": "Best Landing RFD",      "unit": "N/s", "scale": 1},
-    13303813: {"key": "bestTimeToPF",      "label": "Best Time to Peak Force", "unit": "ms", "scale": 1000},
-    13303817: {"key": "bestImpulse",       "label": "Best Impulse",          "unit": "N s", "scale": 1},
-    13303811: {"key": "bestAvgForce",      "label": "Best Average Force",    "unit": "N",   "scale": 1},
-    13303855: {"key": "bestPeakPower",     "label": "Best Peak Power",       "unit": "W",   "scale": 1},
-    13303816: {"key": "bestJumpHeightFT",  "label": "Best Jump Height (FT)", "unit": "cm",  "scale": 1},
-    13303841: {"key": "rsiFatigue",        "label": "RSI Fatigue",           "unit": "%",   "scale": 1},
-    13303840: {"key": "peakForceFatigue",  "label": "Peak Force Fatigue",    "unit": "%",   "scale": 1},
-    13303843: {"key": "stiffnessFatigue",  "label": "Stiffness Fatigue",     "unit": "%",   "scale": 1},
+    13303821: {"key": "bestActiveStiffness", "label": "Best Active Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
+    13303812: {"key": "bestLandingRfd",    "label": "Best Landing RFD",      "unit": "N/s", "scale": 1, "trialOnly": True},
+    13303813: {"key": "bestTimeToPF",      "label": "Best Time to Peak Force", "unit": "ms", "scale": 1000, "trialOnly": True},
+    13303817: {"key": "bestImpulse",       "label": "Best Impulse",          "unit": "N s", "scale": 1, "trialOnly": True},
+    13303811: {"key": "bestAvgForce",      "label": "Best Average Force",    "unit": "N",   "scale": 1, "trialOnly": True},
+    13303855: {"key": "bestPeakPower",     "label": "Best Peak Power",       "unit": "W",   "scale": 1, "trialOnly": True},
+    13303816: {"key": "bestJumpHeightFT",  "label": "Best Jump Height (FT)", "unit": "cm",  "scale": 1, "trialOnly": True},
+    13303841: {"key": "rsiFatigue",        "label": "RSI Fatigue",           "unit": "%",   "scale": 1, "trialOnly": True},
+    13303840: {"key": "peakForceFatigue",  "label": "Peak Force Fatigue",    "unit": "%",   "scale": 1, "trialOnly": True},
+    13303843: {"key": "stiffnessFatigue",  "label": "Stiffness Fatigue",     "unit": "%",   "scale": 1, "trialOnly": True},
     13303815: {"key": "hopFlightTime",     "label": "Hop Flight Time",     "unit": "ms",   "scale": 1000},
     13303818: {"key": "hopPeakForce",      "label": "Hop Peak Force",      "unit": "N",    "scale": 1},
 }
@@ -549,6 +549,11 @@ def process_trial(trial, test_type=""):
         value = result.get("value")
         limb = result.get("limb", "Trial")
         meta = PPU_METRICS[result_id] if is_ppu_metric else PORTAL_METRICS[result_id]
+        # Sweep metrics are screened at trial level only; skipping the
+        # Left/Right/Asym variants keeps the portal JSON ~30 MB smaller
+        # (GitHub rejects blobs over 100 MB — bitten 2026-08-02).
+        if meta.get("trialOnly") and limb != "Trial":
+            continue
         scale = meta.get("scale", 1)
         if is_ppu_metric:
             value = _ppu_norm(meta["key"], value)

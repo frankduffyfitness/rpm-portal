@@ -69,16 +69,6 @@ jobs:
           set -o pipefail
           python vald_sync.py $ARGS 2>&1 | tee sync_run.log
 
-      - name: Preserve failure log
-        if: failure()
-        run: |
-          git config user.name "RPM Sync Bot"
-          git config user.email "sync@rpmstrength.coach"
-          tail -c 100000 sync_run.log > sync_failure.log
-          git add sync_failure.log
-          git commit -m "Sync failure log (auto)"
-          for i in 1 2 3; do git push && break || { git pull --rebase; }; done
-
       - name: Generate portal data
         run: |
           # Target src/App.jsx explicitly: a STALE root App.jsx also exists, and
@@ -134,6 +124,16 @@ jobs:
             echo "push rejected (main moved) — rebuilding, attempt ${attempt}"
           done
           echo "ERROR: could not push after 3 attempts"; exit 1
+
+      - name: Preserve failure log
+        if: failure()
+        run: |
+          git config user.name "RPM Sync Bot"
+          git config user.email "sync@rpmstrength.coach"
+          tail -c 100000 sync_run.log > sync_failure.log
+          git add sync_failure.log
+          git commit -m "Sync failure log (auto)"
+          for i in 1 2 3; do git push && break || { git pull --rebase; }; done
 
       - name: Job summary
         if: always()
