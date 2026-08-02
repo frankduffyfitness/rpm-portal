@@ -8,7 +8,7 @@ import hashlib
 _lg.disable(_lg.NOTSET)
 del _lg
 
-import os, sys, json, time, requests
+import os, random, sys, json, threading, time, requests
 from datetime import datetime, timezone
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -284,17 +284,47 @@ def fetch_trials_for_test(token, test_id):
         return []
 
 
-def fetch_trials_strict(token, test_id, tries=5):
+# Cooperative 429 cooldown: when VALD throttles one worker, every worker
+# pauses until the window passes instead of burning its own retry budget
+# against the same wall. The 2026-08-02 round-2 hop re-pull died at trial
+# 1500/7968 exactly this way — a sustained tenant-side throttle (Hub
+# activity shares the quota) outlasted five short per-test retries.
+_cooldown = {"until": 0.0}
+_cooldown_lock = threading.Lock()
+
+
+def _respect_cooldown():
+    while True:
+        wait = _cooldown["until"] - time.time()
+        if wait <= 0:
+            return
+        time.sleep(min(wait, 5))
+
+
+def _set_cooldown(seconds):
+    with _cooldown_lock:
+        _cooldown["until"] = max(_cooldown["until"], time.time() + seconds)
+
+
+def fetch_trials_strict(token, test_id, tries=9):
     """Like fetch_trials_for_test but RAISES on persistent failure instead of
-    returning []. Used by the CMJ refresh: a silently-empty result would make
-    build_portal_data drop that CMJ test entirely (data loss). Better to fail
-    the whole job — nothing gets committed — than to lose tests."""
+    returning []. Used by the CMJ/hop refreshes: a silently-empty result would
+    make build_portal_data drop that test entirely (data loss). Better to fail
+    the whole job — nothing gets committed — than to lose tests.
+    429s: exponential backoff capped at 45s honoring Retry-After, shared
+    through a process-wide cooldown so a sustained throttle window pauses all
+    workers together."""
     url = f"{FORCEDECKS_BASE}/v2019q3/teams/{TENANT_ID}/tests/{test_id}/trials"
     for attempt in range(tries):
+        _respect_cooldown()
         try:
             resp = requests.get(url, headers=H(token), timeout=30)
             if resp.status_code == 429:
-                time.sleep(2 * (attempt + 1))
+                try:
+                    wait = float(resp.headers.get("Retry-After"))
+                except (TypeError, ValueError):
+                    wait = min(45, 2 * (2 ** attempt))
+                _set_cooldown(wait + random.uniform(0, 2))
                 continue
             resp.raise_for_status()
             return resp.json()
