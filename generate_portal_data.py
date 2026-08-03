@@ -159,7 +159,7 @@ GROUP_OVERRIDES = {
 # and match the Female Athletes filter. Matching collapses whitespace (the
 # VALD data has e.g. "Francesca  Albergo" with a double space).
 FEMALE_ATHLETES = {
-    "Alanna Behler", "Francesca Albergo", "Nicole Berinato", "Victoria Barrientos",
+    "Alannah Behler", "Francesca Albergo", "Nicole Berinato", "Victoria Barrientos",
     "Grace Bekios", "Bella Cafasso", "Sophia Conrath", "Barbara DiMaria",
     "Niki Eckert", "Samantha Hartwig", "Aryanna Hernandez", "Tiana Hernandez",
     "Lyla Kondel", "Amber Mangold", "Scarlett Molina", "Diem Nenadich",
@@ -2032,7 +2032,6 @@ if os.path.exists(DYNAMO_JSON):
 # lightest shade (count 1); it never inflates days that already have tests.
 ATTENDANCE_ALIASES = {
     "zachary uysal": "Zach Uysal",
-    "alannah behler": "Alanna  Behler",   # sheet spelling is CORRECT; VALD store typo until Frank's Hub fix propagates
     "collin leavy": "Colin Leavy",
     "joe frazzetta": "Joey Frazzetta",
     "joe muzio": "Joey Muzio",
