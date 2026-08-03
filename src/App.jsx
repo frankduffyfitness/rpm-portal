@@ -3971,7 +3971,7 @@ function VeloModelSection() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
-        {[["overview", "Overview"], ["flags", "Flag list"], ["gains", "Gains"], ["sandbox", "Evaluation"]].map(([k, l]) => (
+        {[["overview", "Overview"], ["flags", "Flag list"], ["gains", "Impulse"], ["sandbox", "Evaluation"]].map(([k, l]) => (
           <button key={k} onClick={() => setView(k)} style={{ padding: "7px 12px", border: "1px solid " + (view === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: view === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: view === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
         ))}
       </div>
