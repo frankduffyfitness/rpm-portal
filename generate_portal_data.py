@@ -1970,7 +1970,7 @@ for _a in athletes_data:
     _ss = sorted(_a['sessions'], key=lambda s: s['date'])
     _e = _FH.setdefault(_a['name'], {})
     _e['d'] = [_ymd(s['date']) for s in _ss]
-    for _k in ('jh', 'rsi', 'pp', 'brk'):
+    for _k in ('jh', 'rsi', 'pp'):
         _e[_k] = [s.get(_k) for s in _ss]
 for _a in hop_athletes_data:
     _ss = sorted(_a['sessions'], key=lambda s: s['date'])
