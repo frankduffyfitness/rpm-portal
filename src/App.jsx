@@ -3934,6 +3934,7 @@ function VmImpulseVeloChart({ ci, vp, va }) {
 const VM_GAIN_RATE = 1.1;
 function VmGains({ onPick }) {
   const [win, setWin] = useState("3m");
+  const [pool, setPool] = useState("vm");
   const [open, setOpen] = useState(null);
   const now = new Date();
   const toI = (d) => (d.getFullYear() % 100) * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
@@ -3948,7 +3949,11 @@ function VmGains({ onPick }) {
     });
     return m;
   }, []);
-  const all = useMemo(() => VM_ROWS.map(r => {
+  const vmNames = useMemo(() => new Set(VM_ROWS.map(r => r.name)), []);
+  // Rest of roster = every CMJ athlete outside the fitted velo model. Female
+  // athletes stay off bodyweight boards portal-wide.
+  const poolRows = pool === "vm" ? VM_ROWS : ATHLETES.filter(x => !vmNames.has(x.name) && !FEM_SET.has(x.name));
+  const all = useMemo(() => poolRows.map(r => {
     const f = _FH[r.name]; const b = BW_DATA[r.name];
     if (!f || !f.d || !b || !b.dates) return null;
     const ci = f.d.map((d, i) => [d, f.pp ? f.pp[i] : null]).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null);
@@ -3960,7 +3965,7 @@ function VmGains({ onPick }) {
     const vp = vh ? vh.d.map((d, i) => [d, vh.p[i]]).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null) : [];
     const va = vh ? vh.d.map((d, i) => [d, vh.g[i]]).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null) : [];
     return { r, ci, bw, dci, dbw, vp, va };
-  }).filter(Boolean), [lo, hi, veloBy]);
+  }).filter(Boolean), [lo, hi, veloBy, pool]);
   const gainers = all.filter(g => g.dbw >= 3).map(g => ({ ...g, ratio: Math.round((g.dci / g.dbw) * 100) / 100 })).sort((a, b) => b.ratio - a.ratio);
   const stable = all.filter(g => Math.abs(g.dbw) < 3).sort((a, b) => b.dci - a.dci);
   const losers = all.filter(g => g.dbw <= -3).sort((a, b) => b.dci - a.dci);
@@ -3970,7 +3975,7 @@ function VmGains({ onPick }) {
       <div onClick={() => setOpen(open === g.r.name ? null : g.r.name)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", cursor: "pointer" }}>
         <div style={{ width: 20, fontSize: 11, fontWeight: 700, textAlign: "center", color: i < 3 ? "#8A8F98" : "#4A4F57", flexShrink: 0 }}>{i + 1}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div onClick={(e) => { e.stopPropagation(); onPick(g.r); }} style={{ fontSize: 12.5, fontWeight: 700, color: "#E0E0E0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.r.name}</div>
+          <div onClick={pool === "vm" ? (e) => { e.stopPropagation(); onPick(g.r); } : undefined} style={{ fontSize: 12.5, fontWeight: 700, color: "#E0E0E0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.r.name}</div>
           <div style={{ fontSize: 9, color: "#6B7280" }}>{(GROUPS[g.r.group] || {}).shortLabel || g.r.group} {"·"} {g.dbw > 0 ? "+" : ""}{g.dbw} lb {"·"} {g.dci > 0 ? "+" : ""}{g.dci} N·s</div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -3997,12 +4002,17 @@ function VmGains({ onPick }) {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+        {[["vm", "Velo Model"], ["roster", "Rest of roster"]].map(([k, l]) => (
+          <button key={k} onClick={() => { setPool(k); setOpen(null); }} style={rangeChip(pool === k, "#60A5FA")}>{l}</button>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
         {[["3m", "3M"], ["6m", "6M"], ["ytd", "YTD"], ["all", "All"]].map(([k, l]) => (
           <button key={k} onClick={() => { setWin(k); setOpen(null); }} style={rangeChip(win === k, "#4FFFB0")}>{l}</button>
         ))}
       </div>
       <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.55, marginBottom: 12 }}>
-        Concentric impulse gained per pound of bodyweight gained. The facility's measured rate is about <b style={{ color: "#8A8F98" }}>{VM_GAIN_RATE} N·s per lb</b>: above that, the engine is growing faster than the scale. As a rule of thumb, +10 N·s is roughly +0.5 to 1 mph on the model. Tap a row for both graphs, tap a name for the athlete card.
+        Concentric impulse gained per pound of bodyweight gained. The facility's measured rate is about <b style={{ color: "#8A8F98" }}>{VM_GAIN_RATE} N·s per lb</b>: above that, the engine is growing faster than the scale. As a rule of thumb, +10 N·s is roughly +0.5 to 1 mph on the model. Tap a row for both graphs{pool === "vm" ? ", tap a name for the athlete card" : ""}.{pool === "roster" ? " Non-pitchers and unfitted pitchers; female athletes stay off bodyweight boards." : ""}
       </div>
       {gainers.length > 0 && (<>
         <div style={{ fontSize: 11, fontWeight: 700, color: "#8A8F98", marginBottom: 6 }}>Gained weight (3+ lb)</div>
