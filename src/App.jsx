@@ -3888,6 +3888,72 @@ function VmSandboxCard() {
   );
 }
 
+// ─── Weight → Impulse gains board (coach ask 2026-08-03) ─────────────────────
+// Ranks fitted pitchers by impulse gained BEYOND what their bodyweight change
+// predicts. The facility's measured within-athlete coupling is ~+1.1 N·s per
+// lb (physics ceiling ~1.2 if jump height holds), so surplus = ΔCI − 1.1·ΔBW.
+// A raw ΔCI/ΔBW ratio is shown only when |ΔBW| ≥ 3 lb: under that, the
+// denominator is water weight and the ratio is noise.
+const VM_GAIN_RATE = 1.1;
+function VmGains({ onPick }) {
+  const [win, setWin] = useState("3m");
+  const [open, setOpen] = useState(null);
+  const now = new Date();
+  const toI = (d) => (d.getFullYear() % 100) * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  let lo = 0; const hi = toI(now);
+  if (win === "ytd") lo = (now.getFullYear() % 100) * 10000 + 101;
+  else if (win !== "all") { const days = { "3m": 91, "6m": 182 }[win]; const d = new Date(now); d.setDate(d.getDate() - days); lo = toI(d); }
+  const rows = useMemo(() => VM_ROWS.map(r => {
+    const f = _FH[r.name]; const b = BW_DATA[r.name];
+    if (!f || !f.d || !b || !b.dates) return null;
+    const ci = f.d.map((d, i) => [d, f.pp ? f.pp[i] : null]).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null);
+    const bw = b.dates.map((t, i) => { const q = String(t).split("/").map(Number); return [(q[2] % 100) * 10000 + q[0] * 100 + q[1], b.history[i]]; }).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null);
+    if (ci.length < 2 || bw.length < 2) return null;
+    const dci = Math.round((ci[ci.length - 1][1] - ci[0][1]) * 10) / 10;
+    const dbw = Math.round((bw[bw.length - 1][1] - bw[0][1]) * 10) / 10;
+    const surplus = Math.round((dci - VM_GAIN_RATE * dbw) * 10) / 10;
+    const ratio = dbw >= 3 ? Math.round((dci / dbw) * 100) / 100 : null;
+    return { r, ci, bw, dci, dbw, surplus, ratio };
+  }).filter(Boolean).sort((a, b2) => b2.surplus - a.surplus), [lo, hi]);
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+        {[["3m", "3M"], ["6m", "6M"], ["ytd", "YTD"], ["all", "All"]].map(([k, l]) => (
+          <button key={k} onClick={() => { setWin(k); setOpen(null); }} style={rangeChip(win === k, "#4FFFB0")}>{l}</button>
+        ))}
+      </div>
+      <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.55, marginBottom: 10 }}>
+        Weight into impulse. The facility's measured rate is about <b style={{ color: "#8A8F98" }}>+{VM_GAIN_RATE} N·s of concentric impulse per pound</b> gained. Surplus = impulse gained beyond what the weight change predicts: positive means the engine grew faster than the scale, including anyone who leaned out and kept their drive. Ratio shows only for athletes who gained at least 3 lbs. As a rule of thumb, +10 N·s is roughly +0.5 to 1 mph on the model. {rows.length} pitchers with 2+ readings in window. Tap a row for both graphs.
+      </div>
+      {rows.length === 0 && <div style={{ fontSize: 12, color: "#6B7280", textAlign: "center", padding: 30 }}>No pitchers with two readings in this window.</div>}
+      {rows.map((g, i) => (
+        <div key={g.r.name} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, overflow: "hidden" }}>
+          <div onClick={() => setOpen(open === g.r.name ? null : g.r.name)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", cursor: "pointer" }}>
+            <div style={{ width: 20, fontSize: 11, fontWeight: 700, textAlign: "center", color: i < 3 && g.surplus > 0 ? "#4FFFB0" : "#6B7280", flexShrink: 0 }}>{i + 1}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div onClick={(e) => { e.stopPropagation(); onPick(g.r); }} style={{ fontSize: 12.5, fontWeight: 700, color: "#E0E0E0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.r.name}</div>
+              <div style={{ fontSize: 9, color: "#6B7280" }}>{(GROUPS[g.r.group] || {}).shortLabel || g.r.group} {"·"} {g.dbw > 0 ? "+" : ""}{g.dbw} lb {"·"} {g.dci > 0 ? "+" : ""}{g.dci} N·s{g.ratio != null ? " · " + g.ratio + " N·s/lb" : ""}</div>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: g.surplus > 0 ? "#4FFFB0" : g.surplus < 0 ? "#FF6B6B" : "#8A8F98" }}>{g.surplus > 0 ? "+" : ""}{g.surplus} N·s</div>
+              <div style={{ fontSize: 8, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5 }}>beyond the scale</div>
+            </div>
+            <div style={{ color: "#4A4F57", fontSize: 14, flexShrink: 0, transform: open === g.r.name ? "rotate(90deg)" : "none", transition: "transform 0.15s" }}>{"›"}</div>
+          </div>
+          {open === g.r.name && (
+            <div style={{ padding: "0 12px 10px" }}>
+              <div style={{ fontSize: 9, color: "#60A5FA", fontWeight: 700, marginTop: 2 }}>CONCENTRIC IMPULSE (N·s)</div>
+              <RangeChart pts={g.ci} color="#60A5FA" dec={1} />
+              <div style={{ fontSize: 9, color: "#E0E0E0", fontWeight: 700, marginTop: 8 }}>BODYWEIGHT (LBS)</div>
+              <RangeChart pts={g.bw} color="#E0E0E0" dec={1} />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function VeloModelSection() {
   const [view, setView] = useState("overview");
   const [pick, setPick] = useState(null);
@@ -3905,12 +3971,13 @@ function VeloModelSection() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
-        {[["overview", "Overview"], ["flags", "Flag list"], ["sandbox", "Evaluation"]].map(([k, l]) => (
+        {[["overview", "Overview"], ["flags", "Flag list"], ["gains", "Gains"], ["sandbox", "Evaluation"]].map(([k, l]) => (
           <button key={k} onClick={() => setView(k)} style={{ padding: "7px 12px", border: "1px solid " + (view === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: view === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: view === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
         ))}
       </div>
       {view === "overview" ? <VmOverview rows={curRows} onPick={open} />
         : view === "sandbox" ? <VmSandboxCard />
+        : view === "gains" ? <VmGains onPick={open} />
         : <VmFlags rows={rows} onPick={open} openLists={openLists} onToggleList={onToggleList} />}
     </div>
   );
