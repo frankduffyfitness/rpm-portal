@@ -3892,6 +3892,45 @@ function VmSandboxCard() {
 // Headline is the actual ratio for weight-gainers (3+ lb, where a ratio is
 // real). Athletes who held or lost weight get their impulse change with a
 // plain label instead of a sign-flipped ratio. Facility coupling ~1.1 N·s/lb.
+// Impulse (left axis, solid) overlaid with per-session peak + avg fastball
+// velocity (right axis, dotted) — the mass→force→velo chain on one graph.
+function VmImpulseVeloChart({ ci, vp, va }) {
+  const W = 300, H = 132, P = 32, PR = 28, PB = 18;
+  const allPts = [...ci, ...vp, ...va];
+  const xs = allPts.map(pt => rangeDate(pt[0]).getTime());
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const X = (t) => P + ((t - x0) / Math.max(1, x1 - x0)) * (W - P - PR);
+  let lo = Math.min(...ci.map(pt => pt[1])), hi = Math.max(...ci.map(pt => pt[1]));
+  if (hi - lo < 1e-9) { hi += 1; lo -= 1; }
+  const gl = lo, gh = hi; const pad = (hi - lo) * 0.18; lo -= pad; hi += pad;
+  const Y = (v) => (H - PB) - ((v - lo) / (hi - lo)) * (H - PB - 8);
+  const vv = [...vp, ...va].map(pt => pt[1]);
+  let vlo = vv.length ? Math.min(...vv) : 0, vhi = vv.length ? Math.max(...vv) : 1;
+  if (vhi - vlo < 1e-9) { vhi += 1; vlo -= 1; }
+  const vgl = vlo, vgh = vhi; const vpad = (vhi - vlo) * 0.18; vlo -= vpad; vhi += vpad;
+  const VY = (v) => (H - PB) - ((v - vlo) / (vhi - vlo)) * (H - PB - 8);
+  const line = (pts, Yf) => pts.map(pt => X(rangeDate(pt[0]).getTime()).toFixed(1) + "," + Yf(pt[1]).toFixed(1)).join(" ");
+  return (
+    <svg viewBox={"0 0 " + W + " " + H} style={{ display: "block", width: "100%", marginTop: 6 }}>
+      {[gl, gh].map((v, i) => (<g key={i}>
+        <line x1={P} y1={Y(v)} x2={W - PR} y2={Y(v)} stroke="rgba(255,255,255,0.07)" strokeWidth="0.7" />
+        <text x={P - 4} y={Y(v) + 2.5} textAnchor="end" style={{ fontSize: 7, fill: "#60A5FA", fontFamily: "DM Sans" }}>{v.toFixed(0)}</text>
+      </g>))}
+      {vv.length > 0 && [vgl, vgh].map((v, i) => (
+        <text key={"r" + i} x={W - PR + 4} y={VY(v) + 2.5} style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{v.toFixed(1)}</text>
+      ))}
+      <polyline points={line(ci, Y)} fill="none" stroke="#60A5FA" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
+      {ci.map((pt, i) => <circle key={"c" + i} cx={X(rangeDate(pt[0]).getTime())} cy={Y(pt[1])} r="1.8" fill="#60A5FA" stroke="#0A0C10" strokeWidth="0.7" />)}
+      {vp.length > 1 && <polyline points={line(vp, VY)} fill="none" stroke="#4FFFB0" strokeWidth="1.3" strokeDasharray="4 3" strokeLinejoin="round" />}
+      {vp.map((pt, i) => <circle key={"p" + i} cx={X(rangeDate(pt[0]).getTime())} cy={VY(pt[1])} r="1.6" fill="#4FFFB0" stroke="#0A0C10" strokeWidth="0.6" />)}
+      {va.length > 1 && <polyline points={line(va, VY)} fill="none" stroke="#FF8C42" strokeWidth="1.2" strokeDasharray="2 3" strokeLinejoin="round" />}
+      {va.map((pt, i) => <circle key={"a" + i} cx={X(rangeDate(pt[0]).getTime())} cy={VY(pt[1])} r="1.4" fill="#FF8C42" stroke="#0A0C10" strokeWidth="0.6" />)}
+      <text x={P} y={H - 4} style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{rangeFmt(allPts.reduce((m, pt) => Math.min(m, pt[0]), 999999))}</text>
+      <text x={W - PR} y={H - 4} textAnchor="end" style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{rangeFmt(allPts.reduce((m, pt) => Math.max(m, pt[0]), 0))}</text>
+    </svg>
+  );
+}
+
 const VM_GAIN_RATE = 1.1;
 function VmGains({ onPick }) {
   const [win, setWin] = useState("3m");
@@ -3901,6 +3940,14 @@ function VmGains({ onPick }) {
   let lo = 0; const hi = toI(now);
   if (win === "ytd") lo = (now.getFullYear() % 100) * 10000 + 101;
   else if (win !== "all") { const days = { "3m": 91, "6m": 182 }[win]; const d = new Date(now); d.setDate(d.getDate() - days); lo = toI(d); }
+  const veloBy = useMemo(() => {
+    const m = {};
+    VELO_ATHLETES.forEach(v => {
+      const d = (v.dateHistory || []).map(t => { const q = String(t).split("/").map(Number); return (q[2] % 100) * 10000 + q[0] * 100 + q[1]; });
+      m[v.name] = { d, p: v.peakHistory || [], g: v.avgHistory || [] };
+    });
+    return m;
+  }, []);
   const all = useMemo(() => VM_ROWS.map(r => {
     const f = _FH[r.name]; const b = BW_DATA[r.name];
     if (!f || !f.d || !b || !b.dates) return null;
@@ -3909,8 +3956,11 @@ function VmGains({ onPick }) {
     if (ci.length < 2 || bw.length < 2) return null;
     const dci = Math.round((ci[ci.length - 1][1] - ci[0][1]) * 10) / 10;
     const dbw = Math.round((bw[bw.length - 1][1] - bw[0][1]) * 10) / 10;
-    return { r, ci, bw, dci, dbw };
-  }).filter(Boolean), [lo, hi]);
+    const vh = veloBy[r.name];
+    const vp = vh ? vh.d.map((d, i) => [d, vh.p[i]]).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null) : [];
+    const va = vh ? vh.d.map((d, i) => [d, vh.g[i]]).filter(pt => pt[0] >= lo && pt[0] <= hi && pt[1] != null) : [];
+    return { r, ci, bw, dci, dbw, vp, va };
+  }).filter(Boolean), [lo, hi, veloBy]);
   const gainers = all.filter(g => g.dbw >= 3).map(g => ({ ...g, ratio: Math.round((g.dci / g.dbw) * 100) / 100 })).sort((a, b) => b.ratio - a.ratio);
   const stable = all.filter(g => Math.abs(g.dbw) < 3).sort((a, b) => b.dci - a.dci);
   const losers = all.filter(g => g.dbw <= -3).sort((a, b) => b.dci - a.dci);
@@ -3931,8 +3981,13 @@ function VmGains({ onPick }) {
       </div>
       {open === g.r.name && (
         <div style={{ padding: "0 12px 10px" }}>
-          <div style={{ fontSize: 9, color: "#60A5FA", fontWeight: 700, marginTop: 2 }}>CONCENTRIC IMPULSE (N·s)</div>
-          <RangeChart pts={g.ci} color="#60A5FA" dec={1} />
+          <div style={{ display: "flex", gap: 10, fontSize: 8.5, fontWeight: 700, marginTop: 2, flexWrap: "wrap" }}>
+            <span style={{ color: "#60A5FA" }}>— Impulse (N·s)</span>
+            {g.vp.length > 0 && <span style={{ color: "#4FFFB0" }}>┄ Peak velo (mph)</span>}
+            {g.va.length > 0 && <span style={{ color: "#FF8C42" }}>┄ Avg FB (mph)</span>}
+            {g.vp.length === 0 && g.va.length === 0 && <span style={{ color: "#6B7280", fontWeight: 400 }}>no velo sessions in window</span>}
+          </div>
+          <VmImpulseVeloChart ci={g.ci} vp={g.vp} va={g.va} />
           <div style={{ fontSize: 9, color: "#E0E0E0", fontWeight: 700, marginTop: 8 }}>BODYWEIGHT (LBS)</div>
           <RangeChart pts={g.bw} color="#E0E0E0" dec={1} />
         </div>
