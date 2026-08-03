@@ -3433,7 +3433,11 @@ const ROSTER_STATUS = {
   "Dom Persichilli": "departed", "Rob Williams": "departed",
   "Issac Santana": "away", "Isaiah Rubin-Patel": "away",
   "Eric Greenlund-Caraballo": "away", "Sebastian Pitt": "away",
-  "Mario Corso-Winks": "injured",
+  // Frank 2026-08-03: Winquest back in the offseason (pro season); Corso-Winks
+  // (still injured) and Leavy not expected anytime soon; Hansen was a one-off
+  // All-Star-break guest alongside Winquest.
+  "Cade Winquest": "away", "Mario Corso-Winks": "away", "Colin Leavy": "away",
+  "Pete Hansen": "departed",
 };
 const VM_STATUS_CHIP = {
   departed: { label: "DEPARTED", color: "#FF8C42" },
