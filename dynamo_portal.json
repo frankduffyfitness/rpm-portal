@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-03T19:53:22.805909+00:00",
+    "syncDate": "2026-08-03T22:13:53.835204+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 57
+    "totalAthletes": 58
   },
   "athletes": {
     "Joey Muzio": {
@@ -3414,7 +3414,7 @@
     },
     "Mason Morello": {
       "name": "Mason Morello",
-      "group": "hs",
+      "group": "pro",
       "dob": "2002-11-19",
       "tests": [
         {
@@ -4982,6 +4982,65 @@
       "group": "hs",
       "dob": "2010-04-07",
       "tests": [
+        {
+          "date": "2026-08-03",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                567.9
+              ],
+              "peakLbs": [
+                null,
+                127.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3492
+              ],
+              "ttp": [
+                null,
+                2.21
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                591.7
+              ],
+              "peakLbs": [
+                null,
+                133.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3370
+              ],
+              "ttp": [
+                null,
+                2.83
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-07-15",
           "type": "Shoulder Strength Baseline",
@@ -9092,6 +9151,65 @@
       "dob": "2008-04-26",
       "tests": [
         {
+          "date": "2026-08-03",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                468.6
+              ],
+              "peakLbs": [
+                null,
+                105.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2948
+              ],
+              "ttp": [
+                null,
+                1.38
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                453.5
+              ],
+              "peakLbs": [
+                null,
+                102.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3032
+              ],
+              "ttp": [
+                null,
+                0.93
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-07-29",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -9920,6 +10038,72 @@
           "erIr": {
             "left": null,
             "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Noah DeJesus": {
+      "name": "Noah DeJesus",
+      "group": "ms",
+      "dob": "2012-03-17",
+      "tests": [
+        {
+          "date": "2026-08-03",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                123.4
+              ],
+              "peakLbs": [
+                null,
+                27.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                554
+              ],
+              "ttp": [
+                null,
+                2.13
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                153.5
+              ],
+              "peakLbs": [
+                null,
+                34.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                664
+              ],
+              "ttp": [
+                null,
+                3.3
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.8
           },
           "discomfortNote": "",
           "planNote": ""
