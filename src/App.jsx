@@ -1387,7 +1387,10 @@ function rangeDate(i) { const t = String(i).padStart(6, "0"); return new Date(20
 function rangeFmt(i) { const d = rangeDate(i); return (d.getMonth() + 1) + "/" + d.getDate() + "/" + String(d.getFullYear()).slice(2); }
 const rangeRound = (v, dec) => Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
 
-function RangeChart({ pts, color, dec }) {
+function rangeTipDate(i) { return rangeDate(i).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+
+function RangeChart({ pts, color, dec, unit }) {
+  const [hit, setHit] = useState(null);
   const W = 300, H = 112, P = 30, PB = 18;
   const xs = pts.map(p => rangeDate(p[0]).getTime());
   const ys = pts.map(p => p[1]);
@@ -1399,16 +1402,27 @@ function RangeChart({ pts, color, dec }) {
   const Y = (v) => (H - PB) - ((v - lo) / (hi - lo)) * (H - PB - 6);
   const line = pts.map((p, i) => X(xs[i]).toFixed(1) + "," + Y(p[1]).toFixed(1)).join(" ");
   return (
+    <div style={{ position: "relative" }}>
+      {hit != null && (
+        <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "5px 10px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
+          <span style={{ fontSize: 10, color: "#8A8F98" }}>{rangeTipDate(pts[hit][0])} {"·"} </span>
+          <span style={{ fontSize: 10.5, fontWeight: 800, color }}>{pts[hit][1]}{unit || ""}</span>
+        </div>
+      )}
     <svg viewBox={"0 0 " + W + " " + H} style={{ display: "block", width: "100%", marginTop: 6 }}>
       {[glo, ghi].map((v, i) => (<g key={i}>
         <line x1={P} y1={Y(v)} x2={W - 8} y2={Y(v)} stroke="rgba(255,255,255,0.07)" strokeWidth="0.7" />
         <text x={P - 4} y={Y(v) + 2.5} textAnchor="end" style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{v.toFixed(dec)}</text>
       </g>))}
       <polyline points={line} fill="none" stroke={color} strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
-      {pts.map((p, i) => <circle key={i} cx={X(xs[i])} cy={Y(p[1])} r="2" fill={color} stroke="#0A0C10" strokeWidth="0.8" />)}
+      {pts.map((p, i) => <circle key={i} cx={X(xs[i])} cy={Y(p[1])} r={hit === i ? 3.2 : 2} fill={color} stroke="#0A0C10" strokeWidth="0.8" />)}
+      {pts.map((p, i) => <circle key={"h" + i} cx={X(xs[i])} cy={Y(p[1])} r="8" fill="transparent" style={{ cursor: "pointer" }}
+        onMouseEnter={() => setHit(i)} onMouseLeave={() => setHit(null)}
+        onClick={(e) => { e.stopPropagation(); setHit(hit === i ? null : i); }} />)}
       <text x={P} y={H - 4} style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{rangeFmt(pts[0][0])}</text>
       <text x={W - 8} y={H - 4} textAnchor="end" style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{rangeFmt(pts[pts.length - 1][0])}</text>
     </svg>
+    </div>
   );
 }
 
@@ -1471,7 +1485,7 @@ function DateRangeSection({ cfgs, pool, note }) {
             </div>
             <div style={{ color: "#4A4F57", fontSize: 14, flexShrink: 0, transform: open === r.a.name ? "rotate(90deg)" : "none", transition: "transform 0.15s" }}>{"›"}</div>
           </div>
-          {open === r.a.name && <div style={{ padding: "0 12px 10px" }}><RangeChart pts={r.pts} color={cfg.color} dec={cfg.dec} /></div>}
+          {open === r.a.name && <div style={{ padding: "0 12px 10px" }}><RangeChart pts={r.pts} color={cfg.color} dec={cfg.dec} unit={cfg.unit} /></div>}
         </div>
       ))}
     </div>
@@ -3895,6 +3909,7 @@ function VmSandboxCard() {
 // Impulse (left axis, solid) overlaid with per-session peak + avg fastball
 // velocity (right axis, dotted) — the mass→force→velo chain on one graph.
 function VmImpulseVeloChart({ ci, vp, va }) {
+  const [hit, setHit] = useState(null);  // {s: series label, d, v, u, c}
   const W = 300, H = 132, P = 32, PR = 28, PB = 18;
   const allPts = [...ci, ...vp, ...va];
   const xs = allPts.map(pt => rangeDate(pt[0]).getTime());
@@ -3910,7 +3925,20 @@ function VmImpulseVeloChart({ ci, vp, va }) {
   const vgl = vlo, vgh = vhi; const vpad = (vhi - vlo) * 0.18; vlo -= vpad; vhi += vpad;
   const VY = (v) => (H - PB) - ((v - vlo) / (vhi - vlo)) * (H - PB - 8);
   const line = (pts, Yf) => pts.map(pt => X(rangeDate(pt[0]).getTime()).toFixed(1) + "," + Yf(pt[1]).toFixed(1)).join(" ");
+  const tap = (label, unit, color2) => (pt) => setHit(hit && hit.d === pt[0] && hit.s === label ? null : { s: label, d: pt[0], v: pt[1], u: unit, c: color2 });
+  const targets = (pts, Yf, label, unit, color2) => pts.map((pt, i) => (
+    <circle key={label + "t" + i} cx={X(rangeDate(pt[0]).getTime())} cy={Yf(pt[1])} r="8" fill="transparent" style={{ cursor: "pointer" }}
+      onMouseEnter={() => setHit({ s: label, d: pt[0], v: pt[1], u: unit, c: color2 })} onMouseLeave={() => setHit(null)}
+      onClick={(e) => { e.stopPropagation(); tap(label, unit, color2)(pt); }} />
+  ));
   return (
+    <div style={{ position: "relative" }}>
+      {hit != null && (
+        <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "5px 10px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
+          <span style={{ fontSize: 10, color: "#8A8F98" }}>{rangeTipDate(hit.d)} {"·"} {hit.s} </span>
+          <span style={{ fontSize: 10.5, fontWeight: 800, color: hit.c }}>{hit.v}{hit.u}</span>
+        </div>
+      )}
     <svg viewBox={"0 0 " + W + " " + H} style={{ display: "block", width: "100%", marginTop: 6 }}>
       {[gl, gh].map((v, i) => (<g key={i}>
         <line x1={P} y1={Y(v)} x2={W - PR} y2={Y(v)} stroke="rgba(255,255,255,0.07)" strokeWidth="0.7" />
@@ -3927,7 +3955,11 @@ function VmImpulseVeloChart({ ci, vp, va }) {
       {va.map((pt, i) => <circle key={"a" + i} cx={X(rangeDate(pt[0]).getTime())} cy={VY(pt[1])} r="1.4" fill="#FF8C42" stroke="#0A0C10" strokeWidth="0.6" />)}
       <text x={P} y={H - 4} style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{rangeFmt(allPts.reduce((m, pt) => Math.min(m, pt[0]), 999999))}</text>
       <text x={W - PR} y={H - 4} textAnchor="end" style={{ fontSize: 7, fill: "#6B7280", fontFamily: "DM Sans" }}>{rangeFmt(allPts.reduce((m, pt) => Math.max(m, pt[0]), 0))}</text>
+      {targets(ci, Y, "Impulse", " N·s", "#60A5FA")}
+      {targets(vp, VY, "Peak velo", " mph", "#4FFFB0")}
+      {targets(va, VY, "Avg FB", " mph", "#FF8C42")}
     </svg>
+    </div>
   );
 }
 
@@ -3994,7 +4026,7 @@ function VmGains({ onPick }) {
           </div>
           <VmImpulseVeloChart ci={g.ci} vp={g.vp} va={g.va} />
           <div style={{ fontSize: 9, color: "#E0E0E0", fontWeight: 700, marginTop: 8 }}>BODYWEIGHT (LBS)</div>
-          <RangeChart pts={g.bw} color="#E0E0E0" dec={1} />
+          <RangeChart pts={g.bw} color="#E0E0E0" dec={1} unit=" lbs" />
         </div>
       )}
     </div>
