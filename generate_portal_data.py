@@ -1956,6 +1956,32 @@ _FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
               {ath['name'] for ath in hop_athletes_data if is_female(ath['name'])} |
               {r[0] for r in _VELO if is_female(r[0])})
 
+# ─── Full metric histories: _FH (Trending "Date Range" section) ──────────────
+# name -> { d: [YYMMDD...oldest-first], jh/rsi/pp/brk: [aligned values|null],
+#           hd: [YYMMDD...], hrsi/hct/hft/hpf: [aligned values|null] }
+# The 8-deep sparkline arrays in _A/_HA can't serve a custom date range, so the
+# range view gets every session. Velo (_VELO) and DynaMo (_DYNAMO) already ship
+# full history and need nothing here.
+def _ymd(dt):
+    return (dt.year % 100) * 10000 + dt.month * 100 + dt.day
+
+_FH = {}
+for _a in athletes_data:
+    _ss = sorted(_a['sessions'], key=lambda s: s['date'])
+    _e = _FH.setdefault(_a['name'], {})
+    _e['d'] = [_ymd(s['date']) for s in _ss]
+    for _k in ('jh', 'rsi', 'pp', 'brk'):
+        _e[_k] = [s.get(_k) for s in _ss]
+for _a in hop_athletes_data:
+    _ss = sorted(_a['sessions'], key=lambda s: s['date'])
+    _e = _FH.setdefault(_a['name'], {})
+    _e['hd'] = [_ymd(s['date']) for s in _ss]
+    for _k, _sk in (('hrsi', 'rsi'), ('hct', 'ct'), ('hft', 'ft'), ('hpf', 'pfbm')):
+        _e[_k] = [s.get(_sk) for s in _ss]
+print(f"  _FH:  {len(_FH)} athletes with full histories "
+      f"({sum(len(v.get('d', [])) + len(v.get('hd', [])) for v in _FH.values())} sessions, "
+      f"~{len(json.dumps(_FH, separators=(',', ':'))) // 1024} KB)", flush=True)
+
 # ─── Consistency calendar: _CONS ─────────────────────────────────────────────
 # name -> [["YYYY-MM", packed], ...] newest month first. packed = concatenated
 # "ddc" triplets: day-of-month (2 digits) + tests that day (1 digit, capped 9).
@@ -2117,6 +2143,7 @@ output_lines.append(f"const _DYNAMO = {json.dumps(_DYNAMO, separators=(',', ':')
 output_lines.append(f"const _VM = {json.dumps(_VM, separators=(',', ':'))};")
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 output_lines.append(f"const _CONS = {json.dumps(_CONS, separators=(',', ':'))};")
+output_lines.append(f"const _FH = {json.dumps(_FH, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -2142,6 +2169,7 @@ replacements.update({'_DYNAMO': _DYNAMO})
 replacements.update({'_VM': _VM})
 replacements.update({'_FEM': _FEM})
 replacements.update({'_CONS': _CONS})
+replacements.update({'_FH': _FH})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
