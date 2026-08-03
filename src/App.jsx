@@ -789,7 +789,6 @@ function TrendingTab({ filterGroup, onSelect }) {
   const sections = [
     { key: "prs", label: "\uD83C\uDFC6 New PRs", color: "#FFB020" },
     { key: "weekly", label: "\uD83D\uDD25 This Week", color: "#FF6B6B" },
-    { key: "monthly", label: "\uD83D\uDCC8 Monthly", color: "#60A5FA" },
     { key: "range", label: "\uD83D\uDCC5 Date Range", color: "#A78BFA" },
   ];
 
@@ -803,7 +802,6 @@ function TrendingTab({ filterGroup, onSelect }) {
 
       {section === "prs" && <PRSection filterGroup={filterGroup} onSelect={onSelect} />}
       {section === "weekly" && <WeeklySection filterGroup={filterGroup} onSelect={onSelect} />}
-      {section === "monthly" && <MonthlySection filterGroup={filterGroup} onSelect={onSelect} />}
       {section === "range" && <CmjRangeSection filterGroup={filterGroup} />}
     </div>
   );
