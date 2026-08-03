@@ -1,59 +1,14 @@
 {
-  "lastSyncedAt": "2026-07-22T13:42:41Z",
+  "lastSyncedAt": "2026-08-03T15:38:41Z",
   "athletes": {
-    "Axel Campos": {
-      "name": "Axel Campos",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1RolTZLMDk65bZ7Rk3YKt1cYabida0zjAilcV3av3q94/edit",
+    "Brett Baek": {
+      "name": "Brett Baek",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1RR6W6oBPnkqPaB2a60A_TZqCvt8nZAwAzUyVt_vRkGw/edit",
       "sessions": [
         {
-          "date": "2026-07-21",
-          "peakVelo": 78.6,
-          "avgVelo": 77.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-16",
-          "peakVelo": 78.9,
-          "avgVelo": 76.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-13",
-          "peakVelo": 77.9,
-          "avgVelo": 76.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 77.3,
-          "avgVelo": 76.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-03",
-          "peakVelo": 76.1,
-          "avgVelo": 74.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-29",
-          "peakVelo": 77.6,
-          "avgVelo": 76.4,
+          "date": "2026-08-01",
+          "peakVelo": 78.7,
+          "avgVelo": 78.0,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
@@ -61,176 +16,53 @@
         },
         {
           "date": "2026-06-23",
-          "peakVelo": 74.8,
-          "avgVelo": 74.0,
+          "peakVelo": 79.5,
+          "avgVelo": 77.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-06-18",
-          "peakVelo": 76.1,
-          "avgVelo": 75.3,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Dallas Williams": {
-      "name": "Dallas Williams",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1Wwte3VqR2bfhMxzRq3vGgUSYCzP-5HnUQIQWfOLh70U/edit",
-      "sessions": [
-        {
-          "date": "2026-07-21",
-          "peakVelo": 66.9,
-          "avgVelo": 65.3,
+          "date": "2026-06-20",
+          "peakVelo": 79.1,
+          "avgVelo": 78.1,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-07-16",
-          "peakVelo": 67.0,
-          "avgVelo": 65.4,
+          "date": "2026-06-12",
+          "peakVelo": 80.4,
+          "avgVelo": 78.5,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-07-02",
-          "peakVelo": 68.0,
-          "avgVelo": 66.7,
+          "date": "2026-06-09",
+          "peakVelo": 78.5,
+          "avgVelo": 77.3,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-05-21",
+          "peakVelo": 79.4,
+          "avgVelo": 78.8,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-06-18",
-          "peakVelo": 65.0,
-          "avgVelo": 63.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-04",
-          "peakVelo": 64.7,
-          "avgVelo": 63.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-28",
-          "peakVelo": 67.6,
-          "avgVelo": 64.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-19",
-          "peakVelo": 68.0,
-          "avgVelo": 64.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-16",
-          "peakVelo": 65.8,
-          "avgVelo": 64.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-12",
-          "peakVelo": 67.3,
-          "avgVelo": 65.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-09",
-          "peakVelo": 65.0,
-          "avgVelo": 63.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-05",
-          "peakVelo": 66.1,
-          "avgVelo": 64.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-02",
-          "peakVelo": 61.7,
-          "avgVelo": 61.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-28",
-          "peakVelo": 68.5,
-          "avgVelo": 66.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-25",
-          "peakVelo": 66.8,
-          "avgVelo": 64.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-18",
-          "peakVelo": 65.6,
-          "avgVelo": 64.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-11",
-          "peakVelo": 66.1,
-          "avgVelo": 63.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-28",
-          "peakVelo": 66.7,
-          "avgVelo": 65.2,
+          "date": "2026-05-01",
+          "peakVelo": 79.0,
+          "avgVelo": 77.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
@@ -238,98 +70,338 @@
         },
         {
           "date": "2026-03-03",
-          "peakVelo": 67.1,
-          "avgVelo": 64.2,
+          "peakVelo": 80.6,
+          "avgVelo": 79.1,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-02-26",
-          "peakVelo": 67.3,
-          "avgVelo": 65.6,
+          "date": "2026-02-24",
+          "peakVelo": 78.3,
+          "avgVelo": 77.9,
+          "sessionType": "Bullpen",
+          "notes": "Trackman errors, only 3 pitches read",
+          "isFlagged": true,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-20",
+          "peakVelo": 82.9,
+          "avgVelo": 81.0,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-17",
+          "peakVelo": 81.1,
+          "avgVelo": 80.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-02-11",
-          "peakVelo": 66.8,
-          "avgVelo": 65.7,
+          "date": "2026-02-13",
+          "peakVelo": 82.0,
+          "avgVelo": 81.6,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-02-05",
-          "peakVelo": 66.2,
-          "avgVelo": 63.4,
+          "date": "2026-02-10",
+          "peakVelo": 83.2,
+          "avgVelo": 81.8,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-01-29",
-          "peakVelo": 67.1,
-          "avgVelo": 64.2,
+          "date": "2026-02-06",
+          "peakVelo": 82.6,
+          "avgVelo": 81.2,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-01-22",
-          "peakVelo": 64.8,
-          "avgVelo": 62.9,
+          "date": "2026-01-30",
+          "peakVelo": 82.3,
+          "avgVelo": 80.5,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-01-09",
-          "peakVelo": 65.9,
-          "avgVelo": 63.7,
+          "date": "2026-01-23",
+          "peakVelo": 81.2,
+          "avgVelo": 80.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-01-02",
-          "peakVelo": 67.3,
-          "avgVelo": 64.6,
+          "date": "2026-01-20",
+          "peakVelo": 80.9,
+          "avgVelo": 79.6,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2025-12-23",
-          "peakVelo": 65.2,
-          "avgVelo": 61.0,
+          "date": "2026-01-16",
+          "peakVelo": 79.5,
+          "avgVelo": 78.6,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2025-12-18",
-          "peakVelo": 66.1,
-          "avgVelo": 64.2,
+          "date": "2026-01-13",
+          "peakVelo": 80.6,
+          "avgVelo": 78.6,
+          "sessionType": "Other",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-09-16",
+          "peakVelo": 79.9,
+          "avgVelo": 78.3,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2025-12-11",
-          "peakVelo": 66.6,
-          "avgVelo": 64.2,
+          "date": "2025-09-12",
+          "peakVelo": 79.8,
+          "avgVelo": 77.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-09-09",
+          "peakVelo": 79.7,
+          "avgVelo": 77.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-09-05",
+          "peakVelo": 80.4,
+          "avgVelo": 78.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-09-02",
+          "peakVelo": 76.9,
+          "avgVelo": 76.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-29",
+          "peakVelo": 81.9,
+          "avgVelo": 80.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-26",
+          "peakVelo": 77.7,
+          "avgVelo": 76.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-21",
+          "peakVelo": 79.5,
+          "avgVelo": 77.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Christian Peralta": {
+      "name": "Christian Peralta",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1fWF4nxjzdc9uLCOvq5oYUKD5FqJiL92agJ_YEutnyZ0/edit",
+      "sessions": [
+        {
+          "date": "2026-08-01",
+          "peakVelo": 80.3,
+          "avgVelo": 77.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-29",
+          "peakVelo": 79.8,
+          "avgVelo": 79.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-25",
+          "peakVelo": 80.7,
+          "avgVelo": 78.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-18",
+          "peakVelo": 81.2,
+          "avgVelo": 78.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-11",
+          "peakVelo": 81.9,
+          "avgVelo": 80.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-09",
+          "peakVelo": 80.8,
+          "avgVelo": 79.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-19",
+          "peakVelo": 81.8,
+          "avgVelo": 80.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-17",
+          "peakVelo": 78.2,
+          "avgVelo": 76.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-13",
+          "peakVelo": 81.0,
+          "avgVelo": 78.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-10",
+          "peakVelo": 81.1,
+          "avgVelo": 80.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-06",
+          "peakVelo": 80.2,
+          "avgVelo": 79.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-15",
+          "peakVelo": 80.2,
+          "avgVelo": 77.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-10",
+          "peakVelo": 83.1,
+          "avgVelo": 81.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-04",
+          "peakVelo": 79.5,
+          "avgVelo": 77.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-10-31",
+          "peakVelo": 83.2,
+          "avgVelo": 80.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-10-24",
+          "peakVelo": 81.7,
+          "avgVelo": 80.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-10-21",
+          "peakVelo": 80.9,
+          "avgVelo": 79.1,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
@@ -341,6 +413,24 @@
       "name": "Eli Delgado",
       "programUrl": "https://docs.google.com/spreadsheets/d/1KdAjjbSUcsHis_6xHIZJw7AfVxGFyzVARmtm8TBEAVA/edit",
       "sessions": [
+        {
+          "date": "2026-08-01",
+          "peakVelo": 82.8,
+          "avgVelo": 81.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-29",
+          "peakVelo": 81.8,
+          "avgVelo": 79.9,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
         {
           "date": "2026-07-21",
           "peakVelo": 83.6,
@@ -532,685 +622,82 @@
         }
       ]
     },
-    "Henry Hilger": {
-      "name": "Henry Hilger",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1CIqN9lBv1eTDzagXVfNfwnHJznjek3a4r10MuHbDF5c/edit",
+    "Jackson Mavrides": {
+      "name": "Jackson Mavrides",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1Xcg_kBT3OYgfljk69UrUPcXeQg77htCOmf7DfF0ifro/edit",
       "sessions": [
         {
-          "date": "2026-07-21",
-          "peakVelo": 68.2,
-          "avgVelo": 67.5,
+          "date": "2026-08-01",
+          "peakVelo": 75.1,
+          "avgVelo": 72.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-07-16",
-          "peakVelo": 68.7,
-          "avgVelo": 67.4,
+          "date": "2026-07-25",
+          "peakVelo": 75.0,
+          "avgVelo": 71.9,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-06-24",
-          "peakVelo": 68.6,
-          "avgVelo": 67.6,
+          "date": "2026-07-18",
+          "peakVelo": 71.9,
+          "avgVelo": 70.3,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-06-02",
+          "date": "2026-07-11",
           "peakVelo": 68.8,
-          "avgVelo": 66.7,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-18",
-          "peakVelo": 68.7,
-          "avgVelo": 68.0,
-          "sessionType": "Bullpen",
+          "avgVelo": 67.4,
+          "sessionType": "Short Slope",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         }
       ]
     },
-    "Hudson Geiger": {
-      "name": "Hudson Geiger",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1Fbv__fGXKsALk2yo7SirdJ7HFO-yQico9Ipw-V966oU/edit",
-      "sessions": [
-        {
-          "date": "2026-07-21",
-          "peakVelo": 74.4,
-          "avgVelo": 73.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-09",
-          "peakVelo": 74.7,
-          "avgVelo": 73.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-01",
-          "peakVelo": 76.1,
-          "avgVelo": 73.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 75.9,
-          "avgVelo": 75.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-03",
-          "peakVelo": 73.3,
-          "avgVelo": 72.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-06",
-          "peakVelo": 74.4,
-          "avgVelo": 74.4,
-          "sessionType": "Other",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-29",
-          "peakVelo": 73.2,
-          "avgVelo": 72.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Joseph McRae": {
-      "name": "Joseph McRae",
+    "Nathan Wei": {
+      "name": "Nathan Wei",
       "programUrl": "",
       "sessions": [
         {
-          "date": "2026-07-21",
-          "peakVelo": 70.8,
-          "avgVelo": 68.4,
+          "date": "2026-08-01",
+          "peakVelo": 75.7,
+          "avgVelo": 74.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-07-09",
-          "peakVelo": 70.7,
-          "avgVelo": 68.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Mason Morello": {
-      "name": "Mason Morello",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1feN0CQ91V0Bh--xbAnfslrgQ9TV2G1aVgel65FuogxQ/edit",
-      "sessions": [
-        {
-          "date": "2026-07-21",
-          "peakVelo": 76.1,
-          "avgVelo": 74.0,
-          "sessionType": "Velo Session",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-17",
-          "peakVelo": 78.3,
-          "avgVelo": 77.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-14",
-          "peakVelo": 79.4,
-          "avgVelo": 78.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-03",
-          "peakVelo": 78.4,
-          "avgVelo": 77.2,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Shea O'Sullivan": {
-      "name": "Shea O'Sullivan",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1Nv9wD7ZzN9GgssvHL0_SSSG2Cs8FURBOIVF8NNuJl4g/edit",
-      "sessions": [
-        {
-          "date": "2026-07-21",
-          "peakVelo": 81.9,
-          "avgVelo": 79.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-17",
-          "peakVelo": 83.1,
-          "avgVelo": 81.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 82.8,
-          "avgVelo": 80.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-03",
-          "peakVelo": 77.8,
-          "avgVelo": 76.6,
-          "sessionType": "Bullpen",
-          "notes": "Seemed incredibly tired",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-26",
-          "peakVelo": 84.1,
-          "avgVelo": 82.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-23",
-          "peakVelo": 81.8,
-          "avgVelo": 80.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-19",
-          "peakVelo": 84.2,
-          "avgVelo": 82.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-16",
-          "peakVelo": 82.0,
-          "avgVelo": 81.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-05",
-          "peakVelo": 85.4,
-          "avgVelo": 83.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-02",
-          "peakVelo": 80.5,
-          "avgVelo": 79.2,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-29",
-          "peakVelo": 84.3,
-          "avgVelo": 82.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-26",
-          "peakVelo": 80.0,
-          "avgVelo": 79.4,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-22",
-          "peakVelo": 84.3,
-          "avgVelo": 83.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-18",
-          "peakVelo": 82.3,
-          "avgVelo": 81.8,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Tanner Gola": {
-      "name": "Tanner Gola",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1YTwp6LHtpuRITaZ4wI-qPwDAAauFKbBnxsXGyV_wzdQ/edit",
-      "sessions": [
-        {
-          "date": "2026-07-21",
-          "peakVelo": 74.8,
-          "avgVelo": 72.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-08",
-          "peakVelo": 75.1,
-          "avgVelo": 72.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-22",
-          "peakVelo": 76.5,
+          "date": "2026-07-28",
+          "peakVelo": 77.3,
           "avgVelo": 75.3,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
-        },
-        {
-          "date": "2026-05-27",
-          "peakVelo": 78.0,
-          "avgVelo": 76.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
         }
       ]
     },
-    "Zach Powell": {
-      "name": "Zach Powell",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1_LJFbAJcoD_v1cf5h9bzDeOlP0BMdeOsk3LrfsXbYmo/edit",
+    "Alex Rodriguez": {
+      "name": "Alex Rodriguez",
+      "programUrl": "",
       "sessions": [
         {
-          "date": "2026-07-21",
-          "peakVelo": 81.5,
-          "avgVelo": 80.4,
+          "date": "2026-07-31",
+          "peakVelo": 81.0,
+          "avgVelo": 79.5,
           "sessionType": "Bullpen",
           "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-16",
-          "peakVelo": 80.1,
-          "avgVelo": 79.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-13",
-          "peakVelo": 80.8,
-          "avgVelo": 79.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-09",
-          "peakVelo": 78.2,
-          "avgVelo": 77.4,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-06",
-          "peakVelo": 80.1,
-          "avgVelo": 78.3,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-02",
-          "peakVelo": 81.1,
-          "avgVelo": 79.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-29",
-          "peakVelo": 80.9,
-          "avgVelo": 79.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-26",
-          "peakVelo": 79.6,
-          "avgVelo": 78.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-03",
-          "peakVelo": 80.5,
-          "avgVelo": 79.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-30",
-          "peakVelo": 80.4,
-          "avgVelo": 79.2,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-26",
-          "peakVelo": 81.8,
-          "avgVelo": 80.8,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Abe Florman": {
-      "name": "Abe Florman",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1PpLOmsNimbqfYL4QZ3dOwrZkzsbP8QHg0YQoR9P1jO4/edit",
-      "sessions": [
-        {
-          "date": "2026-07-20",
-          "peakVelo": 71.0,
-          "avgVelo": 69.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-16",
-          "peakVelo": 69.7,
-          "avgVelo": 68.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-18",
-          "peakVelo": 73.9,
-          "avgVelo": 71.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-15",
-          "peakVelo": 71.6,
-          "avgVelo": 70.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-10",
-          "peakVelo": 69.8,
-          "avgVelo": 68.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-03",
-          "peakVelo": 70.9,
-          "avgVelo": 69.5,
-          "sessionType": "Bullpen",
-          "notes": "Post-Sickness",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-25",
-          "peakVelo": 73.1,
-          "avgVelo": 72.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-22",
-          "peakVelo": 73.8,
-          "avgVelo": 72.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-14",
-          "peakVelo": 73.7,
-          "avgVelo": 73.4,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Bobby Connolly": {
-      "name": "Bobby Connolly",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1fEskmmEeRCoA6fvnHPBk6tJLzxHYmUaWlpOhl_AvgIs/edit",
-      "sessions": [
-        {
-          "date": "2026-07-20",
-          "peakVelo": 81.2,
-          "avgVelo": 78.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-17",
-          "peakVelo": 78.0,
-          "avgVelo": 77.3,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-15",
-          "peakVelo": 81.5,
-          "avgVelo": 80.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 80.0,
-          "avgVelo": 78.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-11",
-          "peakVelo": 83.7,
-          "avgVelo": 82.3,
-          "sessionType": "Velo Session",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-01",
-          "peakVelo": 83.1,
-          "avgVelo": 81.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-08",
-          "peakVelo": 76.3,
-          "avgVelo": 75.7,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-03-30",
-          "peakVelo": 77.8,
-          "avgVelo": 77.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-27",
-          "peakVelo": 78.7,
-          "avgVelo": 77.2,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-24",
-          "peakVelo": 74.6,
-          "avgVelo": 73.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-17",
-          "peakVelo": 78.1,
-          "avgVelo": 76.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-14",
-          "peakVelo": 78.9,
-          "avgVelo": 77.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-07",
-          "peakVelo": 78.8,
-          "avgVelo": 76.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-04",
-          "peakVelo": 79.6,
-          "avgVelo": 78.0,
-          "sessionType": "Bullpen",
-          "notes": "Assessment",
           "isFlagged": false,
           "isSubmax": false
         }
@@ -1220,6 +707,33 @@
       "name": "Christian Sanchez",
       "programUrl": "https://docs.google.com/spreadsheets/d/1vV7s8Zib5HiLXudEO9KceSNkbTWl-aFmwxPoPJLmi2U/edit",
       "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 73.9,
+          "avgVelo": 72.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-27",
+          "peakVelo": 73.3,
+          "avgVelo": 72.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 72.9,
+          "avgVelo": 71.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-20",
           "peakVelo": 75.0,
@@ -1496,6 +1010,33 @@
       "name": "Eric Grgas",
       "programUrl": "https://docs.google.com/spreadsheets/d/1P87835IqgerW2JA48uxsPyhNUuLpFEVLi6H1ykTdE3U/edit",
       "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 83.0,
+          "avgVelo": 80.2,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-27",
+          "peakVelo": 88.8,
+          "avgVelo": 87.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 84.0,
+          "avgVelo": 81.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-20",
           "peakVelo": 85.5,
@@ -1840,10 +1381,313 @@
         }
       ]
     },
+    "Frankie Muro": {
+      "name": "Frankie Muro",
+      "programUrl": "https://docs.google.com/spreadsheets/d/18uAve_5rZ6XfXDMFAPXETW4LvaszjSDLigbFQXz40gg/edit",
+      "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 84.4,
+          "avgVelo": 82.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-15",
+          "peakVelo": 81.6,
+          "avgVelo": 80.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-10",
+          "peakVelo": 81.6,
+          "avgVelo": 79.3,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-01",
+          "peakVelo": 84.2,
+          "avgVelo": 83.0,
+          "sessionType": "Bullpen",
+          "notes": "Long pen, sustained velo to the end",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-24",
+          "peakVelo": 84.5,
+          "avgVelo": 83.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 83.6,
+          "avgVelo": 81.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-10",
+          "peakVelo": 84.2,
+          "avgVelo": 80.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-03",
+          "peakVelo": 82.8,
+          "avgVelo": 80.1,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-05-26",
+          "peakVelo": 86.5,
+          "avgVelo": 83.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-20",
+          "peakVelo": 82.7,
+          "avgVelo": 80.9,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-05-12",
+          "peakVelo": 85.3,
+          "avgVelo": 83.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-25",
+          "peakVelo": 83.7,
+          "avgVelo": 82.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-18",
+          "peakVelo": 86.2,
+          "avgVelo": 83.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-11",
+          "peakVelo": 82.0,
+          "avgVelo": 80.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-28",
+          "peakVelo": 81.1,
+          "avgVelo": 80.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-21",
+          "peakVelo": 83.7,
+          "avgVelo": 82.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-17",
+          "peakVelo": 82.8,
+          "avgVelo": 80.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-14",
+          "peakVelo": 83.8,
+          "avgVelo": 82.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-28",
+          "peakVelo": 83.5,
+          "avgVelo": 82.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-21",
+          "peakVelo": 82.7,
+          "avgVelo": 81.8,
+          "sessionType": "Bullpen",
+          "notes": "Body dead, focus on offspeed",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-14",
+          "peakVelo": 84.7,
+          "avgVelo": 83.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-06",
+          "peakVelo": 81.9,
+          "avgVelo": 80.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-20",
+          "peakVelo": 80.3,
+          "avgVelo": 78.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-16",
+          "peakVelo": 79.3,
+          "avgVelo": 77.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-18",
+          "peakVelo": 83.4,
+          "avgVelo": 80.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-15",
+          "peakVelo": 85.9,
+          "avgVelo": 83.8,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-12",
+          "peakVelo": 81.2,
+          "avgVelo": 80.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-07",
+          "peakVelo": 79.6,
+          "avgVelo": 76.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-04",
+          "peakVelo": 80.6,
+          "avgVelo": 78.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-07-30",
+          "peakVelo": 82.7,
+          "avgVelo": 79.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
     "Frankie Muzio": {
       "name": "Frankie Muzio",
       "programUrl": "https://docs.google.com/spreadsheets/d/16kVLmYXe1f5t7o-nRNQbA-yAPNZpGWt-4P8zpWFsRK0/edit",
       "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 82.3,
+          "avgVelo": 81.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-28",
+          "peakVelo": 83.3,
+          "avgVelo": 81.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 82.7,
+          "avgVelo": 81.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-20",
           "peakVelo": 81.8,
@@ -2017,220 +1861,13 @@
         }
       ]
     },
-    "Julian Minaya": {
-      "name": "Julian Minaya",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1_6gd96UfIB89k0doRpoJ4HuYVWX7Jvpvhcmua7yVA5M/edit",
+    "Joe Hauser": {
+      "name": "Joe Hauser",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1EHTtq2poCNoo4lCHcJKQLzXCJ0vv-PCiBciaHoQoT0E/edit",
       "sessions": [
         {
-          "date": "2026-07-20",
-          "peakVelo": 90.8,
-          "avgVelo": 89.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-07",
+          "date": "2026-07-31",
           "peakVelo": 90.4,
-          "avgVelo": 89.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-02",
-          "peakVelo": 84.4,
-          "avgVelo": 82.8,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-03-31",
-          "peakVelo": 91.7,
-          "avgVelo": 90.7,
-          "sessionType": "Velo Session",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-24",
-          "peakVelo": 87.3,
-          "avgVelo": 86.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-10",
-          "peakVelo": 87.7,
-          "avgVelo": 86.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-06",
-          "peakVelo": 90.4,
-          "avgVelo": 87.8,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-02",
-          "peakVelo": 88.1,
-          "avgVelo": 87.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-26",
-          "peakVelo": 86.0,
-          "avgVelo": 84.6,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-02-09",
-          "peakVelo": 91.3,
-          "avgVelo": 90.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-06",
-          "peakVelo": 92.9,
-          "avgVelo": 91.8,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-02",
-          "peakVelo": 85.6,
-          "avgVelo": 84.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-30",
-          "peakVelo": 92.0,
-          "avgVelo": 90.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-23",
-          "peakVelo": 90.4,
-          "avgVelo": 89.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-19",
-          "peakVelo": 86.0,
-          "avgVelo": 84.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-14",
-          "peakVelo": 89.8,
-          "avgVelo": 88.7,
-          "sessionType": "Other",
-          "notes": "Random Mound Feel",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-22",
-          "peakVelo": 89.4,
-          "avgVelo": 88.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-19",
-          "peakVelo": 90.3,
-          "avgVelo": 88.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-12",
-          "peakVelo": 87.9,
-          "avgVelo": 86.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-05",
-          "peakVelo": 88.4,
-          "avgVelo": 86.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-02",
-          "peakVelo": 88.2,
-          "avgVelo": 86.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-28",
-          "peakVelo": 82.3,
-          "avgVelo": 82.2,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-24",
-          "peakVelo": 89.6,
-          "avgVelo": 88.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-21",
-          "peakVelo": 89.6,
           "avgVelo": 88.3,
           "sessionType": "Bullpen",
           "notes": "",
@@ -2238,9 +1875,255 @@
           "isSubmax": false
         },
         {
-          "date": "2025-11-17",
-          "peakVelo": 88.7,
-          "avgVelo": 87.9,
+          "date": "2026-07-28",
+          "peakVelo": 86.4,
+          "avgVelo": 85.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-17",
+          "peakVelo": 91.4,
+          "avgVelo": 89.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-14",
+          "peakVelo": 92.2,
+          "avgVelo": 91.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-10",
+          "peakVelo": 92.3,
+          "avgVelo": 90.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 91.7,
+          "avgVelo": 90.5,
+          "sessionType": "Bullpen",
+          "notes": "Best pen so far",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-02",
+          "peakVelo": 91.2,
+          "avgVelo": 89.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-29",
+          "peakVelo": 85.6,
+          "avgVelo": 82.3,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-23",
+          "peakVelo": 88.8,
+          "avgVelo": 88.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-19",
+          "peakVelo": 89.0,
+          "avgVelo": 88.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-16",
+          "peakVelo": 90.4,
+          "avgVelo": 89.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-11",
+          "peakVelo": 88.2,
+          "avgVelo": 87.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-08",
+          "peakVelo": 90.5,
+          "avgVelo": 89.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-04",
+          "peakVelo": 88.9,
+          "avgVelo": 88.5,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Joey Frazzetta": {
+      "name": "Joey Frazzetta",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1Y1VvY20l1FATf8mpzyZ_Mz_Ss1R6KGSPJP_eFgvU5ow/edit",
+      "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 87.8,
+          "avgVelo": 86.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-27",
+          "peakVelo": 87.8,
+          "avgVelo": 86.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-12",
+          "peakVelo": 90.7,
+          "avgVelo": 89.0,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Kai Ventura": {
+      "name": "Kai Ventura",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1xJXON8iG7XyY9-KcFlCNR4a1GjZfRClyz_zR_sd1LXw/edit",
+      "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 74.3,
+          "avgVelo": 73.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-28",
+          "peakVelo": 72.9,
+          "avgVelo": 71.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 79.0,
+          "avgVelo": 75.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 76.0,
+          "avgVelo": 73.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-11",
+          "peakVelo": 75.5,
+          "avgVelo": 73.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-06",
+          "peakVelo": 74.8,
+          "avgVelo": 71.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-29",
+          "peakVelo": 73.7,
+          "avgVelo": 72.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-24",
+          "peakVelo": 73.2,
+          "avgVelo": 70.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-18",
+          "peakVelo": 72.9,
+          "avgVelo": 72.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-10",
+          "peakVelo": 69.8,
+          "avgVelo": 68.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-06",
+          "peakVelo": 71.6,
+          "avgVelo": 69.0,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
@@ -2252,6 +2135,24 @@
       "name": "Liam Brower",
       "programUrl": "https://docs.google.com/spreadsheets/d/1wTjOXk78i1cLhs-eNMxnBB86p352IwWTemZZiIETNhE/edit",
       "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 86.2,
+          "avgVelo": 84.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-23",
+          "peakVelo": 84.8,
+          "avgVelo": 83.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-20",
           "peakVelo": 84.0,
@@ -2488,10 +2389,1672 @@
         }
       ]
     },
+    "Mason Morello": {
+      "name": "Mason Morello",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1feN0CQ91V0Bh--xbAnfslrgQ9TV2G1aVgel65FuogxQ/edit",
+      "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 80.0,
+          "avgVelo": 79.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-28",
+          "peakVelo": 80.3,
+          "avgVelo": 77.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 79.5,
+          "avgVelo": 77.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-21",
+          "peakVelo": 76.1,
+          "avgVelo": 74.0,
+          "sessionType": "Velo Session",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-17",
+          "peakVelo": 78.3,
+          "avgVelo": 77.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-14",
+          "peakVelo": 79.4,
+          "avgVelo": 78.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-03",
+          "peakVelo": 78.4,
+          "avgVelo": 77.2,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Rob Stingone": {
+      "name": "Rob Stingone",
+      "programUrl": "",
+      "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 81.0,
+          "avgVelo": 79.2,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        }
+      ]
+    },
+    "Zach Powell": {
+      "name": "Zach Powell",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1_LJFbAJcoD_v1cf5h9bzDeOlP0BMdeOsk3LrfsXbYmo/edit",
+      "sessions": [
+        {
+          "date": "2026-07-31",
+          "peakVelo": 80.7,
+          "avgVelo": 78.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-27",
+          "peakVelo": 82.1,
+          "avgVelo": 80.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-21",
+          "peakVelo": 81.5,
+          "avgVelo": 80.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 80.1,
+          "avgVelo": 79.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-13",
+          "peakVelo": 80.8,
+          "avgVelo": 79.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 78.2,
+          "avgVelo": 77.4,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-06",
+          "peakVelo": 80.1,
+          "avgVelo": 78.3,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-02",
+          "peakVelo": 81.1,
+          "avgVelo": 79.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-29",
+          "peakVelo": 80.9,
+          "avgVelo": 79.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-26",
+          "peakVelo": 79.6,
+          "avgVelo": 78.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-03",
+          "peakVelo": 80.5,
+          "avgVelo": 79.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-30",
+          "peakVelo": 80.4,
+          "avgVelo": 79.2,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-26",
+          "peakVelo": 81.8,
+          "avgVelo": 80.8,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Darren Espinal": {
+      "name": "Darren Espinal",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1sXoUKXZy90kVzClgqj5s8h9PrzeDdzwlEOyqcC1q2E4/edit",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 77.3,
+          "avgVelo": 72.5,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-27",
+          "peakVelo": 74.8,
+          "avgVelo": 72.4,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 75.0,
+          "avgVelo": 72.2,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-13",
+          "peakVelo": 75.2,
+          "avgVelo": 71.3,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 65.1,
+          "avgVelo": 69.9,
+          "sessionType": "Rehab",
+          "notes": "Longer throwing session ~50 throws",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 74.2,
+          "avgVelo": 70.9,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-02",
+          "peakVelo": 74.8,
+          "avgVelo": 70.1,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-25",
+          "peakVelo": 74.3,
+          "avgVelo": 68.9,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-22",
+          "peakVelo": 75.6,
+          "avgVelo": 68.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-18",
+          "peakVelo": 69.7,
+          "avgVelo": 66.0,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-15",
+          "peakVelo": 72.9,
+          "avgVelo": 66.9,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-11",
+          "peakVelo": 68.0,
+          "avgVelo": 64.4,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-08",
+          "peakVelo": 66.3,
+          "avgVelo": 55.7,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-03",
+          "peakVelo": 69.9,
+          "avgVelo": 63.9,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        }
+      ]
+    },
+    "Emrie McLaughlin": {
+      "name": "Emrie McLaughlin",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1-vuB1hxgZjoSlh2QZEUVEdHgD-XCRxlZfYaACbpImIg/edit",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 78.2,
+          "avgVelo": 77.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-23",
+          "peakVelo": 76.9,
+          "avgVelo": 75.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-06",
+          "peakVelo": 76.3,
+          "avgVelo": 74.4,
+          "sessionType": "Rehab",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 75.6,
+          "avgVelo": 74.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-18",
+          "peakVelo": 80.2,
+          "avgVelo": 78.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-14",
+          "peakVelo": 78.4,
+          "avgVelo": 76.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-11",
+          "peakVelo": 77.9,
+          "avgVelo": 74.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-07",
+          "peakVelo": 75.2,
+          "avgVelo": 73.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-04",
+          "peakVelo": 79.0,
+          "avgVelo": 77.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-30",
+          "peakVelo": 78.0,
+          "avgVelo": 76.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-27",
+          "peakVelo": 76.7,
+          "avgVelo": 75.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-23",
+          "peakVelo": 79.4,
+          "avgVelo": 77.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-20",
+          "peakVelo": 77.7,
+          "avgVelo": 74.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-16",
+          "peakVelo": 76.2,
+          "avgVelo": 73.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-13",
+          "peakVelo": 78.7,
+          "avgVelo": 77.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-09",
+          "peakVelo": 77.1,
+          "avgVelo": 74.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-06",
+          "peakVelo": 79.6,
+          "avgVelo": 77.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-02",
+          "peakVelo": 77.4,
+          "avgVelo": 75.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-30",
+          "peakVelo": 76.1,
+          "avgVelo": 75.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-25",
+          "peakVelo": 76.5,
+          "avgVelo": 74.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Gianni Muro": {
+      "name": "Gianni Muro",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1WNQ6fdXtJUbeIWqWFCYCJbnNeHzpqsAtBnDWWa7zEEE/edit",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 76.9,
+          "avgVelo": 75.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-25",
+          "peakVelo": 75.8,
+          "avgVelo": 74.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 75.9,
+          "avgVelo": 73.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-29",
+          "peakVelo": 76.0,
+          "avgVelo": 73.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-18",
+          "peakVelo": 81.3,
+          "avgVelo": 77.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-12",
+          "peakVelo": 75.2,
+          "avgVelo": 74.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-28",
+          "peakVelo": 74.2,
+          "avgVelo": 72.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-23",
+          "peakVelo": 73.9,
+          "avgVelo": 71.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-18",
+          "peakVelo": 72.8,
+          "avgVelo": 72.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-02",
+          "peakVelo": 73.7,
+          "avgVelo": 71.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-02",
+          "peakVelo": 73.9,
+          "avgVelo": 71.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-30",
+          "peakVelo": 73.7,
+          "avgVelo": 72.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-14",
+          "peakVelo": 74.3,
+          "avgVelo": 73.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-07",
+          "peakVelo": 72.5,
+          "avgVelo": 70.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-28",
+          "peakVelo": 73.9,
+          "avgVelo": 72.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-21",
+          "peakVelo": 73.8,
+          "avgVelo": 70.9,
+          "sessionType": "Low Effort",
+          "notes": "Build Up",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-02-12",
+          "peakVelo": 72.9,
+          "avgVelo": 72.9,
+          "sessionType": "Assessment",
+          "notes": "Trackman not really working",
+          "isFlagged": true,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Henry Hilger": {
+      "name": "Henry Hilger",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1CIqN9lBv1eTDzagXVfNfwnHJznjek3a4r10MuHbDF5c/edit",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 71.2,
+          "avgVelo": 69.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-21",
+          "peakVelo": 68.2,
+          "avgVelo": 67.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 68.7,
+          "avgVelo": 67.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-24",
+          "peakVelo": 68.6,
+          "avgVelo": 67.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-02",
+          "peakVelo": 68.8,
+          "avgVelo": 66.7,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-18",
+          "peakVelo": 68.7,
+          "avgVelo": 68.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Joseph McRae": {
+      "name": "Joseph McRae",
+      "programUrl": "",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 69.5,
+          "avgVelo": 67.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-21",
+          "peakVelo": 70.8,
+          "avgVelo": 68.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 70.7,
+          "avgVelo": 68.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Rob Romero": {
+      "name": "Rob Romero",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1RrqFyi6EiuL05uY_hFxC3hcEgnh6a9YLQtnjnCj_vko/edit",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 72.5,
+          "avgVelo": 71.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 71.1,
+          "avgVelo": 68.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-10",
+          "peakVelo": 68.9,
+          "avgVelo": 68.6,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 71.1,
+          "avgVelo": 70.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-02",
+          "peakVelo": 71.7,
+          "avgVelo": 70.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-25",
+          "peakVelo": 70.5,
+          "avgVelo": 68.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-19",
+          "peakVelo": 66.5,
+          "avgVelo": 64.0,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 70.2,
+          "avgVelo": 68.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-09",
+          "peakVelo": 69.0,
+          "avgVelo": 64.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-30",
+          "peakVelo": 64.8,
+          "avgVelo": 63.5,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Thomas DiGiovanna": {
+      "name": "Thomas DiGiovanna",
+      "programUrl": "https://docs.google.com/spreadsheets/d/15m5JaulLdiuMGJMj_33F6YKnqMz3jp4zOymyYtd7SMc/edit",
+      "sessions": [
+        {
+          "date": "2026-07-30",
+          "peakVelo": 82.7,
+          "avgVelo": 81.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-13",
+          "peakVelo": 81.0,
+          "avgVelo": 79.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Dallas Williams": {
+      "name": "Dallas Williams",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1Wwte3VqR2bfhMxzRq3vGgUSYCzP-5HnUQIQWfOLh70U/edit",
+      "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 65.4,
+          "avgVelo": 63.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-21",
+          "peakVelo": 66.9,
+          "avgVelo": 65.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 67.0,
+          "avgVelo": 65.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-02",
+          "peakVelo": 68.0,
+          "avgVelo": 66.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-18",
+          "peakVelo": 65.0,
+          "avgVelo": 63.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-04",
+          "peakVelo": 64.7,
+          "avgVelo": 63.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-28",
+          "peakVelo": 67.6,
+          "avgVelo": 64.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-19",
+          "peakVelo": 68.0,
+          "avgVelo": 64.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-16",
+          "peakVelo": 65.8,
+          "avgVelo": 64.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-12",
+          "peakVelo": 67.3,
+          "avgVelo": 65.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-09",
+          "peakVelo": 65.0,
+          "avgVelo": 63.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-05",
+          "peakVelo": 66.1,
+          "avgVelo": 64.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-02",
+          "peakVelo": 61.7,
+          "avgVelo": 61.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-28",
+          "peakVelo": 68.5,
+          "avgVelo": 66.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-25",
+          "peakVelo": 66.8,
+          "avgVelo": 64.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-18",
+          "peakVelo": 65.6,
+          "avgVelo": 64.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-11",
+          "peakVelo": 66.1,
+          "avgVelo": 63.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-28",
+          "peakVelo": 66.7,
+          "avgVelo": 65.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-03",
+          "peakVelo": 67.1,
+          "avgVelo": 64.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-26",
+          "peakVelo": 67.3,
+          "avgVelo": 65.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-11",
+          "peakVelo": 66.8,
+          "avgVelo": 65.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-05",
+          "peakVelo": 66.2,
+          "avgVelo": 63.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-29",
+          "peakVelo": 67.1,
+          "avgVelo": 64.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-22",
+          "peakVelo": 64.8,
+          "avgVelo": 62.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-09",
+          "peakVelo": 65.9,
+          "avgVelo": 63.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-02",
+          "peakVelo": 67.3,
+          "avgVelo": 64.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-23",
+          "peakVelo": 65.2,
+          "avgVelo": 61.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-18",
+          "peakVelo": 66.1,
+          "avgVelo": 64.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-11",
+          "peakVelo": 66.6,
+          "avgVelo": 64.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Dylan Vetell": {
+      "name": "Dylan Vetell",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1wJe4Qe9Suvnpzrugr27ZDpEeE4ZkR7MIZOHxt_WfZ3g/edit",
+      "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 76.6,
+          "avgVelo": 75.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 73.5,
+          "avgVelo": 71.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-02",
+          "peakVelo": 72.6,
+          "avgVelo": 70.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-26",
+          "peakVelo": 72.9,
+          "avgVelo": 71.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-20",
+          "peakVelo": 75.0,
+          "avgVelo": 73.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 75.1,
+          "avgVelo": 72.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Jay Delgadillo": {
+      "name": "Jay Delgadillo",
+      "programUrl": "",
+      "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 77.4,
+          "avgVelo": 76.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Joey Muzio": {
+      "name": "Joey Muzio",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1GiclgarhcwS_Zp5FMHkQruGMco0E4CjoxgVBmKJLgOQ/edit",
+      "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 77.8,
+          "avgVelo": 76.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-03",
+          "peakVelo": 79.6,
+          "avgVelo": 78.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-27",
+          "peakVelo": 78.6,
+          "avgVelo": 77.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 78.9,
+          "avgVelo": 77.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-11",
+          "peakVelo": 80.5,
+          "avgVelo": 78.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-27",
+          "peakVelo": 77.5,
+          "avgVelo": 76.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-02",
+          "peakVelo": 80.6,
+          "avgVelo": 80.1,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-27",
+          "peakVelo": 84.2,
+          "avgVelo": 82.2,
+          "sessionType": "Live ABs",
+          "notes": "Trackman errors, only 3 pitches registered",
+          "isFlagged": true,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-24",
+          "peakVelo": 81.2,
+          "avgVelo": 80.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-19",
+          "peakVelo": 82.7,
+          "avgVelo": 80.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-11",
+          "peakVelo": 81.7,
+          "avgVelo": 79.8,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Julian Minaya": {
+      "name": "Julian Minaya",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1_6gd96UfIB89k0doRpoJ4HuYVWX7Jvpvhcmua7yVA5M/edit",
+      "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 92.0,
+          "avgVelo": 88.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-20",
+          "peakVelo": 90.8,
+          "avgVelo": 89.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-07",
+          "peakVelo": 90.4,
+          "avgVelo": 89.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-02",
+          "peakVelo": 84.4,
+          "avgVelo": 82.8,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-03-31",
+          "peakVelo": 91.7,
+          "avgVelo": 90.7,
+          "sessionType": "Velo Session",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-24",
+          "peakVelo": 87.3,
+          "avgVelo": 86.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-10",
+          "peakVelo": 87.7,
+          "avgVelo": 86.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-06",
+          "peakVelo": 90.4,
+          "avgVelo": 87.8,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-02",
+          "peakVelo": 88.1,
+          "avgVelo": 87.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-26",
+          "peakVelo": 86.0,
+          "avgVelo": 84.6,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-02-09",
+          "peakVelo": 91.3,
+          "avgVelo": 90.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-06",
+          "peakVelo": 92.9,
+          "avgVelo": 91.8,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-02",
+          "peakVelo": 85.6,
+          "avgVelo": 84.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-30",
+          "peakVelo": 92.0,
+          "avgVelo": 90.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-23",
+          "peakVelo": 90.4,
+          "avgVelo": 89.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-19",
+          "peakVelo": 86.0,
+          "avgVelo": 84.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-14",
+          "peakVelo": 89.8,
+          "avgVelo": 88.7,
+          "sessionType": "Other",
+          "notes": "Random Mound Feel",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-22",
+          "peakVelo": 89.4,
+          "avgVelo": 88.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-19",
+          "peakVelo": 90.3,
+          "avgVelo": 88.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-12",
+          "peakVelo": 87.9,
+          "avgVelo": 86.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-05",
+          "peakVelo": 88.4,
+          "avgVelo": 86.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-02",
+          "peakVelo": 88.2,
+          "avgVelo": 86.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-28",
+          "peakVelo": 82.3,
+          "avgVelo": 82.2,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-24",
+          "peakVelo": 89.6,
+          "avgVelo": 88.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-21",
+          "peakVelo": 89.6,
+          "avgVelo": 88.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-17",
+          "peakVelo": 88.7,
+          "avgVelo": 87.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Michael Destefano": {
+      "name": "Michael Destefano",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1U6sJYqpo5rNkD7-uE3NHAZ7FPFLLTOxd0GD58YI_nEs/edit",
+      "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 76.4,
+          "avgVelo": 74.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-22",
+          "peakVelo": 75.9,
+          "avgVelo": 74.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-18",
+          "peakVelo": 76.4,
+          "avgVelo": 75.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-15",
+          "peakVelo": 74.7,
+          "avgVelo": 73.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-11",
+          "peakVelo": 74.8,
+          "avgVelo": 72.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-08",
+          "peakVelo": 78.0,
+          "avgVelo": 76.0,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
     "Nicky Callonas": {
       "name": "Nicky Callonas",
       "programUrl": "https://docs.google.com/spreadsheets/d/1mGR3u6cbIh92m7dMwcnCu2Y-LGPdY4t6N7IwyuUzpVI/edit",
       "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 67.8,
+          "avgVelo": 66.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-22",
+          "peakVelo": 68.0,
+          "avgVelo": 66.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-20",
           "peakVelo": 68.5,
@@ -2557,239 +4120,32 @@
         }
       ]
     },
-    "Pat Rodriguez": {
-      "name": "Pat Rodriguez",
-      "programUrl": "https://docs.google.com/spreadsheets/d/13Az_T3tQp7dGeAgd9EmSvzLp2jHCct85OvWHHKOiFGg/edit",
+    "Tanner Gola": {
+      "name": "Tanner Gola",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1YTwp6LHtpuRITaZ4wI-qPwDAAauFKbBnxsXGyV_wzdQ/edit",
       "sessions": [
         {
-          "date": "2026-07-20",
-          "peakVelo": 73.7,
-          "avgVelo": 72.0,
+          "date": "2026-07-29",
+          "peakVelo": 72.3,
+          "avgVelo": 70.9,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-07-27",
+          "peakVelo": 75.1,
+          "avgVelo": 73.1,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
         },
         {
-          "date": "2026-07-16",
-          "peakVelo": 71.1,
-          "avgVelo": 69.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-13",
-          "peakVelo": 71.6,
-          "avgVelo": 70.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 72.0,
-          "avgVelo": 69.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-29",
-          "peakVelo": 72.2,
-          "avgVelo": 68.9,
-          "sessionType": "Short Slope",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Christian Peralta": {
-      "name": "Christian Peralta",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1fWF4nxjzdc9uLCOvq5oYUKD5FqJiL92agJ_YEutnyZ0/edit",
-      "sessions": [
-        {
-          "date": "2026-07-18",
-          "peakVelo": 81.2,
-          "avgVelo": 78.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-11",
-          "peakVelo": 81.9,
-          "avgVelo": 80.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-09",
-          "peakVelo": 80.8,
-          "avgVelo": 79.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-19",
-          "peakVelo": 81.8,
-          "avgVelo": 80.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-17",
-          "peakVelo": 78.2,
-          "avgVelo": 76.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-13",
-          "peakVelo": 81.0,
-          "avgVelo": 78.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-10",
-          "peakVelo": 81.1,
-          "avgVelo": 80.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-06",
-          "peakVelo": 80.2,
-          "avgVelo": 79.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-15",
-          "peakVelo": 80.2,
-          "avgVelo": 77.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-10",
-          "peakVelo": 83.1,
-          "avgVelo": 81.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-04",
-          "peakVelo": 79.5,
-          "avgVelo": 77.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-10-31",
-          "peakVelo": 83.2,
-          "avgVelo": 80.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-10-24",
-          "peakVelo": 81.7,
-          "avgVelo": 80.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-10-21",
-          "peakVelo": 80.9,
-          "avgVelo": 79.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Jackson Mavrides": {
-      "name": "Jackson Mavrides",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1Xcg_kBT3OYgfljk69UrUPcXeQg77htCOmf7DfF0ifro/edit",
-      "sessions": [
-        {
-          "date": "2026-07-18",
-          "peakVelo": 71.9,
-          "avgVelo": 70.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-11",
-          "peakVelo": 68.8,
-          "avgVelo": 67.4,
-          "sessionType": "Short Slope",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Michael Destefano": {
-      "name": "Michael Destefano",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1U6sJYqpo5rNkD7-uE3NHAZ7FPFLLTOxd0GD58YI_nEs/edit",
-      "sessions": [
-        {
-          "date": "2026-07-18",
-          "peakVelo": 76.4,
-          "avgVelo": 75.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-15",
-          "peakVelo": 74.7,
-          "avgVelo": 73.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-11",
+          "date": "2026-07-21",
           "peakVelo": 74.8,
-          "avgVelo": 72.3,
+          "avgVelo": 72.2,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
@@ -2797,422 +4153,26 @@
         },
         {
           "date": "2026-07-08",
+          "peakVelo": 75.1,
+          "avgVelo": 72.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-22",
+          "peakVelo": 76.5,
+          "avgVelo": 75.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-27",
           "peakVelo": 78.0,
-          "avgVelo": 76.0,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Colin Leavy": {
-      "name": "Colin Leavy",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1YYSzTeb3DZWYOJeP1flIZK1I79cM40vjKVQwaHjYBGI/edit",
-      "sessions": [
-        {
-          "date": "2026-07-17",
-          "peakVelo": 73.1,
-          "avgVelo": 71.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-25",
-          "peakVelo": 71.8,
-          "avgVelo": 70.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-19",
-          "peakVelo": 72.5,
-          "avgVelo": 69.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-23",
-          "peakVelo": 69.7,
-          "avgVelo": 69.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-27",
-          "peakVelo": 70.8,
-          "avgVelo": 70.8,
-          "sessionType": "Live ABs",
-          "notes": "Trackman errors, only 2 pitches tracked",
-          "isFlagged": true,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-10",
-          "peakVelo": 71.6,
-          "avgVelo": 70.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-06",
-          "peakVelo": 72.2,
-          "avgVelo": 70.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-23",
-          "peakVelo": 71.2,
-          "avgVelo": 69.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-19",
-          "peakVelo": 70.6,
-          "avgVelo": 68.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-09",
-          "peakVelo": 71.3,
-          "avgVelo": 69.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-02",
-          "peakVelo": 70.2,
-          "avgVelo": 71.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-19",
-          "peakVelo": 71.6,
-          "avgVelo": 69.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-12",
-          "peakVelo": 71.1,
-          "avgVelo": 68.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-05",
-          "peakVelo": 70.5,
-          "avgVelo": 68.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-21",
-          "peakVelo": 67.7,
-          "avgVelo": 67.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-11-06",
-          "peakVelo": 68.4,
-          "avgVelo": 66.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Joe Hauser": {
-      "name": "Joe Hauser",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1EHTtq2poCNoo4lCHcJKQLzXCJ0vv-PCiBciaHoQoT0E/edit",
-      "sessions": [
-        {
-          "date": "2026-07-17",
-          "peakVelo": 91.4,
-          "avgVelo": 89.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-14",
-          "peakVelo": 92.2,
-          "avgVelo": 91.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-10",
-          "peakVelo": 92.3,
-          "avgVelo": 90.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 91.7,
-          "avgVelo": 90.5,
-          "sessionType": "Bullpen",
-          "notes": "Best pen so far",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-02",
-          "peakVelo": 91.2,
-          "avgVelo": 89.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-29",
-          "peakVelo": 85.6,
-          "avgVelo": 82.3,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-23",
-          "peakVelo": 88.8,
-          "avgVelo": 88.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-19",
-          "peakVelo": 89.0,
-          "avgVelo": 88.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-16",
-          "peakVelo": 90.4,
-          "avgVelo": 89.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-11",
-          "peakVelo": 88.2,
-          "avgVelo": 87.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-08",
-          "peakVelo": 90.5,
-          "avgVelo": 89.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-04",
-          "peakVelo": 88.9,
-          "avgVelo": 88.5,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Severino Napolitano": {
-      "name": "Severino Napolitano",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1DBcrAqwNXFPKUKJJ5bh5_2jcznnRrlCkzGdXZVm_Gk0/edit",
-      "sessions": [
-        {
-          "date": "2026-07-17",
-          "peakVelo": 83.9,
-          "avgVelo": 83.2,
-          "sessionType": "Short Slope",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-24",
-          "peakVelo": 79.7,
-          "avgVelo": 77.2,
-          "sessionType": "Low Effort",
-          "notes": "Building back up from forearm strain",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-01-12",
-          "peakVelo": 87.0,
-          "avgVelo": 84.9,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-09",
-          "peakVelo": 79.8,
           "avgVelo": 76.1,
-          "sessionType": "Other",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-06",
-          "peakVelo": 85.6,
-          "avgVelo": 84.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-02",
-          "peakVelo": 83.5,
-          "avgVelo": 82.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-29",
-          "peakVelo": 87.4,
-          "avgVelo": 84.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-26",
-          "peakVelo": 80.7,
-          "avgVelo": 78.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-23",
-          "peakVelo": 86.3,
-          "avgVelo": 83.9,
-          "sessionType": "Velo Session",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-19",
-          "peakVelo": 85.6,
-          "avgVelo": 84.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-16",
-          "peakVelo": 83.8,
-          "avgVelo": 81.4,
-          "sessionType": "Other",
-          "notes": "Build Up",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-19",
-          "peakVelo": 81.3,
-          "avgVelo": 78.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-08",
-          "peakVelo": 86.3,
-          "avgVelo": 84.7,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-05",
-          "peakVelo": 80.9,
-          "avgVelo": 79.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-01",
-          "peakVelo": 83.6,
-          "avgVelo": 82.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-07-29",
-          "peakVelo": 81.6,
-          "avgVelo": 80.2,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
@@ -3224,6 +4184,24 @@
       "name": "Thomas LoBello",
       "programUrl": "https://docs.google.com/spreadsheets/d/1AjBdaXQHTK3kABtb_Vqod3rsGdN0H418EoxHfJH0g2c/edit",
       "sessions": [
+        {
+          "date": "2026-07-29",
+          "peakVelo": 91.2,
+          "avgVelo": 87.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-24",
+          "peakVelo": 94.5,
+          "avgVelo": 92.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
         {
           "date": "2026-07-17",
           "peakVelo": 92.3,
@@ -3515,6 +4493,1098 @@
         }
       ]
     },
+    "Shane Maxwell": {
+      "name": "Shane Maxwell",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1eDJrzSx9oxwYQsvCa6oAgPkhE5li7PEZse8dSLmHxL4/edit",
+      "sessions": [
+        {
+          "date": "2026-07-28",
+          "peakVelo": 70.6,
+          "avgVelo": 69.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-14",
+          "peakVelo": 71.0,
+          "avgVelo": 69.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 70.8,
+          "avgVelo": 70.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-30",
+          "peakVelo": 72.6,
+          "avgVelo": 70.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-24",
+          "peakVelo": 68.2,
+          "avgVelo": 68.2,
+          "sessionType": "Assessment",
+          "notes": "Trackman not working, only 1 FB",
+          "isFlagged": true,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Axel Campos": {
+      "name": "Axel Campos",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1RolTZLMDk65bZ7Rk3YKt1cYabida0zjAilcV3av3q94/edit",
+      "sessions": [
+        {
+          "date": "2026-07-27",
+          "peakVelo": 78.0,
+          "avgVelo": 76.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-23",
+          "peakVelo": 77.1,
+          "avgVelo": 76.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-21",
+          "peakVelo": 78.6,
+          "avgVelo": 77.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 78.9,
+          "avgVelo": 76.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-13",
+          "peakVelo": 77.9,
+          "avgVelo": 76.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 77.3,
+          "avgVelo": 76.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-03",
+          "peakVelo": 76.1,
+          "avgVelo": 74.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-29",
+          "peakVelo": 77.6,
+          "avgVelo": 76.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-23",
+          "peakVelo": 74.8,
+          "avgVelo": 74.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-18",
+          "peakVelo": 76.1,
+          "avgVelo": 75.3,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Matthew Mamak": {
+      "name": "Matthew Mamak",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1uKg4sTMlBXCOm_W4GB-VYWiOryAwnx5BJNzBJQfxmig/edit",
+      "sessions": [
+        {
+          "date": "2026-07-24",
+          "peakVelo": 75.0,
+          "avgVelo": 73.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 71.0,
+          "avgVelo": 70.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-10",
+          "peakVelo": 72.8,
+          "avgVelo": 72.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 73.5,
+          "avgVelo": 72.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-19",
+          "peakVelo": 72.8,
+          "avgVelo": 72.8,
+          "sessionType": "Bullpen",
+          "notes": "Only 1 Fastball read, low slot issue",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-15",
+          "peakVelo": 74.5,
+          "avgVelo": 74.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-11",
+          "peakVelo": 75.8,
+          "avgVelo": 75.4,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Abe Florman": {
+      "name": "Abe Florman",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1PpLOmsNimbqfYL4QZ3dOwrZkzsbP8QHg0YQoR9P1jO4/edit",
+      "sessions": [
+        {
+          "date": "2026-07-23",
+          "peakVelo": 71.0,
+          "avgVelo": 68.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-20",
+          "peakVelo": 71.0,
+          "avgVelo": 69.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 69.7,
+          "avgVelo": 68.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-18",
+          "peakVelo": 73.9,
+          "avgVelo": 71.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-15",
+          "peakVelo": 71.6,
+          "avgVelo": 70.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-10",
+          "peakVelo": 69.8,
+          "avgVelo": 68.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-03",
+          "peakVelo": 70.9,
+          "avgVelo": 69.5,
+          "sessionType": "Bullpen",
+          "notes": "Post-Sickness",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-25",
+          "peakVelo": 73.1,
+          "avgVelo": 72.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-22",
+          "peakVelo": 73.8,
+          "avgVelo": 72.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-14",
+          "peakVelo": 73.7,
+          "avgVelo": 73.4,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Joey Ramos": {
+      "name": "Joey Ramos",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1WwtvwPj3_sn0C9WtELZyyuqwn-zKMR4yYEnnmU3KNxk/edit",
+      "sessions": [
+        {
+          "date": "2026-07-22",
+          "peakVelo": 73.7,
+          "avgVelo": 71.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-08",
+          "peakVelo": 70.8,
+          "avgVelo": 69.7,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-06-22",
+          "peakVelo": 73.5,
+          "avgVelo": 72.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 73.3,
+          "avgVelo": 71.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-03",
+          "peakVelo": 74.5,
+          "avgVelo": 73.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-30",
+          "peakVelo": 72.4,
+          "avgVelo": 71.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-25",
+          "peakVelo": 72.0,
+          "avgVelo": 70.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-20",
+          "peakVelo": 73.2,
+          "avgVelo": 72.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-18",
+          "peakVelo": 72.3,
+          "avgVelo": 72.1,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Severino Napolitano": {
+      "name": "Severino Napolitano",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1DBcrAqwNXFPKUKJJ5bh5_2jcznnRrlCkzGdXZVm_Gk0/edit",
+      "sessions": [
+        {
+          "date": "2026-07-22",
+          "peakVelo": 86.3,
+          "avgVelo": 84.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-17",
+          "peakVelo": 83.9,
+          "avgVelo": 83.2,
+          "sessionType": "Short Slope",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-24",
+          "peakVelo": 79.7,
+          "avgVelo": 77.2,
+          "sessionType": "Low Effort",
+          "notes": "Building back up from forearm strain",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-01-12",
+          "peakVelo": 87.0,
+          "avgVelo": 84.9,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-09",
+          "peakVelo": 79.8,
+          "avgVelo": 76.1,
+          "sessionType": "Other",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-06",
+          "peakVelo": 85.6,
+          "avgVelo": 84.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-02",
+          "peakVelo": 83.5,
+          "avgVelo": 82.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-29",
+          "peakVelo": 87.4,
+          "avgVelo": 84.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-26",
+          "peakVelo": 80.7,
+          "avgVelo": 78.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-23",
+          "peakVelo": 86.3,
+          "avgVelo": 83.9,
+          "sessionType": "Velo Session",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-19",
+          "peakVelo": 85.6,
+          "avgVelo": 84.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-16",
+          "peakVelo": 83.8,
+          "avgVelo": 81.4,
+          "sessionType": "Other",
+          "notes": "Build Up",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-19",
+          "peakVelo": 81.3,
+          "avgVelo": 78.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-08",
+          "peakVelo": 86.3,
+          "avgVelo": 84.7,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-05",
+          "peakVelo": 80.9,
+          "avgVelo": 79.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-08-01",
+          "peakVelo": 83.6,
+          "avgVelo": 82.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-07-29",
+          "peakVelo": 81.6,
+          "avgVelo": 80.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Hudson Geiger": {
+      "name": "Hudson Geiger",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1Fbv__fGXKsALk2yo7SirdJ7HFO-yQico9Ipw-V966oU/edit",
+      "sessions": [
+        {
+          "date": "2026-07-21",
+          "peakVelo": 74.4,
+          "avgVelo": 73.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-09",
+          "peakVelo": 74.7,
+          "avgVelo": 73.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-01",
+          "peakVelo": 76.1,
+          "avgVelo": 73.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-17",
+          "peakVelo": 75.9,
+          "avgVelo": 75.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-03",
+          "peakVelo": 73.3,
+          "avgVelo": 72.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-06",
+          "peakVelo": 74.4,
+          "avgVelo": 74.4,
+          "sessionType": "Other",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-29",
+          "peakVelo": 73.2,
+          "avgVelo": 72.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Shea O'Sullivan": {
+      "name": "Shea O'Sullivan",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1Nv9wD7ZzN9GgssvHL0_SSSG2Cs8FURBOIVF8NNuJl4g/edit",
+      "sessions": [
+        {
+          "date": "2026-07-21",
+          "peakVelo": 81.9,
+          "avgVelo": 79.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-17",
+          "peakVelo": 83.1,
+          "avgVelo": 81.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 82.8,
+          "avgVelo": 80.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-03",
+          "peakVelo": 77.8,
+          "avgVelo": 76.6,
+          "sessionType": "Bullpen",
+          "notes": "Seemed incredibly tired",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-26",
+          "peakVelo": 84.1,
+          "avgVelo": 82.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-23",
+          "peakVelo": 81.8,
+          "avgVelo": 80.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-19",
+          "peakVelo": 84.2,
+          "avgVelo": 82.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-16",
+          "peakVelo": 82.0,
+          "avgVelo": 81.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-05",
+          "peakVelo": 85.4,
+          "avgVelo": 83.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-02",
+          "peakVelo": 80.5,
+          "avgVelo": 79.2,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-29",
+          "peakVelo": 84.3,
+          "avgVelo": 82.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-26",
+          "peakVelo": 80.0,
+          "avgVelo": 79.4,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-22",
+          "peakVelo": 84.3,
+          "avgVelo": 83.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-05-18",
+          "peakVelo": 82.3,
+          "avgVelo": 81.8,
+          "sessionType": "Assessment",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Bobby Connolly": {
+      "name": "Bobby Connolly",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1fEskmmEeRCoA6fvnHPBk6tJLzxHYmUaWlpOhl_AvgIs/edit",
+      "sessions": [
+        {
+          "date": "2026-07-20",
+          "peakVelo": 81.2,
+          "avgVelo": 78.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-17",
+          "peakVelo": 78.0,
+          "avgVelo": 77.3,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-15",
+          "peakVelo": 81.5,
+          "avgVelo": 80.5,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 80.0,
+          "avgVelo": 78.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-11",
+          "peakVelo": 83.7,
+          "avgVelo": 82.3,
+          "sessionType": "Velo Session",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-01",
+          "peakVelo": 83.1,
+          "avgVelo": 81.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-04-08",
+          "peakVelo": 76.3,
+          "avgVelo": 75.7,
+          "sessionType": "Low Effort",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": true
+        },
+        {
+          "date": "2026-03-30",
+          "peakVelo": 77.8,
+          "avgVelo": 77.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-27",
+          "peakVelo": 78.7,
+          "avgVelo": 77.2,
+          "sessionType": "Live ABs",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-24",
+          "peakVelo": 74.6,
+          "avgVelo": 73.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-17",
+          "peakVelo": 78.1,
+          "avgVelo": 76.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-14",
+          "peakVelo": 78.9,
+          "avgVelo": 77.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-07",
+          "peakVelo": 78.8,
+          "avgVelo": 76.7,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-04",
+          "peakVelo": 79.6,
+          "avgVelo": 78.0,
+          "sessionType": "Bullpen",
+          "notes": "Assessment",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Pat Rodriguez": {
+      "name": "Pat Rodriguez",
+      "programUrl": "https://docs.google.com/spreadsheets/d/13Az_T3tQp7dGeAgd9EmSvzLp2jHCct85OvWHHKOiFGg/edit",
+      "sessions": [
+        {
+          "date": "2026-07-20",
+          "peakVelo": 73.7,
+          "avgVelo": 72.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-16",
+          "peakVelo": 71.1,
+          "avgVelo": 69.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-13",
+          "peakVelo": 71.6,
+          "avgVelo": 70.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-07-07",
+          "peakVelo": 72.0,
+          "avgVelo": 69.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-29",
+          "peakVelo": 72.2,
+          "avgVelo": 68.9,
+          "sessionType": "Short Slope",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Colin Leavy": {
+      "name": "Colin Leavy",
+      "programUrl": "https://docs.google.com/spreadsheets/d/1YYSzTeb3DZWYOJeP1flIZK1I79cM40vjKVQwaHjYBGI/edit",
+      "sessions": [
+        {
+          "date": "2026-07-17",
+          "peakVelo": 73.1,
+          "avgVelo": 71.9,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-25",
+          "peakVelo": 71.8,
+          "avgVelo": 70.0,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-06-19",
+          "peakVelo": 72.5,
+          "avgVelo": 69.3,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-03-23",
+          "peakVelo": 69.7,
+          "avgVelo": 69.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-27",
+          "peakVelo": 70.8,
+          "avgVelo": 70.8,
+          "sessionType": "Live ABs",
+          "notes": "Trackman errors, only 2 pitches tracked",
+          "isFlagged": true,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-10",
+          "peakVelo": 71.6,
+          "avgVelo": 70.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-02-06",
+          "peakVelo": 72.2,
+          "avgVelo": 70.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-23",
+          "peakVelo": 71.2,
+          "avgVelo": 69.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-19",
+          "peakVelo": 70.6,
+          "avgVelo": 68.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-09",
+          "peakVelo": 71.3,
+          "avgVelo": 69.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2026-01-02",
+          "peakVelo": 71.2,
+          "avgVelo": 70.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-19",
+          "peakVelo": 71.6,
+          "avgVelo": 69.4,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-12",
+          "peakVelo": 71.1,
+          "avgVelo": 68.1,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-12-05",
+          "peakVelo": 70.5,
+          "avgVelo": 68.8,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-21",
+          "peakVelo": 67.7,
+          "avgVelo": 67.2,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        },
+        {
+          "date": "2025-11-06",
+          "peakVelo": 68.4,
+          "avgVelo": 66.6,
+          "sessionType": "Bullpen",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
     "Ben Wallace": {
       "name": "Ben Wallace",
       "programUrl": "https://docs.google.com/spreadsheets/d/1F19sEQ2gGImYUTcoRxDMUr8E3HbM_Bl0_DjTigAPIeA/edit",
@@ -3701,120 +5771,6 @@
         }
       ]
     },
-    "Darren Espinal": {
-      "name": "Darren Espinal",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1sXoUKXZy90kVzClgqj5s8h9PrzeDdzwlEOyqcC1q2E4/edit",
-      "sessions": [
-        {
-          "date": "2026-07-16",
-          "peakVelo": 75.0,
-          "avgVelo": 72.2,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-07-13",
-          "peakVelo": 75.2,
-          "avgVelo": 71.3,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-07-09",
-          "peakVelo": 65.1,
-          "avgVelo": 69.9,
-          "sessionType": "Rehab",
-          "notes": "Longer throwing session ~50 throws",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 74.2,
-          "avgVelo": 70.9,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-07-02",
-          "peakVelo": 74.8,
-          "avgVelo": 70.1,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-25",
-          "peakVelo": 74.3,
-          "avgVelo": 68.9,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-22",
-          "peakVelo": 75.6,
-          "avgVelo": 68.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-18",
-          "peakVelo": 69.7,
-          "avgVelo": 66.0,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-15",
-          "peakVelo": 72.9,
-          "avgVelo": 66.9,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-11",
-          "peakVelo": 68.0,
-          "avgVelo": 64.4,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-08",
-          "peakVelo": 66.3,
-          "avgVelo": 55.7,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-03",
-          "peakVelo": 69.9,
-          "avgVelo": 63.9,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        }
-      ]
-    },
     "Elian Carrasco": {
       "name": "Elian Carrasco",
       "programUrl": "https://docs.google.com/spreadsheets/d/1iqZUm3WrVxGrhQnAisM0J3YTmi_MCs7Cxc4jOq8blJo/edit",
@@ -3908,408 +5864,48 @@
         }
       ]
     },
-    "Kai Ventura": {
-      "name": "Kai Ventura",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1xJXON8iG7XyY9-KcFlCNR4a1GjZfRClyz_zR_sd1LXw/edit",
-      "sessions": [
-        {
-          "date": "2026-07-16",
-          "peakVelo": 76.0,
-          "avgVelo": 73.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-11",
-          "peakVelo": 75.5,
-          "avgVelo": 73.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-06",
-          "peakVelo": 74.8,
-          "avgVelo": 71.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-29",
-          "peakVelo": 73.7,
-          "avgVelo": 72.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-24",
-          "peakVelo": 73.2,
-          "avgVelo": 70.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-18",
-          "peakVelo": 72.9,
-          "avgVelo": 72.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-10",
-          "peakVelo": 69.8,
-          "avgVelo": 68.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-06",
-          "peakVelo": 71.6,
-          "avgVelo": 69.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Matthew Mamak": {
-      "name": "Matthew Mamak",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1uKg4sTMlBXCOm_W4GB-VYWiOryAwnx5BJNzBJQfxmig/edit",
-      "sessions": [
-        {
-          "date": "2026-07-16",
-          "peakVelo": 71.0,
-          "avgVelo": 70.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-10",
-          "peakVelo": 72.8,
-          "avgVelo": 72.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 73.5,
-          "avgVelo": 72.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-19",
-          "peakVelo": 72.8,
-          "avgVelo": 72.8,
-          "sessionType": "Bullpen",
-          "notes": "Only 1 Fastball read, low slot issue",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-15",
-          "peakVelo": 74.5,
-          "avgVelo": 74.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-11",
-          "peakVelo": 75.8,
-          "avgVelo": 75.4,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Frankie Muro": {
-      "name": "Frankie Muro",
-      "programUrl": "https://docs.google.com/spreadsheets/d/18uAve_5rZ6XfXDMFAPXETW4LvaszjSDLigbFQXz40gg/edit",
+    "Cade Winquest": {
+      "name": "Cade Winquest",
+      "programUrl": "",
       "sessions": [
         {
           "date": "2026-07-15",
-          "peakVelo": 81.6,
-          "avgVelo": 80.7,
+          "peakVelo": 95.0,
+          "avgVelo": 93.8,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
-        },
+        }
+      ]
+    },
+    "Matt Bowman": {
+      "name": "Matt Bowman",
+      "programUrl": "",
+      "sessions": [
         {
-          "date": "2026-07-10",
-          "peakVelo": 81.6,
-          "avgVelo": 79.3,
+          "date": "2026-07-15",
+          "peakVelo": 86.6,
+          "avgVelo": 85.0,
+          "sessionType": "Pitch Design",
+          "notes": "",
+          "isFlagged": false,
+          "isSubmax": false
+        }
+      ]
+    },
+    "Pete Hansen": {
+      "name": "Pete Hansen",
+      "programUrl": "",
+      "sessions": [
+        {
+          "date": "2026-07-15",
+          "peakVelo": 86.8,
+          "avgVelo": 86.7,
           "sessionType": "Low Effort",
           "notes": "",
           "isFlagged": false,
           "isSubmax": true
-        },
-        {
-          "date": "2026-07-01",
-          "peakVelo": 84.2,
-          "avgVelo": 83.0,
-          "sessionType": "Bullpen",
-          "notes": "Long pen, sustained velo to the end",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-24",
-          "peakVelo": 84.5,
-          "avgVelo": 83.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 83.6,
-          "avgVelo": 81.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-10",
-          "peakVelo": 84.2,
-          "avgVelo": 80.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-03",
-          "peakVelo": 82.8,
-          "avgVelo": 80.1,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-05-26",
-          "peakVelo": 86.5,
-          "avgVelo": 83.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-20",
-          "peakVelo": 82.7,
-          "avgVelo": 80.9,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-05-12",
-          "peakVelo": 85.3,
-          "avgVelo": 83.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-25",
-          "peakVelo": 83.7,
-          "avgVelo": 82.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-18",
-          "peakVelo": 86.2,
-          "avgVelo": 83.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-11",
-          "peakVelo": 82.0,
-          "avgVelo": 80.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-28",
-          "peakVelo": 81.1,
-          "avgVelo": 80.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-21",
-          "peakVelo": 83.7,
-          "avgVelo": 82.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-17",
-          "peakVelo": 82.8,
-          "avgVelo": 80.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-14",
-          "peakVelo": 83.8,
-          "avgVelo": 82.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-28",
-          "peakVelo": 83.5,
-          "avgVelo": 82.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-21",
-          "peakVelo": 82.7,
-          "avgVelo": 81.8,
-          "sessionType": "Bullpen",
-          "notes": "Body dead, focus on offspeed",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-14",
-          "peakVelo": 84.7,
-          "avgVelo": 83.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-06",
-          "peakVelo": 81.9,
-          "avgVelo": 80.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-20",
-          "peakVelo": 80.3,
-          "avgVelo": 78.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-12-16",
-          "peakVelo": 79.3,
-          "avgVelo": 77.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-18",
-          "peakVelo": 83.4,
-          "avgVelo": 80.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-15",
-          "peakVelo": 85.9,
-          "avgVelo": 83.8,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-12",
-          "peakVelo": 81.2,
-          "avgVelo": 80.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-07",
-          "peakVelo": 79.6,
-          "avgVelo": 76.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-04",
-          "peakVelo": 80.6,
-          "avgVelo": 78.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-07-30",
-          "peakVelo": 82.7,
-          "avgVelo": 79.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
         }
       ]
     },
@@ -4453,48 +6049,6 @@
           "sessionType": "Assessment",
           "notes": "",
           "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Shane Maxwell": {
-      "name": "Shane Maxwell",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1eDJrzSx9oxwYQsvCa6oAgPkhE5li7PEZse8dSLmHxL4/edit",
-      "sessions": [
-        {
-          "date": "2026-07-14",
-          "peakVelo": 71.0,
-          "avgVelo": 69.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-09",
-          "peakVelo": 70.8,
-          "avgVelo": 70.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-30",
-          "peakVelo": 72.6,
-          "avgVelo": 70.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-24",
-          "peakVelo": 68.2,
-          "avgVelo": 68.2,
-          "sessionType": "Assessment",
-          "notes": "Trackman not working, only 1 FB",
-          "isFlagged": true,
           "isSubmax": false
         }
       ]
@@ -4727,8 +6281,8 @@
         },
         {
           "date": "2026-02-06",
-          "peakVelo": 75.4,
-          "avgVelo": 76.9,
+          "peakVelo": 76.9,
+          "avgVelo": 75.4,
           "sessionType": "Velo Session",
           "notes": "",
           "isFlagged": false,
@@ -4768,291 +6322,6 @@
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Thomas DiGiovanna": {
-      "name": "Thomas DiGiovanna",
-      "programUrl": "",
-      "sessions": [
-        {
-          "date": "2026-07-13",
-          "peakVelo": 81.0,
-          "avgVelo": 79.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Rob Romero": {
-      "name": "Rob Romero",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1RrqFyi6EiuL05uY_hFxC3hcEgnh6a9YLQtnjnCj_vko/edit",
-      "sessions": [
-        {
-          "date": "2026-07-10",
-          "peakVelo": 68.9,
-          "avgVelo": 68.6,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-07-07",
-          "peakVelo": 71.1,
-          "avgVelo": 70.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-02",
-          "peakVelo": 71.7,
-          "avgVelo": 70.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-25",
-          "peakVelo": 70.5,
-          "avgVelo": 68.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-19",
-          "peakVelo": 66.5,
-          "avgVelo": 64.0,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 70.2,
-          "avgVelo": 68.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-09",
-          "peakVelo": 69.0,
-          "avgVelo": 64.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-30",
-          "peakVelo": 64.8,
-          "avgVelo": 63.5,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Dylan Vetell": {
-      "name": "Dylan Vetell",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1wJe4Qe9Suvnpzrugr27ZDpEeE4ZkR7MIZOHxt_WfZ3g/edit",
-      "sessions": [
-        {
-          "date": "2026-07-09",
-          "peakVelo": 73.5,
-          "avgVelo": 71.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-07-02",
-          "peakVelo": 72.6,
-          "avgVelo": 70.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-26",
-          "peakVelo": 72.9,
-          "avgVelo": 71.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-20",
-          "peakVelo": 75.0,
-          "avgVelo": 73.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 75.1,
-          "avgVelo": 72.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Gianni Muro": {
-      "name": "Gianni Muro",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1WNQ6fdXtJUbeIWqWFCYCJbnNeHzpqsAtBnDWWa7zEEE/edit",
-      "sessions": [
-        {
-          "date": "2026-07-09",
-          "peakVelo": 75.9,
-          "avgVelo": 73.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-29",
-          "peakVelo": 76.0,
-          "avgVelo": 73.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-18",
-          "peakVelo": 81.3,
-          "avgVelo": 77.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-12",
-          "peakVelo": 75.2,
-          "avgVelo": 74.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-28",
-          "peakVelo": 74.2,
-          "avgVelo": 72.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-23",
-          "peakVelo": 73.9,
-          "avgVelo": 71.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-18",
-          "peakVelo": 72.8,
-          "avgVelo": 72.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-02",
-          "peakVelo": 73.7,
-          "avgVelo": 71.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-02",
-          "peakVelo": 73.9,
-          "avgVelo": 71.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-30",
-          "peakVelo": 73.7,
-          "avgVelo": 72.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-14",
-          "peakVelo": 74.3,
-          "avgVelo": 73.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-07",
-          "peakVelo": 72.5,
-          "avgVelo": 70.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-28",
-          "peakVelo": 73.9,
-          "avgVelo": 72.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-21",
-          "peakVelo": 73.8,
-          "avgVelo": 70.9,
-          "sessionType": "Low Effort",
-          "notes": "Build Up",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-02-12",
-          "peakVelo": 72.9,
-          "avgVelo": 72.9,
-          "sessionType": "Assessment",
-          "notes": "Trackman not really working",
-          "isFlagged": true,
           "isSubmax": false
         }
       ]
@@ -5101,84 +6370,6 @@
           "date": "2026-06-10",
           "peakVelo": 77.8,
           "avgVelo": 76.4,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Joey Ramos": {
-      "name": "Joey Ramos",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1WwtvwPj3_sn0C9WtELZyyuqwn-zKMR4yYEnnmU3KNxk/edit",
-      "sessions": [
-        {
-          "date": "2026-07-08",
-          "peakVelo": 70.8,
-          "avgVelo": 69.7,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-22",
-          "peakVelo": 73.5,
-          "avgVelo": 72.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 73.3,
-          "avgVelo": 71.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-03",
-          "peakVelo": 74.5,
-          "avgVelo": 73.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-30",
-          "peakVelo": 72.4,
-          "avgVelo": 71.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-25",
-          "peakVelo": 72.0,
-          "avgVelo": 70.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-20",
-          "peakVelo": 73.2,
-          "avgVelo": 72.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-18",
-          "peakVelo": 72.3,
-          "avgVelo": 72.1,
           "sessionType": "Assessment",
           "notes": "",
           "isFlagged": false,
@@ -5245,270 +6436,6 @@
           "date": "2026-06-10",
           "peakVelo": 71.0,
           "avgVelo": 69.6,
-          "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Emrie McLaughlin": {
-      "name": "Emrie McLaughlin",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1-vuB1hxgZjoSlh2QZEUVEdHgD-XCRxlZfYaACbpImIg/edit",
-      "sessions": [
-        {
-          "date": "2026-07-06",
-          "peakVelo": 76.3,
-          "avgVelo": 74.4,
-          "sessionType": "Rehab",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 75.6,
-          "avgVelo": 74.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-18",
-          "peakVelo": 80.2,
-          "avgVelo": 78.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-14",
-          "peakVelo": 78.4,
-          "avgVelo": 76.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-11",
-          "peakVelo": 77.9,
-          "avgVelo": 74.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-07",
-          "peakVelo": 75.2,
-          "avgVelo": 73.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-04",
-          "peakVelo": 79.0,
-          "avgVelo": 77.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-30",
-          "peakVelo": 78.0,
-          "avgVelo": 76.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-27",
-          "peakVelo": 76.7,
-          "avgVelo": 75.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-23",
-          "peakVelo": 79.4,
-          "avgVelo": 77.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-20",
-          "peakVelo": 77.7,
-          "avgVelo": 74.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-16",
-          "peakVelo": 76.2,
-          "avgVelo": 73.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-13",
-          "peakVelo": 78.7,
-          "avgVelo": 77.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-09",
-          "peakVelo": 77.1,
-          "avgVelo": 74.9,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-06",
-          "peakVelo": 79.6,
-          "avgVelo": 77.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-04-02",
-          "peakVelo": 77.4,
-          "avgVelo": 75.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-30",
-          "peakVelo": 76.1,
-          "avgVelo": 75.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-25",
-          "peakVelo": 76.5,
-          "avgVelo": 74.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Joey Muzio": {
-      "name": "Joey Muzio",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1GiclgarhcwS_Zp5FMHkQruGMco0E4CjoxgVBmKJLgOQ/edit",
-      "sessions": [
-        {
-          "date": "2026-07-03",
-          "peakVelo": 79.6,
-          "avgVelo": 78.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-27",
-          "peakVelo": 78.6,
-          "avgVelo": 77.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-17",
-          "peakVelo": 78.9,
-          "avgVelo": 77.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-11",
-          "peakVelo": 80.5,
-          "avgVelo": 78.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-27",
-          "peakVelo": 77.5,
-          "avgVelo": 76.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-02",
-          "peakVelo": 80.6,
-          "avgVelo": 80.1,
-          "sessionType": "Pitch Design",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-27",
-          "peakVelo": 84.2,
-          "avgVelo": 82.2,
-          "sessionType": "Live ABs",
-          "notes": "Trackman errors, only 3 pitches registered",
-          "isFlagged": true,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-24",
-          "peakVelo": 81.2,
-          "avgVelo": 80.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-19",
-          "peakVelo": 82.7,
-          "avgVelo": 80.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-11",
-          "peakVelo": 81.7,
-          "avgVelo": 79.8,
           "sessionType": "Assessment",
           "notes": "",
           "isFlagged": false,
@@ -5888,246 +6815,6 @@
           "peakVelo": 68.5,
           "avgVelo": 68.1,
           "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Brett Baek": {
-      "name": "Brett Baek",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1RR6W6oBPnkqPaB2a60A_TZqCvt8nZAwAzUyVt_vRkGw/edit",
-      "sessions": [
-        {
-          "date": "2026-06-23",
-          "peakVelo": 79.5,
-          "avgVelo": 77.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-20",
-          "peakVelo": 79.1,
-          "avgVelo": 78.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-12",
-          "peakVelo": 80.4,
-          "avgVelo": 78.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-06-09",
-          "peakVelo": 78.5,
-          "avgVelo": 77.3,
-          "sessionType": "Low Effort",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": true
-        },
-        {
-          "date": "2026-05-21",
-          "peakVelo": 79.4,
-          "avgVelo": 78.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-05-01",
-          "peakVelo": 79.0,
-          "avgVelo": 77.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-03-03",
-          "peakVelo": 80.6,
-          "avgVelo": 79.1,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-24",
-          "peakVelo": 78.3,
-          "avgVelo": 77.9,
-          "sessionType": "Bullpen",
-          "notes": "Trackman errors, only 3 pitches read",
-          "isFlagged": true,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-20",
-          "peakVelo": 82.9,
-          "avgVelo": 81.0,
-          "sessionType": "Live ABs",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-17",
-          "peakVelo": 81.1,
-          "avgVelo": 80.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-13",
-          "peakVelo": 82.0,
-          "avgVelo": 81.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-10",
-          "peakVelo": 83.2,
-          "avgVelo": 81.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-02-06",
-          "peakVelo": 82.6,
-          "avgVelo": 81.2,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-30",
-          "peakVelo": 82.3,
-          "avgVelo": 80.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-23",
-          "peakVelo": 81.2,
-          "avgVelo": 80.7,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-20",
-          "peakVelo": 80.9,
-          "avgVelo": 79.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-16",
-          "peakVelo": 79.5,
-          "avgVelo": 78.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2026-01-13",
-          "peakVelo": 80.6,
-          "avgVelo": 78.6,
-          "sessionType": "Other",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-09-16",
-          "peakVelo": 79.9,
-          "avgVelo": 78.3,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-09-12",
-          "peakVelo": 79.8,
-          "avgVelo": 77.5,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-09-09",
-          "peakVelo": 79.7,
-          "avgVelo": 77.6,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-09-05",
-          "peakVelo": 80.4,
-          "avgVelo": 78.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-09-02",
-          "peakVelo": 76.9,
-          "avgVelo": 76.0,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-29",
-          "peakVelo": 81.9,
-          "avgVelo": 80.4,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-26",
-          "peakVelo": 77.7,
-          "avgVelo": 76.8,
-          "sessionType": "Bullpen",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        },
-        {
-          "date": "2025-08-21",
-          "peakVelo": 79.5,
-          "avgVelo": 77.7,
-          "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
@@ -6887,21 +7574,6 @@
           "peakVelo": 75.1,
           "avgVelo": 73.5,
           "sessionType": "Assessment",
-          "notes": "",
-          "isFlagged": false,
-          "isSubmax": false
-        }
-      ]
-    },
-    "Joey Frazzetta": {
-      "name": "Joey Frazzetta",
-      "programUrl": "https://docs.google.com/spreadsheets/d/1Y1VvY20l1FATf8mpzyZ_Mz_Ss1R6KGSPJP_eFgvU5ow/edit",
-      "sessions": [
-        {
-          "date": "2026-05-27",
-          "peakVelo": 87.8,
-          "avgVelo": 86.9,
-          "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
           "isSubmax": false
@@ -8174,8 +8846,8 @@
         },
         {
           "date": "2025-12-23",
-          "peakVelo": 74.7,
-          "avgVelo": 75.8,
+          "peakVelo": 75.8,
+          "avgVelo": 74.7,
           "sessionType": "Bullpen",
           "notes": "",
           "isFlagged": false,
