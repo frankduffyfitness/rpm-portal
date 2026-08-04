@@ -2153,7 +2153,9 @@ print(f"\nWritten to portal_data_arrays.js ({os.path.getsize('portal_data_arrays
 
 # Update LAST_UPDATED date
 import re
-today_str = datetime.now().strftime('%B %-d, %Y')
+# Eastern-stamped: the 6h bots run in UTC, so convert explicitly.
+from zoneinfo import ZoneInfo
+today_str = datetime.now(ZoneInfo('America/New_York')).strftime('%B %-d, %Y \u00b7 %-I:%M %p ET')
 jsx = re.sub(r'const LAST_UPDATED = ".*?";', f'const LAST_UPDATED = "{today_str}";', jsx)
 
 # Find where each const is defined and replace it
