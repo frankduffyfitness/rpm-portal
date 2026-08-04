@@ -3439,12 +3439,16 @@ const ROSTER_STATUS = {
   "George Cancel Jr": "departed", "Aiden Santiago": "departed", "Michael Mihaltses": "departed",
   "Anderson Villar": "departed", "Stefano Ancona": "departed", "Aidan Cellilli": "departed",
   "Dom Persichilli": "departed", "Rob Williams": "departed",
+  // 2026-08-04 updates (Frank): Leavy quit; Choudri no longer pitching;
+  // Mendez quit pitching here (still trains at RPM, grip stays collectable).
+  "Colin Leavy": "departed", "Toren Choudri": "departed", "Luke Mendez": "departed",
   "Issac Santana": "away", "Isaiah Rubin-Patel": "away",
   "Eric Greenlund-Caraballo": "away", "Sebastian Pitt": "away",
-  // Frank 2026-08-03: Winquest back in the offseason (pro season); Corso-Winks
-  // (still injured) and Leavy not expected anytime soon; Hansen was a one-off
-  // All-Star-break guest alongside Winquest.
-  "Cade Winquest": "away", "Mario Corso-Winks": "away", "Colin Leavy": "away",
+  // Frank 2026-08-03: Winquest back in the offseason (pro season); Hansen was
+  // a one-off All-Star-break guest alongside Winquest. 2026-08-04: Leavy quit
+  // (departed above supersedes the 8/3 "away"); Corso-Winks stays "injured"
+  // per the UCL ledger, matching the 8/3 note.
+  "Cade Winquest": "away", "Mario Corso-Winks": "injured",
   "Pete Hansen": "departed",
 };
 const VM_STATUS_CHIP = {
