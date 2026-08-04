@@ -1290,11 +1290,18 @@ def _velo_initials(name):
 
 
 def _velo_extract_groups_from_jsx(jsx_text):
-    """Pull name → group from existing _VELO and _A/_HA arrays.
-    Existing _VELO classifications win — they reflect Frank's pitcher-aware bucketing."""
+    """Pull name → group from the existing _A/_HA/_VELO arrays.
+
+    _A/_HA win because they are rebuilt from VALD every run, so a group change
+    Frank makes in the Hub (e.g. the 2026-08-04 rising-class update) reaches the
+    velo cards too. _VELO is the last resort: it carries bullpen-only pitchers
+    who have no plate row, and it must NOT outrank fresh VALD data — when it did,
+    the HS default a bullpen-first athlete got on day one went permanently
+    sticky. Deliberate deviations belong in GROUP_OVERRIDES, which beats all of
+    these."""
     import re
     out = {}
-    for var, idx in (("_VELO", 2), ("_A", 2), ("_HA", 2)):
+    for var, idx in (("_A", 2), ("_HA", 2), ("_VELO", 2)):
         m = re.search(rf"const {var}\s*=\s*(\[[\s\S]*?\]);", jsx_text)
         if not m:
             continue
@@ -1304,7 +1311,7 @@ def _velo_extract_groups_from_jsx(jsx_text):
             continue
         for row in rows:
             if isinstance(row, list) and len(row) > idx and isinstance(row[0], str):
-                # Don't overwrite — first source wins (so _VELO trumps later)
+                # Don't overwrite — first source wins (so VALD-fresh _A trumps _VELO)
                 if row[0] not in out:
                     out[row[0]] = row[idx]
     return out
