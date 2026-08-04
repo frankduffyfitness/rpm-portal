@@ -507,3 +507,5 @@ if __name__ == "__main__":
 # sync trigger 2026-07-30 pm — pull new VALD Hub data
 
 # sync trigger 2026-08-04 pm — pull Napolitano + Peralta grips
+
+# sync trigger 2026-08-04 pm — pull Nieto grip
