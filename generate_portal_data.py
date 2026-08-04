@@ -143,6 +143,9 @@ GROUP_OVERRIDES = {
     # college board too.
     "Rob Stingone": "col",
     "Zach Weinschel": "col",
+    # Arrived bullpen-first, so the velo pipeline defaulted him to HS before any
+    # plate data existed and that default went sticky (Frank, 2026-08-04).
+    "Alex Rodriguez": "col",
     "Darren Espinal": "col",
     "Jackson Mavrides": "col",
     "Severino Napolitano": "col",
