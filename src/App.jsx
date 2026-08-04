@@ -57,7 +57,7 @@ const LAST_UPDATED = "August 4, 2026 · 11:59 AM ET";
 // generate_portal_data.py drops anyone inactive past the 42-day ACTIVE_CUTOFF
 // before the roster is built, so a stale pro is gone within ~6 weeks.
 const ROSTER_MIN_EXEMPT = new Set(["pro", "ml"]);
-const ATHLETES = _A.map((a, i) => {
+const _ATHLETES_MAPPED = _A.map((a, i) => {
   const pb = _PB[i] || [];
   function bObj(off) { return pb[off] != null ? { jumpHeight: pb[off], rsi: pb[off+1], conImpulse: pb[off+2], eccBrakingRFD: pb[off+3] } : null; }
   return {
@@ -67,7 +67,13 @@ const ATHLETES = _A.map((a, i) => {
     best: { jumpHeight: a[12], rsi: a[13], conImpulse: a[14], eccBrakingRFD: a[15] },
     pb: { all: bObj(0), tm: bObj(4), lm: bObj(8), tw: bObj(12) },
   };
-}).filter(a => (a.testCount >= 5 || ROSTER_MIN_EXEMPT.has(a.group)) && new Date(a.latestDate) >= new Date("01/01/2026"));
+});
+// The 5-session gate keeps unstable one-off data out of SEARCH and the
+// leaderboards. Report cards are a different context: you already have the
+// athlete in front of you, so they resolve from the ungated list (see
+// CMJ_BY_CANON) and a brand-new athlete's plate data still prints.
+const ATHLETES_ALL = _ATHLETES_MAPPED;
+const ATHLETES = _ATHLETES_MAPPED.filter(a => (a.testCount >= 5 || ROSTER_MIN_EXEMPT.has(a.group)) && new Date(a.latestDate) >= new Date("01/01/2026"));
 
 const TRENDS = _T.map(t => ({
   name: t[0], group: t[1], sessions: t[2],
@@ -77,7 +83,7 @@ const TRENDS = _T.map(t => ({
   brk_first: t[12], brk_last: t[13], brk_change: t[14],
 }));
 
-const HOP_ATHLETES = _HA.map((a, i) => {
+const _HOP_MAPPED = _HA.map((a, i) => {
   const pb = _HPB[i] || [];
   function bObj(off) { return pb[off] != null ? { rsi: pb[off], ct: pb[off+1], ft: pb[off+2], pfbm: pb[off+3] } : null; }
   return {
@@ -87,7 +93,9 @@ const HOP_ATHLETES = _HA.map((a, i) => {
     best: { rsi: a[12], ct: a[13], ft: a[14], pfbm: a[15] },
     pb: { all: bObj(0), tm: bObj(4), lm: bObj(8), tw: bObj(12) },
   };
-}).filter(a => (a.testCount >= 5 || ROSTER_MIN_EXEMPT.has(a.group)) && new Date(a.latestDate) >= new Date("01/01/2026"));
+});
+const HOP_ATHLETES_ALL = _HOP_MAPPED;
+const HOP_ATHLETES = _HOP_MAPPED.filter(a => (a.testCount >= 5 || ROSTER_MIN_EXEMPT.has(a.group)) && new Date(a.latestDate) >= new Date("01/01/2026"));
 
 const HOP_NORMS = _HN;
 
@@ -213,8 +221,8 @@ for (const group of NAME_CLUSTERS) {
 }
 const canonName = (s) => { const k = normName(s); return _CANON[k] || k; };
 
-const CMJ_BY_CANON = Object.fromEntries(ATHLETES.map(a => [canonName(a.name), a]));
-const HOP_BY_CANON = Object.fromEntries(HOP_ATHLETES.map(a => [canonName(a.name), a]));
+const CMJ_BY_CANON = Object.fromEntries(ATHLETES_ALL.map(a => [canonName(a.name), a]));
+const HOP_BY_CANON = Object.fromEntries(HOP_ATHLETES_ALL.map(a => [canonName(a.name), a]));
 const VELO_BY_CANON = Object.fromEntries(VELO_ATHLETES.map(v => [canonName(v.name), v]));
 const DYNAMO_BY_CANON = Object.fromEntries(_DYNAMO.map(d => [canonName(d.name), d]));
 const OFFSEASON_BY_CANON = Object.fromEntries(OFFSEASON.map(o => [canonName(o.name), o]));
