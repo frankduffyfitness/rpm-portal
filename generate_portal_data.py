@@ -1751,6 +1751,26 @@ def _fill_erir(test):
                 ratio[side] = round(e / n, 2)
     test["erIr"] = ratio
 
+# Bad DynaMo tests confirmed by Frank — dropped at build time so the fix
+# survives every re-sync. Key: (athlete, date, movement, position); position
+# None = any. Applied before bilateral merge so the paired good test survives.
+DYNAMO_MOVEMENT_EXCLUSIONS = [
+    # 547.4 N shoulder IR vs his real 197.7 six days earlier — device misread
+    # (Frank, 2026-08-05).
+    ("Emrie McLaughlin", "2026-08-04", "Internal Rotation", None),
+    # Hip IR recorded under the shoulder IR movement (prone position, 358.6 N —
+    # double any true shoulder IR in the building). The same-day Supine test is
+    # the real shoulder IR and stays (Frank, 2026-08-05).
+    ("Tom Hackimer", "2026-07-24", "Internal Rotation", "Prone"),
+]
+
+def _dyn_excluded(name, date, mv):
+    for xn, xd, xm, xp in DYNAMO_MOVEMENT_EXCLUSIONS:
+        if name == xn and date == xd and mv.get("name") == xm and (xp is None or mv.get("position") == xp):
+            return True
+    return False
+
+
 def gen_DYNAMO():
     """_DYNAMO: [{name, group, dob, tests:[...]}] for the password-gated DynaMo
     page. Joins raw force (dynamo_portal.json, from the VALD DynaMo API) with the
@@ -1772,7 +1792,8 @@ def gen_DYNAMO():
         throw_arm = am.get("throwingArm")  # "L"/"R" — clinically relevant side for the ER:IR board
         tests = a.get("tests", [])
         for t in tests:
-            t["movements"] = _merge_bilateral_dynamo(t.get("movements", []))
+            t["movements"] = [m for m in t.get("movements", []) if not _dyn_excluded(a.get("name", name), t.get("date"), m)]
+            t["movements"] = _merge_bilateral_dynamo(t["movements"])
             for mv in t["movements"]:
                 pk = mv.get("peakN")
                 if arm and mv.get("name") in DYNAMO_TORQUE_MOVES and pk:
