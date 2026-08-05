@@ -85,6 +85,26 @@ VELO_BULLPEN_LABELS = {
 with open(PORTAL_JSON) as f:
     fd = json.load(f)
 
+# ─── Duplicate VALD profiles ────────────────────────────────────────────────
+# Same human, two profileIds in the Hub — every downstream array keys off the
+# profile, so the athlete renders twice (search, standings, velo model, the
+# Impulse board). Drop the redundant profile HERE, at load, so one edit covers
+# every consumer. Only list a profile after verifying its tests are a strict
+# subset of the survivor's; the note records that check.
+DUPLICATE_PROFILES = {
+    # Mason Morello: orphan profile, no group set, 11 tests all byte-identical
+    # to the kept profile 640def2a (which also has 8/04 and carries the Pro
+    # group). Verified strict subset 2026-08-04. Frank to merge in the Hub;
+    # this stays harmless once he does.
+    "a9018134-2fae-4677-9ba6-e6a142960475": "Mason Morello (dupe of 640def2a)",
+}
+_dropped = [(pid, why) for pid, why in DUPLICATE_PROFILES.items() if pid in fd.get('athletes', {})]
+for pid, why in _dropped:
+    del fd['athletes'][pid]
+if _dropped:
+    print(f"  Dropped {len(_dropped)} duplicate VALD profile(s): "
+          + "; ".join(why for _, why in _dropped), flush=True)
+
 with open(CURRENT_JSX) as f:
     jsx = f.read()
 
