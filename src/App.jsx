@@ -395,10 +395,17 @@ function MC({ metricKey, value, unit, norms, sparkData, sparkColor, bestValue, o
         {[25, 50, 75].map(t => <div key={t} style={{ position: "absolute", left: `${t}%`, top: 0, width: 1, height: "100%", background: "rgba(255,255,255,0.08)" }} />)}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: sparkData ? 14 : 0 }}><span style={{ fontSize: 9, color: "#4a4f57" }}>25th</span><span style={{ fontSize: 9, color: "#4a4f57" }}>50th</span><span style={{ fontSize: 9, color: "#4a4f57" }}>75th</span></div>
-      {bestValue != null && bestValue !== value && (
+      {/* Best Ever always shows when we have one. It used to hide whenever the
+          latest session WAS the best, which made the row look missing on ~1 in 5
+          profiles; now that case is called out in green instead. Bodyweight
+          passes no bestValue, so it stays off that card by design. */}
+      {bestValue != null && (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0 4px", borderTop: "1px solid rgba(255,255,255,0.04)", marginTop: 4 }}>
           <span style={{ fontSize: 11, color: "#6B7280" }}>Best Ever</span>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#FFB020" }}>{typeof bestValue === "number" ? (bestValue >= 100 ? bestValue.toLocaleString() : bestValue) : bestValue}{unit}</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: bestValue === value ? "#4FFFB0" : "#FFB020" }}>
+            {typeof bestValue === "number" ? (bestValue >= 100 ? bestValue.toLocaleString() : bestValue) : bestValue}{unit}
+            {bestValue === value && <span style={{ fontSize: 10, fontWeight: 600, color: "#4FFFB0" }}> {"\u00b7"} this session</span>}
+          </span>
         </div>
       )}
       {rank != null && (
