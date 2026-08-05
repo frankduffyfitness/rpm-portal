@@ -69,6 +69,7 @@ ANNOTATIONS_FILE = "dynamo_annotations.json"
 # portal (TrackMan/velo), so an athlete's data unifies and measurements join.
 NAME_ALIASES = {
     "Zach Uysal": "Zachary Uysal",
+    "Robert Romero": "Rob Romero",   # portal/velo-model spelling (2026-08-05)
 }
 STATE_FILE       = "dynamo_sync_state.json"
 RATE_LIMIT_PAUSE = 0.05
