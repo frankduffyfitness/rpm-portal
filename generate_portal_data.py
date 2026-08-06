@@ -2212,6 +2212,11 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
             # bucket steps back. Decided here so React never owns the threshold.
             "stale": bool(conf == "LOW" or (days is not None and days > STRAT_STALE_DAYS)),
             "extended": bool(cur.get("extended")),
+            # Plateau overlay (Frank 2026-08-06): computed by bucket_engine
+            # (state "down" when 90-day JH change <= -5%); carried verbatim.
+            "plateau": (a.get("plateau") or {}).get("state") or "",
+            "jhD90": (a.get("plateau") or {}).get("jh_d90_in"),
+            "jhD90Pct": (a.get("plateau") or {}).get("jh_d90_pct"),
             "ind": [_strat_ind(i) for i in (a.get("indicators") or [])],
             "ind2": [_strat_ind(i) for i in (a.get("secondary_indicators") or [])],
             "tags": [[t.get("tag"),
