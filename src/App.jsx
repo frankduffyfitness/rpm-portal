@@ -4604,7 +4604,7 @@ function DynamoPage() {
   const open = (a) => { setSel(a); setDynTab("dynamo"); setDynSub("athletes"); window.scrollTo(0, 0); };
   return shell(<>
     <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3 }}>
-      {[["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"], ["strategy", "🦵 Strategy"]].map(([k, l]) => (
+      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"]].map(([k, l]) => (
         <button key={k} onClick={() => { setDynTab(k); if (k !== "dynamo") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
           background: dynTab === k ? "rgba(79,255,176,0.12)" : "transparent", color: dynTab === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
       ))}
