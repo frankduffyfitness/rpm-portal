@@ -2217,6 +2217,11 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
             "plateau": (a.get("plateau") or {}).get("state") or "",
             "jhD90": (a.get("plateau") or {}).get("jh_d90_in"),
             "jhD90Pct": (a.get("plateau") or {}).get("jh_d90_pct"),
+            # Per-KPI 90-day trends for the Plateau selector: {key: [d, pct,
+            # worse_pct, state]} — worse_pct is direction-normalized upstream.
+            "trends": {k: [v.get("d"), v.get("pct"), v.get("worse_pct"),
+                           v.get("state") or ""]
+                       for k, v in (a.get("trends") or {}).items()},
             "ind": [_strat_ind(i) for i in (a.get("indicators") or [])],
             "ind2": [_strat_ind(i) for i in (a.get("secondary_indicators") or [])],
             "tags": [[t.get("tag"),
