@@ -166,6 +166,8 @@ GROUP_OVERRIDES = {
     # Arrived bullpen-first, so the velo pipeline defaulted him to HS before any
     # plate data existed and that default went sticky (Frank, 2026-08-04).
     "Alex Rodriguez": "col",
+    # Bullpen-first, so the velo pipeline defaulted him to HS (Frank, 2026-08-06).
+    "Brendan Ott": "col",
     "Darren Espinal": "col",
     "Jackson Mavrides": "col",
     "Severino Napolitano": "col",
