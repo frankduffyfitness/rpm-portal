@@ -4324,6 +4324,15 @@ function ArsenalLeaderboard({ onPick }) {
 // the athlete.
 const STRAT_BUCKET_ORDER = ["S1", "S2", "S3", "S4", "S5"];
 const STRAT_CONF_COLOR = { HIGH: "#4FFFB0", MED: "#8A8F98", LOW: "#FFB020" };
+// One-line coach explanations per bucket (Frank's ask, 2026-08-06). Wording
+// mirrors the frozen taxonomy; keep neutral, no prescriptions.
+const STRAT_BUCKET_DESC = {
+  S1: "Long, deep, slow dip with weak braking. Stopping the descent is the struggle, so the turnaround never gets quick.",
+  S2: "Builds force to stop, then dumps it before the push. Force sags through the turn instead of carrying into it.",
+  S3: "Strong but slow. The force is there, it just arrives late: a long push with low velocity behind it.",
+  S4: "Absorbs well but cannot re-express. The braking side is loud while the push side lags behind it.",
+  S5: "Strength is there, elasticity is not. Low stiffness and low RSI at a normal force level.",
+};
 
 function StratChip({ label, color, title }) {
   return <span title={title} style={{ fontSize: 8, fontWeight: 800, color, background: `${color}1F`, borderRadius: 6, padding: "2px 6px", letterSpacing: 0.5, flexShrink: 0 }}>{label}</span>;
@@ -4351,16 +4360,12 @@ function StratEvidence({ rows, dim }) {
 
 function StratCard({ r }) {
   const gi = GROUPS[r.group] || {};
-  // Stale means the date leads and the bucket steps back: a hypothesis built on
-  // old plates is a reason to retest, not a reason to train.
-  const dim = r.stale;
+  // Retest banners and stale gray-out removed at Frank's request (2026-08-06):
+  // the "Last test" date on every card is the staleness signal; the LOW
+  // confidence chip still carries the caution.
+  const dim = false;
   return (
     <div style={{ padding: "11px 12px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-      {r.stale && (
-        <div style={{ fontSize: 9.5, fontWeight: 800, color: "#FFB020", letterSpacing: 0.4, marginBottom: 6 }}>
-          RETEST BEFORE ACTING (last test {r.lastTest})
-        </div>
-      )}
       <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: dim ? "#8A8F98" : "#E0E0E0" }}>{r.name}</span>
         {gi.shortLabel && <span style={{ fontSize: 9, color: gi.color || "#6B7280" }}>{gi.shortLabel}</span>}
@@ -4442,7 +4447,6 @@ function StrategySection() {
         .filter((x) => x.rows.length),
       balanced: pool.filter((r) => r.bucket === "S0"),
       outside: _STRAT.filter((r) => !r.pool),
-      retest: pool.filter((r) => r.stale),
       tagged: pool.some((r) => r.tags.length > 0),
     };
   }, []);
@@ -4462,24 +4466,26 @@ function StrategySection() {
       <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, marginBottom: 12 }}>
         How each pitcher jumps, not how high. A bucket names the most likely limiter behind his jump strategy, and the lines under his name are the evidence the engine used: the metric, his value, his percentile in the pitcher pool, and how far past the band it sits.
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
         <VmTile v={flaggedCount} l="Flagged" />
         <VmTile v={g.balanced.length} l="Balanced" />
-        <VmTile v={g.retest.length} l="Retest first" />
       </div>
       {g.flagged.map(({ bucket, label, rows }) => (
         <div key={bucket} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, marginBottom: 10, overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "12px 12px 10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "12px 12px 4px" }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: "#8A8F98" }}>{label}</span>
             <span style={{ fontSize: 10, fontWeight: 800, color: "#4A4F57" }}>{rows.length}</span>
           </div>
+          {STRAT_BUCKET_DESC[bucket] && (
+            <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, padding: "0 12px 9px" }}>{STRAT_BUCKET_DESC[bucket]}</div>
+          )}
           {rows.map((r) => <StratCard key={r.name} r={r} />)}
         </div>
       ))}
       {g.balanced.length > 0 && (
         <StratGroupList title="Balanced, no flag" rows={g.balanced}
           caption="No signature fired past the band, or the indicators contradicted each other. This is the majority bucket by design, and it is the intended outcome, not a gap in the data."
-          right={(r) => r.stale ? "retest · " + r.lastTest : r.lastTest}
+          right={(r) => r.lastTest}
           open={openLists.balanced} onToggle={() => toggle("balanced")} />
       )}
       {g.outside.length > 0 && (
