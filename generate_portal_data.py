@@ -3,7 +3,7 @@
 Generate portal data arrays from forcedecks_portal.json
 Outputs a JS snippet to paste into App.jsx, replacing the hardcoded arrays.
 """
-import json, sys, os
+import json, sys, os, re
 from datetime import datetime, timedelta
 from collections import defaultdict
 import statistics
@@ -2001,6 +2001,232 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
 
 _VM = gen_VM(fd, trackman, _DYNAMO)
 
+
+# ─── CMJ strategy buckets — staff-only board (Phase 4a) ──────────────────────
+# Source of truth: bucket_engine.py in ~/Desktop/Pitch Model/cmj_strategy, which
+# emits cmj_buckets.json (schema rpm.cmj_strategy.buckets/v1). See
+# ~/Desktop/Programs/RPM Docs/RPM_CMJ_STRATEGY_BLUEPRINT.md for the taxonomy.
+#
+# Unlike every other array here, the input JSON lives OUTSIDE this repo: buckets
+# are re-cut by hand when athletes retest, not by the 6-hourly syncs. Two
+# consequences, both deliberate:
+#   1. Missing/unreadable file -> gen_STRAT returns [] and never raises. The
+#      6-hourly cron must never die on a file that is not its business.
+#   2. When the file is absent, _STRAT is left OUT of the splice below, so the
+#      board already committed in src/App.jsx survives. The GitHub Action runs on
+#      a checkout that has no ~/Desktop, so splicing an empty array there would
+#      wipe the board every 6 hours. CI has no fresher strategy data to offer, so
+#      it says nothing rather than something false.
+# Override the path with RPM_CMJ_STRATEGY_JSON (used by tests and by anyone who
+# keeps the Pitch Model tree somewhere else).
+CMJ_STRATEGY_JSON = os.environ.get("RPM_CMJ_STRATEGY_JSON") or os.path.expanduser(
+    "~/Desktop/Pitch Model/cmj_strategy/cmj_buckets.json")
+
+# Column -> the words a coach uses. The engine's column names are metric keys;
+# the board must never make Frank translate `ci100_share` in his head. Anything
+# not listed falls back to a de-camelCased form, so a new engine indicator
+# renders readably instead of breaking the board.
+STRAT_COL_LABELS = {
+    "contractionTime_med": "time to takeoff",
+    "cmDepth_med": "countermovement depth",
+    "eccPeakVelo_med": "dip speed",
+    "eccDecelRfd_med": "braking rate",
+    "brakingForceBW_med": "braking force per BW",
+    "brakingPhaseDur_med": "braking phase length",
+    "eccBrakingImpulse_med": "braking impulse",
+    "forceAtZeroV_med": "force at the turn",
+    "fzv_ratio": "force at the turn, share of peak",
+    "ci100_share": "first 100 ms share of the push",
+    "conImpulse100_med": "first 100 ms impulse",
+    "concDuration_med": "push duration",
+    "concPeakVelo_med": "peak push velocity",
+    "concTimeToPF_med": "time to peak force",
+    "concPeakForce_bw": "push force per BW",
+    "concImpulse_perkg": "push impulse per kg",
+    "relativePower_med": "power per kg",
+    "rsiModified_med": "reactive strength (RSI-mod)",
+    "cmjStiffness_med": "jump stiffness",
+    "jumpHeight_best": "jump height",
+    "landingRfd_med": "landing rate",
+    "landingPeakForceBM_med": "landing peak force per kg",
+    "landingStiffness_med": "landing stiffness",
+    "concentricImpulseAsym_med": "push impulse asymmetry",
+    "conImpulse100Asym_med": "first 100 ms impulse asymmetry",
+    "eccBrakingImpulseAsym_med": "braking impulse asymmetry",
+    "concPeakForceAsym_med": "peak push force asymmetry",
+    "bw_delta_pct_6mo": "bodyweight change, 6 months",
+}
+
+# Training emphasis per bucket deliberately does NOT live here. That is taxonomy,
+# it belongs to the blueprint and to Frank's prescription, and a copy pasted into
+# the portal would drift the first time a bucket is retuned. The board shows the
+# engine's evidence; the coach brings the plan.
+#
+# Blueprint rule: dates beat buckets once the data is old. LOW confidence or a
+# test older than this many days and the row leads with the retest line.
+STRAT_STALE_DAYS = 90
+
+
+def _strat_label(col):
+    """`ci100_share` -> "first 100 ms share of the push"; unknown columns
+    de-camelCase to something readable rather than leaking a metric key."""
+    if col in STRAT_COL_LABELS:
+        return STRAT_COL_LABELS[col]
+    s = re.sub(r"_(med|best|bw|perkg)$", "", str(col or ""))
+    s = re.sub(r"(?<!^)(?=[A-Z])", " ", s).replace("_", " ")
+    return s.lower().strip() or str(col or "")
+
+
+def _strat_num(v):
+    """One display form for values spanning 0.33 to 6146.8, so the board reads
+    as one column of numbers instead of a float dump."""
+    if v is None:
+        return ""
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return str(v)
+    a = abs(f)
+    if a >= 100:
+        return f"{f:,.0f}"
+    if a >= 10:
+        return f"{f:.1f}"
+    if a >= 1:
+        return f"{f:.2f}"
+    return f"{f:.3f}"
+
+
+def _strat_pct(p):
+    """Percentile chip text: 2.0 -> "p2", 9.5 -> "p9.5"."""
+    if p is None:
+        return ""
+    f = float(p)
+    return "p" + (f"{f:.0f}" if abs(f - round(f)) < 0.05 else f"{f:.1f}")
+
+
+def _strat_date_label(iso):
+    """2026-03-09 -> "Mar 9, 2026" — the portal's long-date form (_TMR "df")."""
+    if not iso:
+        return ""
+    try:
+        d = datetime.strptime(str(iso)[:10], "%Y-%m-%d")
+    except ValueError:
+        return str(iso)
+    return f"{_month_abbr(str(iso)[:10])[1]} {d.day}, {d.year}"
+
+
+def _strat_ind(i):
+    """One indicator -> [label, value, percentile, depth+direction, required?].
+    Rendered as-is; React does no arithmetic on strategy numbers."""
+    depth = str(i.get("depth") or "")
+    direction = str(i.get("direction") or "")
+    return [
+        _strat_label(i.get("col")),
+        _strat_num(i.get("value")),
+        _strat_pct(i.get("pct")),
+        (depth + " " + direction).strip(),
+        1 if i.get("role") == "required" else 0,
+    ]
+
+
+def gen_STRAT(fd_data, velo_rows, athlete_rows):
+    """_STRAT: one row per athlete carried by cmj_buckets.json, ready to render.
+    [{name, group, bucket, label, secondary, secondaryLabel, conf, confBasis,
+      score, pool, note, days, lastTest, stale, extended,
+      ind: [[label, value, pct, depth, required]], ind2: [...],
+      tags: [[tag, [[label, value, pct, depth], ...]]]}]
+
+    Buckets are hypotheses about the most likely limiter, so nothing here is
+    scored, ranked or colour-coded by severity — the board shows the evidence and
+    lets the coach decide. Every displayed value is finished here: the React side
+    groups the rows and prints them, and computes nothing.
+
+    `days` is recomputed against today rather than trusting the file's anchor
+    date, so the retest rule fires on the athlete's real test age.
+    """
+    if not os.path.exists(CMJ_STRATEGY_JSON):
+        print(f"  _STRAT: no strategy file at {CMJ_STRATEGY_JSON} — skipping "
+              f"(existing board in the JSX is left alone)", flush=True)
+        return []
+    try:
+        with open(CMJ_STRATEGY_JSON) as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"  WARNING: could not read {CMJ_STRATEGY_JSON} ({e}) — _STRAT "
+              f"skipped, existing board left alone", flush=True)
+        return []
+    if not isinstance(data, dict) or not isinstance(data.get("athletes"), list):
+        print(f"  WARNING: {CMJ_STRATEGY_JSON} is not a buckets file "
+              f"(schema={data.get('schema') if isinstance(data, dict) else type(data).__name__}) "
+              f"— _STRAT skipped", flush=True)
+        return []
+
+    names = data.get("bucket_names") or {}
+    # Group chips resolve exactly like every other board's: the ForceDecks store
+    # via get_group (which honours GROUP_OVERRIDES) as the base, then the live
+    # _A/_VELO rows on top. The store is the base because a third of this file's
+    # athletes last tested months ago and have already dropped out of the live
+    # arrays — without it they would render with no group at all.
+    group_map = {}
+    for _pid, _a in (fd_data.get("athletes") or {}).items():
+        _n = _a.get("name")
+        if _n:
+            group_map[_vm_norm(_n)] = get_group(_n, _a.get("groups"))
+    for r in athlete_rows:
+        group_map[_vm_norm(r[0])] = r[2]
+    for r in velo_rows:
+        group_map[_vm_norm(r[0])] = r[2]
+
+    today = datetime.now().date()
+    out = []
+    for a in data["athletes"]:
+        raw_name = a.get("athlete")
+        if not raw_name or is_excluded(raw_name):
+            continue
+        name = _vm_norm(raw_name)
+        cur = a.get("currency") or {}
+        iso = cur.get("latest_test")
+        days = cur.get("days")
+        if iso:
+            try:
+                days = (today - datetime.strptime(str(iso)[:10], "%Y-%m-%d").date()).days
+            except ValueError:
+                pass
+        conf = a.get("confidence")
+        bucket = a.get("primary")
+        row = {
+            "name": name,
+            "group": group_map.get(name, ""),
+            "bucket": bucket,
+            "label": names.get(bucket, "") if bucket else "",
+            "secondary": a.get("secondary"),
+            "secondaryLabel": names.get(a.get("secondary"), "") if a.get("secondary") else "",
+            "conf": conf,
+            "confBasis": a.get("confidence_basis") or "",
+            "score": a.get("score"),
+            "pool": bool(a.get("in_pool")),
+            "note": a.get("note") or "",
+            "days": days,
+            "lastTest": _strat_date_label(iso),
+            # Blueprint: LOW confidence or a stale test means dates lead and the
+            # bucket steps back. Decided here so React never owns the threshold.
+            "stale": bool(conf == "LOW" or (days is not None and days > STRAT_STALE_DAYS)),
+            "extended": bool(cur.get("extended")),
+            "ind": [_strat_ind(i) for i in (a.get("indicators") or [])],
+            "ind2": [_strat_ind(i) for i in (a.get("secondary_indicators") or [])],
+            "tags": [[t.get("tag"),
+                      [[_strat_label(e.get("col")), _strat_num(e.get("value")),
+                        _strat_pct(e.get("pct")), str(e.get("depth") or "")]
+                       for e in (t.get("evidence") or [])]]
+                     for t in (a.get("tags") or [])],
+        }
+        out.append(row)
+    out.sort(key=lambda x: (x["name"].split()[-1] if x["name"] else "", x["name"]))
+    return out
+
+
+_STRAT = gen_STRAT(fd, _VELO, _A)
+
 # Female-athlete name list for the UI (exact data-spelling strings, so
 # FEM_SET.has(a.name) matches even quirks like "Francesca  Albergo").
 _FEM = sorted({ath['name'] for ath in athletes_data if is_female(ath['name'])} |
@@ -2157,6 +2383,9 @@ print(f"  _TMR: {len(_TMR)} pitchers with bullpen reports "
       f"({sum(len(v) for v in _TMR.values())} sessions)", flush=True)
 print(f"  _DYNAMO: {len(_DYNAMO)} athletes with DynaMo tests", flush=True)
 print(f"  _VM:  {len(_VM['rows'])} velo-model rows", flush=True)
+print(f"  _STRAT: {len(_STRAT)} CMJ-strategy rows "
+      f"({sum(1 for r in _STRAT if r['bucket'] and r['bucket'] != 'S0')} flagged, "
+      f"{sum(1 for r in _STRAT if r['stale'])} needing retest)", flush=True)
 print(f"  _FEM: {len(_FEM)} female athletes labeled", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
@@ -2194,6 +2423,11 @@ output_lines.append(f"const _VM = {json.dumps(_VM, separators=(',', ':'))};")
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 output_lines.append(f"const _CONS = {json.dumps(_CONS, separators=(',', ':'))};")
 output_lines.append(f"const _FH = {json.dumps(_FH, separators=(',', ':'))};")
+# Only when this run actually had strategy data: a printed `const _STRAT = [];`
+# in the reference dump would read as "no buckets exist" on a machine that simply
+# does not carry the Pitch Model tree.
+if _STRAT:
+    output_lines.append(f"const _STRAT = {json.dumps(_STRAT, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -2222,6 +2456,12 @@ replacements.update({'_VM': _VM})
 replacements.update({'_FEM': _FEM})
 replacements.update({'_CONS': _CONS})
 replacements.update({'_FH': _FH})
+# _STRAT joins the splice ONLY when this run read a real buckets file. Its source
+# lives outside the repo (see gen_STRAT), so the 6-hourly GitHub Action has no
+# strategy data at all — splicing [] there would delete the committed board on
+# every run. No data means no opinion, so the JSX keeps what it has.
+if _STRAT:
+    replacements.update({'_STRAT': _STRAT})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
