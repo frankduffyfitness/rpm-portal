@@ -3427,12 +3427,11 @@ function DynamoTrending({ onSelect }) {
 
 // ─── Velo Model (staff dashboard section) ────────────────────────────────────
 // Cross-sectional velocity model: predicted vs actual peak FB, residual flags,
-// and a what-if card. Rankings use Model A residuals only; Model B (adds the
-// arm) appears as detail on the athlete card, never mixed into a ranked list.
+// and a what-if card. Model A only — see the Model B note below.
 const VM_ROWS = _VM.rows.map(r => ({
   name: r[0], group: r[1], ci: r[2], rsi: r[3], erRfd: r[4], velo: r[5],
   sessions: r[6], lastVelo: r[7], predA: r[8], residA: r[9],
-  predB: r[10], residB: r[11], thin: !!r[12], bw: r[13],
+  thin: !!r[12], bw: r[13],
   // Current form (last 6 weeks): scoring inputs windowed, coefficients all-time.
   velo6: r[14], sess6: r[15], ci6: r[16], rsi6: r[17],
   pred6: r[18], resid6: r[19], cur: r[20] === "current", lastCmj: r[21],
@@ -3508,7 +3507,13 @@ const VM_RANGE = (() => {
   return { ci: rng("ci"), rsi: rng("rsi"), erRfd: rng("erRfd") };
 })();
 const vmPredA = (ci, rsi) => _VM.a ? _VM.a[0] + _VM.a[1] * ci + _VM.a[2] * rsi : 0;
-const vmPredB = (ci, rsi, er) => _VM.b && er > 0 ? _VM.b[0] + _VM.b[1] * ci + _VM.b[2] * rsi + _VM.b[3] * Math.log(er) : null;
+// Model B (adds shoulder ER RFD) was REMOVED from the UI 2026-08-07 (Frank).
+// It measured WORSE than Model A on every sample tested — n=45 by its own
+// inputs, n=37 and n=40 head-to-head — so showing it as a refinement was
+// misleading, most visibly on Zach Uysal. The coefficients still ride in
+// _VM.b and the generator still emits predB/residB, so this is a UI removal
+// and nothing else: restoring it is re-adding the helper. Model A only until
+// grip clears its pre-registered verdict.
 const vmBandColor = (r) => r > VM_BAND ? "#FF6B6B" : r < -VM_BAND ? "#60A5FA" : "#6B7280";
 const vmBandLabel = (r) => r > VM_BAND ? "Over the model" : r < -VM_BAND ? "Under the model" : "On model";
 
@@ -3749,15 +3754,14 @@ function VmAthleteCard({ r, onBack }) {
   const ci = Math.min(Math.max(ciBase + bwAdj, ciB[0]), ciB[1]);
   const setCi = (v) => setCiBase(v - bwAdj);
   const [rsi, setRsi] = useState(rsi0);
-  const [er, setEr] = useState(r.erRfd || 0);
-  const hasB = r.erRfd != null;
+
   const gi = GROUPS[r.group] || {};
 
-  const curPred = hasB ? vmPredB(ci0, rsi0, r.erRfd) : vmPredA(ci0, rsi0);
-  const livePred = hasB ? vmPredB(ci, rsi, er) : vmPredA(ci, rsi);
+  const curPred = vmPredA(ci0, rsi0);
+  const livePred = vmPredA(ci, rsi);
   const delta = Math.round(livePred - curPred);
   const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
-    (hasB && (er < VM_RANGE.erRfd[0] || er > VM_RANGE.erRfd[1]));
+    false;
   const changed = [];
   const bwMoved = hasBw && Math.abs(bw - r.bw) >= 1;
   if (bwMoved) changed.push(`${Math.round(bw)} lbs`);
@@ -3765,7 +3769,6 @@ function VmAthleteCard({ r, onBack }) {
   // let the visibly dragged CI slider tell the impulse half of the chain.
   if (Math.abs(ci - ci0) >= 1 && !(bwMoved && Math.abs(ciBase - ci0) < 1)) changed.push(`${Math.round(ci)} N·s`);
   if (Math.abs(rsi - rsi0) >= 0.01) changed.push(rsi.toFixed(2));
-  if (hasB && Math.abs(er - r.erRfd) >= 1) changed.push(`${Math.round(er)} lbs/s`);
   const deltaLine = changed.length === 0 ? null :
     `At ${changed.length === 1 ? changed[0] : "these inputs"} the model predicts ${delta > 0 ? "+" : ""}${delta} mph vs his current prediction.`;
 
@@ -3800,11 +3803,6 @@ function VmAthleteCard({ r, onBack }) {
         {cur && (
           <div style={{ fontSize: 10, color: "#6B7280", marginTop: 8, textAlign: "center" }}>All-time peak {r.velo.toFixed(1)} mph, last session {r.lastVelo}.</div>
         )}
-        {hasB && (
-          <div style={{ fontSize: 10.5, color: "#8A8F98", marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.05)", lineHeight: 1.5 }}>
-            With the arm test (Model B, adds ER RFD): predicts <b style={{ color: "#E0E0E0" }}>{Math.round(r.predB)} {"±"} {Math.round(VM_BAND)}</b>, residual <b style={{ color: vmBandColor(r.residB) }}>{r.residB > 0 ? "+" : ""}{r.residB.toFixed(1)}</b>. Rankings use Model A so every pitcher is scored on the same scale.
-          </div>
-        )}
         {!cur && (
           <div style={{ fontSize: 10.5, color: "#FFB020", marginTop: 10, lineHeight: 1.5 }}>
             No current-form score: {r.sess6 > 0 ? `only ${r.sess6} Trackman session${r.sess6 === 1 ? "" : "s"} in the last 6 weeks` : `no Trackman since ${r.lastVelo}`}{r.ci6 == null ? ", and no CMJ in the window" : ""}. Numbers above are all-time; the score returns with 3 recent sessions and a recent CMJ.
@@ -3829,10 +3827,9 @@ function VmAthleteCard({ r, onBack }) {
 
       <div style={card}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>What if</div>
-        <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14 }}>Slide the testing inputs and watch the {hasB ? "Model B" : "Model A"} prediction. {cur ? "Sliders start from his current 6-week testing." : "Sliders start from his all-time bests."}</div>
+        <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14 }}>Slide the testing inputs and watch the Model A prediction. {cur ? "Sliders start from his current 6-week testing." : "Sliders start from his all-time bests."}</div>
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={setCi} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={setRsi} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
-        {hasB && <VmSlider label="ER RFD" unit="lbs/s" value={er} onChange={setEr} min={erB[0]} max={erB[1]} fit={VM_RANGE.erRfd} step={1} dec={0} />}
         {hasBw && (
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
@@ -3847,7 +3844,7 @@ function VmAthleteCard({ r, onBack }) {
           {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
           {deltaLine && <div style={{ fontSize: 11, color: "#B8BDC4", marginTop: 6 }}>{deltaLine}</div>}
         </div>
-        <button onClick={() => { setCiBase(ci0); if (hasBw) setBw(r.bw); setRsi(rsi0); if (hasB) setEr(r.erRfd); }} style={{ marginTop: 10, width: "100%", padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, background: "none", color: "#6B7280", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Reset to his current testing</button>
+        <button onClick={() => { setCiBase(ci0); if (hasBw) setBw(r.bw); setRsi(rsi0); }} style={{ marginTop: 10, width: "100%", padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, background: "none", color: "#6B7280", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Reset to his current testing</button>
         <div style={{ fontSize: 9.5, color: "#4A4F57", lineHeight: 1.55, marginTop: 12 }}>
           The model is cross-sectional: it says what athletes who test at a number typically throw, not a guarantee that training the input adds the output. Month-over-month data within the same athlete currently shows about half the cross-sectional slope.
         </div>
@@ -3876,7 +3873,6 @@ function VmSandboxCard() {
   // The pinned baseline: what the delta line and the bodyweight coupling are
   // measured against. Starts at roster medians.
   const [pin, setPin] = useState(d0);
-  const [useB, setUseB] = useState(false);
   const [bw, setBw] = useState(d0.bw);
   const [ciBase, setCiBase] = useState(d0.ci);
   const bwAdj = VM_CI_PER_LB * (bw - pin.bw);
@@ -3885,13 +3881,13 @@ function VmSandboxCard() {
   const [rsi, setRsi] = useState(d0.rsi);
   const [er, setEr] = useState(d0.er);
 
-  const livePred = useB ? vmPredB(ci, rsi, er) : vmPredA(ci, rsi);
-  const pinPred = useB ? vmPredB(pin.ci, pin.rsi, pin.er) : vmPredA(pin.ci, pin.rsi);
+  const livePred = vmPredA(ci, rsi);
+  const pinPred = vmPredA(pin.ci, pin.rsi);
   const delta = Math.round(livePred - pinPred);
   const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
-    (useB && (er < VM_RANGE.erRfd[0] || er > VM_RANGE.erRfd[1]));
+    false;
   const pinned = Math.abs(ci - pin.ci) < 1 && Math.abs(rsi - pin.rsi) < 0.01 &&
-    Math.abs(bw - pin.bw) < 1 && (!useB || Math.abs(er - pin.er) < 1);
+    Math.abs(bw - pin.bw) < 1;
   const card = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 16px", marginBottom: 12 };
 
   return (
@@ -3903,10 +3899,6 @@ function VmSandboxCard() {
         </div>
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={setCi} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={setRsi} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
-        <button onClick={() => setUseB(v => !v)} style={{ marginBottom: 12, padding: "6px 10px", border: "1px solid " + (useB ? "#4FFFB0" : "rgba(255,255,255,0.08)"), borderRadius: 8, background: useB ? "rgba(79,255,176,0.12)" : "none", color: useB ? "#4FFFB0" : "#6B7280", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>
-          {useB ? "Using Model B (arm test included)" : "Add arm test (Model B)"}
-        </button>
-        {useB && <VmSlider label="ER RFD" unit="lbs/s" value={er} onChange={setEr} min={erB[0]} max={erB[1]} fit={VM_RANGE.erRfd} step={1} dec={0} />}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 4 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
           <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility&rsquo;s measured rate. It never moves RSI.</div>
