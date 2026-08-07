@@ -84,6 +84,8 @@ VELO_MANUAL_EXCLUSIONS = {}
 VELO_BULLPEN_LABELS = {
     ("Ben Wallace", "2026-07-16"): "Low Effort",
     ("Christian Peralta", "2026-08-07"): "Live AB",   # Frank, 2026-08-07
+    ("Ben Wallace", "2026-08-07"): "Live AB",         # Frank, 2026-08-07
+    ("Mason Morello", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
 }
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
