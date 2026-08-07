@@ -76,8 +76,14 @@ VELO_MANUAL_EXCLUSIONS = {}
 # bullpen imports as a max-effort "Bullpen"). (athlete, YYYY-MM-DD) -> label; a
 # label in VELO_SUBMAX_TYPES (e.g. "Low Effort") also marks it submax so it drops
 # out of best/avg/trend but still shows in history.
+# LIVE ABs: TrackMan stamps every session "Pitching practice" — it cannot tell a
+# bullpen from live at-bats, so the distinction is recorded here by hand. "Live
+# AB" is deliberately NOT in VELO_SUBMAX_TYPES: facing hitters is max effort, so
+# it still counts toward peak/average velo. It only changes what the session is
+# CALLED, on both the velo card and the Bullpen Breakdown.
 VELO_BULLPEN_LABELS = {
     ("Ben Wallace", "2026-07-16"): "Low Effort",
+    ("Christian Peralta", "2026-08-07"): "Live AB",   # Frank, 2026-08-07
 }
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
@@ -1666,7 +1672,8 @@ def gen_TMR(velo_rows):
                      p["ivb"], p["hb"], p["relH"], p["relSide"]]
                     for p in s["pitches"]]
             entry = {"d": f"{mon} {d.day}", "df": f"{mon} {d.day}, {d.year}",
-                     "st": s["sessionType"], "tot": s["total"],
+                     "st": VELO_BULLPEN_LABELS.get((name, s["date"]), s["sessionType"]),
+                     "tot": s["total"],
                      "types": types_arr, "dots": dots}
             note = TMR_SESSION_NOTES.get((name, s["date"]))
             if note:
