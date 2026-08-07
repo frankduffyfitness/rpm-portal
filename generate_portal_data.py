@@ -86,6 +86,7 @@ VELO_BULLPEN_LABELS = {
     ("Christian Peralta", "2026-08-07"): "Live AB",   # Frank, 2026-08-07
     ("Ben Wallace", "2026-08-07"): "Live AB",         # Frank, 2026-08-07
     ("Mason Morello", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
+    ("Eli Delgado", "2026-08-07"): "Live AB",         # Frank, 2026-08-07
 }
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
