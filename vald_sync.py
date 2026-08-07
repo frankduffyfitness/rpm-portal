@@ -76,7 +76,17 @@ PORTAL_METRICS = {
     6553660: {"key": "ftCtRatio",         "label": "Flight Time:Contraction Time", "unit": "", "scale": 1, "trialOnly": True},
     6553634: {"key": "concPeakVelo",      "label": "Concentric Peak Velocity", "unit": "m/s", "scale": 1, "trialOnly": True},
     6553701: {"key": "eccPeakVelo",       "label": "Eccentric Peak Velocity", "unit": "m/s", "scale": 1, "trialOnly": True},
-    6553713: {"key": "forceAtZeroV",      "label": "Force at Zero Velocity", "unit": "N", "scale": 1, "trialOnly": True},
+    # trialOnly REMOVED 2026-08-07: the L/R split is the transition-leak signal
+    # the CMJ-strategy S2 bucket was approximating. Verified stable within
+    # athlete (session-to-session sd 1-3% vs a -26..+24% between-athlete range).
+    6553713: {"key": "forceAtZeroV",      "label": "Force at Zero Velocity", "unit": "N", "scale": 1},
+    # ── 2026-08-07 CMJ-strategy widening. The trials endpoint carries 273
+    # result definitions per rep; we pin only what has a stated use. P1/P2 are
+    # the bimodality (stalled second push) the 44-metric set could not see.
+    6553676: {"key": "p1ConcImpulse",     "label": "P1 Concentric Impulse", "unit": "N·s", "scale": 1},
+    6553677: {"key": "p2ConcImpulse",     "label": "P2 Concentric Impulse", "unit": "N·s", "scale": 1},
+    6553725: {"key": "p2p1ImpulseRatio",  "label": "P2:P1 Concentric Impulse", "unit": "", "scale": 1, "trialOnly": True},
+    6553726: {"key": "ci100Ratio",        "label": "Conc Impulse-100ms:Conc Impulse", "unit": "", "scale": 1, "trialOnly": True},
     6553673: {"key": "forceAtPeakPower",  "label": "Force at Peak Power", "unit": "N", "scale": 1, "trialOnly": True},
     6553718: {"key": "cmjStiffness",      "label": "CMJ Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
     6553709: {"key": "activeStiffness",   "label": "Active Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
@@ -653,7 +663,8 @@ def process_trial(trial, test_type=""):
             metrics["hopSetMeanPeakForce"] = round(_mean(perhop["pf"]), 2)   # N (L+R)
 
     # Calculate asymmetry percentages for L/R metrics
-    for base_key in ["concentricImpulse", "eccBrakingImpulse", "concPeakForce"]:
+    for base_key in ["concentricImpulse", "eccBrakingImpulse", "concPeakForce",
+                     "forceAtZeroV", "p1ConcImpulse", "p2ConcImpulse"]:
         left = metrics.get(f"{base_key}Left")
         right = metrics.get(f"{base_key}Right")
         if left is not None and right is not None and (left + right) > 0:
