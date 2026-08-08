@@ -107,8 +107,16 @@ def main():
         sys.exit(f"'{a.athlete}' is not on the arsenal board. Graded athletes:\n  "
                  + ", ".join(sorted(ARS["athletes"])[:12]) + " ...")
     ath = ARS["athletes"][name]
-    types = [t for t in ath["types"] if t[0] != "Other" and t[2]]
+    # Show a pitch on COUNT, never on usage %. A percentage scales with how much
+    # the athlete throws, so it fails both ways: it cuts Axel Campos' 22-pitch
+    # slider (8% of 263) while keeping Pete Hansen's 2-pitch changeup (11% of
+    # 18). Across the board a 10% rule would keep 118 two-pitch rows. 15 is the
+    # grader's own bar for a per-pitch claim (MIN_BEST_PITCH); 10-14 shows but
+    # carries the provisional dagger the arsenal board already uses.
+    MIN_SHOW, MIN_SOLID_TYPE = 10, 15
+    types = [t for t in ath["types"] if t[0] != "Other" and t[2] and t[1] >= MIN_SHOW]
     types.sort(key=lambda t: -(t[2] or 0))
+    hidden = [t for t in ath["types"] if t[0] != "Other" and t[2] and t[1] < MIN_SHOW]
     sessions = TMR.get(name, [])
     v = next((x for x in VELO if x[0] == name), None)
 
@@ -123,7 +131,17 @@ def main():
 
     # ---- panel 1: movement profile (IVB vs HB) ----
     W = H = 200
-    mv = [(i, x, y) for i, y, x, _, _ in dots if x is not None and y is not None]
+    mv_all = [(i, x, y) for i, y, x, _, _ in dots if x is not None and y is not None]
+    mv, mv_dropped = mv_all, 0
+    if len(mv_all) >= 8:
+        import statistics as _st
+        mx = _st.median([p[1] for p in mv_all]); my = _st.median([p[2] for p in mv_all])
+        dx = _st.median([abs(p[1] - mx) for p in mv_all]) or 0.01
+        dy = _st.median([abs(p[2] - my) for p in mv_all]) or 0.01
+        k = [p for p in mv_all
+             if abs(p[1] - mx) <= 4.0 * 1.4826 * dx and abs(p[2] - my) <= 4.0 * 1.4826 * dy]
+        if len(k) >= 0.8 * len(mv_all):
+            mv_dropped = len(mv_all) - len(k); mv = k
     lim = max([20] + [abs(z) for _, x, y in mv for z in (x, y)])
     lim = min(26, lim * 1.12)
     def MX(x): return 30 + (x + lim) / (2 * lim) * (W - 38)
@@ -140,7 +158,20 @@ def main():
         mvsvg.append(f'<text x="{xx:.0f}" y="{yy:.0f}" text-anchor="{anc}" font-size="7" fill="{FAINT}">{lab}</text>')
 
     # ---- panel 2: release point ----
-    rp = [(i, s, h) for i, _, _, h, s in dots if h is not None and s is not None]
+    # Strays in the release cloud are mis-tracked pitches, not release points.
+    # Same robust median+MAD test the portal uses for force-plate misreads —
+    # mean/SD is defeated by two or more outliers, which is exactly this shape.
+    rp_all = [(i, s, h) for i, _, _, h, s in dots if h is not None and s is not None]
+    rp, rp_dropped = rp_all, 0
+    if len(rp_all) >= 8:
+        import statistics as _st
+        ms = _st.median([p[1] for p in rp_all]); mh = _st.median([p[2] for p in rp_all])
+        ds = _st.median([abs(p[1] - ms) for p in rp_all]) or 0.01
+        dh = _st.median([abs(p[2] - mh) for p in rp_all]) or 0.01
+        keep = [p for p in rp_all
+                if abs(p[1] - ms) <= 3.5 * 1.4826 * ds and abs(p[2] - mh) <= 3.5 * 1.4826 * dh]
+        if len(keep) >= 0.8 * len(rp_all):      # never let the filter eat the cloud
+            rp_dropped = len(rp_all) - len(keep); rp = keep
     rsvg = []
     if rp:
         xs = [p[1] for p in rp]; ys = [p[2] for p in rp]
@@ -170,7 +201,7 @@ def main():
         yy += 20
 
     rows = "".join(
-        f'<tr><td class="pt"><span class="dot" style="background:{PC.get(t[0],"#6B7280")}"></span>{t[0]}</td>'
+        f'<tr><td class="pt"><span class="dot" style="background:{PC.get(t[0],"#6B7280")}"></span>{t[0]}{"&#8202;&dagger;" if t[1] < MIN_SOLID_TYPE else ""}</td>'
         f'<td>{t[1]}</td><td>{num(t[2],0,"%")}</td><td class="hi">{num(t[3],1)}</td><td>{num(t[4],1)}</td><td>{num(t[7])}</td>'
         f'<td>{num(t[5],1)}</td><td>{num(t[6],1)}</td>'
         f'<td>{t[8] or "&ndash;"}</td><td>{num(t[10],1)}</td><td>{num(t[9],0,"%")}</td>'
@@ -213,6 +244,13 @@ def main():
     statboxes = "".join(
         f'<div class="sb"><div class="sbv" style="color:{c or "#fff"}">{v}</div><div class="sbl">{l}</div></div>'
         for l, v, c in stats)
+    nb = [f"Pitch types under {MIN_SHOW} tracked pitches are not shown"
+          + (f" ({', '.join(t[0].lower() for t in hidden)})" if hidden else "") + "."]
+    if any(t[1] < MIN_SOLID_TYPE for t in types):
+        nb.append("&dagger; fewer than 15 pitches &mdash; provisional.")
+    if rp_dropped or mv_dropped:
+        nb.append(f"{rp_dropped + mv_dropped} mis-tracked pitch{'' if rp_dropped+mv_dropped==1 else 'es'} excluded from the plots.")
+    notes = " ".join(nb)
     peak = f"{v[4]} mph" if v and len(v) > 4 else "&ndash;"
     pens = len(sessions)
     lvl = GROUP.get(ath["lvl"], ath["lvl"])
@@ -271,7 +309,7 @@ td.hi{{font-weight:800}}
   </table>
   {trend}
   <div class="foot">
-    <div class="fl"><b style="color:#DCE6F5">Shape+, Strike+ and Overall: 100 = the RPM {lvl} average.</b> 10 points = one standard deviation, so 120 is roughly the top 2% of that group.<br>Velo, spin and movement are session averages; MAX is the hardest pitch of that type. Grades update with every tracked bullpen.</div>
+    <div class="fl"><b style="color:#DCE6F5">Shape+, Strike+ and Overall: 100 = the RPM {lvl} average.</b> 10 points = one standard deviation, so 120 is roughly the top 2% of that group.<br>Velo, spin and movement are session averages; MAX is the hardest pitch of that type. {notes}</div>
     <div class="fr">RPM Strength &middot; Queens, NY<br>Generated {updated}</div>
   </div>
 </div></body></html>"""
