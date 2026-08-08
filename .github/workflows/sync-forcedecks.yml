@@ -75,6 +75,16 @@ jobs:
           set -o pipefail
           python vald_sync.py $ARGS 2>&1 | tee sync_run.log
 
+      # Reads the store the sync just wrote and refreshes watch.json +
+      # watch_state.json for the splice below. continue-on-error is the whole
+      # point of putting it here: the Watch is a nice-to-have panel and must
+      # never be able to cost a 6-hourly data sync. If this step fails,
+      # gen_WATCH finds the previous committed watch.json (or nothing) and
+      # leaves the panel already in App.jsx exactly as it is.
+      - name: Run CMJ Session Watch
+        continue-on-error: true
+        run: python session_watch.py
+
       - name: Generate portal data
         run: |
           # Target src/App.jsx explicitly: a STALE root App.jsx also exists, and
@@ -117,10 +127,15 @@ jobs:
           # JSONs, so regenerating after reset gives a conflict-free result.
           mkdir -p /tmp/synced
           cp forcedecks_portal.json vald_sync_state.json /tmp/synced/
+          # The watch outputs are this run's work too, so they have to survive
+          # the reset below like the store does. Best-effort: the watch step is
+          # continue-on-error, so these two may legitimately not exist.
+          cp watch.json watch_state.json /tmp/synced/ 2>/dev/null || true
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
             cp /tmp/synced/forcedecks_portal.json /tmp/synced/vald_sync_state.json .
+            cp /tmp/synced/watch.json /tmp/synced/watch_state.json . 2>/dev/null || true
             python generate_portal_data.py forcedecks_portal.json src/App.jsx trackman_portal.json
             if [ -f App_updated.jsx ]; then mv App_updated.jsx src/App.jsx; fi
             git add -A
