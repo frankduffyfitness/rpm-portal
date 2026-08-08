@@ -1,0 +1,905 @@
+{
+  "meta": {
+    "anchor": "2026-08-07",
+    "cleared_n": 0,
+    "confirmed_n": 0,
+    "flagged_metric_n": 35,
+    "flagged_n": 20,
+    "followup_n": 0,
+    "state_version": 1,
+    "universe_n": 133
+  },
+  "rows": [
+    {
+      "athlete": "Christian Peralta",
+      "days_since": 0,
+      "metrics": [
+        {
+          "B": 506.0,
+          "Bdisp": "506",
+          "C": 618.0,
+          "Cdisp": "618",
+          "baseline_sessions": [
+            "2026-07-16",
+            "2026-08-04"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 7.62,
+          "s": 14.7045,
+          "sdDisp": "7.6",
+          "unit": "ms"
+        },
+        {
+          "B": 0.83,
+          "Bdisp": "0.830",
+          "C": 0.595,
+          "Cdisp": "0.595",
+          "baseline_sessions": [
+            "2026-07-16",
+            "2026-08-04"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 6.58,
+          "s": 0.0357,
+          "sdDisp": "6.6",
+          "unit": ""
+        },
+        {
+          "B": 2582.6,
+          "Bdisp": "2,583",
+          "C": 2108.59,
+          "Cdisp": "2,109",
+          "baseline_sessions": [
+            "2026-07-16",
+            "2026-08-04"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 5.57,
+          "s": 85.0796,
+          "sdDisp": "5.6",
+          "unit": "N"
+        },
+        {
+          "B": 0.8925,
+          "Bdisp": "0.893",
+          "C": 0.755,
+          "Cdisp": "0.755",
+          "baseline_sessions": [
+            "2026-07-16",
+            "2026-08-04"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "rsiModified",
+          "label": "reactive strength (RSI-mod)",
+          "magnitude_in_sd": 2.87,
+          "s": 0.048,
+          "sdDisp": "2.9",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-08-06",
+        "2026-08-07"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 7.62
+    },
+    {
+      "athlete": "Gustav Krueger",
+      "days_since": 15,
+      "metrics": [
+        {
+          "B": 0.5025,
+          "Bdisp": "0.502",
+          "C": 0.4125,
+          "Cdisp": "0.412",
+          "baseline_sessions": [
+            "2026-05-22",
+            "2026-07-09"
+          ],
+          "direction": -1,
+          "floor_used": true,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 7.18,
+          "s": 0.0125,
+          "sdDisp": "7.2",
+          "unit": ""
+        },
+        {
+          "B": 2279.315,
+          "Bdisp": "2,279",
+          "C": 2027.55,
+          "Cdisp": "2,028",
+          "baseline_sessions": [
+            "2026-05-22",
+            "2026-07-09"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 3.48,
+          "s": 72.2749,
+          "sdDisp": "3.5",
+          "unit": "N"
+        },
+        {
+          "B": 684.5,
+          "Bdisp": "684",
+          "C": 749.5,
+          "Cdisp": "750",
+          "baseline_sessions": [
+            "2026-05-22",
+            "2026-07-09"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 3.31,
+          "s": 19.62,
+          "sdDisp": "3.3",
+          "unit": "ms"
+        },
+        {
+          "B": 0.6325,
+          "Bdisp": "0.633",
+          "C": 0.5575,
+          "Cdisp": "0.557",
+          "baseline_sessions": [
+            "2026-05-22",
+            "2026-07-09"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "rsiModified",
+          "label": "reactive strength (RSI-mod)",
+          "magnitude_in_sd": 2.31,
+          "s": 0.0324,
+          "sdDisp": "2.3",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-17",
+        "2026-07-23"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 7.18
+    },
+    {
+      "athlete": "Cooper Goodman",
+      "days_since": 24,
+      "metrics": [
+        {
+          "B": 626.21,
+          "Bdisp": "626",
+          "C": 556.785,
+          "Cdisp": "557",
+          "baseline_sessions": [
+            "2026-05-12",
+            "2026-06-30"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 3.89,
+          "s": 17.8415,
+          "sdDisp": "3.9",
+          "unit": "N"
+        },
+        {
+          "B": 0.695,
+          "Bdisp": "0.695",
+          "C": 0.5525,
+          "Cdisp": "0.552",
+          "baseline_sessions": [
+            "2026-05-12",
+            "2026-06-30"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.7,
+          "s": 0.0528,
+          "sdDisp": "2.7",
+          "unit": ""
+        },
+        {
+          "B": 0.275,
+          "Bdisp": "0.275",
+          "C": 0.2325,
+          "Cdisp": "0.232",
+          "baseline_sessions": [
+            "2026-05-12",
+            "2026-06-30"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "rsiModified",
+          "label": "reactive strength (RSI-mod)",
+          "magnitude_in_sd": 2.19,
+          "s": 0.0194,
+          "sdDisp": "2.2",
+          "unit": ""
+        },
+        {
+          "B": 605.0,
+          "Bdisp": "605",
+          "C": 658.0,
+          "Cdisp": "658",
+          "baseline_sessions": [
+            "2026-05-12",
+            "2026-06-30"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.11,
+          "s": 25.1263,
+          "sdDisp": "2.1",
+          "unit": "ms"
+        }
+      ],
+      "sessions": [
+        "2026-07-06",
+        "2026-07-14"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 3.89
+    },
+    {
+      "athlete": "Aaron Yorker",
+      "days_since": 7,
+      "metrics": [
+        {
+          "B": 764.0,
+          "Bdisp": "764",
+          "C": 905.0,
+          "Cdisp": "905",
+          "baseline_sessions": [
+            "2026-07-10",
+            "2026-07-28"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 3.53,
+          "s": 39.9334,
+          "sdDisp": "3.5",
+          "unit": "ms"
+        },
+        {
+          "B": 0.47,
+          "Bdisp": "0.470",
+          "C": 0.4,
+          "Cdisp": "0.400",
+          "baseline_sessions": [
+            "2026-07-10",
+            "2026-07-28"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "rsiModified",
+          "label": "reactive strength (RSI-mod)",
+          "magnitude_in_sd": 3.38,
+          "s": 0.0207,
+          "sdDisp": "3.4",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-29",
+        "2026-07-31"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 3.53
+    },
+    {
+      "athlete": "Emiliano Avila",
+      "days_since": 22,
+      "metrics": [
+        {
+          "B": 1870.96,
+          "Bdisp": "1,871",
+          "C": 1693.705,
+          "Cdisp": "1,694",
+          "baseline_sessions": [
+            "2026-06-08",
+            "2026-07-09"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 3.02,
+          "s": 58.7002,
+          "sdDisp": "3.0",
+          "unit": "N"
+        },
+        {
+          "B": 0.435,
+          "Bdisp": "0.435",
+          "C": 0.375,
+          "Cdisp": "0.375",
+          "baseline_sessions": [
+            "2026-06-08",
+            "2026-07-09"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.52,
+          "s": 0.0238,
+          "sdDisp": "2.5",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-15",
+        "2026-07-16"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 3.02
+    },
+    {
+      "athlete": "Samantha Hartwig",
+      "days_since": 3,
+      "metrics": [
+        {
+          "B": 597.5,
+          "Bdisp": "598",
+          "C": 681.0,
+          "Cdisp": "681",
+          "baseline_sessions": [
+            "2026-03-19",
+            "2026-07-23"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.92,
+          "s": 28.6434,
+          "sdDisp": "2.9",
+          "unit": "ms"
+        },
+        {
+          "B": 0.4125,
+          "Bdisp": "0.412",
+          "C": 0.35,
+          "Cdisp": "0.350",
+          "baseline_sessions": [
+            "2026-03-19",
+            "2026-07-23"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "rsiModified",
+          "label": "reactive strength (RSI-mod)",
+          "magnitude_in_sd": 2.63,
+          "s": 0.0237,
+          "sdDisp": "2.6",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-29",
+        "2026-08-04"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.92
+    },
+    {
+      "athlete": "Scarlett Molina",
+      "days_since": 15,
+      "metrics": [
+        {
+          "B": 0.33,
+          "Bdisp": "0.330",
+          "C": 0.195,
+          "Cdisp": "0.195",
+          "baseline_sessions": [
+            "2026-06-09",
+            "2026-07-10"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.7,
+          "s": 0.0499,
+          "sdDisp": "2.7",
+          "unit": ""
+        },
+        {
+          "B": 0.3,
+          "Bdisp": "0.300",
+          "C": 0.24,
+          "Cdisp": "0.240",
+          "baseline_sessions": [
+            "2026-06-09",
+            "2026-07-10"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "rsiModified",
+          "label": "reactive strength (RSI-mod)",
+          "magnitude_in_sd": 2.39,
+          "s": 0.0251,
+          "sdDisp": "2.4",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-22",
+        "2026-07-23"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.7
+    },
+    {
+      "athlete": "Mason Morello",
+      "days_since": 0,
+      "metrics": [
+        {
+          "B": 0.51,
+          "Bdisp": "0.510",
+          "C": 0.4725,
+          "Cdisp": "0.473",
+          "baseline_sessions": [
+            "2026-07-17",
+            "2026-07-31"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.62,
+          "s": 0.0143,
+          "sdDisp": "2.6",
+          "unit": ""
+        },
+        {
+          "B": 733.0,
+          "Bdisp": "733",
+          "C": 793.5,
+          "Cdisp": "794",
+          "baseline_sessions": [
+            "2026-07-17",
+            "2026-07-31"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.03,
+          "s": 29.8613,
+          "sdDisp": "2.0",
+          "unit": "ms"
+        }
+      ],
+      "sessions": [
+        "2026-08-04",
+        "2026-08-07"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.62
+    },
+    {
+      "athlete": "Jay Delgadillo",
+      "days_since": 3,
+      "metrics": [
+        {
+          "B": 2151.09,
+          "Bdisp": "2,151",
+          "C": 1996.635,
+          "Cdisp": "1,997",
+          "baseline_sessions": [
+            "2026-07-21",
+            "2026-07-30"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 2.57,
+          "s": 60.1739,
+          "sdDisp": "2.6",
+          "unit": "N"
+        }
+      ],
+      "sessions": [
+        "2026-08-03",
+        "2026-08-04"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.57
+    },
+    {
+      "athlete": "Lucas Sookpaul",
+      "days_since": 8,
+      "metrics": [
+        {
+          "B": 1440.445,
+          "Bdisp": "1,440",
+          "C": 1307.015,
+          "Cdisp": "1,307",
+          "baseline_sessions": [
+            "2026-04-22",
+            "2026-07-10"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 2.53,
+          "s": 52.6646,
+          "sdDisp": "2.5",
+          "unit": "N"
+        }
+      ],
+      "sessions": [
+        "2026-07-24",
+        "2026-07-30"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.53
+    },
+    {
+      "athlete": "CJ Burke",
+      "days_since": 25,
+      "metrics": [
+        {
+          "B": 0.47,
+          "Bdisp": "0.470",
+          "C": 0.325,
+          "Cdisp": "0.325",
+          "baseline_sessions": [
+            "2026-05-28",
+            "2026-07-07"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.42,
+          "s": 0.0599,
+          "sdDisp": "2.4",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-10",
+        "2026-07-13"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.42
+    },
+    {
+      "athlete": "Ben Wallace",
+      "days_since": 0,
+      "metrics": [
+        {
+          "B": 554.5,
+          "Bdisp": "554",
+          "C": 704.5,
+          "Cdisp": "704",
+          "baseline_sessions": [
+            "2026-07-15",
+            "2026-08-04"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.35,
+          "s": 63.8797,
+          "sdDisp": "2.3",
+          "unit": "ms"
+        },
+        {
+          "B": 2950.535,
+          "Bdisp": "2,951",
+          "C": 2305.13,
+          "Cdisp": "2,305",
+          "baseline_sessions": [
+            "2026-07-15",
+            "2026-08-04"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 2.01,
+          "s": 320.8422,
+          "sdDisp": "2.0",
+          "unit": "N"
+        }
+      ],
+      "sessions": [
+        "2026-08-06",
+        "2026-08-07"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.35
+    },
+    {
+      "athlete": "Jack Sheehan",
+      "days_since": 2,
+      "metrics": [
+        {
+          "B": 466.5,
+          "Bdisp": "466",
+          "C": 541.0,
+          "Cdisp": "541",
+          "baseline_sessions": [
+            "2026-06-22",
+            "2026-07-28"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.25,
+          "s": 33.1202,
+          "sdDisp": "2.2",
+          "unit": "ms"
+        }
+      ],
+      "sessions": [
+        "2026-07-31",
+        "2026-08-05"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.25
+    },
+    {
+      "athlete": "Jayleen Torres",
+      "days_since": 0,
+      "metrics": [
+        {
+          "B": 1875.21,
+          "Bdisp": "1,875",
+          "C": 1692.38,
+          "Cdisp": "1,692",
+          "baseline_sessions": [
+            "2026-06-11",
+            "2026-07-22"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "concPeakForce",
+          "label": "peak push force",
+          "magnitude_in_sd": 2.16,
+          "s": 84.8235,
+          "sdDisp": "2.2",
+          "unit": "N"
+        }
+      ],
+      "sessions": [
+        "2026-07-25",
+        "2026-08-07"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.16
+    },
+    {
+      "athlete": "Lucas Garcia",
+      "days_since": 23,
+      "metrics": [
+        {
+          "B": 0.9962,
+          "Bdisp": "0.996",
+          "C": 0.9463,
+          "Cdisp": "0.946",
+          "baseline_sessions": [
+            "2026-03-26",
+            "2026-07-03"
+          ],
+          "direction": -1,
+          "floor_used": true,
+          "key": "fzvRatio",
+          "label": "force at the turn, share of peak",
+          "magnitude_in_sd": 2.09,
+          "s": 0.0238,
+          "sdDisp": "2.1",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-06",
+        "2026-07-15"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.09
+    },
+    {
+      "athlete": "Wayne Webster",
+      "days_since": 11,
+      "metrics": [
+        {
+          "B": 0.9589,
+          "Bdisp": "0.959",
+          "C": 0.9082,
+          "Cdisp": "0.908",
+          "baseline_sessions": [
+            "2026-07-08",
+            "2026-07-22"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "fzvRatio",
+          "label": "force at the turn, share of peak",
+          "magnitude_in_sd": 2.09,
+          "s": 0.0242,
+          "sdDisp": "2.1",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-23",
+        "2026-07-27"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.09
+    },
+    {
+      "athlete": "Jason Sun",
+      "days_since": 7,
+      "metrics": [
+        {
+          "B": 691.0,
+          "Bdisp": "691",
+          "C": 741.0,
+          "Cdisp": "741",
+          "baseline_sessions": [
+            "2026-02-21",
+            "2026-07-23"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.08,
+          "s": 23.9852,
+          "sdDisp": "2.1",
+          "unit": "ms"
+        }
+      ],
+      "sessions": [
+        "2026-07-28",
+        "2026-07-31"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.08
+    },
+    {
+      "athlete": "Amy Welsh",
+      "days_since": 1,
+      "metrics": [
+        {
+          "B": 0.6025,
+          "Bdisp": "0.603",
+          "C": 0.54,
+          "Cdisp": "0.540",
+          "baseline_sessions": [
+            "2026-07-06",
+            "2026-08-04"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.05,
+          "s": 0.0305,
+          "sdDisp": "2.1",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-08-05",
+        "2026-08-06"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.05
+    },
+    {
+      "athlete": "Abe Florman",
+      "days_since": 15,
+      "metrics": [
+        {
+          "B": 0.515,
+          "Bdisp": "0.515",
+          "C": 0.475,
+          "Cdisp": "0.475",
+          "baseline_sessions": [
+            "2026-05-25",
+            "2026-07-06"
+          ],
+          "direction": -1,
+          "floor_used": false,
+          "key": "ci100Ratio",
+          "label": "first 100 ms share of the push",
+          "magnitude_in_sd": 2.03,
+          "s": 0.0197,
+          "sdDisp": "2.0",
+          "unit": ""
+        }
+      ],
+      "sessions": [
+        "2026-07-20",
+        "2026-07-23"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.03
+    },
+    {
+      "athlete": "Charlie Rattenbury",
+      "days_since": 0,
+      "metrics": [
+        {
+          "B": 707.0,
+          "Bdisp": "707",
+          "C": 796.0,
+          "Cdisp": "796",
+          "baseline_sessions": [
+            "2026-06-11",
+            "2026-07-29"
+          ],
+          "direction": 1,
+          "floor_used": false,
+          "key": "contractionTime",
+          "label": "time to takeoff",
+          "magnitude_in_sd": 2.02,
+          "s": 44.0011,
+          "sdDisp": "2.0",
+          "unit": "ms"
+        }
+      ],
+      "sessions": [
+        "2026-08-03",
+        "2026-08-07"
+      ],
+      "since": "2026-08-07",
+      "type": "REGRESSION",
+      "worst_sd": 2.02
+    }
+  ],
+  "schema": "rpm.cmj.watch/v1"
+}

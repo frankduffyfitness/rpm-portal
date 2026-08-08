@@ -1,0 +1,111 @@
+{
+  "schema": "rpm.cmj.experiments/v1",
+  "_readme": [
+    "Phase-5 experiment registry for the CMJ Session Watch. The prose ledger",
+    "lives at ~/Desktop/Pitch Model/cmj_strategy/experiments.md; this file is",
+    "the machine-readable half, seeded from it on 2026-08-07.",
+    "",
+    "Bars are PRE-REGISTERED. They are written down before the next session is",
+    "read so a result cannot be rationalised after the fact, and session_watch.py",
+    "reports the numbers against them without ever calling a result good or bad.",
+    "The ledger is where verdicts get written, by Frank.",
+    "",
+    "status stays 'open' until Frank closes it. session_watch.py never edits",
+    "this file: what it has already reported is tracked in watch_state.json,",
+    "so last_seen_session here is only the starting point.",
+    "",
+    "manipulation[].direction is '>=' or '<=' against the session value.",
+    "Session values are per-athlete-day medians of the session's reps, with rep 1",
+    "dropped on any test of 3+ reps. 'cv:<metric>' is that session's",
+    "within-session coefficient of variation instead of its median."
+  ],
+  "experiments": [
+    {
+      "id": "EXP-001",
+      "athlete": "Diem Nenadich",
+      "title": "Acute cue, reversed rep order",
+      "status": "open",
+      "registered": "2026-08-07",
+      "manipulation": [
+        {
+          "metric": "fzvRatio",
+          "bar": 0.922,
+          "direction": ">=",
+          "note": "Her cued reps 4-6 on 2026-08-07 held 0.922 against 0.827 uncued. The next session reverses the order (cue reps 1-3, leave 4-6 uncued) to separate the cue from rep position; this monitor reads session medians only and cannot split a session by rep window."
+        },
+        {
+          "metric": "ci100Ratio",
+          "bar": 0.788,
+          "direction": ">=",
+          "note": "Cued reps 4-6 held 0.788 against 0.693 uncued on 2026-08-07."
+        }
+      ],
+      "outcome": [
+        {
+          "metric": "jumpHeight",
+          "note": "14.50 in uncued, 15.04 in cued on 2026-08-07. Outcome only: the pre-registered markers are the manipulation metrics above."
+        }
+      ],
+      "last_seen_session": null,
+      "note": "Today's session (2026-08-07) WAS the intervention session, so the watch starts looking from the next one. That session is a cued test and must not be read as a clean baseline for the board. Live competing explanation carried from the ledger: her 2026-08-05 session already showed the same late-session pattern, and she is on reactive-stiffness pre-work."
+    },
+    {
+      "id": "EXP-002",
+      "athlete": "Jayleen Torres",
+      "title": "Ground-intent cue, retention",
+      "status": "open",
+      "registered": "2026-08-07",
+      "manipulation": [
+        {
+          "metric": "cv:ci100Ratio",
+          "bar": 0.10,
+          "direction": "<=",
+          "note": "Consistency, not level, is the finding being tested. Her within-session CV on the first-100ms share was 5.3% on 2026-08-07 against a 47.7% mean across the 12 prior clean sessions."
+        },
+        {
+          "metric": "cv:jumpHeight",
+          "bar": 0.05,
+          "direction": "<=",
+          "note": "3.26% on 2026-08-07 against a 12.9% prior mean."
+        }
+      ],
+      "outcome": [
+        {
+          "metric": "jumpHeight",
+          "note": "Session median 7.52 in on 2026-08-07, her best in 90 days."
+        }
+      ],
+      "last_seen_session": null,
+      "note": "Today's session (2026-08-07) WAS the intervention session; the cue ran across all 7 reps, so it carries no within-session control. The next session tests retention. Ledger data-quality rule still applies: exclude 2026-06-11, 06-12, 07-01 and 07-02 from any Jayleen trend."
+    },
+    {
+      "id": "EXP-003",
+      "athlete": "Shea O'Sullivan",
+      "title": "Countermovement depth, retention uncued",
+      "status": "open",
+      "registered": "2026-08-07",
+      "manipulation": [
+        {
+          "metric": "ci100Ratio",
+          "bar": 0.38,
+          "direction": ">=",
+          "note": "Pre-registered before he jumped on 2026-08-07: above ~0.38 is outside anything in his 73-rep history (only 3 of 73 baseline reps cleared it). Retention asks whether it holds with no depth cue."
+        },
+        {
+          "metric": "conImpulse100",
+          "bar": 90.0,
+          "direction": ">=",
+          "note": "The absolute first-100ms impulse, carried alongside the share so a shallower jump cannot clear the bar on the denominator alone. Baseline 80.1 N s, 98.8 N s on 2026-08-07."
+        }
+      ],
+      "outcome": [
+        {
+          "metric": "jumpHeight",
+          "note": "17.42 in baseline, 17.72 in on 2026-08-07. His single best baseline rep (19.61 in) was not beaten."
+        }
+      ],
+      "last_seen_session": null,
+      "note": "Today's session (2026-08-07) WAS the intervention session, with depth cued. The watch starts at the next one, which is the uncued retention test the ledger asks for. Blueprint rule: testing stays uncued, so a cued session is not a baseline measurement."
+    }
+  ]
+}
