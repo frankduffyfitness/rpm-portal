@@ -2336,11 +2336,21 @@ def gen_WATCH(fd_data, velo_rows, athlete_rows):
             if len(base) == 2:
                 m["baselineDisp"] = (f"{_strat_date_label(base[0])} to "
                                      f"{_strat_date_label(base[1])}")
+        # The early tier renders as one compact line per athlete, so its worst
+        # metric is named here rather than dug out of the metrics array in JSX.
+        # `tier` itself is passed through untouched from session_watch.py.
+        metrics = row.get("metrics") or []
+        if metrics:
+            row["worstLabel"] = metrics[0].get("label", "")
+            row["worstSdDisp"] = metrics[0].get("sdDisp", "")
         rows.append(row)
 
     meta = dict(data.get("meta") or {})
     # Recount after exclusions so the header never claims more than it shows.
-    meta["flagged_n"] = sum(1 for r in rows if r.get("type") == "REGRESSION")
+    _reg = [r for r in rows if r.get("type") == "REGRESSION"]
+    meta["flagged_n"] = len(_reg)
+    meta["strong_n"] = sum(1 for r in _reg if r.get("tier") == "strong")
+    meta["early_n"] = sum(1 for r in _reg if r.get("tier") == "early")
     meta["rows_n"] = len(rows)
     meta["anchorDisp"] = _strat_date_label(meta.get("anchor"))
     return {"meta": meta, "rows": rows}

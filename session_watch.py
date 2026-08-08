@@ -64,6 +64,16 @@ SD_MULT = 2.0               # flag past 2x the athlete's own SD
 FLOOR_PCT = 0.05            # ...but never on less than a 5% move
 CLEAR_SD = 1.0              # CLEARED when the gap is back inside 1 SD
 
+# DISPLAY tier only. This changes nothing about who flags: the bar above is the
+# bar, and every flagged athlete is still emitted. It splits the flagged list
+# into what a coach should look at today and what he should watch at the next
+# session, because 20 rows of equal visual weight is 20 rows nobody reads.
+# An athlete is "strong" when ANY ONE of his flagged metrics reaches this; the
+# tier is per athlete, not per metric, because the athlete is who gets coached.
+# Compared against the ROUNDED magnitude the row displays, so a row that reads
+# "3.0x own noise" is never sorted into the quiet list.
+STRONG_SD = 3.0
+
 REP1_DROP_MIN = 3           # drop rep 1 only when the test has >= 3 reps
 
 # ─── Metrics ─────────────────────────────────────────────────────────────────
@@ -328,16 +338,18 @@ def run_regressions(by_athlete, anchor, state):
         if flagged:
             for ev in flagged:
                 dist[ev["key"]] = dist.get(ev["key"], 0) + 1
-            worst = max((e["magnitude_in_sd"] or 0) for e in flagged)
+            metrics = [metric_row(e) for e in
+                       sorted(flagged, key=lambda x: -(x["magnitude_in_sd"] or 0))]
+            worst = max((m["magnitude_in_sd"] or 0) for m in metrics)
             rows.append({
                 "type": "REGRESSION",
                 "athlete": name,
-                "metrics": [metric_row(e) for e in
-                            sorted(flagged, key=lambda x: -(x["magnitude_in_sd"] or 0))],
+                "metrics": metrics,
                 "sessions": flagged[0]["current_sessions"],
                 "days_since": days_between(anchor, last_date),
                 "since": min(open_state[f"{name}||{e['key']}"]["since"] for e in flagged),
                 "worst_sd": round(worst, 2),
+                "tier": "strong" if worst >= STRONG_SD else "early",
             })
         if cleared:
             cleared_rows.append({
@@ -519,6 +531,9 @@ def main():
             "universe_n": len(universe),
             "flagged_n": len(regressions),
             "flagged_metric_n": sum(len(r["metrics"]) for r in regressions),
+            # Display tiers, not a second bar: strong + early == flagged_n.
+            "strong_n": sum(1 for r in regressions if r["tier"] == "strong"),
+            "early_n": sum(1 for r in regressions if r["tier"] == "early"),
             "followup_n": len(follow),
             "confirmed_n": len(confirmed),
             "cleared_n": len(cleared),
@@ -539,7 +554,9 @@ def main():
     log(f"  universe:    {len(universe)} athletes "
         f"(>={RECENT_MIN} sessions in {RECENT_DAYS}d and >={HISTORY_MIN} in {HISTORY_DAYS}d)")
     log(f"  REGRESSION:  {len(regressions)} athletes, "
-        f"{sum(len(r['metrics']) for r in regressions)} athlete-metrics")
+        f"{sum(len(r['metrics']) for r in regressions)} athlete-metrics "
+        f"({sum(1 for r in regressions if r['tier'] == 'strong')} strong, "
+        f"{sum(1 for r in regressions if r['tier'] == 'early')} early)")
     for key, _d in WATCH_METRICS:
         log(f"      {label_of(key):36s} {dist.get(key, 0)}")
     log(f"  CLEARED:     {len(cleared)}")
@@ -548,7 +565,7 @@ def main():
     log("")
     for r in regressions:
         worst = r["metrics"][0]
-        log(f"    {r['athlete']:26s} {worst['label']:36s} "
+        log(f"    [{r['tier']:6s}] {r['athlete']:26s} {worst['label']:36s} "
             f"{worst['Bdisp']} -> {worst['Cdisp']}  ({worst['sdDisp']} SD)"
             f"{'  +%d more' % (len(r['metrics']) - 1) if len(r['metrics']) > 1 else ''}")
     log("")

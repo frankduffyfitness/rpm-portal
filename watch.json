@@ -3,10 +3,12 @@
     "anchor": "2026-08-07",
     "cleared_n": 0,
     "confirmed_n": 0,
+    "early_n": 15,
     "flagged_metric_n": 35,
     "flagged_n": 20,
     "followup_n": 0,
     "state_version": 1,
+    "strong_n": 5,
     "universe_n": 133
   },
   "rows": [
@@ -92,6 +94,7 @@
         "2026-08-07"
       ],
       "since": "2026-08-07",
+      "tier": "strong",
       "type": "REGRESSION",
       "worst_sd": 7.62
     },
@@ -177,6 +180,7 @@
         "2026-07-23"
       ],
       "since": "2026-08-07",
+      "tier": "strong",
       "type": "REGRESSION",
       "worst_sd": 7.18
     },
@@ -262,6 +266,7 @@
         "2026-07-14"
       ],
       "since": "2026-08-07",
+      "tier": "strong",
       "type": "REGRESSION",
       "worst_sd": 3.89
     },
@@ -311,6 +316,7 @@
         "2026-07-31"
       ],
       "since": "2026-08-07",
+      "tier": "strong",
       "type": "REGRESSION",
       "worst_sd": 3.53
     },
@@ -360,6 +366,7 @@
         "2026-07-16"
       ],
       "since": "2026-08-07",
+      "tier": "strong",
       "type": "REGRESSION",
       "worst_sd": 3.02
     },
@@ -409,6 +416,7 @@
         "2026-08-04"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.92
     },
@@ -458,6 +466,7 @@
         "2026-07-23"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.7
     },
@@ -507,6 +516,7 @@
         "2026-08-07"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.62
     },
@@ -538,6 +548,7 @@
         "2026-08-04"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.57
     },
@@ -569,6 +580,7 @@
         "2026-07-30"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.53
     },
@@ -600,6 +612,7 @@
         "2026-07-13"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.42
     },
@@ -649,6 +662,7 @@
         "2026-08-07"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.35
     },
@@ -680,6 +694,7 @@
         "2026-08-05"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.25
     },
@@ -711,6 +726,7 @@
         "2026-08-07"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.16
     },
@@ -742,6 +758,7 @@
         "2026-07-15"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.09
     },
@@ -773,6 +790,7 @@
         "2026-07-27"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.09
     },
@@ -804,6 +822,7 @@
         "2026-07-31"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.08
     },
@@ -835,6 +854,7 @@
         "2026-08-06"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.05
     },
@@ -866,6 +886,7 @@
         "2026-07-23"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.03
     },
@@ -897,6 +918,7 @@
         "2026-08-07"
       ],
       "since": "2026-08-07",
+      "tier": "early",
       "type": "REGRESSION",
       "worst_sd": 2.02
     }
