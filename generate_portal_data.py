@@ -5,7 +5,7 @@ Outputs a JS snippet to paste into App.jsx, replacing the hardcoded arrays.
 """
 import json, sys, os, re
 from datetime import datetime, timedelta
-from collections import defaultdict
+from collections import defaultdict, Counter
 import statistics
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -2145,6 +2145,26 @@ def _strat_ind(i):
     ]
 
 
+def _board_group_map(fd_data, velo_rows, athlete_rows):
+    """Normalised name -> group code, for the staff boards whose rows come from
+    outside the live arrays.
+
+    The ForceDecks store is the BASE because a third of these boards' athletes
+    last tested months ago and have already dropped out of _A/_VELO; without it
+    they render with no group at all. The live rows then win on top.
+    """
+    group_map = {}
+    for _pid, _a in (fd_data.get("athletes") or {}).items():
+        _n = _a.get("name")
+        if _n:
+            group_map[_vm_norm(_n)] = get_group(_n, _a.get("groups"))
+    for r in athlete_rows:
+        group_map[_vm_norm(r[0])] = r[2]
+    for r in velo_rows:
+        group_map[_vm_norm(r[0])] = r[2]
+    return group_map
+
+
 def gen_STRAT(fd_data, velo_rows, athlete_rows):
     """_STRAT: one row per athlete carried by cmj_buckets.json, ready to render.
     [{name, group, bucket, label, secondary, secondaryLabel, conf, confBasis,
@@ -2183,15 +2203,7 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
     # _A/_VELO rows on top. The store is the base because a third of this file's
     # athletes last tested months ago and have already dropped out of the live
     # arrays — without it they would render with no group at all.
-    group_map = {}
-    for _pid, _a in (fd_data.get("athletes") or {}).items():
-        _n = _a.get("name")
-        if _n:
-            group_map[_vm_norm(_n)] = get_group(_n, _a.get("groups"))
-    for r in athlete_rows:
-        group_map[_vm_norm(r[0])] = r[2]
-    for r in velo_rows:
-        group_map[_vm_norm(r[0])] = r[2]
+    group_map = _board_group_map(fd_data, velo_rows, athlete_rows)
 
     today = datetime.now().date()
     out = []
@@ -2252,6 +2264,89 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
 
 
 _STRAT = gen_STRAT(fd, _VELO, _A)
+
+# ─── CMJ Session Watch — staff-only drift + experiment monitor ───────────────
+# Source of truth: session_watch.py in this repo, which emits watch.json
+# (schema rpm.cmj.watch/v1) from forcedecks_portal.json + experiments.json +
+# watch_state.json. Unlike _STRAT's buckets, watch.json IS a repo file and the
+# 6-hourly Action regenerates it, so CI normally has fresh data here.
+#
+# The guard still matters, and it is sharper than _STRAT's. The watch step runs
+# continue-on-error so a watch failure can never sink the sync, which means a
+# run can reach this point with no watch.json at all. Those two cases must not
+# look alike:
+#   * file missing or unreadable  -> None -> _WATCH stays OUT of the splice, and
+#     the panel already committed in src/App.jsx survives untouched.
+#   * file present with zero rows -> {} with rows: [] -> spliced, because
+#     "nothing is flagged today" is a real and useful thing to say, and the
+#     anchor date behind it has probably moved.
+# _STRAT cannot draw that line (it returns [] for both); this can, so it does.
+WATCH_JSON = os.environ.get("RPM_WATCH_JSON") or os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "watch.json")
+
+
+def gen_WATCH(fd_data, velo_rows, athlete_rows):
+    """_WATCH: {meta, rows} exactly as session_watch.py computed them.
+
+    Every number, label and unit is finished upstream: this applies
+    EXCLUDE_ATHLETES, canonicalises names the way every other board does, and
+    otherwise passes the rows straight through. React renders and computes
+    nothing, which is the same contract _STRAT ships under.
+
+    Returns None (not []) when there is no readable watch.json, so the caller
+    can tell "no data" from "no flags".
+    """
+    if not os.path.exists(WATCH_JSON):
+        print(f"  _WATCH: no watch file at {WATCH_JSON} — skipping "
+              f"(existing panel in the JSX is left alone)", flush=True)
+        return None
+    try:
+        with open(WATCH_JSON) as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"  WARNING: could not read {WATCH_JSON} ({e}) — _WATCH skipped, "
+              f"existing panel left alone", flush=True)
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("rows"), list):
+        print(f"  WARNING: {WATCH_JSON} is not a watch file "
+              f"(schema={data.get('schema') if isinstance(data, dict) else type(data).__name__}) "
+              f"— _WATCH skipped", flush=True)
+        return None
+
+    group_map = _board_group_map(fd_data, velo_rows, athlete_rows)
+    rows = []
+    for r in data["rows"]:
+        name = r.get("athlete")
+        if not name or is_excluded(name):
+            continue
+        row = dict(r)
+        row["athlete"] = _vm_norm(name)
+        row["group"] = group_map.get(row["athlete"], "")
+        # Dates become words here, in the portal's long-date form, for the same
+        # reason the strategy board formats its own: React should never own a
+        # date convention that two other surfaces already agreed on.
+        sessions = row.get("sessions") or []
+        row["sessionsDisp"] = ", ".join(_strat_date_label(d) for d in sessions)
+        days = row.get("days_since")
+        row["ageDisp"] = ("today" if days == 0
+                          else f"{days} day{'' if days == 1 else 's'} ago"
+                          if isinstance(days, int) else "")
+        for m in row.get("metrics") or []:
+            base = m.get("baseline_sessions") or []
+            if len(base) == 2:
+                m["baselineDisp"] = (f"{_strat_date_label(base[0])} to "
+                                     f"{_strat_date_label(base[1])}")
+        rows.append(row)
+
+    meta = dict(data.get("meta") or {})
+    # Recount after exclusions so the header never claims more than it shows.
+    meta["flagged_n"] = sum(1 for r in rows if r.get("type") == "REGRESSION")
+    meta["rows_n"] = len(rows)
+    meta["anchorDisp"] = _strat_date_label(meta.get("anchor"))
+    return {"meta": meta, "rows": rows}
+
+
+_WATCH = gen_WATCH(fd, _VELO, _A)
 
 # Female-athlete name list for the UI (exact data-spelling strings, so
 # FEM_SET.has(a.name) matches even quirks like "Francesca  Albergo").
@@ -2412,6 +2507,14 @@ print(f"  _VM:  {len(_VM['rows'])} velo-model rows", flush=True)
 print(f"  _STRAT: {len(_STRAT)} CMJ-strategy rows "
       f"({sum(1 for r in _STRAT if r['bucket'] and r['bucket'] != 'S0')} flagged, "
       f"{sum(1 for r in _STRAT if r['stale'])} needing retest)", flush=True)
+if _WATCH is None:
+    print("  _WATCH: skipped (no watch.json this run)", flush=True)
+else:
+    _wc = Counter(r.get("type") for r in _WATCH["rows"])
+    print(f"  _WATCH: {len(_WATCH['rows'])} watch rows "
+          f"({_wc['REGRESSION']} regression, {_wc['FOLLOW-UP']} follow-up, "
+          f"{_wc['CONFIRMED']} confirmed, {_wc['CLEARED']} cleared; "
+          f"anchor {_WATCH['meta'].get('anchor')})", flush=True)
 print(f"  _FEM: {len(_FEM)} female athletes labeled", flush=True)
 print(f"  _HT:  {len(_HT)} hop trends", flush=True)
 print(f"  _HN:  {len(_HN)} hop norms", flush=True)
@@ -2454,6 +2557,9 @@ output_lines.append(f"const _FH = {json.dumps(_FH, separators=(',', ':'))};")
 # does not carry the Pitch Model tree.
 if _STRAT:
     output_lines.append(f"const _STRAT = {json.dumps(_STRAT, separators=(',', ':'))};")
+# Same rule for the Watch: printed only when this run actually read a watch file.
+if _WATCH is not None:
+    output_lines.append(f"const _WATCH = {json.dumps(_WATCH, separators=(',', ':'))};")
 
 with open("portal_data_arrays.js", "w") as f:
     f.write("\n".join(output_lines))
@@ -2488,6 +2594,10 @@ replacements.update({'_FH': _FH})
 # every run. No data means no opinion, so the JSX keeps what it has.
 if _STRAT:
     replacements.update({'_STRAT': _STRAT})
+# _WATCH joins on the same terms. `is not None` rather than truthiness: an empty
+# rows list means "watch ran, nothing flagged", which the panel should show.
+if _WATCH is not None:
+    replacements.update({'_WATCH': _WATCH})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
