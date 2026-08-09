@@ -72,7 +72,12 @@ PORTAL_METRICS = {
     6553657: {"key": "concDuration",      "label": "Concentric Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
     6553664: {"key": "brakingPhaseDur",   "label": "Braking Phase Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
     6553668: {"key": "eccDecelPhaseDur",  "label": "Ecc Deceleration Phase Duration", "unit": "s", "scale": 1, "trialOnly": True},
-    6553642: {"key": "concTimeToPF",      "label": "Conc Time to Peak Force", "unit": "ms", "scale": 1000, "trialOnly": True},
+    # 6553642 concTimeToPF DROPPED 2026-08-09 (Frank's call, DECISIONS_2026-08-09.md).
+    # VALD emits a literal 0 on 42.9% of reps instead of omitting the value — an
+    # upstream event-detection failure, not a real "peak force at concentric onset".
+    # Averages come out ~43% low. Evidence: ~/Desktop/Pitch Model/cmj_strategy/
+    # impulse_rsi_model/CMJ_METRIC_AUDIT.md. Historical values already in
+    # forcedecks_portal.json are intentionally KEPT; only future capture stops.
     6553660: {"key": "ftCtRatio",         "label": "Flight Time:Contraction Time", "unit": "", "scale": 1, "trialOnly": True},
     6553634: {"key": "concPeakVelo",      "label": "Concentric Peak Velocity", "unit": "m/s", "scale": 1, "trialOnly": True},
     6553701: {"key": "eccPeakVelo",       "label": "Eccentric Peak Velocity", "unit": "m/s", "scale": 1, "trialOnly": True},
@@ -95,7 +100,11 @@ PORTAL_METRICS = {
     6553727: {"key": "landingImpulse",    "label": "Landing Impulse", "unit": "N s", "scale": 1, "trialOnly": True},
     6553768: {"key": "landingStiffness",  "label": "Landing Stiffness", "unit": "N/m", "scale": 1, "trialOnly": True},
     6553682: {"key": "eccDecelRfd",       "label": "Ecc Deceleration RFD", "unit": "N/s", "scale": 1, "trialOnly": True},
-    6553641: {"key": "concMaxRfd",        "label": "Conc Maximum RFD", "unit": "N/s", "scale": 1, "trialOnly": True},
+    # 6553641 concMaxRfd DROPPED 2026-08-09 (Frank's call, DECISIONS_2026-08-09.md).
+    # Present on only 17.7% of reps, and the populated subset is non-random, so any
+    # reference built on it compares different athletes to each other. Evidence:
+    # ~/Desktop/Pitch Model/cmj_strategy/impulse_rsi_model/CMJ_METRIC_AUDIT.md.
+    # Historical values in forcedecks_portal.json are KEPT; only future capture stops.
     # HJ (Hop Jump) metrics — VALD returns CT/FT in seconds, scale ×1000 to ms
     13303830: {"key": "hopMeanRsi",        "label": "Hop Mean RSI (FT/CT)","unit": "ratio","scale": 1},
     13303819: {"key": "hopRsi",            "label": "Hop RSI (FT/CT)",     "unit": "ratio","scale": 1},
