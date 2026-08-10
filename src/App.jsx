@@ -3570,7 +3570,7 @@ function VmScatter({ rows, onPick }) {
       {h && (
         <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 10px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{h.name}</span>
-          <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {h.velo} actual, {Math.round(h.predA)} predicted</span>
+          <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {h.velo} actual, {h.predA.toFixed(1)} predicted</span>
           {!h.thin && <span style={{ fontSize: 10, fontWeight: 700, color: vmBandColor(h.residA) }}> {"·"} {h.residA > 0 ? "+" : ""}{h.residA.toFixed(1)}</span>}
           {h.thin && <span style={{ fontSize: 10, color: "#FFB020" }}> {"·"} thin data</span>}
         </div>
@@ -3767,7 +3767,9 @@ function VmAthleteCard({ r, onBack }) {
 
   const curPred = vmPredA(ci0, rsi0);
   const livePred = vmPredA(ci, rsi);
-  const delta = Math.round(livePred - curPred);
+  // Kept at one decimal so the card's own arithmetic closes: a whole-number
+  // delta beside one-decimal predictions reads as a mistake to a coach.
+  const delta = livePred - curPred;
   const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
     false;
   const changed = [];
@@ -3778,7 +3780,7 @@ function VmAthleteCard({ r, onBack }) {
   if (Math.abs(ci - ci0) >= 1 && !(bwMoved && Math.abs(ciBase - ci0) < 1)) changed.push(`${Math.round(ci)} N·s`);
   if (Math.abs(rsi - rsi0) >= 0.01) changed.push(rsi.toFixed(2));
   const deltaLine = changed.length === 0 ? null :
-    `At ${changed.length === 1 ? changed[0] : "these inputs"} the model predicts ${delta > 0 ? "+" : ""}${delta} mph vs his current prediction.`;
+    `At ${changed.length === 1 ? changed[0] : "these inputs"} the model predicts ${delta > 0 ? "+" : ""}${delta.toFixed(1)} mph vs his current prediction.`;
 
   const status = !cur ? { l: "Stale", c: "#FFB020" } : { l: vmBandLabel(resid0), c: vmBandColor(resid0) };
   const card = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 16px", marginBottom: 12 };
@@ -3800,7 +3802,7 @@ function VmAthleteCard({ r, onBack }) {
             <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>{cur ? "6-WEEK PEAK FB" : "ALL-TIME PEAK FB"}</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{Math.round(pred0)} <span style={{ fontSize: 12, color: "#8A8F98" }}>{"±"} {Math.round(VM_BAND)}</span></div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{pred0.toFixed(1)} <span style={{ fontSize: 12, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
             <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>{cur ? "PREDICTED, CURRENT TESTS" : "MODEL A PREDICTED"}</div>
           </div>
           <div>
@@ -3847,7 +3849,7 @@ function VmAthleteCard({ r, onBack }) {
           </div>
         )}
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 4, textAlign: "center" }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{Math.round(livePred)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {Math.round(VM_BAND)}</span></div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
           <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph)</div>
           {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
           {deltaLine && <div style={{ fontSize: 11, color: "#B8BDC4", marginTop: 6 }}>{deltaLine}</div>}
@@ -3891,7 +3893,7 @@ function VmSandboxCard() {
 
   const livePred = vmPredA(ci, rsi);
   const pinPred = vmPredA(pin.ci, pin.rsi);
-  const delta = Math.round(livePred - pinPred);
+  const delta = livePred - pinPred;
   const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
     false;
   const pinned = Math.abs(ci - pin.ci) < 1 && Math.abs(rsi - pin.rsi) < 0.01 &&
@@ -3914,10 +3916,10 @@ function VmSandboxCard() {
           <div style={{ fontSize: 9.5, color: "#6B7280", lineHeight: 1.55, marginTop: -6 }}>Holds only if you keep your jump. Gaining weight while jump height drops more than about 0.4 cm per pound nets zero.</div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 12, textAlign: "center" }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{Math.round(livePred)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {Math.round(VM_BAND)}</span></div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
           <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph)</div>
           {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
-          {!pinned && <div style={{ fontSize: 11, color: "#B8BDC4", marginTop: 6 }}>{delta > 0 ? "+" : ""}{delta} mph vs the pinned baseline ({Math.round(pinPred)}).</div>}
+          {!pinned && <div style={{ fontSize: 11, color: "#B8BDC4", marginTop: 6 }}>{delta > 0 ? "+" : ""}{delta.toFixed(1)} mph vs the pinned baseline ({pinPred.toFixed(1)}).</div>}
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <button onClick={() => { setPin({ ci, rsi, er, bw }); setCiBase(ci); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(79,255,176,0.4)", borderRadius: 10, background: "rgba(79,255,176,0.08)", color: "#4FFFB0", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Pin as baseline</button>
