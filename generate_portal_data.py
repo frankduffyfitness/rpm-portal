@@ -91,6 +91,16 @@ VELO_BULLPEN_LABELS = {
     ("Thomas LoBello", "2026-08-07"): "Low Effort",  # low-intent pen (Frank, 2026-08-07)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
+    # Return-to-throw thrown from the BOTTOM HALF of the portable mound's slope,
+    # not off the rubber (Frank, 2026-08-10). First use of the "Rehab" label.
+    # Velo is submax by construction here, but the geometry is the harder
+    # problem: TrackMan measures extension FROM THE RUBBER, so starting several
+    # feet down the slope reports 9.2 ft against a mound norm of ~5.5-7. The
+    # extension and release-height numbers are artifacts of where he stood, not
+    # measurements of his delivery. Submax keeps it out of best/avg/trend; a matching
+    # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py keeps it
+    # out of arsenal GRADING. Both are needed - this map does not reach grading.
+    ("Johnny Hammer", "2026-08-10"): "Rehab",
 }
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
