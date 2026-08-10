@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-10T10:25:13.103571+00:00",
+    "syncDate": "2026-08-10T16:04:48.004246+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 67
+    "totalAthletes": 68
   },
   "athletes": {
     "Joey Muzio": {
@@ -11743,6 +11743,72 @@
           ],
           "erIr": {
             "left": 0.86,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "KJ Osorio": {
+      "name": "KJ Osorio",
+      "group": "col",
+      "dob": "2008-05-22",
+      "tests": [
+        {
+          "date": "2026-08-10",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                506.4
+              ],
+              "peakLbs": [
+                null,
+                113.8
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3265
+              ],
+              "ttp": [
+                null,
+                1.01
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                526.3
+              ],
+              "peakLbs": [
+                null,
+                118.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3417
+              ],
+              "ttp": [
+                null,
+                2.83
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
             "right": null
           },
           "discomfortNote": "",
