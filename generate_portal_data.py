@@ -184,6 +184,9 @@ GROUP_OVERRIDES = {
     "Darren Espinal": "col",
     "Jackson Mavrides": "col",
     "Severino Napolitano": "col",
+    # Evaluation pen was his first contact with us, so no plate data existed to
+    # set a level from and the pipeline defaulted him to HS (Frank, 2026-08-10).
+    "KJ Osorio": "col",
     # Middle school
     "Josh Miller": "ms",
     # Men's league
@@ -966,9 +969,17 @@ def gen_ASY(athletes_data):
         cpf_a = latest.get('cpf_asym') or 0
         cpf_d = latest.get('cpf_dom') or "="
         
-        # Dominant side = whichever appears most
+        # Dominant side = whichever appears most, and "=" when nothing does.
+        # The tie branch is not cosmetic: max(set(sides), key=sides.count)
+        # iterates a SET, and Python randomizes string hashing per process, so
+        # a tie resolved to a different letter on every regeneration. Christian
+        # Peralta (=, R, L) flipped between =/L/R across runs of identical data
+        # (2026-08-10). A split verdict is also not dominance on the merits.
         sides = [con_d, ecc_d, cpf_d]
-        dom = max(set(sides), key=sides.count) if sides else "="
+        counts = {s: sides.count(s) for s in sides}
+        top = max(counts.values())
+        winners = [s for s in ("L", "R", "=") if counts.get(s) == top]
+        dom = winners[0] if len(winners) == 1 else "="
         
         # L/R concentric impulse values
         con_l = latest.get('con_l') or 0
