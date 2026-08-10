@@ -510,3 +510,5 @@ if __name__ == "__main__":
 # sync trigger 2026-08-04 pm — pull Napolitano + Peralta grips
 
 # sync trigger 2026-08-04 pm — pull Nieto grip
+
+# sync trigger 2026-08-10 — pull Florman grip
