@@ -101,7 +101,16 @@ VELO_BULLPEN_LABELS = {
     # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py keeps it
     # out of arsenal GRADING. Both are needed - this map does not reach grading.
     ("Johnny Hammer", "2026-08-10"): "Rehab",
+    # Very low-intent day: 74.2 peak against an 86.6 best, on a 3-session sample
+    # where one pen is a quarter of everything he has (Frank, 2026-08-11).
+    ("Jaylen Cruz", "2026-08-11"): "Low Effort",
 }
+# NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
+# SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
+# velo best/avg/trend ONLY and does not reach arsenal grading, so a session
+# labelled here still feeds Shape+ unless it is ALSO excluded there. Audited on
+# this date: all three low-effort pens on record had been grading normally since
+# the label was introduced (Wallace -3 Shape+, Cruz -3, LoBello unaffected).
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
 
