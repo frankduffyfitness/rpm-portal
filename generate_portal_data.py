@@ -168,6 +168,21 @@ def is_excluded(name):
 
 # Manual group overrides — these always win, even over VALD.
 # Keep this for athletes whose VALD group is wrong or who aren't yet in VALD.
+# Round-4 integrity adjudications (Frank's VALD Hub pass, 2026-08-11): these
+# athletes' best RSI-mod values were human-verified as REAL countermovement-
+# depth strategy reps, not mis-segmented artifacts. The quadrant guard skips
+# an athlete only while his best stays at/below this value; any future spike
+# above it re-flags. Consumed by gen_QUAD here and by Pitch Model/
+# build_cmj_quadrants.py (which parses this dict from source).
+ADJUDICATED_RSI = {
+    "Aaron Gonzalez": 1.01, "Aaron Liriano": 0.43, "Ayden Soehngen": 0.61,
+    "Dylan Mackay": 0.66, "Francesca  Albergo": 0.59, "Frankie Sturiano": 0.69,
+    "Jace Congemi": 0.70, "Jason Mendez": 0.65, "Jason Peacock": 0.95,
+    "Jayleen Torres": 0.70, "Lucas Garcia": 0.53, "Matthew Mamak": 0.72,
+    "Toren Choudri": 1.22, "Vincent Schlosser": 0.72, "Westry Robinson": 0.57,
+    "Yadi Molina": 0.34,
+}
+
 GROUP_OVERRIDES = {
     "Nick Padilla": "pro",
     "Cade Winquest": "pro",
@@ -2036,6 +2051,63 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             "target": VM_TARGET, "rows": rows}
 
 
+def gen_QUAD(fd_data):
+    """_QUAD: CMJ force/elasticity quadrant payload for the coach portal.
+    rows = [name, group, ci, rsi, sus, lastCmj]
+    ci = best session-best concentric impulse (measured, physics fallback),
+    rsi = best session-best RSI-mod, both through the round-4 display guard:
+    a best more than 1.30x (CI) / 1.45x (RSI) the athlete's own median of
+    session bests displays at the next-real session best with sus=1 (hollow
+    dot, Hub verify pending) - unless adjudicated real in ADJUDICATED_RSI,
+    which disarms the guard only up to the verified value."""
+    from statistics import median as _qmed
+    rows = []
+    for a in fd_data["athletes"].values():
+        name = a.get("name")
+        if not name or is_excluded(name):
+            continue
+        grp = get_group(name, a.get("groups"))
+        ci_s, rsi_s = {}, {}
+        last = ""
+        for t in a.get("tests", []):
+            if t.get("testType") != "CMJ":
+                continue
+            d = (t.get("date") or "")[:10]
+            if d:
+                last = max(last, d)
+            for tr in t.get("trials", []):
+                m = tr.get("metrics", {})
+                v = m.get("concentricImpulse")
+                jh, bw = m.get("jumpHeight"), m.get("bodyweightLbs")
+                if not v and jh and bw:
+                    v = (bw * 0.45359237) * (2 * 9.81 * jh * 0.0254) ** 0.5 * 1.006
+                if v:
+                    ci_s[d] = max(ci_s.get(d, 0), v)
+                r = m.get("rsiModified")
+                if r:
+                    rsi_s[d] = max(rsi_s.get(d, 0), r)
+        if not ci_s or not rsi_s or not last:
+            continue
+        sus = 0
+        def _guard(series, bar):
+            nonlocal sus
+            vals = sorted(series.values(), reverse=True)
+            if len(vals) >= 3 and vals[0] > bar * _qmed(vals):
+                sus = 1
+                return vals[1]
+            return vals[0]
+        rsi_best = max(rsi_s.values())
+        if rsi_best <= ADJUDICATED_RSI.get(name, 0) + 0.005:
+            rsi = rsi_best
+        else:
+            rsi = _guard(rsi_s, 1.45)
+        ci = _guard(ci_s, 1.30)
+        rows.append([name, grp, round(ci, 1), round(rsi, 2), sus, last])
+    rows.sort(key=lambda r: r[0])
+    return rows
+
+
+_QUAD = gen_QUAD(fd)
 _VM = gen_VM(fd, trackman, _DYNAMO)
 
 
@@ -2580,6 +2652,7 @@ output_lines.append(f"const _VELO = {json.dumps(_VELO, separators=(',', ':'))};"
 output_lines.append(f"const _TMR = {json.dumps(_TMR, separators=(',', ':'))};")
 output_lines.append(f"const _DYNAMO = {json.dumps(_DYNAMO, separators=(',', ':'))};")
 output_lines.append(f"const _VM = {json.dumps(_VM, separators=(',', ':'))};")
+output_lines.append(f"const _QUAD = {json.dumps(_QUAD, separators=(',', ':'))};")
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 output_lines.append(f"const _CONS = {json.dumps(_CONS, separators=(',', ':'))};")
 output_lines.append(f"const _FH = {json.dumps(_FH, separators=(',', ':'))};")
@@ -2616,6 +2689,7 @@ replacements.update({'_VELO': _VELO})
 replacements.update({'_TMR': _TMR})
 replacements.update({'_DYNAMO': _DYNAMO})
 replacements.update({'_VM': _VM})
+replacements.update({'_QUAD': _QUAD})
 replacements.update({'_FEM': _FEM})
 replacements.update({'_CONS': _CONS})
 replacements.update({'_FH': _FH})
