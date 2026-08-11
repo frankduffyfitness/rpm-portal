@@ -2053,7 +2053,11 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
 
 def gen_QUAD(fd_data):
     """_QUAD: CMJ force/elasticity quadrant payload for the coach portal.
-    rows = [name, group, ci, rsi, sus, lastCmj, bwLbs|null]
+    rows = [name, group, ci, rsi, sus, lastCmj, bwLbs|null, fem]
+    fem=1 marks a Female Athletes group member (they can resolve into hs/col
+    via GROUP_PRIORITY, so the group code alone cannot identify them); the
+    UI suppresses the velo-model engine projection for fem=1 - the model was
+    fit on male pitchers and has no validity claim for female athletes.
     ci = best session-best concentric impulse (measured, physics fallback),
     rsi = best session-best RSI-mod, both through the round-4 display guard:
     a best more than 1.30x (CI) / 1.45x (RSI) the athlete's own median of
@@ -2107,7 +2111,8 @@ def gen_QUAD(fd_data):
         ci = _guard(ci_s, 1.30)
         last5 = [w for _, w in sorted(wts)[-5:]]
         bw = round(sum(last5) / len(last5) * LB_PER_KG, 1) if last5 else None
-        rows.append([name, grp, round(ci, 1), round(rsi, 2), sus, last, bw])
+        fem = 1 if "Female Athletes" in (a.get("groups") or []) else 0
+        rows.append([name, grp, round(ci, 1), round(rsi, 2), sus, last, bw, fem])
     rows.sort(key=lambda r: r[0])
     return rows
 
