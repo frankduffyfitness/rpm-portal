@@ -4685,6 +4685,7 @@ const QUAD_WIN = { hs: 90, col: 183, ms: 183, pro: 183, stf: 183 };
 function CmjQuadrants() {
   const [grp, setGrp] = useState("hs");
   const [pick, setPick] = useState(null);
+  const [hover, setHover] = useState(null);
   const cut = useMemo(() => new Date(Date.now() - (QUAD_WIN[grp] || 183) * 864e5).toISOString().slice(0, 10), [grp]);
   const pool = useMemo(() => _QUAD.filter(r => r[1] === grp && r[5] >= cut), [grp, cut]);
   const med = useMemo(() => {
@@ -4708,7 +4709,17 @@ function CmjQuadrants() {
         {["hs", "col", "ms", "pro", "stf"].map(k => { const gi = GROUPS[k] || {}; return (
           <button key={k} onClick={() => { setGrp(k); setPick(null); }} style={{ padding: "6px 11px", border: "1px solid " + (grp === k ? gi.color : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: grp === k ? gi.color + "18" : "rgba(255,255,255,0.02)", color: grp === k ? gi.color : "#6B7280" }}>{gi.shortLabel || k}</button>); })}
       </div>
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 8px 6px" }}>
+      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 8px 6px", position: "relative" }}>
+        {hover != null && pool[hover] && (() => { const r = pool[hover];
+          const pc = (k) => Math.round(100 * pool.filter(o => o[k] < r[k]).length / pool.length);
+          return (
+            <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "6px 11px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{r[0]}</span>
+              <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} CI {r[2].toFixed(0)} ({pc(2)}th) {"·"} RSI {r[3].toFixed(2)} ({pc(3)}th)</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#4FFFB0" }}> {"·"} {quadName(r)}</span>
+              {r[4] ? <span style={{ fontSize: 10, color: "#FFB020" }}> {"·"} unverified</span> : null}
+            </div>
+          ); })()}
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Force vs elasticity</div>
         <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Lifetime-best concentric impulse and RSI-mod, quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes, active last {QUAD_WIN[grp] === 90 ? "90 days" : "6 months"}. Tap a dot.</div>
         <svg viewBox={`0 0 ${S} ${S}`} style={{ display: "block", width: "100%" }}>
@@ -4722,10 +4733,12 @@ function CmjQuadrants() {
             <text key={t} x={x} y={y} textAnchor={a} style={{ fontSize: 7, fill: "#5B6470", letterSpacing: 0.6, fontFamily: "DM Sans" }}>{t}</text>
           ))}
           {pool.map((r, i) => (
-            <circle key={r[0]} cx={X(r[2])} cy={Y(r[3])} r={pick === i ? 6 : 4}
-              fill={r[4] ? "none" : (pick === i ? "#4FFFB0" : "#60A5FA")}
+            <circle key={r[0]} cx={X(r[2])} cy={Y(r[3])} r={hover === i || pick === i ? 6 : 4}
+              fill={r[4] ? "none" : (hover === i || pick === i ? "#4FFFB0" : "#60A5FA")}
               stroke={r[4] ? "#FFB020" : "#0A0C10"} strokeWidth={r[4] ? 1.6 : 1.2}
-              style={{ cursor: "pointer" }} onClick={() => setPick(pick === i ? null : i)} />
+              style={{ cursor: "pointer" }}
+              onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
+              onClick={() => setPick(pick === i ? null : i)} />
           ))}
           <text x={S / 2} y={S - 4} textAnchor="middle" style={{ fontSize: 7.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>CONCENTRIC IMPULSE (N·s) · FORCE</text>
           <text x={9} y={S / 2} textAnchor="middle" transform={`rotate(-90 9 ${S / 2})`} style={{ fontSize: 7.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>RSI-MOD · ELASTICITY</text>
