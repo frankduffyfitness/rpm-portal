@@ -2053,7 +2053,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
 
 def gen_QUAD(fd_data):
     """_QUAD: CMJ force/elasticity quadrant payload for the coach portal.
-    rows = [name, group, ci, rsi, sus, lastCmj]
+    rows = [name, group, ci, rsi, sus, lastCmj, bwLbs|null]
     ci = best session-best concentric impulse (measured, physics fallback),
     rsi = best session-best RSI-mod, both through the round-4 display guard:
     a best more than 1.30x (CI) / 1.45x (RSI) the athlete's own median of
@@ -2068,6 +2068,7 @@ def gen_QUAD(fd_data):
             continue
         grp = get_group(name, a.get("groups"))
         ci_s, rsi_s = {}, {}
+        wts = []
         last = ""
         for t in a.get("tests", []):
             if t.get("testType") != "CMJ":
@@ -2075,6 +2076,8 @@ def gen_QUAD(fd_data):
             d = (t.get("date") or "")[:10]
             if d:
                 last = max(last, d)
+            if t.get("weight"):
+                wts.append((t.get("date") or "", t["weight"]))
             for tr in t.get("trials", []):
                 m = tr.get("metrics", {})
                 v = m.get("concentricImpulse")
@@ -2102,7 +2105,9 @@ def gen_QUAD(fd_data):
         else:
             rsi = _guard(rsi_s, 1.45)
         ci = _guard(ci_s, 1.30)
-        rows.append([name, grp, round(ci, 1), round(rsi, 2), sus, last])
+        last5 = [w for _, w in sorted(wts)[-5:]]
+        bw = round(sum(last5) / len(last5) * LB_PER_KG, 1) if last5 else None
+        rows.append([name, grp, round(ci, 1), round(rsi, 2), sus, last, bw])
     rows.sort(key=lambda r: r[0])
     return rows
 
