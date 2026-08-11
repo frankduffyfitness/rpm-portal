@@ -4886,7 +4886,7 @@ function DynamoPage() {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState(false);
   const [sel, setSel] = useState(null);
-  const [dynTab, setDynTab] = useState("dynamo");
+  const [dynTab, setDynTab] = useState("model");  // Velo Model first (Frank, 8/11)
   const [dynSub, setDynSub] = useState("standings");
   const submit = (e) => {
     e.preventDefault();
