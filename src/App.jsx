@@ -4677,16 +4677,33 @@ function WatchSection() {
 }
 
 
-// ─── CMJ tab: force/elasticity quadrants (live twin of the printed PDF) ─────
+// ─── CMJ tab: force/elasticity quadrants ────────────────────────────────────
 // _QUAD rows = [name, group, ci, rsi, sus, lastCmj]; sus = the display guard
-// caught an unverified best (shown hollow at the next-real value). Windows
-// match the print version: HS = 90 days, everyone else = 6 months.
-const QUAD_WIN = { hs: 90, col: 183, ms: 183, pro: 183, stf: 183 };
+// caught an unverified best (shown hollow at the next-real value).
+//
+// 42-day activity window, uniform across groups (Frank, 2026-08-11). Was
+// HS = 90 days / everyone else = 6 months, which left the plot crowded with
+// athletes we have not seen in months and probably will not see again. 42 days
+// is the same six-week cutoff the velo, hop and strategy sections already use,
+// so "active" now means one thing portal-wide.
+//
+// Tightening the window moves the CROSSHAIR too, since quadrants split at the
+// pool's own medians -- so this was measured before shipping. HS 101 -> 85
+// athletes on an identical median (208 / 0.66); college 71 -> 56 (248 -> 249 /
+// 0.80); MS 28 -> 22 (116 -> 111 / 0.49 -> 0.53). The dropped athletes were
+// noise on the plot, not weight on the split. Pro and Staff fall to 5 each,
+// thin enough that one new test can swing their crosshair -- they were already
+// only 6 and 10, and the big three groups are the ones that carry decisions.
+//
+// NOTE: the printed twin, Pitch Model/build_cmj_quadrants.py, still runs the OLD
+// 90/183 windows, so the two deliberately diverge as of this change. Set PAGES
+// there to 42 if the sheet should match the portal again.
+const QUAD_WIN_DAYS = 42;
 function CmjQuadrants() {
   const [grp, setGrp] = useState("hs");
   const [pick, setPick] = useState(null);
   const [hover, setHover] = useState(null);
-  const cut = useMemo(() => new Date(Date.now() - (QUAD_WIN[grp] || 183) * 864e5).toISOString().slice(0, 10), [grp]);
+  const cut = useMemo(() => new Date(Date.now() - QUAD_WIN_DAYS * 864e5).toISOString().slice(0, 10), []);
   const pool = useMemo(() => _QUAD.filter(r => r[1] === grp && r[5] >= cut), [grp, cut]);
   const med = useMemo(() => {
     if (!pool.length) return null;
@@ -4725,7 +4742,7 @@ function CmjQuadrants() {
             </div>
           ); })()}
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Force vs elasticity</div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Lifetime-best concentric impulse and RSI-mod, quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes, active last {QUAD_WIN[grp] === 90 ? "90 days" : "6 months"}. Tap a dot.</div>
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Lifetime-best concentric impulse and RSI-mod, quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes, active last {QUAD_WIN_DAYS} days. Tap a dot.</div>
         <svg viewBox={`0 0 ${S} ${S}`} style={{ display: "block", width: "100%" }}>
           <rect x={mx} y={P} width={S - P - mx} height={my - P} fill="rgba(255,176,32,0.05)" />
           <rect x={P} y={P} width={mx - P} height={my - P} fill="rgba(96,165,250,0.05)" />
