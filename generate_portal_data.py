@@ -66,6 +66,12 @@ HOP_MANUAL_EXCLUSIONS = {
     ],
 }
 
+# CMJ force/elasticity quadrants: how far back "current form" reaches. Must
+# stay equal to QUAD_WIN_DAYS in src/App.jsx, which filters the same plot by
+# lastCmj -- if these two ever disagree, an athlete can be drawn from a median
+# that reaches outside the window he was admitted on. See gen_QUAD.
+QUAD_WIN_DAYS = 42
+
 # ─── Velo (Trackman) config ──────────────────────────────────────────────────
 VELO_HISTORY_LEN = 8                          # last N sessions in sparkline history
 VELO_SUBMAX_TYPES = {"Low Effort", "Rehab"}   # excluded from "best ever" math
@@ -2067,12 +2073,28 @@ def gen_QUAD(fd_data):
     via GROUP_PRIORITY, so the group code alone cannot identify them); the
     UI suppresses the velo-model engine projection for fem=1 - the model was
     fit on male pitchers and has no validity claim for female athletes.
-    ci = best session-best concentric impulse (measured, physics fallback),
-    rsi = best session-best RSI-mod, both through the round-4 display guard:
-    a best more than 1.30x (CI) / 1.45x (RSI) the athlete's own median of
-    session bests displays at the next-real session best with sus=1 (hollow
-    dot, Hub verify pending) - unless adjudicated real in ADJUDICATED_RSI,
-    which disarms the guard only up to the verified value."""
+    ci / rsi = the MEDIAN of session bests inside a 42-day window, i.e. current
+    form, not career peak (Frank, 2026-08-11). sus=1 marks a thin window
+    (< 3 sessions), drawn hollow.
+
+    Why this changed. The plot used LIFETIME bests, so an athlete's two axes
+    could come from different years. Miles Bohn plotted at a CI set the morning
+    of 2026-08-11 against an RSI set in November 2025, nine months earlier; he
+    trained elsewhere over the offseason and came back worse (0.46 median in
+    2025 -> 0.34 now). Lifetime bests parked him in "Engine + spring" on the
+    strength of a self that no longer exists, when current form is
+    force-dominant - the quadrant that actually prescribes the reactive work he
+    needs. Career peaks are the right axis for ranking potential and the wrong
+    one for reading who is in front of you today.
+
+    Why the MEDIAN and not the best-in-window. A max is fragile no matter how
+    short the window: Bohn's 12 sessions in the window run 0.29-0.35 except for
+    a single 0.43 on 7/24, and best-in-window would have plotted that 0.43 and
+    left him in the wrong quadrant anyway. The median absorbs the spike, which
+    is also why it retires the old round-4 display guard - that guard existed
+    only because a max can be defeated by one mis-segmented rep. ADJUDICATED_RSI
+    is no longer consulted here; it stays in this file because
+    Pitch Model/build_cmj_quadrants.py still parses it."""
     from statistics import median as _qmed
     rows = []
     for a in fd_data["athletes"].values():
@@ -2104,20 +2126,18 @@ def gen_QUAD(fd_data):
                     rsi_s[d] = max(rsi_s.get(d, 0), r)
         if not ci_s or not rsi_s or not last:
             continue
-        sus = 0
-        def _guard(series, bar):
-            nonlocal sus
-            vals = sorted(series.values(), reverse=True)
-            if len(vals) >= 3 and vals[0] > bar * _qmed(vals):
-                sus = 1
-                return vals[1]
-            return vals[0]
-        rsi_best = max(rsi_s.values())
-        if rsi_best <= ADJUDICATED_RSI.get(name, 0) + 0.005:
-            rsi = rsi_best
-        else:
-            rsi = _guard(rsi_s, 1.45)
-        ci = _guard(ci_s, 1.30)
+        # Current form: median of session bests inside the window. Must match
+        # QUAD_WIN_DAYS in src/App.jsx, which also filters the plot by lastCmj.
+        qcut = (datetime.now() - timedelta(days=QUAD_WIN_DAYS)).strftime("%Y-%m-%d")
+        ci_w = [v for d, v in ci_s.items() if d >= qcut]
+        rsi_w = [v for d, v in rsi_s.items() if d >= qcut]
+        if not ci_w or not rsi_w:
+            continue   # nothing inside the window; the UI would hide the dot anyway
+        ci, rsi = _qmed(ci_w), _qmed(rsi_w)
+        # Hollow now means THIN, not suspect: a median over one or two sessions
+        # is the live fragility here, where a max over a long history was the
+        # old one. 36 athletes sat below this bar the day it shipped.
+        sus = 1 if min(len(ci_w), len(rsi_w)) < 3 else 0
         last5 = [w for _, w in sorted(wts)[-5:]]
         bw = round(sum(last5) / len(last5) * LB_PER_KG, 1) if last5 else None
         fem = 1 if "Female Athletes" in (a.get("groups") or []) else 0
