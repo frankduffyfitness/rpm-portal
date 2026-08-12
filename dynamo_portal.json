@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-12T21:33:55.880235+00:00",
+    "syncDate": "2026-08-12T21:44:19.565984+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 71
+    "totalAthletes": 72
   },
   "athletes": {
     "Joey Muzio": {
@@ -7306,6 +7306,29 @@
                 null,
                 2.86
               ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                441
+              ],
+              "peakLbs": [
+                null,
+                99.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                993
+              ],
+              "ttp": [
+                null,
+                3.76
+              ]
             }
           ],
           "erIr": {
@@ -12189,6 +12212,72 @@
               "ttp": [
                 null,
                 1.96
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Luke Mendez": {
+      "name": "Luke Mendez",
+      "group": "hs",
+      "dob": "2011-01-25",
+      "tests": [
+        {
+          "date": "2026-08-12",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                389.8,
+                null
+              ],
+              "peakLbs": [
+                87.6,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                2045,
+                null
+              ],
+              "ttp": [
+                1.74,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                380,
+                null
+              ],
+              "peakLbs": [
+                85.4,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                1695,
+                null
+              ],
+              "ttp": [
+                2.01,
+                null
               ]
             }
           ],
