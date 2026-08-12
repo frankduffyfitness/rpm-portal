@@ -2073,9 +2073,9 @@ def gen_QUAD(fd_data):
     via GROUP_PRIORITY, so the group code alone cannot identify them); the
     UI suppresses the velo-model engine projection for fem=1 - the model was
     fit on male pitchers and has no validity claim for female athletes.
-    ci / rsi = the MEDIAN of session bests inside a 42-day window, i.e. current
-    form, not career peak (Frank, 2026-08-11). sus=1 marks a thin window
-    (< 3 sessions), drawn hollow.
+    ci / rsi = the BEST session value inside a 42-day window, i.e. the best he
+    has shown recently, not his career peak (Frank, 2026-08-12). sus=1 marks a
+    thin window (< 3 sessions), drawn hollow.
 
     Why this changed. The plot used LIFETIME bests, so an athlete's two axes
     could come from different years. Miles Bohn plotted at a CI set the morning
@@ -2087,15 +2087,27 @@ def gen_QUAD(fd_data):
     needs. Career peaks are the right axis for ranking potential and the wrong
     one for reading who is in front of you today.
 
-    Why the MEDIAN and not the best-in-window. A max is fragile no matter how
-    short the window: Bohn's 12 sessions in the window run 0.29-0.35 except for
-    a single 0.43 on 7/24, and best-in-window would have plotted that 0.43 and
-    left him in the wrong quadrant anyway. The median absorbs the spike, which
-    is also why it retires the old round-4 display guard - that guard existed
-    only because a max can be defeated by one mis-segmented rep. ADJUDICATED_RSI
-    is no longer consulted here; it stays in this file because
-    Pitch Model/build_cmj_quadrants.py still parses it."""
-    from statistics import median as _qmed
+    Why the BEST inside the window and not the median. The window, not the
+    statistic, is what handles the detrained athlete: a kid we have not seen in
+    six weeks does not get plotted at all, so nobody is labelled off stale work.
+    Inside the window the best rep is the fairer read of what he can currently
+    do - a median drags him down for bad reps, fatigue and off days that are not
+    what you are trying to classify (Frank, 2026-08-12).
+
+    Known cost, accepted deliberately. A max is still decided by one rep. Bohn's
+    12 sessions in the window run 0.29-0.35 except a single 0.43 on 7/24, so he
+    plots at 0.43 and stays in "Engine + spring" - the placement that started
+    this whole thread. Under a median he lands force-dominant. Frank was shown
+    both and chose the best-in-window; switch _qbest to statistics.median here to
+    reverse it, and update the axis copy in src/App.jsx to match.
+
+    This still retires the old round-4 display guard, which existed to stop a
+    career-long max being defeated by one mis-segmented rep. A 42-day window
+    bounds that exposure to weeks instead of years, and sus/hollow now marks the
+    live fragility: fewer than 3 sessions. ADJUDICATED_RSI is no longer consulted
+    here; it stays in this file because Pitch Model/build_cmj_quadrants.py still
+    parses it."""
+    _qbest = max
     rows = []
     for a in fd_data["athletes"].values():
         name = a.get("name")
@@ -2133,7 +2145,7 @@ def gen_QUAD(fd_data):
         rsi_w = [v for d, v in rsi_s.items() if d >= qcut]
         if not ci_w or not rsi_w:
             continue   # nothing inside the window; the UI would hide the dot anyway
-        ci, rsi = _qmed(ci_w), _qmed(rsi_w)
+        ci, rsi = _qbest(ci_w), _qbest(rsi_w)
         # Hollow now means THIN, not suspect: a median over one or two sessions
         # is the live fragility here, where a max over a long history was the
         # old one. 36 athletes sat below this bar the day it shipped.
