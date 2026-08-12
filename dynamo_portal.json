@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-12T16:03:58.128931+00:00",
+    "syncDate": "2026-08-12T17:55:26.770931+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 70
+    "totalAthletes": 71
   },
   "athletes": {
     "Joey Muzio": {
@@ -12093,6 +12093,72 @@
           "erIr": {
             "left": null,
             "right": 1.01
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Brendan Ott": {
+      "name": "Brendan Ott",
+      "group": "col",
+      "dob": "2007-07-06",
+      "tests": [
+        {
+          "date": "2026-08-12",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                471.3
+              ],
+              "peakLbs": [
+                null,
+                106.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2884
+              ],
+              "ttp": [
+                null,
+                4.17
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                458.9
+              ],
+              "peakLbs": [
+                null,
+                103.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3133
+              ],
+              "ttp": [
+                null,
+                1.96
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
