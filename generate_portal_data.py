@@ -110,6 +110,7 @@ VELO_BULLPEN_LABELS = {
     # Very low-intent day: 74.2 peak against an 86.6 best, on a 3-session sample
     # where one pen is a quarter of everything he has (Frank, 2026-08-11).
     ("Jaylen Cruz", "2026-08-11"): "Low Effort",
+    ("Thomas LoBello", "2026-08-12"): "Low Effort",   # Frank, 2026-08-12
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
