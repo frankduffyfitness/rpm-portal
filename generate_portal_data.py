@@ -115,6 +115,8 @@ VELO_BULLPEN_LABELS = {
     ("Mason Morello", "2026-08-14"): "Live AB",       # Frank, 2026-08-14
     ("Brendan Ott", "2026-08-14"): "Live AB",         # two innings, one date (Frank, 2026-08-14)
     ("Liam Brower", "2026-08-14"): "Live AB",         # Frank, 2026-08-14
+    ("KJ Osorio", "2026-08-14"): "Live AB",           # Frank, 2026-08-14
+    ("Joe Hauser", "2026-08-14"): "Live AB",          # Frank, 2026-08-14
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
