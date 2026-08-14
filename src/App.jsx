@@ -4679,7 +4679,8 @@ function WatchSection() {
 
 // ─── CMJ tab: force/elasticity quadrants ────────────────────────────────────
 // _QUAD rows = [name, group, ci, rsi, sus, lastCmj]; sus = the display guard
-// flagged a THIN window (< 3 sessions), drawn hollow. ci/rsi are the BEST
+// flagged a THIN window (< 3 sessions) -- noted in the tooltip and tap card,
+// dots render uniform (Frank, 2026-08-14). ci/rsi are the BEST
 // of session bests inside the window below -- the best he has shown recently,
 // not his career peak.
 // See gen_QUAD in generate_portal_data.py for why.
@@ -4758,8 +4759,8 @@ function CmjQuadrants() {
           ))}
           {pool.map((r, i) => (
             <circle key={r[0]} cx={X(r[2])} cy={Y(r[3])} r={hover === i || pick === i ? 6 : 4}
-              fill={r[4] ? "none" : (hover === i || pick === i ? "#4FFFB0" : "#60A5FA")}
-              stroke={r[4] ? "#FFB020" : "#0A0C10"} strokeWidth={r[4] ? 1.6 : 1.2}
+              fill={hover === i || pick === i ? "#4FFFB0" : "#60A5FA"}
+              stroke="#0A0C10" strokeWidth={1.2}
               style={{ cursor: "pointer" }}
               onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
               onClick={() => setPick(pick === i ? null : i)} />
@@ -4782,7 +4783,6 @@ function CmjQuadrants() {
           <span>spring-dom. <b style={{ color: "#B8BDC4" }}>{counts.sd}</b></span>
           <span>force-dom. <b style={{ color: "#B8BDC4" }}>{counts.fd}</b></span>
           <span>developing <b style={{ color: "#B8BDC4" }}>{counts.dev}</b></span>
-          <span style={{ marginLeft: "auto" }}>hollow = fewer than 3 sessions in window</span>
         </div>
       </div>
       <div style={{ fontSize: 9.5, color: "#4A4F57", lineHeight: 1.55, padding: "8px 4px 0" }}>

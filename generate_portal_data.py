@@ -2078,7 +2078,7 @@ def gen_QUAD(fd_data):
     fit on male pitchers and has no validity claim for female athletes.
     ci / rsi = the BEST session value inside a 42-day window, i.e. the best he
     has shown recently, not his career peak (Frank, 2026-08-12). sus=1 marks a
-    thin window (< 3 sessions), drawn hollow.
+    thin window (< 3 sessions) -- shown in the tooltip/tap card only; dots render uniform (Frank, 2026-08-14).
 
     Why this changed. The plot used LIFETIME bests, so an athlete's two axes
     could come from different years. Miles Bohn plotted at a CI set the morning
@@ -2106,7 +2106,7 @@ def gen_QUAD(fd_data):
 
     This still retires the old round-4 display guard, which existed to stop a
     career-long max being defeated by one mis-segmented rep. A 42-day window
-    bounds that exposure to weeks instead of years, and sus/hollow now marks the
+    bounds that exposure to weeks instead of years, and sus now marks the
     live fragility: fewer than 3 sessions. ADJUDICATED_RSI is no longer consulted
     here; it stays in this file because Pitch Model/build_cmj_quadrants.py still
     parses it."""
