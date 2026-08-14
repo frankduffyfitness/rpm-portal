@@ -112,6 +112,7 @@ VELO_BULLPEN_LABELS = {
     ("Jaylen Cruz", "2026-08-11"): "Low Effort",
     ("Thomas LoBello", "2026-08-12"): "Low Effort",   # Frank, 2026-08-12
     ("Christian Peralta", "2026-08-14"): "Live AB",   # Frank, 2026-08-14
+    ("Mason Morello", "2026-08-14"): "Live AB",       # Frank, 2026-08-14
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
