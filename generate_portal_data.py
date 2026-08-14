@@ -113,6 +113,8 @@ VELO_BULLPEN_LABELS = {
     ("Thomas LoBello", "2026-08-12"): "Low Effort",   # Frank, 2026-08-12
     ("Christian Peralta", "2026-08-14"): "Live AB",   # Frank, 2026-08-14
     ("Mason Morello", "2026-08-14"): "Live AB",       # Frank, 2026-08-14
+    ("Brendan Ott", "2026-08-14"): "Live AB",         # two innings, one date (Frank, 2026-08-14)
+    ("Liam Brower", "2026-08-14"): "Live AB",         # Frank, 2026-08-14
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
@@ -1625,29 +1627,46 @@ def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
     for name, r in (rep.get("athletes") or {}).items():
         ath = aths.setdefault(name, {"sessions": []})
         have = {s["date"] for s in ath["sessions"]}
+        # An athlete can log TWO report sessions on one date (Brendan Ott threw
+        # two live-AB innings on 2026-08-14, exported as separate PDFs). The velo
+        # card carries one session per date, so same-date reports are POOLED
+        # here before the skip check: peak = max across them (Ott's day peak
+        # 83.8 was in inning 2 and would otherwise be silently dropped), avg =
+        # pitch-count-weighted across each report's primary true fastball.
+        by_date = {}
         for s in r.get("sessions", []):
-            if s["date"] in have:
+            by_date.setdefault(s["date"], []).append(s)
+        for date, day in by_date.items():
+            if date in have:
                 continue
             # Peak FB velo = the hardest pitch in the FASTBALL FAMILY (4-seam,
             # sinker, cutter) — e.g. Cade popped a 95 sinker above his 94 four-seam.
-            types = s.get("types", [])
-            fam = [t for t in types if t.get("name") in FB_FAMILY]
-            peaks = [t.get("veloMax") for t in fam if t.get("veloMax")]
+            peaks, avg_num, avg_den = [], 0.0, 0
+            for s in day:
+                types = s.get("types", [])
+                fam = [t for t in types if t.get("name") in FB_FAMILY]
+                peaks += [t.get("veloMax") for t in fam if t.get("veloMax")]
+                # Average FB velo = the primary TRUE fastball (four-seam, else
+                # sinker), NOT the most-thrown family member. A cutter counts for
+                # peak but is a distinct, slower pitch that must not stand in for
+                # average fastball velo (Jaylen Cruz threw more cutters than
+                # four-seams, so his avg read his 79.6 cutter instead of his 85.3
+                # fastball). Cutter drives avg only if it's the session's only
+                # fastball-family pitch.
+                true_fb = [t for t in fam if t.get("name") in ("Fastball", "Sinker")]
+                if true_fb or fam:
+                    avg_src = max(true_fb or fam, key=lambda t: t.get("count") or 0)
+                    if avg_src.get("veloAvg"):
+                        n_ = avg_src.get("count") or 1
+                        avg_num += avg_src["veloAvg"] * n_
+                        avg_den += n_
             if not peaks:
-                continue  # no fastball-family pitch this session — no FB velo to record
+                continue  # no fastball-family pitch this date — no FB velo to record
             peak = max(peaks)
-            # Average FB velo = the primary TRUE fastball (four-seam, else sinker),
-            # NOT the most-thrown family member. A cutter counts for peak but is a
-            # distinct, slower pitch that must not stand in for average fastball
-            # velo (Jaylen Cruz threw more cutters than four-seams, so his avg read
-            # his 79.6 cutter instead of his 85.3 fastball). Cutter drives avg only
-            # if it's the session's only fastball-family pitch.
-            true_fb = [t for t in fam if t.get("name") in ("Fastball", "Sinker")]
-            avg_src = max(true_fb or fam, key=lambda t: t.get("count") or 0)
-            avg = avg_src.get("veloAvg")
-            label = VELO_BULLPEN_LABELS.get((name, s["date"]), "Bullpen")
+            avg = (avg_num / avg_den) if avg_den else None
+            label = VELO_BULLPEN_LABELS.get((name, date), "Bullpen")
             ath["sessions"].append({
-                "date": s["date"],
+                "date": date,
                 "peakVelo": round(peak, 1),
                 "avgVelo": round(avg, 1) if avg else None,
                 "sessionType": label,
