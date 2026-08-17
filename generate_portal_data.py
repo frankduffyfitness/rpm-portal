@@ -117,6 +117,15 @@ VELO_BULLPEN_LABELS = {
     ("Liam Brower", "2026-08-14"): "Live AB",         # Frank, 2026-08-14
     ("KJ Osorio", "2026-08-14"): "Live AB",           # Frank, 2026-08-14
     ("Joe Hauser", "2026-08-14"): "Live AB",          # Frank, 2026-08-14
+    ("Eli Delgado", "2026-08-14"): "Live AB",         # Frank, 2026-08-16
+    ("Elian Carrasco", "2026-08-14"): "Live AB",      # Frank, 2026-08-16
+    ("Angelo Nunes", "2026-08-14"): "Live AB",        # Frank, 2026-08-16
+    ("Emrie McLaughlin", "2026-08-14"): "Live AB",    # Frank, 2026-08-16
+    ("Eric Grgas", "2026-08-14"): "Live AB",          # Frank, 2026-08-16
+    ("Zach Powell", "2026-08-14"): "Live AB",         # Frank, 2026-08-16
+    # First official rehab BULLPEN: on the rubber now (ext 6.0 vs the 9.2 of the
+    # down-slope 8/10 session) but velo still a ramp at 72-74 (Frank, 2026-08-16).
+    ("Johnny Hammer", "2026-08-14"): "Rehab",
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
