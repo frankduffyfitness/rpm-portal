@@ -126,6 +126,12 @@ VELO_BULLPEN_LABELS = {
     # First official rehab BULLPEN: on the rubber now (ext 6.0 vs the 9.2 of the
     # down-slope 8/10 session) but velo still a ramp at 72-74 (Frank, 2026-08-16).
     ("Johnny Hammer", "2026-08-14"): "Rehab",
+    # Pitch-design day for Parikh; plain low-intent for Grgas and Uysal
+    # (Frank, 2026-08-17). Matching SESSION_EXCLUSIONS entries ride in
+    # stuff_plus_model/extract_arsenal.py -- this map does not reach grading.
+    ("Nikhil Parikh", "2026-08-17"): "Low Effort",
+    ("Eric Grgas", "2026-08-17"): "Low Effort",
+    ("Zachary Uysal", "2026-08-17"): "Low Effort",
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
