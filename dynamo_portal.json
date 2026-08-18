@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-18T09:40:54.678479+00:00",
+    "syncDate": "2026-08-18T15:38:48.528048+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 76
+    "totalAthletes": 77
   },
   "athletes": {
     "Joey Muzio": {
@@ -12798,6 +12798,72 @@
               "ttp": [
                 null,
                 0.7
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Hudson Geiger": {
+      "name": "Hudson Geiger",
+      "group": "hs",
+      "dob": "2011-06-23",
+      "tests": [
+        {
+          "date": "2026-08-18",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                399.5
+              ],
+              "peakLbs": [
+                null,
+                89.8
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2869
+              ],
+              "ttp": [
+                null,
+                0.41
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                375.2
+              ],
+              "peakLbs": [
+                null,
+                84.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2392
+              ],
+              "ttp": [
+                null,
+                1.04
               ]
             }
           ],
