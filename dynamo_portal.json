@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-18T15:38:48.528048+00:00",
+    "syncDate": "2026-08-18T17:27:44.439906+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 77
+    "totalAthletes": 78
   },
   "athletes": {
     "Joey Muzio": {
@@ -5349,6 +5349,65 @@
       "group": "col",
       "dob": "2008-06-09",
       "tests": [
+        {
+          "date": "2026-08-18",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                513.4
+              ],
+              "peakLbs": [
+                null,
+                115.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2160
+              ],
+              "ttp": [
+                null,
+                5.89
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                492.3
+              ],
+              "peakLbs": [
+                null,
+                110.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1543
+              ],
+              "ttp": [
+                null,
+                3.81
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-08-03",
           "type": "Shoulder Strength Baseline",
@@ -12864,6 +12923,72 @@
               "ttp": [
                 null,
                 1.04
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Ethan Tineo": {
+      "name": "Ethan Tineo",
+      "group": "hs",
+      "dob": "2009-07-23",
+      "tests": [
+        {
+          "date": "2026-08-18",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                355.2
+              ],
+              "peakLbs": [
+                null,
+                79.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1880
+              ],
+              "ttp": [
+                null,
+                2.71
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                373.6
+              ],
+              "peakLbs": [
+                null,
+                84.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2509
+              ],
+              "ttp": [
+                null,
+                0.54
               ]
             }
           ],
