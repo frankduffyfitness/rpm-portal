@@ -132,6 +132,9 @@ VELO_BULLPEN_LABELS = {
     ("Nikhil Parikh", "2026-08-17"): "Low Effort",
     ("Eric Grgas", "2026-08-17"): "Low Effort",
     ("Zachary Uysal", "2026-08-17"): "Low Effort",
+    # Rehab progression; partly off the mound but mixed with down-slope throws
+    # in one session, ext 10.6-12.5 (Frank, 2026-08-18).
+    ("Darren Espinal", "2026-08-18"): "Rehab",
 }
 # NOTE (2026-08-11): every "Low Effort" / "Rehab" entry above needs a matching
 # SESSION_EXCLUSIONS entry in stuff_plus_model/extract_arsenal.py. This map gates
