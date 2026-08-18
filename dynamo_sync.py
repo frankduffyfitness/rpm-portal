@@ -522,3 +522,5 @@ if __name__ == "__main__":
 # sync trigger 2026-08-13 — pull the DynaMo tests that came with today's pens
 
 # sync trigger 2026-08-17 pm — pull the DynaMo tests from today
+
+# sync trigger 2026-08-18 — pull today's eval DynaMo (Tineo, Corkery + any new)

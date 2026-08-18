@@ -905,3 +905,5 @@ if __name__ == "__main__":
 # cmj re-pull, round-3 first-rep artifacts deleted 2026-08-02
 
 # cmj re-pull, round-4 base-wide rep deletions 2026-08-11
+
+# sync trigger 2026-08-18 — pull today's eval CMJs (Schroeder, Tineo, Corkery)
