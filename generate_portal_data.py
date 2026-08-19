@@ -1934,6 +1934,15 @@ VM_A = (49.7784, 0.099611, 9.433266)              # velo = a0 + a1*CI + a2*RSI
 VM_B = (41.8141, 0.068449, 11.978324, 3.185650)   # ... + b3*ln(ER_RFD lbs/s)
 VM_RMSE = 4.4
 VM_R2 = 0.56
+# A + grip (Frank adopted DISPLAY-BESIDE-A, 2026-08-19: "merit enough to show
+# guys"). Fit frozen from that day's grip-covered subset (n=67, LOO ±4.43);
+# grip = best-side max peakN across every DynaMo Grip Squeeze. Shown as a
+# second read on the athlete card only — Model A stays the headline, flags,
+# and boards. The CI coefficient is much smaller than A's because grip
+# absorbs part of the size axis; do not compare coefficients across models.
+# Provisional pending the pre-registered refresh-battery verdict.
+VM_G = (49.23519, 0.026726, 11.027560, 0.034926)  # velo = g0 + g1*CI + g2*RSI + g3*gripN
+VM_G_BAND = 4.4
 # Velo target: max Peak FB across sessions. The top-3-median target ("t3")
 # validated slightly better in the refit; flip only with coach sign-off.
 VM_TARGET = "max"
@@ -1962,7 +1971,10 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
     [name, group, ci, rsi, erRfd|null, velo, sessions, lastVelo, predA, residA,
      predB|null, residB|null, thin, bwLbs|null,
      velo6w|null, sess6w, ci6w|null, rsi6w|null, pred6w|null, resid6w|null,
-     status, lastCmj|null, bestCiDate|null, bestRsiDate|null]
+     status, lastCmj|null, bestCiDate|null, bestRsiDate|null,
+     gripN|null, predG|null, residG|null]
+    Indices 24-26 (2026-08-19): DynaMo grip peak (best-side max, N) and the
+    frozen A+grip prediction/residual (VM_G, display-beside-A only).
     Indices 22-23 are the session dates the LIFETIME-BEST ci and rsi were set
     (stale-engine badge, 2026-08-02: an all-time prediction leaning on an old
     best can flag an athlete who has since declined; Cellilli and Persichilli's
@@ -2010,6 +2022,14 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
                    "v6": _target(peaks6) if peaks6 else None, "n6": len(recent)}
 
     er = {}
+    gripN = {}
+    for a in dynamo_list:
+        k = _vm_norm(a.get("name"))
+        vals = [v for t in a.get("tests", []) for m in t.get("movements", [])
+                if m.get("name") == "Grip Squeeze"
+                for v in (m.get("peakN") or []) if v is not None]
+        if vals:
+            gripN[k] = max(vals)
     for a in dynamo_list:
         k = _vm_norm(a.get("name"))
         per_test = []
@@ -2094,6 +2114,13 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             pred6 = VM_A[0] + VM_A[1] * ci6 + VM_A[2] * rsi6
             resid6 = round(v6 - pred6, 1)
         status = "current" if (n6 >= 3 and resid6 is not None) else "stale"
+        g = gripN.get(k)
+        pred_g = resid_g = None
+        if g:
+            pred_g = round(VM_G[0] + VM_G[1] * ci + VM_G[2] * rsi + VM_G[3] * g, 1)
+            # residual from the ROUNDED pair so the card's arithmetic closes
+            # (2026-08-10 precision lesson: coaches subtract what they see).
+            resid_g = round(round(tv["v"], 1) - pred_g, 1)
         rows.append([
             _vm_norm(name), grp, round(ci, 1), round(rsi, 2),
             round(e, 1) if e else None, round(tv["v"], 1), tv["n"], tv["last"][:10],
@@ -2103,10 +2130,11 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             round(ci6, 1) if ci6 else None, round(rsi6, 2) if rsi6 else None,
             round(pred6, 1) if pred6 is not None else None, resid6,
             status, last_cmj, ci_date, rsi_d,
+            round(g, 1) if g else None, pred_g, resid_g,
         ])
     rows.sort(key=lambda r: -r[9])
-    return {"a": list(VM_A), "b": list(VM_B), "rmse": VM_RMSE, "r2": VM_R2,
-            "target": VM_TARGET, "rows": rows}
+    return {"a": list(VM_A), "b": list(VM_B), "g": list(VM_G), "gband": VM_G_BAND,
+            "rmse": VM_RMSE, "r2": VM_R2, "target": VM_TARGET, "rows": rows}
 
 
 def gen_QUAD(fd_data):
