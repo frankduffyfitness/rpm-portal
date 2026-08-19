@@ -3971,7 +3971,7 @@ function VmSandboxCard() {
     const span = rng[1] - rng[0];
     return [Math.max(rng[0] - span * frac, floor), rng[1] + span * frac];
   };
-  const ciB = pad(VM_RANGE.ci, 0.15, 40), rsiB = pad(VM_RANGE.rsi, 0.15, 0.1), erB = pad(VM_RANGE.erRfd, 0.15, 10);
+  const ciB = pad(VM_RANGE.ci, 0.15, 40), rsiB = pad(VM_RANGE.rsi, 0.15, 0.1), erB = pad(VM_RANGE.erRfd, 0.15, 10), gB = pad(VM_RANGE.grip, 0.15, 50);
   const med = (k, fb) => {
     const v = VM_ROWS.map(r => r[k]).filter(x => x != null).sort((a, b) => a - b);
     return v.length ? v[Math.floor(v.length / 2)] : fb;
@@ -3979,6 +3979,7 @@ function VmSandboxCard() {
   const d0 = {
     ci: Math.round(med("ci", 230)), rsi: Math.round(med("rsi", 0.75) * 100) / 100,
     er: Math.round(med("erRfd", 150)), bw: Math.round(med("bw", 180)),
+    grip: Math.round(med("grip", 500)),
   };
   // The pinned baseline: what the delta line and the bodyweight coupling are
   // measured against. Starts at roster medians.
@@ -3990,14 +3991,20 @@ function VmSandboxCard() {
   const setCi = (v) => setCiBase(v - bwAdj);
   const [rsi, setRsi] = useState(d0.rsi);
   const [er, setEr] = useState(d0.er);
+  const [grip, setGrip] = useState(d0.grip);
 
   const livePred = vmPredA(ci, rsi);
   const pinPred = vmPredA(pin.ci, pin.rsi);
   const delta = livePred - pinPred;
+  // Grip second read (2026-08-19): rounded pairs so visible arithmetic closes.
+  const livePredG = vmPredG(ci, rsi, grip);
+  const pinPredG = vmPredG(pin.ci, pin.rsi, pin.grip != null ? pin.grip : d0.grip);
+  const deltaG = Math.round(livePredG * 10) / 10 - Math.round(pinPredG * 10) / 10;
+  const extrapG = grip < VM_RANGE.grip[0] || grip > VM_RANGE.grip[1];
   const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
     false;
   const pinned = Math.abs(ci - pin.ci) < 1 && Math.abs(rsi - pin.rsi) < 0.01 &&
-    Math.abs(bw - pin.bw) < 1;
+    Math.abs(bw - pin.bw) < 1 && (pin.grip == null || Math.abs(grip - pin.grip) < 1);
   const card = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 16px", marginBottom: 12 };
 
   return (
@@ -4009,6 +4016,7 @@ function VmSandboxCard() {
         </div>
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={setCi} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={setRsi} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
+        <VmSlider label="Grip Peak" unit="N" value={grip} onChange={setGrip} min={gB[0]} max={gB[1]} fit={VM_RANGE.grip} step={5} dec={0} />
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 4 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
           <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility&rsquo;s measured rate. It never moves RSI.</div>
@@ -4018,12 +4026,17 @@ function VmSandboxCard() {
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 12, textAlign: "center" }}>
           <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
           <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph)</div>
+          <div style={{ fontSize: 13, color: "#B8BDC4", marginTop: 8, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            with grip: <span style={{ fontWeight: 800, color: extrapG ? "#FFB020" : "#fff" }}>{livePredG.toFixed(1)}</span> <span style={{ fontSize: 10, color: "#8A8F98" }}>{"±"} {_VM.gband} {"·"} provisional</span>
+            {!pinned && Math.abs(deltaG) >= 0.05 && <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {deltaG > 0 ? "+" : ""}{deltaG.toFixed(1)} vs baseline ({pinPredG.toFixed(1)})</span>}
+          </div>
           {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
+          {extrapG && !extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Grip outside the tested range: extrapolating.</div>}
           {!pinned && <div style={{ fontSize: 11, color: "#B8BDC4", marginTop: 6 }}>{delta > 0 ? "+" : ""}{delta.toFixed(1)} mph vs the pinned baseline ({pinPred.toFixed(1)}).</div>}
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-          <button onClick={() => { setPin({ ci, rsi, er, bw }); setCiBase(ci); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(79,255,176,0.4)", borderRadius: 10, background: "rgba(79,255,176,0.08)", color: "#4FFFB0", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Pin as baseline</button>
-          <button onClick={() => { setBw(pin.bw); setCiBase(pin.ci); setRsi(pin.rsi); setEr(pin.er); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, background: "none", color: "#6B7280", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Reset to baseline</button>
+          <button onClick={() => { setPin({ ci, rsi, er, bw, grip }); setCiBase(ci); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(79,255,176,0.4)", borderRadius: 10, background: "rgba(79,255,176,0.08)", color: "#4FFFB0", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Pin as baseline</button>
+          <button onClick={() => { setBw(pin.bw); setCiBase(pin.ci); setRsi(pin.rsi); setEr(pin.er); if (pin.grip != null) setGrip(pin.grip); }} style={{ flex: 1, padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, background: "none", color: "#6B7280", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Reset to baseline</button>
         </div>
         <div style={{ fontSize: 9.5, color: "#4A4F57", lineHeight: 1.55, marginTop: 12 }}>
           The model is cross-sectional: it says what athletes who test at a number typically throw, not a guarantee that training the input adds the output. Month-over-month data within the same athlete currently shows about half the cross-sectional slope.
