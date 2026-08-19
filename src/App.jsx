@@ -3666,6 +3666,11 @@ function VmFlags({ rows, onPick, openLists, onToggleList }) {
   const stale = rows.filter(r => !r.cur && !ROSTER_STATUS[r.name]);
   const gone = rows.filter(r => !r.cur && ROSTER_STATUS[r.name]);
   const maxAbs = Math.max(...flagged.map(r => Math.abs(r.resid6)), VM_BAND + 1);
+  // Grip second-read flags (2026-08-19): all-time basis like the card's grip
+  // block (grip has no 6-week windowing), 5+ sessions, departed excluded.
+  const gFlagged = rows.filter(r => r.grip != null && r.residG != null && !ROSTER_STATUS[r.name] && r.sessions >= 5 && Math.abs(r.residG) > _VM.gband)
+    .sort((a, b) => b.residG - a.residG);
+  const gMax = Math.max(...gFlagged.map(r => Math.abs(r.residG)), _VM.gband + 1);
   return (
     <div>
       <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, marginBottom: 12 }}>
@@ -3702,6 +3707,45 @@ function VmFlags({ rows, onPick, openLists, onToggleList }) {
           );
         })}
         {!flagged.length && <div style={{ padding: 20, fontSize: 11, color: "#6B7280", textAlign: "center" }}>No pitcher is currently outside the noise band.</div>}
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8, margin: "4px 0 6px" }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Still flagged with grip accounted for</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: "#FFB020", background: "#FFB02018", borderRadius: 8, padding: "2px 7px" }}>PROVISIONAL</span>
+      </div>
+      <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, marginBottom: 10 }}>
+        The A + grip second read, lifetime bests, grip-tested pitchers with 5+ sessions, beyond {"±"}{_VM.gband} mph. A pitcher flagged above but absent here has a residual his grip explains; a pitcher on both lists is off the model even after his hand is counted.
+      </div>
+      <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
+        {gFlagged.map((r) => {
+          const w = Math.abs(r.residG) / gMax * 50;
+          const over = r.residG > 0;
+          const gi = GROUPS[r.group] || {};
+          return (
+            <div key={r.name} onClick={() => onPick(r)} style={{ padding: "9px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 5 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#E0E0E0" }}>{r.name}</span>
+                <span style={{ fontSize: 9, color: "#6B7280" }}>grip {Math.round(r.grip)} N</span>
+                <span style={{ fontSize: 9, color: gi.color || "#6B7280" }}>{gi.shortLabel || r.group}</span>
+                <VmStatusChip name={r.name} />
+                <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 800, color: over ? "#FF6B6B" : "#60A5FA" }}>{over ? "+" : ""}{r.residG.toFixed(1)}</span>
+              </div>
+              <div style={{ position: "relative", height: 10, background: "rgba(255,255,255,0.04)", borderRadius: 5 }}>
+                <div style={{ position: "absolute", left: "50%", top: 0, width: 1, height: "100%", background: "rgba(255,255,255,0.18)" }} />
+                {[1, -1].map(sgn => (
+                  <div key={sgn} style={{ position: "absolute", left: `${50 + sgn * (_VM.gband / gMax * 50)}%`, top: 0, width: 1, height: "100%", background: "rgba(255,255,255,0.09)" }} />
+                ))}
+                <div style={{ position: "absolute", top: 1, height: 8, borderRadius: 4, background: over ? "#FF6B6B" : "#60A5FA",
+                  left: over ? "50%" : `${50 - w}%`, width: `${w}%` }} />
+              </div>
+              {over && vmSelectedArm(r) && (
+                <div style={{ fontSize: 9, color: "#8A8F98", marginTop: 4, lineHeight: 1.4 }}>
+                  Expected for a {r.group === "pro" ? "pro" : "90+"} arm: the leg model under-reads elite velo. Profile, not over-achievement.
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {!gFlagged.length && <div style={{ padding: 20, fontSize: 11, color: "#6B7280", textAlign: "center" }}>Nobody outside the band once grip is counted.</div>}
       </div>
       {onModel.length > 0 && (
         <VmGroupList title="On model, as expected"
