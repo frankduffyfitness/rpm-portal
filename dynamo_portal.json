@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-20T15:41:02.260121+00:00",
+    "syncDate": "2026-08-20T18:02:38.214058+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 80
+    "totalAthletes": 81
   },
   "athletes": {
     "Joey Muzio": {
@@ -13442,6 +13442,72 @@
           "erIr": {
             "left": null,
             "right": 1.05
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Gianni Muro": {
+      "name": "Gianni Muro",
+      "group": "hs",
+      "dob": "2010-10-17",
+      "tests": [
+        {
+          "date": "2026-08-20",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                487.5
+              ],
+              "peakLbs": [
+                null,
+                109.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2746
+              ],
+              "ttp": [
+                null,
+                0.88
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                485.9
+              ],
+              "peakLbs": [
+                null,
+                109.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2726
+              ],
+              "ttp": [
+                null,
+                0.98
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
