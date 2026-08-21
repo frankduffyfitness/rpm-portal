@@ -133,6 +133,22 @@ VELO_BULLPEN_LABELS = {
     ("Eric Grgas", "2026-08-17"): "Low Effort",
     ("Zachary Uysal", "2026-08-17"): "Low Effort",
     ("Brendan Ott", "2026-08-19"): "Low Effort",       # Frank, 2026-08-19
+    # 8/21 live-AB day (Frank, 2026-08-21). Ott threw two innings; one label
+    # covers both (velo pools same-date sessions since the 8/14 fix).
+    ("Christian Peralta", "2026-08-21"): "Live AB",
+    ("Frankie Muzio", "2026-08-21"): "Live AB",
+    ("Brendan Ott", "2026-08-21"): "Live AB",
+    ("Mason Morello", "2026-08-21"): "Live AB",
+    ("Eric Grgas", "2026-08-21"): "Live AB",
+    ("Zach Powell", "2026-08-21"): "Live AB",
+    ("KJ Osorio", "2026-08-21"): "Live AB",
+    ("Frankie Muro", "2026-08-21"): "Live AB",
+    ("Joe Hauser", "2026-08-21"): "Live AB",
+    ("Zachary Uysal", "2026-08-21"): "Live AB",
+    # Final rehab pen before leaving for school (Frank, 2026-08-21).
+    ("Darren Espinal", "2026-08-21"): "Rehab",
+    # Another rehab pen; the 8/17 max-effort pen stays the held first-pen grade.
+    ("Johnny Hammer", "2026-08-21"): "Rehab",
     # Rehab progression; partly off the mound but mixed with down-slope throws
     # in one session, ext 10.6-12.5 (Frank, 2026-08-18).
     ("Darren Espinal", "2026-08-18"): "Rehab",
