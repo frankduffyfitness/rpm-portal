@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-08-20T21:35:19.499471+00:00",
+    "syncDate": "2026-08-21T03:55:44.755327+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 82
   },
@@ -13590,6 +13590,29 @@
               ],
               "ttp": [
                 0.94,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                546.9,
+                null
+              ],
+              "peakLbs": [
+                122.9,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                3127,
+                null
+              ],
+              "ttp": [
+                0.68,
                 null
               ]
             }
