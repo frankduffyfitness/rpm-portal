@@ -4940,6 +4940,89 @@ function CmjQuadrants() {
   );
 }
 
+// ─── Injury List (coach portal) ─────────────────────────────────────────────
+// Manual registry, same pattern as ROSTER_STATUS: lives in UI source so it
+// survives every sync regeneration; Frank updates entries by asking. The card
+// enriches each entry from data already on the page — the athlete's FULL
+// session history (Rehab / Low Effort sessions included, which IS the ramp),
+// peak-velo trajectory, and last-seen dates. Phases are a fixed ladder so
+// progress reads the same for every athlete.
+const INJ_PHASES = ["Shutdown", "Return to throw", "Short slope", "Mound rehab", "Max-effort pens", "Live BP", "Cleared"];
+const INJURY_LIST = [
+  { name: "Johnny Hammer", injury: "Return-to-throw progression", since: "2026-08-10",
+    phase: 3, note: "On the rubber since 8/14; first max-effort pen 8/17 (graded, Shape+ 99); alternating rehab pens while velo builds 72\u201375." },
+  { name: "Mario Corso-Winks", injury: "UCL", since: "2026-01-29",
+    phase: 0, note: "No throwing. Last tracked work January; away from the facility." },
+  { name: "Darren Espinal", injury: "Rehab progression (completed at RPM)", since: "2026-06-25",
+    phase: 3, note: "Final RPM rehab pen 8/21 (35 throws, mixed mound/slope); continuing his build-up at school." },
+];
+function InjurySection() {
+  const days = (d) => Math.max(0, Math.round((Date.now() - new Date(d + "T00:00:00")) / 864e5));
+  return (
+    <div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>Injury &amp; Return-to-Play</div>
+      <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14 }}>Phases advance by coach call, not by data. Session ramps below include rehab and low-effort work &mdash; the sessions the leaderboards deliberately ignore are exactly the ones that matter here.</div>
+      {INJURY_LIST.map((e) => {
+        const v = _VELO.find((r) => r[0] === e.name);
+        const tmr = _TMR[e.name] || [];
+        const cmj = _A.find((r) => r[0] === e.name);
+        const hist = v ? v[10].map((p, i) => ({ p, d: v[12][i], t: (v[13] || [])[i] || "" })).filter((x) => x.p != null) : [];
+        const lo = hist.length ? Math.min(...hist.map((x) => x.p)) - 1.5 : 0;
+        const hi = hist.length ? Math.max(...hist.map((x) => x.p)) + 1.5 : 1;
+        const TW = 360, TH = 74;
+        const TX = (k) => 8 + k / Math.max(1, hist.length - 1) * (TW - 40);
+        const TY = (p) => TH - 16 - (p - lo) / Math.max(0.1, hi - lo) * (TH - 30);
+        return (
+          <div key={e.name} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 18px", marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{e.name}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", background: "rgba(255,176,32,0.10)", border: "1px solid rgba(255,176,32,0.25)", borderRadius: 999, padding: "2px 9px" }}>{e.injury}</span>
+              <span style={{ fontSize: 10, color: "#6B7280" }}>day {days(e.since)}</span>
+            </div>
+            <div style={{ display: "flex", gap: 4, margin: "12px 0 4px", flexWrap: "wrap" }}>
+              {INJ_PHASES.map((ph, i) => (
+                <span key={ph} style={{ fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 6,
+                  background: i < e.phase ? "rgba(79,255,176,0.10)" : i === e.phase ? "rgba(79,255,176,0.22)" : "rgba(255,255,255,0.03)",
+                  color: i < e.phase ? "#4FFFB0" : i === e.phase ? "#0A0C10" : "#4A4F57",
+                  ...(i === e.phase ? { background: "#4FFFB0" } : {}) }}>{ph}</span>
+              ))}
+            </div>
+            {e.note && <div style={{ fontSize: 11, color: "#8A8F98", margin: "8px 0 2px", lineHeight: 1.5 }}>{e.note}</div>}
+            {hist.length >= 2 ? (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, color: "#6B7280", marginBottom: 2 }}>PEAK VELO RAMP &middot; ALL SESSIONS</div>
+                <svg viewBox={"0 0 " + TW + " " + TH} style={{ width: "100%", maxWidth: 480, display: "block" }}>
+                  <polyline points={hist.map((x, k) => TX(k).toFixed(1) + "," + TY(x.p).toFixed(1)).join(" ")} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" />
+                  {hist.map((x, k) => (
+                    <g key={k}>
+                      <circle cx={TX(k)} cy={TY(x.p)} r="3.6" fill={x.t === "Rehab" ? "#FFB020" : x.t === "Low Effort" ? "#C98A00" : x.t === "Live AB" ? "#0E86A8" : "#4FFFB0"} stroke="#0A0C10" strokeWidth="1" />
+                      {(k === 0 || k === hist.length - 1) && <text x={TX(k)} y={TY(x.p) - 7} textAnchor="middle" fontSize="8.5" fontWeight="800" fill="#B8BDC4">{x.p}</text>}
+                      {(k === 0 || k === hist.length - 1) && <text x={TX(k)} y={TH - 3} textAnchor="middle" fontSize="7" fill="#4A4F57">{x.d}</text>}
+                    </g>
+                  ))}
+                </svg>
+                <div style={{ display: "flex", gap: 12, fontSize: 8, color: "#6B7280", marginTop: 2 }}>
+                  <span><span style={{ color: "#4FFFB0" }}>&#9679;</span> bullpen</span>
+                  <span><span style={{ color: "#FFB020" }}>&#9679;</span> rehab</span>
+                  <span><span style={{ color: "#C98A00" }}>&#9679;</span> low effort</span>
+                  <span><span style={{ color: "#0E86A8" }}>&#9679;</span> live AB</span>
+                </div>
+              </div>
+            ) : (
+              <div style={{ fontSize: 10, color: "#4A4F57", marginTop: 8 }}>No tracked throwing yet.</div>
+            )}
+            <div style={{ display: "flex", gap: 16, marginTop: 10, fontSize: 9.5, color: "#6B7280", flexWrap: "wrap" }}>
+              <span>last pen: <b style={{ color: "#B8BDC4" }}>{tmr[0] ? tmr[0].df + " (" + tmr[0].st + ", " + tmr[0].tot + "p)" : "\u2014"}</b></span>
+              <span>last CMJ: <b style={{ color: "#B8BDC4" }}>{cmj ? cmj[5] : "\u2014"}</b></span>
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ fontSize: 9, color: "#4A4F57", marginTop: 4 }}>To add an athlete or advance a phase, tell Claude &mdash; the registry lives in the portal source and survives data syncs.</div>
+    </div>
+  );
+}
+
 function CmjSection() {
   const [view, setView] = useState("quad");
   return (
@@ -5094,7 +5177,7 @@ function DynamoPage() {
   const open = (a) => { setSel(a); setDynTab("dynamo"); setDynSub("athletes"); window.scrollTo(0, 0); };
   return shell(<>
     <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3 }}>
-      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"]].map(([k, l]) => (
+      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"], ["injury", "🩹 Injury"]].map(([k, l]) => (
         <button key={k} onClick={() => { setDynTab(k); if (k !== "dynamo") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
           background: dynTab === k ? "rgba(79,255,176,0.12)" : "transparent", color: dynTab === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
       ))}
@@ -5112,6 +5195,7 @@ function DynamoPage() {
     {dynTab === "model" && <VeloModelSection />}
     {dynTab === "arsenal" && <ArsenalSection />}
     {dynTab === "strategy" && <CmjSection />}
+    {dynTab === "injury" && <InjurySection />}
   </>);
 }
 
