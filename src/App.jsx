@@ -4955,6 +4955,21 @@ const INJURY_LIST = [
     phase: 0, note: "No throwing. Last tracked work January; away from the facility." },
   { name: "Darren Espinal", injury: "Rehab progression (completed at RPM)", since: "2026-06-25",
     phase: 3, note: "Final RPM rehab pen 8/21 (35 throws, mixed mound/slope); continuing his build-up at school." },
+  { name: "Lucas Baker", injury: "Left hamstring strain",
+    phase: 0, next: "Clearance expected in 1\u20132 weeks (from 8/22)",
+    note: "Lower-body injury \u2014 throwing ladder applies loosely; onset date not recorded." },
+  { name: "Michael Regan", injury: "Right medial epicondyle avulsion fracture",
+    phase: 0, next: "Cleared to begin return-to-throw program Wednesday 8/26",
+    note: "" },
+  { name: "Sammy Bolotin", injury: "Left hook-of-hamate fracture",
+    phase: 0, next: "Specialist 8/23 to assess bone healing",
+    note: "" },
+  { name: "Braden Eddy", injury: "Little league elbow (right)", since: "2026-08-10",
+    phase: 0, next: "3\u20134 weeks no throwing from 8/10 \u2192 reassess ~9/1\u20139/7",
+    note: "Not specifically diagnosed as medial epicondylitis." },
+  { name: "Diem Nenadich", injury: "Fractured right forearm (hit by pitch)",
+    phase: 0, next: "Appointment 8/31",
+    note: "Out of the hard cast, now in a brace." },
 ];
 function InjurySection() {
   const days = (d) => Math.max(0, Math.round((Date.now() - new Date(d + "T00:00:00")) / 864e5));
@@ -4977,7 +4992,8 @@ function InjurySection() {
             <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{e.name}</span>
               <span style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", background: "rgba(255,176,32,0.10)", border: "1px solid rgba(255,176,32,0.25)", borderRadius: 999, padding: "2px 9px" }}>{e.injury}</span>
-              <span style={{ fontSize: 10, color: "#6B7280" }}>day {days(e.since)}</span>
+              {e.since && <span style={{ fontSize: 10, color: "#6B7280" }}>day {days(e.since)}</span>}
+              {e.next && <span style={{ fontSize: 10, fontWeight: 700, color: "#60A5FA", background: "rgba(96,165,250,0.10)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: 999, padding: "2px 9px" }}>next: {e.next}</span>}
             </div>
             <div style={{ display: "flex", gap: 4, margin: "12px 0 4px", flexWrap: "wrap" }}>
               {INJ_PHASES.map((ph, i) => (
