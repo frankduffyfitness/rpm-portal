@@ -4970,6 +4970,10 @@ const INJURY_LIST = [
   { name: "Diem Nenadich", injury: "Fractured right forearm (hit by pitch)",
     phase: 0, next: "Appointment 8/31",
     note: "Out of the hard cast, now in a brace." },
+  // monitor: true = never shut down; the phase ladder is replaced by an
+  // active-status chip. For overuse/tendinopathy cases managed by load.
+  { name: "Gavin Laya-Vetell", injury: "Left patellar tendinitis", monitor: true,
+    note: "Physical therapy alongside a 2-day/week training program here. Never shut down from playing \u2014 monitoring symptoms." },
 ];
 function InjurySection() {
   const days = (d) => Math.max(0, Math.round((Date.now() - new Date(d + "T00:00:00")) / 864e5));
@@ -4995,6 +4999,11 @@ function InjurySection() {
               {e.since && <span style={{ fontSize: 10, color: "#6B7280" }}>day {days(e.since)}</span>}
               {e.next && <span style={{ fontSize: 10, fontWeight: 700, color: "#60A5FA", background: "rgba(96,165,250,0.10)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: 999, padding: "2px 9px" }}>next: {e.next}</span>}
             </div>
+            {e.monitor ? (
+              <div style={{ margin: "12px 0 4px" }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "#4FFFB0", background: "rgba(79,255,176,0.10)", border: "1px solid rgba(79,255,176,0.3)", borderRadius: 999, padding: "3px 10px" }}>Active &mdash; symptom monitoring</span>
+              </div>
+            ) : (
             <div style={{ display: "flex", gap: 4, margin: "12px 0 4px", flexWrap: "wrap" }}>
               {INJ_PHASES.map((ph, i) => (
                 <span key={ph} style={{ fontSize: 9, fontWeight: 600, padding: "3px 8px", borderRadius: 6,
@@ -5003,6 +5012,7 @@ function InjurySection() {
                   ...(i === e.phase ? { background: "#4FFFB0" } : {}) }}>{ph}</span>
               ))}
             </div>
+            )}
             {e.note && <div style={{ fontSize: 11, color: "#8A8F98", margin: "8px 0 2px", lineHeight: 1.5 }}>{e.note}</div>}
             {hist.length >= 2 ? (
               <div style={{ marginTop: 10 }}>
