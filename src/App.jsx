@@ -4972,6 +4972,9 @@ const INJURY_LIST = [
     note: "Out of the hard cast, now in a brace." },
   // monitor: true = never shut down; the phase ladder is replaced by an
   // active-status chip. For overuse/tendinopathy cases managed by load.
+  { name: "Will McDuffy", injury: "Little league elbow (right)",
+    phase: 0, next: "Begins low-intent throwing around Labor Day (~9/7)",
+    note: "No physical therapy \u2014 RPM-provided cuff and forearm training program in the meantime." },
   { name: "Gavin Laya-Vetell", injury: "Left patellar tendinitis", monitor: true,
     note: "Physical therapy alongside a 2-day/week training program here. Never shut down from playing \u2014 monitoring symptoms." },
 ];
