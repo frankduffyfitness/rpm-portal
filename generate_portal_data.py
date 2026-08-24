@@ -149,6 +149,8 @@ VELO_BULLPEN_LABELS = {
     ("Darren Espinal", "2026-08-21"): "Rehab",
     # Another rehab pen; the 8/17 max-effort pen stays the held first-pen grade.
     ("Johnny Hammer", "2026-08-21"): "Rehab",
+    # Pitch-design / lower-intent day (Frank, 2026-08-24).
+    ("KJ Osorio", "2026-08-24"): "Low Effort",
     # Rehab progression; partly off the mound but mixed with down-slope throws
     # in one session, ext 10.6-12.5 (Frank, 2026-08-18).
     ("Darren Espinal", "2026-08-18"): "Rehab",
