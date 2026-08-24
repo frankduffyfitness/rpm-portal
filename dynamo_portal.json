@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-08-24T15:47:45.669119+00:00",
+    "syncDate": "2026-08-24T21:36:37.140453+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 83
   },
@@ -10,6 +10,88 @@
       "group": "hs",
       "dob": "2010-11-15",
       "tests": [
+        {
+          "date": "2026-08-24",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                183.7
+              ],
+              "peakLbs": [
+                null,
+                41.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1017
+              ],
+              "ttp": [
+                null,
+                2.07
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                164.8
+              ],
+              "peakLbs": [
+                null,
+                37.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                132
+              ],
+              "ttp": [
+                null,
+                6.24
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                463.7
+              ],
+              "peakLbs": [
+                null,
+                104.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1960
+              ],
+              "ttp": [
+                null,
+                1.92
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 1.11
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-08-03",
           "type": "Shoulder Strength Baseline",
@@ -1255,6 +1337,65 @@
       "group": "stf",
       "dob": "1994-06-28",
       "tests": [
+        {
+          "date": "2026-08-24",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                258.5
+              ],
+              "peakLbs": [
+                null,
+                58.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1211
+              ],
+              "ttp": [
+                null,
+                1.31
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                197.7
+              ],
+              "peakLbs": [
+                null,
+                44.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1117
+              ],
+              "ttp": [
+                null,
+                2.08
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 1.31
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-08-19",
           "type": "Shoulder Strength Baseline",
