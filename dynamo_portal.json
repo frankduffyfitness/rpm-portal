@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-24T09:56:12.784314+00:00",
+    "syncDate": "2026-08-24T15:28:10.937990+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 82
+    "totalAthletes": 83
   },
   "athletes": {
     "Joey Muzio": {
@@ -13724,6 +13724,72 @@
           ],
           "erIr": {
             "left": 1.25,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Leland Daniels-Weeks": {
+      "name": "Leland Daniels-Weeks",
+      "group": "hs",
+      "dob": "2011-04-27",
+      "tests": [
+        {
+          "date": "2026-08-24",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                479.9
+              ],
+              "peakLbs": [
+                null,
+                107.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3148
+              ],
+              "ttp": [
+                null,
+                1.3
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                522.6
+              ],
+              "peakLbs": [
+                null,
+                117.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3217
+              ],
+              "ttp": [
+                null,
+                1.7
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
             "right": null
           },
           "discomfortNote": "",
