@@ -4962,7 +4962,7 @@ const INJURY_LIST = [
     phase: 0, next: "Cleared to begin return-to-throw program Wednesday 8/26",
     note: "" },
   { name: "Sammy Bolotin", injury: "Left hook-of-hamate fracture",
-    phase: 0, next: "Specialist 8/23 to assess bone healing",
+    phase: 0, next: "Follow-up appointment 9/23 to assess bone healing",
     note: "" },
   { name: "Braden Eddy", injury: "Little league elbow (right)", since: "2026-08-10",
     phase: 0, next: "3\u20134 weeks no throwing from 8/10 \u2192 reassess ~9/1\u20139/7",
