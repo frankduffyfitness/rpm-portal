@@ -907,3 +907,5 @@ if __name__ == "__main__":
 # cmj re-pull, round-4 base-wide rep deletions 2026-08-11
 
 # sync trigger 2026-08-18 — pull today's eval CMJs (Schroeder, Tineo, Corkery)
+
+# sync trigger 2026-08-24 — pull Leland Daniels-Weeks eval CMJ if tested

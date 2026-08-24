@@ -526,3 +526,5 @@ if __name__ == "__main__":
 # sync trigger 2026-08-18 — pull today's eval DynaMo (Tineo, Corkery + any new)
 
 # sync trigger 2026-08-20 — pull Gianni Muro grip (device synced by Frank)
+
+# sync trigger 2026-08-24 — pull Leland Daniels-Weeks eval DynaMo
