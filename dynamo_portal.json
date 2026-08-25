@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-08-24T21:36:37.140453+00:00",
+    "syncDate": "2026-08-25T03:53:57.459126+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 83
   },
@@ -82,6 +82,29 @@
               "ttp": [
                 null,
                 1.92
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                484.2
+              ],
+              "peakLbs": [
+                null,
+                108.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2224
+              ],
+              "ttp": [
+                null,
+                3.53
               ]
             }
           ],
