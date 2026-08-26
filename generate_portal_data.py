@@ -97,6 +97,7 @@ VELO_BULLPEN_LABELS = {
     ("Thomas LoBello", "2026-08-07"): "Low Effort",  # low-intent pen (Frank, 2026-08-07)
     ("Eric Grgas", "2026-08-24"): "Low Effort",       # low-intent pen (Frank, 2026-08-24)
     ("Shea O'Sullivan", "2026-08-24"): "Low Effort",  # low-intent pen (Frank, 2026-08-24)
+    ("Severino Napolitano", "2026-08-26"): "Live AB",  # Frank, 2026-08-26
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
     # Return-to-throw thrown from the BOTTOM HALF of the portable mound's slope,
