@@ -98,6 +98,12 @@ VELO_BULLPEN_LABELS = {
     ("Eric Grgas", "2026-08-24"): "Low Effort",       # low-intent pen (Frank, 2026-08-24)
     ("Shea O'Sullivan", "2026-08-24"): "Low Effort",  # low-intent pen (Frank, 2026-08-24)
     ("Severino Napolitano", "2026-08-26"): "Live AB",  # Frank, 2026-08-26
+    ("Eli Delgado", "2026-08-28"): "Live AB",          # Frank, 2026-08-28
+    ("Liam Brower", "2026-08-28"): "Live AB",          # Frank, 2026-08-28
+    ("Matthew Mamak", "2026-08-28"): "Live AB",        # Frank, 2026-08-28
+    ("Eric Grgas", "2026-08-28"): "Live AB",           # Frank, 2026-08-28
+    ("Sebastian Sanchez", "2026-08-28"): "Live AB",    # Frank, 2026-08-28 (new athlete)
+    ("Gavin Laya-Vetell", "2026-08-28"): "Rehab",      # flatground/short slope rehab (Frank, 2026-08-28)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
     # Return-to-throw thrown from the BOTTOM HALF of the portable mound's slope,
