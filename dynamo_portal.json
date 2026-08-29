@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-08-29T14:22:44.684804+00:00",
+    "syncDate": "2026-08-29T18:19:28.775448+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 84
+    "totalAthletes": 85
   },
   "athletes": {
     "Joey Muzio": {
@@ -14253,6 +14253,72 @@
           ],
           "erIr": {
             "left": 1.24,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Noah Becker": {
+      "name": "Noah Becker",
+      "group": "hs",
+      "dob": "2010-08-03",
+      "tests": [
+        {
+          "date": "2026-08-29",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                391.9
+              ],
+              "peakLbs": [
+                null,
+                88.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2567
+              ],
+              "ttp": [
+                null,
+                1.12
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                335.2
+              ],
+              "peakLbs": [
+                null,
+                75.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1986
+              ],
+              "ttp": [
+                null,
+                2.18
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
             "right": null
           },
           "discomfortNote": "",
