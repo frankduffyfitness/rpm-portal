@@ -1,3 +1,4 @@
+# sync-trigger: 2026-08-31 Josh Miller evaluation pull
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)

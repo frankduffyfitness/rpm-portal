@@ -1,4 +1,4 @@
-# sync-trigger: 2026-08-31 Dom D'Alto eval pull
+# sync-trigger: 2026-08-31 Josh Miller evaluation pull
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
