@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-09-04T17:51:39Z",
+ "lastSyncedAt": "2026-09-04T18:24:24Z",
  "athletes": {
   "Abe Florman": {
    "name": "Abe Florman",
@@ -96080,6 +96080,202 @@
   "Joey Muzio": {
    "name": "Joey Muzio",
    "sessions": [
+    {
+     "date": "2026-09-04",
+     "sessionType": "Pitching practice",
+     "total": 13,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 13,
+       "veloMin": 80.9,
+       "veloMax": 84.0,
+       "veloAvg": 82.7,
+       "spinMin": 2057.3,
+       "spinMax": 2309.5,
+       "spinAvg": 2182.1,
+       "ivb": 15.8,
+       "hb": 4.8,
+       "hbMaxAbs": 9.7,
+       "vertMovMaxAbs": 22.8,
+       "relH": 4.7,
+       "relSide": 1.0,
+       "ext": 10.0,
+       "effAvg": 89
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 80.9,
+       "spin": 2090.0,
+       "tilt": "12:00",
+       "ivb": 14.2,
+       "hb": -0.3,
+       "ext": 9.83,
+       "relH": 4.67,
+       "relSide": 1.0,
+       "eff": 89,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 81.7,
+       "spin": 2173.0,
+       "tilt": "1:00",
+       "ivb": 14.9,
+       "hb": 8.1,
+       "ext": 9.67,
+       "relH": 4.75,
+       "relSide": null,
+       "eff": 98,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 81.3,
+       "spin": 2127.0,
+       "tilt": "12:30",
+       "ivb": 16.2,
+       "hb": 4.5,
+       "ext": 10.08,
+       "relH": 4.67,
+       "relSide": null,
+       "eff": 86,
+       "type": "Fastball"
+      },
+      {
+       "no": 4,
+       "velo": 82.1,
+       "spin": 2203.0,
+       "tilt": "12:30",
+       "ivb": 13.7,
+       "hb": 3.8,
+       "ext": 9.83,
+       "relH": 4.75,
+       "relSide": 1.0,
+       "eff": 83,
+       "type": "Fastball"
+      },
+      {
+       "no": 5,
+       "velo": 83.3,
+       "spin": 2292.0,
+       "tilt": "12:30",
+       "ivb": 15.7,
+       "hb": 3.3,
+       "ext": 9.5,
+       "relH": 4.75,
+       "relSide": 1.0,
+       "eff": 90,
+       "type": "Fastball"
+      },
+      {
+       "no": 6,
+       "velo": 83.5,
+       "spin": 2309.0,
+       "tilt": "1:00",
+       "ivb": 15.3,
+       "hb": 9.0,
+       "ext": 10.25,
+       "relH": 4.67,
+       "relSide": 1.17,
+       "eff": 89,
+       "type": "Fastball"
+      },
+      {
+       "no": 7,
+       "velo": 81.9,
+       "spin": 2262.0,
+       "tilt": "1:00",
+       "ivb": 14.7,
+       "hb": 9.7,
+       "ext": 10.0,
+       "relH": 4.58,
+       "relSide": 1.0,
+       "eff": 87,
+       "type": "Fastball"
+      },
+      {
+       "no": 8,
+       "velo": 82.8,
+       "spin": 2057.0,
+       "tilt": "12:45",
+       "ivb": 15.5,
+       "hb": 5.4,
+       "ext": 10.42,
+       "relH": 4.58,
+       "relSide": 1.08,
+       "eff": 88,
+       "type": "Fastball"
+      },
+      {
+       "no": 9,
+       "velo": 83.3,
+       "spin": 2107.0,
+       "tilt": "12:15",
+       "ivb": 15.5,
+       "hb": 3.0,
+       "ext": 9.75,
+       "relH": 4.67,
+       "relSide": null,
+       "eff": 89,
+       "type": "Fastball"
+      },
+      {
+       "no": 10,
+       "velo": 83.2,
+       "spin": 2106.0,
+       "tilt": "12:30",
+       "ivb": 17.2,
+       "hb": 3.5,
+       "ext": 10.0,
+       "relH": 4.75,
+       "relSide": 1.0,
+       "eff": 91,
+       "type": "Fastball"
+      },
+      {
+       "no": 11,
+       "velo": 83.8,
+       "spin": 2291.0,
+       "tilt": "12:30",
+       "ivb": 17.3,
+       "hb": 4.3,
+       "ext": 10.25,
+       "relH": 4.58,
+       "relSide": null,
+       "eff": 83,
+       "type": "Fastball"
+      },
+      {
+       "no": 12,
+       "velo": 84.0,
+       "spin": 2175.0,
+       "tilt": "12:30",
+       "ivb": 18.1,
+       "hb": 5.1,
+       "ext": 10.25,
+       "relH": 4.58,
+       "relSide": null,
+       "eff": 95,
+       "type": "Fastball"
+      },
+      {
+       "no": 13,
+       "velo": 83.0,
+       "spin": 2175.0,
+       "tilt": "12:15",
+       "ivb": 17.5,
+       "hb": 3.1,
+       "ext": 9.67,
+       "relH": 4.67,
+       "relSide": null,
+       "eff": 86,
+       "type": "Fastball"
+      }
+     ]
+    },
     {
      "date": "2026-08-06",
      "sessionType": "Pitching practice",
