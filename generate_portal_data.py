@@ -107,6 +107,7 @@ VELO_BULLPEN_LABELS = {
     ("Severino Napolitano", "2026-08-31"): "Low Effort",  # low-intent pen (Frank, 2026-08-31)
     ("Severino Napolitano", "2026-09-02"): "Live AB",  # Frank, 2026-09-03
     ("Eli Delgado", "2026-09-02"): "Low Effort",       # sub-max effort pen (Frank, 2026-09-03)
+    ("Joey Muzio", "2026-09-04"): "Rehab",             # short slope session (Frank, 2026-09-04)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
     # Return-to-throw thrown from the BOTTOM HALF of the portable mound's slope,
