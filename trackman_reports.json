@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-09-05T13:04:49Z",
+ "lastSyncedAt": "2026-09-05T13:13:04Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -43854,6 +43854,194 @@
        "relH": 3.83,
        "relSide": 1.92,
        "eff": 82,
+       "type": "Fastball"
+      }
+     ]
+    }
+   ]
+  },
+  "Dylan Leitner": {
+   "name": "Dylan Leitner",
+   "sessions": [
+    {
+     "date": "2026-09-04",
+     "sessionType": "Pitching practice",
+     "total": 12,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 12,
+       "veloMin": 75.1,
+       "veloMax": 79.9,
+       "veloAvg": 77.4,
+       "spinMin": 1851.2,
+       "spinMax": 2010.0,
+       "spinAvg": 1916.9,
+       "ivb": 11.4,
+       "hb": -14.4,
+       "hbMaxAbs": 16.5,
+       "vertMovMaxAbs": 31.7,
+       "relH": 4.9,
+       "relSide": -1.8,
+       "ext": 10.2,
+       "effAvg": 94
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 76.5,
+       "spin": 1903.0,
+       "tilt": "10:30",
+       "ivb": 12.8,
+       "hb": -12.7,
+       "ext": 10.33,
+       "relH": 4.58,
+       "relSide": null,
+       "eff": 85,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 76.2,
+       "spin": 1916.0,
+       "tilt": "10:15",
+       "ivb": 11.9,
+       "hb": -15.8,
+       "ext": 10.0,
+       "relH": 4.67,
+       "relSide": null,
+       "eff": 86,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 76.9,
+       "spin": 1900.0,
+       "tilt": "10:15",
+       "ivb": 10.4,
+       "hb": -12.8,
+       "ext": 10.33,
+       "relH": 4.58,
+       "relSide": null,
+       "eff": 87,
+       "type": "Fastball"
+      },
+      {
+       "no": 4,
+       "velo": 75.7,
+       "spin": 1851.0,
+       "tilt": "10:30",
+       "ivb": 13.5,
+       "hb": -13.9,
+       "ext": 10.42,
+       "relH": 5.0,
+       "relSide": null,
+       "eff": 98,
+       "type": "Fastball"
+      },
+      {
+       "no": 5,
+       "velo": 75.1,
+       "spin": 1911.0,
+       "tilt": "10:15",
+       "ivb": 11.6,
+       "hb": -16.2,
+       "ext": 10.25,
+       "relH": 4.67,
+       "relSide": null,
+       "eff": 100,
+       "type": "Fastball"
+      },
+      {
+       "no": 6,
+       "velo": 76.6,
+       "spin": 1906.0,
+       "tilt": "10:00",
+       "ivb": 8.7,
+       "hb": -14.2,
+       "ext": 10.33,
+       "relH": 5.0,
+       "relSide": null,
+       "eff": 92,
+       "type": "Fastball"
+      },
+      {
+       "no": 7,
+       "velo": 78.0,
+       "spin": 1919.0,
+       "tilt": "10:15",
+       "ivb": 12.6,
+       "hb": -15.3,
+       "ext": 10.5,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 100,
+       "type": "Fastball"
+      },
+      {
+       "no": 8,
+       "velo": 79.9,
+       "spin": 1929.0,
+       "tilt": "10:15",
+       "ivb": 12.0,
+       "hb": -14.1,
+       "ext": 10.25,
+       "relH": 5.0,
+       "relSide": null,
+       "eff": 86,
+       "type": "Fastball"
+      },
+      {
+       "no": 9,
+       "velo": 79.0,
+       "spin": 2010.0,
+       "tilt": "10:15",
+       "ivb": 11.3,
+       "hb": -15.5,
+       "ext": 9.92,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 100,
+       "type": "Fastball"
+      },
+      {
+       "no": 10,
+       "velo": 77.4,
+       "spin": 1873.0,
+       "tilt": "10:00",
+       "ivb": 8.4,
+       "hb": -14.6,
+       "ext": 10.25,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 97,
+       "type": "Fastball"
+      },
+      {
+       "no": 11,
+       "velo": 79.6,
+       "spin": 1937.0,
+       "tilt": "10:45",
+       "ivb": 12.6,
+       "hb": -10.6,
+       "ext": 9.58,
+       "relH": 5.0,
+       "relSide": null,
+       "eff": 95,
+       "type": "Fastball"
+      },
+      {
+       "no": 12,
+       "velo": 78.0,
+       "spin": 1949.0,
+       "tilt": "10:15",
+       "ivb": 11.3,
+       "hb": -16.5,
+       "ext": 9.92,
+       "relH": 5.17,
+       "relSide": null,
+       "eff": 100,
        "type": "Fastball"
       }
      ]
