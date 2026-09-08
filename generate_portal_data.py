@@ -235,7 +235,10 @@ def extract_groups_from_jsx(jsx):
 GROUP_MAP = extract_groups_from_jsx(jsx)
 
 # Athletes to exclude from portal
-EXCLUDE_ATHLETES = {"Liam Murphy", "Steph Staiano"}
+# Timmy Stines: no longer trains at RPM; Frank asked for complete removal from
+# every dashboard surface (2026-09-08). Raw stores keep his history; nothing
+# generated from them may show him.
+EXCLUDE_ATHLETES = {"Liam Murphy", "Steph Staiano", "Timmy Stines"}
 _EXCL_NORM = {" ".join(n.split()).lower() for n in EXCLUDE_ATHLETES}
 
 def is_excluded(name):
@@ -1931,6 +1934,8 @@ def gen_DYNAMO():
     meas = _load_dynamo_meas()
     out = []
     for name, a in (data.get("athletes") or {}).items():
+        if is_excluded(a.get("name", name)):
+            continue
         am = meas.get(a.get("name", name)) or {}
         arm = am.get("forearmMeters")
         throw_arm = am.get("throwingArm")  # "L"/"R" — clinically relevant side for the ER:IR board
