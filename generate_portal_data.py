@@ -1975,8 +1975,14 @@ VM_R2 = 0.56
 # and boards. The CI coefficient is much smaller than A's because grip
 # absorbs part of the size axis; do not compare coefficients across models.
 # Provisional pending the pre-registered refresh-battery verdict.
-VM_G = (49.23519, 0.026726, 11.027560, 0.034926)  # velo = g0 + g1*CI + g2*RSI + g3*gripN
-VM_G_BAND = 4.4
+# 2026-09-08: grip term switched to grip PER KG BODYWEIGHT (coach's C-bm form,
+# verified on our basis: identical athletes n=75, LOO 4.281 raw -> 4.178 per-kg,
+# repeated 5x20 k-fold agrees; CI coef returns to a readable 0.079 because
+# grip/kg no longer competes with CI on the size axis). Units: N per kg, bw =
+# the row's bwLbs / LB_PER_KG. Refit on the production store, never pasted
+# from the coach's export-based fit (different target, aggregation, units).
+VM_G = (41.491587, 0.079335, 6.580987, 2.593587)  # velo = g0 + g1*CI + g2*RSI + g3*(gripN / bw_kg)
+VM_G_BAND = 4.2
 # Velo target: max Peak FB across sessions. The top-3-median target ("t3")
 # validated slightly better in the refit; flip only with coach sign-off.
 VM_TARGET = "max"
@@ -2008,7 +2014,8 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
      status, lastCmj|null, bestCiDate|null, bestRsiDate|null,
      gripN|null, predG|null, residG|null]
     Indices 24-26 (2026-08-19): DynaMo grip peak (best-side max, N) and the
-    frozen A+grip prediction/residual (VM_G, display-beside-A only).
+    frozen A+grip prediction/residual (VM_G, display-beside-A only). Since
+    2026-09-08 the grip term is grip/kg (needs bwLbs; predG null without it).
     Indices 22-23 are the session dates the LIFETIME-BEST ci and rsi were set
     (stale-engine badge, 2026-08-02: an all-time prediction leaning on an old
     best can flag an athlete who has since declined; Cellilli and Persichilli's
@@ -2150,8 +2157,8 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
         status = "current" if (n6 >= 3 and resid6 is not None) else "stale"
         g = gripN.get(k)
         pred_g = resid_g = None
-        if g:
-            pred_g = round(VM_G[0] + VM_G[1] * ci + VM_G[2] * rsi + VM_G[3] * g, 1)
+        if g and bw_lbs:
+            pred_g = round(VM_G[0] + VM_G[1] * ci + VM_G[2] * rsi + VM_G[3] * (g / (bw_lbs / LB_PER_KG)), 1)
             # residual from the ROUNDED pair so the card's arithmetic closes
             # (2026-08-10 precision lesson: coaches subtract what they see).
             resid_g = round(round(tv["v"], 1) - pred_g, 1)
