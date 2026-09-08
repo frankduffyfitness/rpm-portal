@@ -111,6 +111,7 @@ VELO_BULLPEN_LABELS = {
     ("Aaron Yorker", "2026-09-04"): "Rehab",           # short slope session (Frank, 2026-09-05)
     ("Dylan Leitner", "2026-09-04"): "Rehab",          # short slope session (Frank, 2026-09-05)
     ("Dylan Leitner", "2026-09-08"): "Rehab",          # short slope session (Frank, 2026-09-08)
+    ("Aaron Yorker", "2026-09-08"): "Rehab",           # short slope session (Frank, 2026-09-08)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
     # Return-to-throw thrown from the BOTTOM HALF of the portable mound's slope,
