@@ -1,6 +1,6 @@
 {
   "meta": {
-    "syncDate": "2026-09-10T23:03:52.248676+00:00",
+    "syncDate": "2026-09-11T07:57:57.603069+00:00",
     "source": "VALD DynaMo",
     "totalAthletes": 87
   },
@@ -6932,6 +6932,65 @@
       "group": "hs",
       "dob": "2009-05-24",
       "tests": [
+        {
+          "date": "2026-09-10",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                541.5
+              ],
+              "peakLbs": [
+                null,
+                121.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1484
+              ],
+              "ttp": [
+                null,
+                4.89
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                537.1
+              ],
+              "peakLbs": [
+                null,
+                120.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1913
+              ],
+              "ttp": [
+                null,
+                4.21
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-07-30",
           "type": "Shoulder Strength Baseline",
