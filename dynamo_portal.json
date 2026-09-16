@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-09-16T18:48:09.525627+00:00",
+    "syncDate": "2026-09-16T23:36:41.356050+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 87
+    "totalAthletes": 88
   },
   "athletes": {
     "Joey Muzio": {
@@ -6981,6 +6981,52 @@
               "ttp": [
                 null,
                 4.21
+              ]
+            },
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                213.8
+              ],
+              "peakLbs": [
+                null,
+                48.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1054
+              ],
+              "ttp": [
+                null,
+                1.4
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                190.7
+              ],
+              "peakLbs": [
+                null,
+                42.9
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                564
+              ],
+              "ttp": [
+                null,
+                3.23
               ]
             }
           ],
@@ -14603,6 +14649,118 @@
           "erIr": {
             "left": null,
             "right": 1.34
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Will McDuffy": {
+      "name": "Will McDuffy",
+      "group": "hs",
+      "dob": "2011-08-19",
+      "tests": [
+        {
+          "date": "2026-09-16",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                108.8
+              ],
+              "peakLbs": [
+                null,
+                24.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                200
+              ],
+              "ttp": [
+                null,
+                2.69
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                123.4
+              ],
+              "peakLbs": [
+                null,
+                27.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                269
+              ],
+              "ttp": [
+                null,
+                2.28
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                332
+              ],
+              "peakLbs": [
+                null,
+                74.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1057
+              ],
+              "ttp": [
+                null,
+                2.65
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                346
+              ],
+              "peakLbs": [
+                null,
+                77.8
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1706
+              ],
+              "ttp": [
+                null,
+                1.7
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.88
           },
           "discomfortNote": "",
           "planNote": ""
