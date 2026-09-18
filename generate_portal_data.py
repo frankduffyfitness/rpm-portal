@@ -265,6 +265,9 @@ ADJUDICATED_RSI = {
 }
 
 GROUP_OVERRIDES = {
+    # VALD has him in Staff, which gen_VM skips outright; Frank wants him
+    # graded and modelled as Men's League (2026-09-18).
+    "Ricky Falcon": "ml",
     "Nick Padilla": "pro",
     "Cade Winquest": "pro",
     "Pete Hansen": "pro",
