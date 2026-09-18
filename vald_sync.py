@@ -1,4 +1,4 @@
-# sync-trigger: 2026-08-31 Josh Miller evaluation pull
+# sync-trigger: 2026-09-18 Jose Pino profile merge (dedupe check)
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
