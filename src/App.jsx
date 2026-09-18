@@ -3238,6 +3238,9 @@ const DYN_STATS = [
 // Torque is rotational (force × forearm lever arm) — ER/IR only, not grip.
 const DYN_TORQUE_MOVES = ["External Rotation", "Internal Rotation"];
 const DYN_LBS = (n) => (n / 4.44822).toFixed(1);
+// Grip sliders read in lbs (Frank, 2026-09-18) while the model keeps Newtons:
+// convert only at the slider boundary so VM_G and vmPredG are untouched.
+const VM_N_PER_LB = 4.44822;
 
 // ── ER:IR ratio (ER peak ÷ IR peak) ──────────────────────────────────────────
 // Sweet-spot coloring: a balanced ER:IR (0.90–1.10) is green; the further outside
@@ -3935,7 +3938,7 @@ function VmAthleteCard({ r, onBack }) {
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={setCi} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={setRsi} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
         {hasGrip && (
-          <VmSlider label="Grip Peak" unit="N" value={grip} onChange={setGrip} min={gB[0]} max={gB[1]} fit={VM_RANGE.grip} step={5} dec={0} sub={`his best ${Math.round(r.grip)}`} />
+          <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => setGrip(v * VM_N_PER_LB)} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} sub={`his best ${Math.round(r.grip / VM_N_PER_LB)}`} />
         )}
         {hasBw && (
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 14 }}>
@@ -4020,7 +4023,7 @@ function VmSandboxCard() {
         </div>
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={setCi} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={setRsi} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
-        <VmSlider label="Grip Peak" unit="N" value={grip} onChange={setGrip} min={gB[0]} max={gB[1]} fit={VM_RANGE.grip} step={5} dec={0} />
+        <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => setGrip(v * VM_N_PER_LB)} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} />
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 4 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
           <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility&rsquo;s measured rate. It never moves RSI. The with-grip line also reads grip per kg, so added weight at the same grip lowers it.</div>
