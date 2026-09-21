@@ -747,6 +747,55 @@ def save_sync_state(last_modified):
                     "lastSyncDate": datetime.now(timezone.utc).isoformat()}, f, indent=2)
 
 
+def refresh_groups_only(profiles):
+    """Carry VALD group/name edits into the store when NO new tests exist.
+
+    Why this exists: the main sync returns early on "No new tests", and the
+    group-refresh block lives downstream of that return inside the merge path.
+    So before 2026-09-21 a VALD group change only reached the portal if the
+    athlete happened to test in the same window -- Alannah Behler was added to
+    High School on 2026-09-21 and stayed "Female Athletes only" in the portal
+    through five consecutive syncs because she had not tested since 9/16.
+
+    Deliberately narrow: touches only `groups` and `name` on athletes ALREADY
+    in the store, never tests, never meta counts, and never removes a profile
+    (a merged-away profileId must stay put -- see the Jose Pino dedupe). Writes
+    only when something actually changed, so a quiet sync stays a no-op instead
+    of churning a 2.4 MB commit every six hours.
+    """
+    if not os.path.exists(OUTPUT_FILE):
+        return
+    try:
+        with open(OUTPUT_FILE) as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, KeyError, OSError) as e:
+        log(f"Group-only refresh skipped (could not read store: {e}).")
+        return
+    athletes = data.get("athletes", {})
+    changed = []
+    for pid, profile in profiles.items():
+        ath = athletes.get(pid)
+        if not ath:
+            continue  # profile has no tests in the store; nothing to attach to
+        new_groups = profile.get("groups", [])
+        if new_groups and new_groups != ath.get("groups"):
+            changed.append(f"{ath.get('name')}: {ath.get('groups')} -> {new_groups}")
+            ath["groups"] = new_groups
+        new_name = profile_name(profile)
+        if new_name and new_name != ath.get("name"):
+            changed.append(f"rename {ath.get('name')} -> {new_name}")
+            ath["name"] = new_name
+    if not changed:
+        log("No new tests, no group/name changes. Done.")
+        return
+    data.setdefault("meta", {})["syncDate"] = datetime.now(timezone.utc).isoformat()
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(data, f, separators=(',', ':'), default=str)
+    log(f"No new tests, but {len(changed)} group/name change(s) written:")
+    for c in changed:
+        log(f"  {c}")
+
+
 def main():
     if "--refresh-cmj" in sys.argv:
         return refresh_cmj()
@@ -773,7 +822,8 @@ def main():
         log(f"Incremental sync from {modified_from[:10]}")
     tests = fetch_tests(token, modified_from)
     if not tests:
-        log("No new tests. Done.")
+        # Group/name edits in VALD must still land even with zero test activity.
+        refresh_groups_only(profiles)
         return
     # Load existing portal data to skip already-processed tests
     existing_test_ids = set()
