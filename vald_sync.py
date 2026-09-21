@@ -1,4 +1,4 @@
-# sync-trigger: 2026-09-21 Alannah Behler group fix (added High School in VALD Hub)
+# sync-trigger: 2026-09-21b Behler group refresh retry
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
