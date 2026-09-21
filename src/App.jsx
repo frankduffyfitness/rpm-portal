@@ -4863,7 +4863,10 @@ function CmjQuadrants() {
   const [pick, setPick] = useState(null);
   const [hover, setHover] = useState(null);
   const cut = useMemo(() => new Date(Date.now() - QUAD_WIN_DAYS * 864e5).toISOString().slice(0, 10), []);
-  const pool = useMemo(() => _QUAD.filter(r => r[1] === grp && r[5] >= cut), [grp, cut]);
+  // FEM selects on the fem FLAG (r[7]), not the group code: GROUP_PRIORITY resolves
+  // fem|hs into hs, so r[1]==="fem" would show 1 of 9 female athletes. Female athletes
+  // stay in their level pool too, so Behler appears in both HS and FEM.
+  const pool = useMemo(() => _QUAD.filter(r => (grp === "fem" ? r[7] === 1 : r[1] === grp) && r[5] >= cut), [grp, cut]);
   const med = useMemo(() => {
     if (!pool.length) return null;
     const mid = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
@@ -4882,7 +4885,7 @@ function CmjQuadrants() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 12, flexWrap: "wrap" }}>
-        {["hs", "col", "ms", "pro", "stf"].map(k => { const gi = GROUPS[k] || {}; return (
+        {["hs", "col", "ms", "pro", "stf", "fem"].map(k => { const gi = GROUPS[k] || {}; return (
           <button key={k} onClick={() => { setGrp(k); setPick(null); }} style={{ padding: "6px 11px", border: "1px solid " + (grp === k ? gi.color : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: grp === k ? gi.color + "18" : "rgba(255,255,255,0.02)", color: grp === k ? gi.color : "#6B7280" }}>{gi.shortLabel || k}</button>); })}
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 8px 6px", position: "relative" }}>
@@ -4901,7 +4904,7 @@ function CmjQuadrants() {
             </div>
           ); })()}
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Force vs elasticity</div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Best concentric impulse and RSI-mod in the last {QUAD_WIN_DAYS} days &mdash; recent form, not career best. Quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes. Tap a dot.</div>
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Best concentric impulse and RSI-mod in the last {QUAD_WIN_DAYS} days &mdash; recent form, not career best. Quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes. Tap a dot.{grp === "fem" ? " Female athletes from every level, ranked against each other; they also appear in their own level's matrix. No engine projection here: the velo model was fit on male pitchers." : ""}</div>
         <svg viewBox={`0 0 ${S} ${S}`} style={{ display: "block", width: "100%" }}>
           <rect x={mx} y={P} width={S - P - mx} height={my - P} fill="rgba(255,176,32,0.05)" />
           <rect x={P} y={P} width={mx - P} height={my - P} fill="rgba(96,165,250,0.05)" />
