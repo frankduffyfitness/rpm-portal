@@ -1,4 +1,4 @@
-# sync-trigger: 2026-09-21b Behler group refresh retry
+# sync-trigger: 2026-09-23 Sophia Conrath group fix (added High School)
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
