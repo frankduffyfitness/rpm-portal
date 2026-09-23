@@ -5216,7 +5216,11 @@ function DynamoPage() {
   const open = (a) => { setSel(a); setDynTab("dynamo"); setDynSub("athletes"); window.scrollTo(0, 0); };
   return shell(<>
     <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 3 }}>
-      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"], ["injury", "🩹 Injury"]].map(([k, l]) => (
+      {/* Injury tab hidden at Frank's request 2026-09-23 ("for the time being").
+          Nothing was deleted: InjurySection, INJURY_LIST and the render line
+          below are all intact, so restoring is just putting ["injury",
+          "\u{1FA79} Injury"] back in this array. */}
+      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"]].map(([k, l]) => (
         <button key={k} onClick={() => { setDynTab(k); if (k !== "dynamo") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
           background: dynTab === k ? "rgba(79,255,176,0.12)" : "transparent", color: dynTab === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
       ))}
@@ -5234,6 +5238,7 @@ function DynamoPage() {
     {dynTab === "model" && <VeloModelSection />}
     {dynTab === "arsenal" && <ArsenalSection />}
     {dynTab === "strategy" && <CmjSection />}
+    {/* unreachable while the tab is hidden; kept so restore is one line */}
     {dynTab === "injury" && <InjurySection />}
   </>);
 }
