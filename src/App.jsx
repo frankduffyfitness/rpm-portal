@@ -4866,7 +4866,7 @@ function CmjQuadrants() {
   // FEM selects on the fem FLAG (r[7]), not the group code: GROUP_PRIORITY resolves
   // fem|hs into hs, so r[1]==="fem" would show 1 of 9 female athletes. Female athletes
   // stay in their level pool too, so Behler appears in both HS and FEM.
-  const pool = useMemo(() => _QUAD.filter(r => (grp === "fem" ? r[7] === 1 : r[1] === grp) && r[5] >= cut), [grp, cut]);
+  const pool = useMemo(() => _QUAD.filter(r => (grp === "all" ? true : grp === "fem" ? r[7] === 1 : r[1] === grp) && r[5] >= cut), [grp, cut]);
   const med = useMemo(() => {
     if (!pool.length) return null;
     const mid = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
@@ -4885,7 +4885,7 @@ function CmjQuadrants() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 12, flexWrap: "wrap" }}>
-        {["hs", "col", "ms", "pro", "stf", "fem"].map(k => { const gi = GROUPS[k] || {}; return (
+        {["all", "hs", "col", "ms", "pro", "stf", "fem"].map(k => { const gi = GROUPS[k] || {}; return (
           <button key={k} onClick={() => { setGrp(k); setPick(null); }} style={{ padding: "6px 11px", border: "1px solid " + (grp === k ? gi.color : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: grp === k ? gi.color + "18" : "rgba(255,255,255,0.02)", color: grp === k ? gi.color : "#6B7280" }}>{gi.shortLabel || k}</button>); })}
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 8px 6px", position: "relative" }}>
@@ -4904,7 +4904,7 @@ function CmjQuadrants() {
             </div>
           ); })()}
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Force vs elasticity</div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Best concentric impulse and RSI-mod in the last {QUAD_WIN_DAYS} days &mdash; recent form, not career best. Quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes. Tap a dot.{grp === "fem" ? " Female athletes from every level, ranked against each other; they also appear in their own level's matrix. No engine projection here: the velo model was fit on male pitchers." : ""}</div>
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Best concentric impulse and RSI-mod in the last {QUAD_WIN_DAYS} days &mdash; recent form, not career best. Quadrants split at this group&rsquo;s medians (CI {med.ci.toFixed(0)}, RSI {med.rsi.toFixed(2)}). {pool.length} athletes. Tap a dot.{grp === "all" ? " Everybody who tested in the window, every level together. The crosshair is the facility-wide median, so the split here tracks age and size as much as movement profile; use a level chip to compare an athlete against his own peers." : ""}{grp === "fem" ? " Female athletes from every level, ranked against each other; they also appear in their own level's matrix. No engine projection here: the velo model was fit on male pitchers." : ""}</div>
         <svg viewBox={`0 0 ${S} ${S}`} style={{ display: "block", width: "100%" }}>
           <rect x={mx} y={P} width={S - P - mx} height={my - P} fill="rgba(255,176,32,0.05)" />
           <rect x={P} y={P} width={mx - P} height={my - P} fill="rgba(96,165,250,0.05)" />
@@ -4917,7 +4917,7 @@ function CmjQuadrants() {
           ))}
           {pool.map((r, i) => (
             <circle key={r[0]} cx={X(r[2])} cy={Y(r[3])} r={hover === i || pick === i ? 6 : 4}
-              fill={hover === i || pick === i ? "#4FFFB0" : "#60A5FA"}
+              fill={hover === i || pick === i ? (grp === "all" ? "#fff" : "#4FFFB0") : (grp === "all" ? ((GROUPS[r[1]] || {}).color || "#60A5FA") : "#60A5FA")}
               stroke="#0A0C10" strokeWidth={1.2}
               style={{ cursor: "pointer" }}
               onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
@@ -4926,6 +4926,16 @@ function CmjQuadrants() {
           <text x={S / 2} y={S - 4} textAnchor="middle" style={{ fontSize: 7.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>CONCENTRIC IMPULSE (N·s) · FORCE</text>
           <text x={9} y={S / 2} textAnchor="middle" transform={`rotate(-90 9 ${S / 2})`} style={{ fontSize: 7.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>RSI-MOD · ELASTICITY</text>
         </svg>
+        {grp === "all" && (
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", padding: "2px 10px 8px", fontSize: 8.5, color: "#6B7280" }}>
+            {["ms", "hs", "col", "pro", "stf"].map(k => (
+              <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 7, height: 7, borderRadius: 99, background: (GROUPS[k] || {}).color }} />
+                {(GROUPS[k] || {}).shortLabel || k}
+              </span>
+            ))}
+          </div>
+        )}
         {pick != null && pool[pick] && (
           <div style={{ margin: "4px 8px 8px", padding: "9px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 10, display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap" }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>{pool[pick][0]}</span>
