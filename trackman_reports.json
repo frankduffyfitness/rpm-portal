@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-09-22T00:20:04Z",
+ "lastSyncedAt": "2026-09-22T23:59:04Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -113227,6 +113227,168 @@
        "relSide": null,
        "eff": 78,
        "type": "Sinker"
+      }
+     ]
+    }
+   ]
+  },
+  "John Turner": {
+   "name": "John Turner",
+   "sessions": [
+    {
+     "date": "2026-09-22",
+     "sessionType": "Pitching practice",
+     "total": 10,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 10,
+       "veloMin": 64.0,
+       "veloMax": 67.3,
+       "veloAvg": 65.5,
+       "spinMin": 1714.2,
+       "spinMax": 1878.2,
+       "spinAvg": 1791.7,
+       "ivb": 17.8,
+       "hb": -8.1,
+       "hbMaxAbs": 14.0,
+       "vertMovMaxAbs": 42.1,
+       "relH": 4.9,
+       "relSide": -1.7,
+       "ext": 9.3,
+       "effAvg": 90
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 65.0,
+       "spin": 1822.0,
+       "tilt": "11:30",
+       "ivb": 17.6,
+       "hb": -4.6,
+       "ext": 8.92,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 95,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 67.3,
+       "spin": 1741.0,
+       "tilt": "10:30",
+       "ivb": 14.5,
+       "hb": -14.0,
+       "ext": 9.0,
+       "relH": 4.83,
+       "relSide": null,
+       "eff": 95,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 65.3,
+       "spin": 1832.0,
+       "tilt": "11:45",
+       "ivb": 19.3,
+       "hb": -3.8,
+       "ext": 9.5,
+       "relH": 5.0,
+       "relSide": null,
+       "eff": 85,
+       "type": "Fastball"
+      },
+      {
+       "no": 4,
+       "velo": 65.1,
+       "spin": 1755.0,
+       "tilt": "11:00",
+       "ivb": 18.0,
+       "hb": -9.1,
+       "ext": 9.08,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 90,
+       "type": "Fastball"
+      },
+      {
+       "no": 5,
+       "velo": 64.0,
+       "spin": 1790.0,
+       "tilt": "11:15",
+       "ivb": 20.0,
+       "hb": -7.3,
+       "ext": 9.58,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 88,
+       "type": "Fastball"
+      },
+      {
+       "no": 6,
+       "velo": 65.4,
+       "spin": 1767.0,
+       "tilt": "11:15",
+       "ivb": 18.0,
+       "hb": -7.6,
+       "ext": 9.42,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 94,
+       "type": "Fastball"
+      },
+      {
+       "no": 7,
+       "velo": 64.4,
+       "spin": 1714.0,
+       "tilt": "11:15",
+       "ivb": 18.7,
+       "hb": -8.9,
+       "ext": 9.5,
+       "relH": 4.83,
+       "relSide": null,
+       "eff": 87,
+       "type": "Fastball"
+      },
+      {
+       "no": 8,
+       "velo": 66.7,
+       "spin": 1873.0,
+       "tilt": "11:00",
+       "ivb": 17.0,
+       "hb": -8.7,
+       "ext": 9.17,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 89,
+       "type": "Fastball"
+      },
+      {
+       "no": 9,
+       "velo": 66.8,
+       "spin": 1878.0,
+       "tilt": "11:00",
+       "ivb": 17.8,
+       "hb": -10.9,
+       "ext": 9.25,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 94,
+       "type": "Fastball"
+      },
+      {
+       "no": 10,
+       "velo": 65.6,
+       "spin": 1744.0,
+       "tilt": "11:30",
+       "ivb": 17.0,
+       "hb": -5.6,
+       "ext": 9.42,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 84,
+       "type": "Fastball"
       }
      ]
     }
