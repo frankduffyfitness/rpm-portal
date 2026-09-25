@@ -350,7 +350,9 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
   const k = `${sel.month}|${skey(sel.day, sel.week)}`;
   const saved = M.logOf(sel.month, sel.day, sel.week);
   const blank = { date: "", bodyweight: null, notes: "", entries: {}, rpe: {}, stance: {}, swaps: {} };
-  const log = drafts[k] || (saved ? JSON.parse(JSON.stringify(saved)) : blank);
+  // Older or partial sessions (e.g. a note saved with no sets) may lack fields.
+  const log = { ...blank, ...(drafts[k] || (saved ? JSON.parse(JSON.stringify(saved)) : {})) };
+  for (const f of ["entries", "rpe", "stance", "swaps"]) if (!log[f] || typeof log[f] !== "object") log[f] = {};
   const prog = A.programs[sel.month];
   const d = prog.days.find((x) => x.day === sel.day);
 
@@ -541,6 +543,48 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
   );
 }
 
+// ─── Athlete link (coach side) ───────────────────────────────────────────────
+function AthleteLinks({ A, pw, onLocked }) {
+  const [count, setCount] = useState(null);
+  const [url, setUrl] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const first = A.athlete.name.split(" ")[0];
+  const load = () => api(pw, { query: { op: "linkStatus", id: A.athlete.id } }).then((d) => setCount(d.links)).catch((e) => { if (e.status === 401) onLocked(); });
+  useEffect(() => { load(); }, [A.athlete.id]);
+  const create = async () => {
+    setBusy(true); setMsg(null);
+    try { const d = await api(pw, { body: { op: "createLink", id: A.athlete.id } }); setUrl(`${window.location.origin}/log#t=${d.token}`); load(); }
+    catch (e) { setMsg(e.message); } finally { setBusy(false); }
+  };
+  const revoke = async () => {
+    setBusy(true); setMsg(null);
+    try { await api(pw, { body: { op: "revokeLinks", id: A.athlete.id } }); setUrl(null); setMsg(`Turned off. ${first}'s old links no longer open.`); load(); }
+    catch (e) { setMsg(e.message); } finally { setBusy(false); }
+  };
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(url); setMsg("Copied. Text it to " + first + "."); }
+    catch (e) { setMsg("Press and hold the link to copy it."); }
+  };
+  return (
+    <Section title={`${first}'s logging link`} subtitle={`A private link ${first} opens on their phone to see this program and log sets. It only opens ${first}'s own log. Anyone holding the link can log for ${first}, so send it only to them.`}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+        <button className="tb" disabled={busy} onClick={create}>{count ? "Make a new link" : "Make a link"}</button>
+        {count > 0 && <button className="tb" disabled={busy} onClick={revoke}>Turn off links</button>}
+        <span style={{ fontSize: 11, color: "#6B7280" }}>{count == null ? "" : count === 0 ? "No active links" : `${count} active link${count === 1 ? "" : "s"}`}</span>
+      </div>
+      {url && (
+        <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
+          <div style={{ fontSize: 11, color: "#8A8F98" }}>Shown once. Copy it now:</div>
+          <div style={{ fontSize: 11, color: "#E0E0E0", background: "#13161B", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "8px 10px", wordBreak: "break-all", userSelect: "all" }}>{url}</div>
+          <div><button className="tb" onClick={copy}>Copy link</button></div>
+        </div>
+      )}
+      {msg && <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 8 }}>{msg}</div>}
+    </Section>
+  );
+}
+
 // ─── Athlete ─────────────────────────────────────────────────────────────────
 function AthleteView({ id, pw, ctx, onBack, onLocked }) {
   const [A, setA] = useState(null);
@@ -567,6 +611,57 @@ function AthleteView({ id, pw, ctx, onBack, onLocked }) {
         {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
       </div>
       {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={pw} onSaved={onSaved} onLocked={onLocked} /> : <Progress A={A} M={M} ctx={ctx} />}
+      <AthleteLinks A={A} pw={pw} onLocked={onLocked} />
+    </div>
+  );
+}
+
+// ─── Athlete's own page: rpmstrength.coach/log#t=<link key> ─────────────────
+const AT_KEY = "rpm_athlete_link";
+export function AthleteLogPage({ ctx, logo }) {
+  const [token] = useState(() => {
+    let t = "";
+    try {
+      const m = window.location.hash.match(/t=([A-Za-z0-9_-]+)/);
+      if (m) { t = m[1]; localStorage.setItem(AT_KEY, t); window.history.replaceState(null, "", window.location.pathname); }
+      else t = localStorage.getItem(AT_KEY) || "";
+    } catch (e) {}
+    return t;
+  });
+  const [A, setA] = useState(null);
+  const [err, setErr] = useState(null);
+  const [tab, setTab] = useState("log");
+  const dead = "This link doesn't work anymore. Ask Coach Frank for a new one.";
+  useEffect(() => {
+    if (!token) { setErr("Open the link Coach Frank sent you to see your program."); return; }
+    api(token, { query: { op: "me" } }).then(setA).catch((e) => setErr(e.status === 401 ? dead : e.message));
+  }, [token]);
+  const M = useMemo(() => (A ? model(A) : null), [A]);
+  const onSaved = (month, sk, body) => setA((a) => ({ ...a, logs: { ...a.logs, [month]: { ...(a.logs[month] || {}), [sk]: body } } }));
+  return (
+    <div style={{ minHeight: "100vh", background: "#0A0C10", fontFamily: "'DM Sans','Helvetica Neue',sans-serif", color: "#E0E0E0", maxWidth: 560, margin: "0 auto", padding: "0 18px" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <div style={{ height: 36 }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        {logo && <img src={logo} alt="RPM Strength" style={{ height: 30, width: "auto" }} />}
+        <div style={{ width: 1, height: 22, background: "rgba(255,255,255,0.12)" }} />
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Training Log</div>
+      </div>
+      <div className="tl"><style>{CSS}</style>
+        {err && <div style={{ fontSize: 14, color: "#8A8F98", padding: "24px 0", lineHeight: 1.5 }}>{err}</div>}
+        {!err && (!A || !M) && <div style={{ fontSize: 13, color: "#6B7280", padding: "20px 0" }}>Loading your program…</div>}
+        {!err && A && M && (
+          <div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{A.athlete.name}</div>
+            <div style={{ fontSize: 12, color: "#8A9099", marginTop: 5 }}>{M.months.map((p) => p.label).join(" · ")}</div>
+            <div className="tabs">
+              {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
+            </div>
+            {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={token} onSaved={onSaved} onLocked={() => setErr(dead)} /> : <Progress A={A} M={M} ctx={ctx} />}
+            <div style={{ fontSize: 11, color: "#4A4F57", margin: "24px 0 40px", lineHeight: 1.5 }}>Your sets save as you type. Only you and your coach can see this log.</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

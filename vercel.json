@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/coachportal", "destination": "/index.html" }
+    {
+      "source": "/coachportal",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/log",
+      "destination": "/index.html"
+    }
   ]
 }

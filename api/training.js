@@ -9,15 +9,25 @@
  *   log:<id>:<month>         hash   "d<day>w<week>" -> session JSON
  * One hash field per session, so saving one session never touches another.
  *
- * Auth: every request needs `Authorization: Bearer <STAFF_PASSWORD>` (Vercel env,
- * Sensitive). Nothing here is public: the data never ships in the page bundle.
+ *   atoken:<sha256(token)>   string {id, created}  athlete link key -> athlete
+ *   atokens:<id>             set    that athlete's key hashes (for "turn off links")
  *
- * GET  ?op=index                         -> {athletes: [{id, name, months}]}
- * GET  ?op=athlete&id=<id>               -> {athlete, programs: {month: doc}, logs: {month: {key: session}}}
- * POST {op:"saveSessions", id, month, sessions: {key: session}}
- * POST {op:"patchAthlete", id, data}     (merges fields, e.g. compStance)
- * POST {op:"putAthlete", id, data}       (replaces; loader scripts)
- * POST {op:"putProgram", id, month, doc} (replaces; loader scripts)
+ * Auth: `Authorization: Bearer <secret>`. The secret is either
+ *   - STAFF_PASSWORD (Vercel env, Sensitive): the coach, every athlete and op; or
+ *   - an athlete link key (random, made by createLink, stored only as a hash): that one
+ *     athlete, read their own log and save their own sessions, nothing else.
+ * Nothing here is public: the data never ships in the page bundle.
+ *
+ * GET  ?op=index                         -> {athletes: [{id, name, months}]}          coach
+ * GET  ?op=athlete&id=<id>               -> {athlete, programs, logs}                 coach
+ * GET  ?op=me                            -> same shape, for the link's athlete        athlete
+ * GET  ?op=linkStatus&id=<id>            -> {links: n}                                coach
+ * POST {op:"saveSessions", id, month, sessions: {key: session}}                       coach, athlete (own id)
+ * POST {op:"patchAthlete", id, data}     (merges fields, e.g. compStance)             coach
+ * POST {op:"putAthlete", id, data}       (replaces; loader scripts)                   coach
+ * POST {op:"putProgram", id, month, doc} (replaces; loader scripts)                   coach
+ * POST {op:"createLink", id}             -> {token} (shown once)                      coach
+ * POST {op:"revokeLinks", id}            turns off every link for that athlete        coach
  */
 import crypto from "crypto";
 
@@ -26,13 +36,18 @@ const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 const SKEY = /^d\d{1,2}w\d{1,2}$/;
 const MAX_JSON = 200 * 1024;
 
-function authorized(req) {
-  const want = process.env.STAFF_PASSWORD || "";
+const sha = (s) => crypto.createHash("sha256").update(s).digest("hex");
+
+// -> {role: "coach"} | {role: "athlete", id} | null
+async function whoIs(req) {
   const got = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  if (!want || !got) return false;
-  const a = crypto.createHash("sha256").update(want).digest();
-  const b = crypto.createHash("sha256").update(got).digest();
-  return crypto.timingSafeEqual(a, b);
+  if (!got || got.length > 200) return null;
+  const want = process.env.STAFF_PASSWORD || "";
+  if (want && crypto.timingSafeEqual(Buffer.from(sha(want), "hex"), Buffer.from(sha(got), "hex"))) return { role: "coach" };
+  if (!/^a_[A-Za-z0-9_-]{20,}$/.test(got)) return null;
+  const [rec] = await redis([["GET", `atoken:${sha(got)}`]]);
+  const r = parse(rec);
+  return r && ID.test(r.id || "") ? { role: "athlete", id: r.id } : null;
 }
 
 async function redis(commands) {
@@ -74,9 +89,11 @@ async function athlete(id) {
   return { athlete: { id, ...parse(a) }, programs, logs };
 }
 
-async function write(body) {
-  const { op, id, month } = body || {};
+async function write(body, who) {
+  const { op, month } = body || {};
+  const id = who.role === "athlete" ? who.id : body && body.id;  // a link only ever writes its own athlete
   if (!ID.test(id || "")) throw fail(400, "Bad athlete id");
+  if (who.role === "athlete" && op !== "saveSessions") throw fail(403, "Not allowed");
   if (op === "saveSessions") {
     if (!MONTH.test(month || "")) throw fail(400, "Bad month");
     const entries = Object.entries(body.sessions || {});
@@ -105,22 +122,43 @@ async function write(body) {
     await redis([["SET", `program:${id}:${month}`, json(body.doc)], ["SADD", `months:${id}`, month]]);
     return { ok: true };
   }
+  if (op === "createLink") {
+    const [a] = await redis([["HGET", "athletes", id]]);
+    if (!a) throw fail(404, "No such athlete");
+    const token = "a_" + crypto.randomBytes(24).toString("base64url");
+    const h = sha(token);
+    await redis([["SET", `atoken:${h}`, json({ id, created: new Date().toISOString() })], ["SADD", `atokens:${id}`, h]]);
+    return { token };
+  }
+  if (op === "revokeLinks") {
+    const [hashes] = await redis([["SMEMBERS", `atokens:${id}`]]);
+    await redis([...(hashes || []).map((h) => ["DEL", `atoken:${h}`]), ["DEL", `atokens:${id}`]]);
+    return { ok: true, revoked: (hashes || []).length };
+  }
   throw fail(400, "Unknown op");
 }
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  if (!authorized(req)) return res.status(401).json({ error: "Staff password required" });
   try {
+    const who = await whoIs(req);
+    if (!who) return res.status(401).json({ error: "Staff password or athlete link required" });
     if (req.method === "GET") {
       const op = req.query.op;
+      if (op === "me" && who.role === "athlete") return res.status(200).json(await athlete(who.id));
+      if (who.role !== "coach") throw fail(403, "Not allowed");
       if (op === "index") return res.status(200).json(await index());
       if (op === "athlete") return res.status(200).json(await athlete(req.query.id));
+      if (op === "linkStatus") {
+        if (!ID.test(req.query.id || "")) throw fail(400, "Bad athlete id");
+        const [n] = await redis([["SCARD", `atokens:${req.query.id}`]]);
+        return res.status(200).json({ links: n || 0 });
+      }
       throw fail(400, "Unknown op");
     }
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-      return res.status(200).json(await write(body));
+      return res.status(200).json(await write(body, who));
     }
     res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ error: "Method not allowed" });
