@@ -2660,22 +2660,6 @@ print(f"  _FH:  {len(_FH)} athletes with full histories "
       f"({sum(len(v.get('d', [])) + len(v.get('hd', [])) for v in _FH.values())} sessions, "
       f"~{len(json.dumps(_FH, separators=(',', ':'))) // 1024} KB)", flush=True)
 
-# ─── Training log: _TRAIN ────────────────────────────────────────────────────
-# Coach-portal Training tab. training_portal.json is written by the Training Log's
-# export (~/Desktop/Claude Code/training-log/export_portal.py) and COMMITTED, so the
-# 6-hourly Action rebuilds with it. Numbers only (attendance + lift trends); session
-# notes never leave the log. Missing/unreadable file = no opinion: the JSX keeps the
-# committed _TRAIN rather than being wiped (same rule as _STRAT / _WATCH).
-TRAIN_JSON = "training_portal.json"
-_TRAIN = None
-if os.path.exists(TRAIN_JSON):
-    try:
-        _TRAIN = json.load(open(TRAIN_JSON))
-        print(f"  _TRAIN: {len(_TRAIN.get('athletes', {}))} athletes with logged training", flush=True)
-    except Exception as e:
-        print(f"  WARNING: could not read {TRAIN_JSON}: {e}", flush=True)
-        _TRAIN = None
-
 # ─── Consistency calendar: _CONS ─────────────────────────────────────────────
 # name -> [["YYYY-MM", packed], ...] newest month first. packed = concatenated
 # "ddc" triplets: day-of-month (2 digits) + tests that day (1 digit, capped 9).
@@ -2849,8 +2833,6 @@ output_lines.append(f"const _QUAD = {json.dumps(_QUAD, separators=(',', ':'))};"
 output_lines.append(f"const _FEM = {json.dumps(_FEM, separators=(',', ':'))};")
 output_lines.append(f"const _CONS = {json.dumps(_CONS, separators=(',', ':'))};")
 output_lines.append(f"const _FH = {json.dumps(_FH, separators=(',', ':'))};")
-if _TRAIN is not None:
-    output_lines.append(f"const _TRAIN = {json.dumps(_TRAIN, separators=(',', ':'))};")
 # Only when this run actually had strategy data: a printed `const _STRAT = [];`
 # in the reference dump would read as "no buckets exist" on a machine that simply
 # does not carry the Pitch Model tree.
@@ -2898,8 +2880,6 @@ if _STRAT:
 # rows list means "watch ran, nothing flagged", which the panel should show.
 if _WATCH is not None:
     replacements.update({'_WATCH': _WATCH})
-if _TRAIN is not None:
-    replacements.update({'_TRAIN': _TRAIN})
 
 new_jsx = jsx
 for var_name, data in replacements.items():
