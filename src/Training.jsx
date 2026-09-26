@@ -19,6 +19,11 @@ const mdyToIso = (s) => { const [m, d, y] = s.split("/"); return `${y}-${m.padSt
 const setDone = (s) => !!s && !s.skipped && (s.load != null || s.reps != null || !!s.done);
 const accounted = (s) => setDone(s) || !!(s && s.skipped);
 const repsOf = (s, wk) => (s.reps != null ? s.reps : wk.repsN ?? null);
+// Bodyweight = no implement in the name (DB, KB, barbell, cable, band, sled...). Those
+// sets get a check-off instead of a weight box; loaded lifts keep the weight box.
+const LOADED = /\b(db|kb|dumbbells?|kettlebells?|barbell|ssb|trap bar|hex bar|ez bar|cable|band|landmine|sled|plate|medicine ball|med ball|machine|weighted|water ball|chains?|bat|fat gripz|sandbag|goblet|farmers?|carry|pallof|chop|rope|vest|rack|deadlift|front squat|back squat|good morning|clean|snatch|jerk)\b|\d-(kb|db)\b/i;
+const isBodyweight = (name) => !LOADED.test(name || "");
+const isAmrap = (reps) => /amrap/i.test(String(reps || ""));
 const num = (v) => { const x = parseFloat(String(v).replace(",", ".")); return Number.isFinite(x) ? x : null; };
 
 // ─── API ─────────────────────────────────────────────────────────────────────
@@ -197,6 +202,9 @@ const CSS = `
 .tl .set input::placeholder{color:var(--faint)}
 .tl .set .rt{font-size:10px;color:var(--mut);text-align:center;border:0;border-top:1px dashed var(--rule2);background:transparent;padding:4px 2px 5px;line-height:1.2;width:100%}
 .tl .set .rt[aria-pressed=true]{color:var(--acc);font-weight:700}
+.tl .set.bw .chk{border:0;background:transparent;font-size:20px;line-height:1;padding:4px 0 5px;color:var(--faint);cursor:pointer}
+.tl .set.bw .chk[aria-pressed=true]{color:var(--acc);font-weight:800}
+.tl .set.bw div.rt{border-top:1px dashed var(--rule2)}
 .tl .set.skipped{border-style:dashed;background:transparent;padding:0 0 5px;justify-items:center;align-content:start;color:var(--mut)}
 .tl .set.skipped .x{font-size:16px;line-height:1.3;color:var(--warn)}
 .tl .set.skipped .sk{font-size:10px}
@@ -556,11 +564,24 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
                   const s = entries[i] || {};
                   if (s.skipped) return <button key={i} className="set skipped" aria-label={`${name} set ${i + 1} skipped. Tap to bring it back.`} onClick={() => change((l) => { l.entries[ex.slot][i] = null; })}><span className="n">{i + 1}</span><span className="x">✕</span><span className="sk">Skipped</span></button>;
                   const ph = target ? target[0] : lt ? (lt.sets[Math.min(i, lt.sets.length - 1)] || {}).load ?? "" : "";
+                  if (isBodyweight(name) && !(s.load > 0)) {
+                    const done = setDone(s), repsBox = wk.repsN != null || isAmrap(wk.reps) || s.reps != null;
+                    return (
+                      <div key={i} className={`set bw ${done ? "filled" : ""}`}>
+                        <span className="n">{i + 1 > wk.sets ? "+" : ""}{i + 1}</span>
+                        <button className="chk" aria-pressed={done} aria-label={`${name} set ${i + 1} ${done ? "done, tap to undo" : "tap when done"}`}
+                          onClick={() => change((l) => { const arr = (l.entries[ex.slot] = l.entries[ex.slot] || []); while (arr.length <= i) arr.push(null); arr[i] = done ? null : { load: null, reps: s.reps ?? null, done: true }; })}>{done ? "✓" : "○"}</button>
+                        {repsBox
+                          ? <input className="reps" inputMode="numeric" aria-label={`${name} set ${i + 1} reps`} placeholder={isAmrap(wk.reps) ? "reps" : `×${wk.repsN ?? ""}`} value={s.reps ?? ""} onChange={(e) => change((l) => { const arr = (l.entries[ex.slot] = l.entries[ex.slot] || []); while (arr.length <= i) arr.push(null); const r = num(e.target.value); arr[i] = r != null ? { load: null, reps: r, done: true } : (arr[i] && arr[i].done ? { load: null, reps: null, done: true } : null); })} />
+                          : <div className="rt">{wk.reps.replace("seconds", "sec").replace("yards", "yd")}</div>}
+                      </div>
+                    );
+                  }
                   return (
                     <div key={i} className={`set ${setDone(s) ? "filled" : ""}`}>
                       <span className="n">{i + 1 > wk.sets ? "+" : ""}{i + 1}</span>
                       <input className="load" inputMode="decimal" aria-label={`${name} set ${i + 1} load, lb`} placeholder={ph} value={s.load ?? ""} onChange={(e) => setCell(ex.slot, i, "load", num(e.target.value))} />
-                      {wk.repsN != null || s.reps != null
+                      {wk.repsN != null || isAmrap(wk.reps) || s.reps != null
                         ? <input className="reps" inputMode="numeric" aria-label={`${name} set ${i + 1} reps`} placeholder={`×${wk.repsN ?? ""}`} value={s.reps ?? ""} onChange={(e) => setCell(ex.slot, i, "reps", num(e.target.value))} />
                         : <button className="rt" aria-pressed={!!s.done} aria-label={`Mark ${name} set ${i + 1} done`} onClick={() => setCell(ex.slot, i, "done", !s.done)}>{s.done ? "✓ " : ""}{wk.reps.replace("seconds", "sec").replace("yards", "yd")}</button>}
                     </div>
