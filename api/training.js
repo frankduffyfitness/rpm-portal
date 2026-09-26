@@ -6,7 +6,8 @@
  *   athletes                 hash   id -> athlete JSON {name, trainingMax?, compStance?, ...}
  *   months:<id>              set    program months, "YYYY-MM"
  *   program:<id>:<month>     string program JSON (days -> exercises -> weeks)
- *   log:<id>:<month>         hash   "d<day>w<week>" -> session JSON
+ *   log:<id>:<month>         hash   "d<day>w<week>" (lift day) or "m<n>w<week>"
+ *                                   (movement day n) -> session JSON
  * One hash field per session, so saving one session never touches another.
  *
  *   atoken:<sha256(token)>   string {id, created}  athlete link key -> athlete
@@ -33,7 +34,7 @@ import crypto from "crypto";
 
 const ID = /^[a-z0-9][a-z0-9-]{0,80}$/;
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
-const SKEY = /^d\d{1,2}w\d{1,2}$/;
+const SKEY = /^[dm]\d{1,2}w\d{1,2}$/;   // d<day>w<week> lift days, m<n>w<week> movement days
 const MAX_JSON = 200 * 1024;
 
 const sha = (s) => crypto.createHash("sha256").update(s).digest("hex");

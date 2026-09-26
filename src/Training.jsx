@@ -297,6 +297,11 @@ function Progress({ A, M, ctx }) {
         <Tile label="Sets completed" value={pct != null ? pct : "–"} unit={pct != null ? "%" : ""} sub={`${done} of ${rx} programmed`} />
         <Tile label="Jump height" value={jh.length ? jh[jh.length - 1].toFixed(1) : "–"} unit={jh.length ? "in" : ""} sub={jhD ? jhD.text : jh.length ? "1 CMJ in this block" : "No CMJ in this block"} subColor={jhD && jhD.color} spark={jh.length > 1 ? jh : null} sparkColor="#4FFFB0" />
         <Tile label="RSI-mod" value={rsi.length ? rsi[rsi.length - 1].toFixed(2) : "–"} sub={rsiD ? rsiD.text : rsi.length ? "1 CMJ in this block" : "No CMJ in this block"} subColor={rsiD && rsiD.color} spark={rsi.length > 1 ? rsi : null} sparkColor="#60A5FA" />
+        {M.months.some((p) => (p.movement || []).length) && (() => {
+          let n = 0, done = 0;
+          M.months.forEach((p) => (p.movement || []).forEach((mv, mi) => { for (let w = 1; w <= 4; w++) { n++; const l = (A.logs[p.month] || {})[`m${mi + 1}w${w}`]; if (l && Object.values(l.entries || {}).some((a) => (a || []).some((c) => c && c.done))) done++; } }));
+          return <Tile label="Movement days" value={done} unit={`/ ${n}`} sub="weeks with the Movement Day logged" />;
+        })()}
         {velo && <Tile label="Peak velo" value={veloWin.length ? Math.max(...veloWin.map((v) => v[1])).toFixed(1) : "–"} unit={veloWin.length ? "mph" : ""} sub={veloWin.length ? `${veloWin.length} TrackMan session${veloWin.length === 1 ? "" : "s"} in this block` : "No TrackMan in this block"} spark={veloWin.length > 1 ? veloWin.map((v) => v[1]) : null} sparkColor="#FFB020" />}
       </div>
       <Section title="Lift trends" subtitle="Heaviest set each week. Estimated 1RM uses the Epley formula on sets of 10 reps or fewer.">
@@ -391,6 +396,27 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
     const key = k;
     timers.current[k] = setTimeout(() => save(key), 700);
   }
+  // Movement days (Pre-Work tab): one log per movement day per week, key m<n>w<week>;
+  // each exercise is a single "done" tick, keyed by its slot label ("A1", "D"...).
+  const mvSk = (mi) => `m${mi + 1}w${sel.week}`;
+  const mvSlot = (x, i) => ((x.name.match(/^([A-Z]\d?)\)/) || [])[1] || `X${i + 1}`);
+  const mvLog = (mi) => {
+    const kk = `${sel.month}|${mvSk(mi)}`;
+    const base = drafts[kk] || (A.logs[sel.month] || {})[mvSk(mi)] || {};
+    return { date: "", notes: "", ...base, entries: { ...(base.entries || {}) } };
+  };
+  function mvChange(mi, mut) {
+    const kk = `${sel.month}|${mvSk(mi)}`;
+    const next = JSON.parse(JSON.stringify(mvLog(mi)));
+    mut(next);
+    if (!next.date) next.date = todayIso();
+    setDrafts((o) => ({ ...o, [kk]: next }));
+    latest.current = { ...latest.current, [kk]: next };
+    try { const p = JSON.parse(localStorage.getItem("rpm_tl_pending") || "{}"); p[kk] = { athlete: A.athlete.id, body: next }; localStorage.setItem("rpm_tl_pending", JSON.stringify(p)); } catch (e) {}
+    clearTimeout(timers.current[kk]);
+    timers.current[kk] = setTimeout(() => save(kk), 700);
+  }
+
   // Force Decks days not yet tied to a session, after the last dated earlier session.
   function dateChoices(l) {
     const curOrder = M.orderOf(sel.month, sel.day, sel.week);
@@ -440,24 +466,41 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
           );
         })}
       </div>
-      {(prog.movement || []).map((mv, mi) => (
-        <details key={mi} style={{ marginTop: 14, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
-          <summary>{mv.label} · Week {sel.week}</summary>
-          <div style={{ fontSize: 12, color: "#8A8F98", marginTop: 8 }}>
-            {mv.warmup.length > 0 && <>
-              <div style={{ color: "#E0E0E0", fontWeight: 600 }}>{mv.warmup[0].endsWith(":") ? mv.warmup[0].slice(0, -1) : "Warm-up"}{mv.note ? ` (${mv.note.replace(/\.$/, "").toLowerCase()})` : ""}</div>
-              <ul>{mv.warmup.filter((x, i) => !(i === 0 && x.endsWith(":"))).map((x, i) => <li key={i}>{x}</li>)}</ul>
-            </>}
-            <div style={{ display: "grid", gap: 4, marginTop: 8 }}>
-              {mv.exercises.map((x, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: 12, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 4 }}>
-                  <span style={{ color: "#E0E0E0" }}>{x.name}</span><span style={{ whiteSpace: "nowrap" }}>{x.weeks[sel.week - 1] || ""}</span>
-                </div>
-              ))}
+      {(prog.movement || []).map((mv, mi) => {
+        const ml = mvLog(mi);
+        const ticked = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
+        return (
+          <details key={mi} style={{ marginTop: 14, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
+            <summary>{mv.label} · Week {sel.week}{" "}
+              <span style={{ fontSize: 11, fontWeight: 700, color: ticked ? "#4FFFB0" : "#6B7280", marginLeft: 6 }}>{ticked === mv.exercises.length ? "✓ logged" : ticked ? `${ticked}/${mv.exercises.length} done` : "not logged"}</span>
+            </summary>
+            <div style={{ fontSize: 12, color: "#8A8F98", marginTop: 8 }}>
+              {mv.warmup.length > 0 && <>
+                <div style={{ color: "#E0E0E0", fontWeight: 600 }}>{mv.warmup[0].endsWith(":") ? mv.warmup[0].slice(0, -1) : "Warm-up"}{mv.note ? ` (${mv.note.replace(/\.$/, "").toLowerCase()})` : ""}</div>
+                <ul>{mv.warmup.filter((x, i) => !(i === 0 && x.endsWith(":"))).map((x, i) => <li key={i}>{x}</li>)}</ul>
+              </>}
+              <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
+                {mv.exercises.map((x, i) => {
+                  const done = !!(((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done);
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 6 }}>
+                      <span style={{ color: "#E0E0E0", minWidth: 0 }}>{x.name}<span style={{ color: "#6B7280" }}>{x.weeks[sel.week - 1] ? ` · ${x.weeks[sel.week - 1]}` : ""}</span></span>
+                      <button className="tb" aria-pressed={done} style={done ? { borderColor: "#4FFFB0", color: "#4FFFB0", background: "rgba(79,255,176,0.12)" } : null}
+                        onClick={() => mvChange(mi, (l) => { l.entries[mvSlot(x, i)] = done ? [] : [{ load: null, reps: null, done: true }]; })}>{done ? "✓ Done" : "Done"}</button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginTop: 10 }}>
+                <button className="tb" onClick={() => mvChange(mi, (l) => { mv.exercises.forEach((x, i) => { l.entries[mvSlot(x, i)] = [{ load: null, reps: null, done: true }]; }); })}>Mark all done</button>
+                {ml.date && <span style={{ fontSize: 11, color: "#6B7280" }}>Logged {shortDate(ml.date)}</span>}
+              </div>
+              <textarea aria-label={`${mv.label} notes`} placeholder="Notes (optional)" value={ml.notes || ""} onChange={(e) => mvChange(mi, (l) => { l.notes = e.target.value; })}
+                style={{ width: "100%", minHeight: 44, marginTop: 8, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "7px 9px", fontSize: 12, resize: "vertical" }} />
             </div>
-          </div>
-        </details>
-      ))}
+          </details>
+        );
+      })}
       <div className="key"><span><i />Not logged</span><span><i className="p" />Partly</span><span><i className="d" />Logged</span><span><i className="n" />Up next</span></div>
 
       <div className="logger">
