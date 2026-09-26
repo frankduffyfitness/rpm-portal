@@ -456,6 +456,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
             </div>
           )}
         </div>
+        {prog.warmup && prog.warmup.length > 0 && <details><summary>Warm-up ({prog.warmup.length})</summary><ul>{prog.warmup.map((x, i) => <li key={i}>{x}</li>)}</ul></details>}
         {d.prework && d.prework.length > 0 && <details><summary>Pre-work ({d.prework.length})</summary><ul>{d.prework.map((x, i) => <li key={i}>{x}</li>)}</ul></details>}
         {d.exercises.map((ex) => {
           const wk = ex.weeks.find((w) => w.w === sel.week);
