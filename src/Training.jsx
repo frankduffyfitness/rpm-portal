@@ -440,6 +440,24 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
           );
         })}
       </div>
+      {(prog.movement || []).map((mv, mi) => (
+        <details key={mi} style={{ marginTop: 14, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
+          <summary>{mv.label} · Week {sel.week}</summary>
+          <div style={{ fontSize: 12, color: "#8A8F98", marginTop: 8 }}>
+            {mv.warmup.length > 0 && <>
+              <div style={{ color: "#E0E0E0", fontWeight: 600 }}>{mv.warmup[0].endsWith(":") ? mv.warmup[0].slice(0, -1) : "Warm-up"}{mv.note ? ` (${mv.note.replace(/\.$/, "").toLowerCase()})` : ""}</div>
+              <ul>{mv.warmup.filter((x, i) => !(i === 0 && x.endsWith(":"))).map((x, i) => <li key={i}>{x}</li>)}</ul>
+            </>}
+            <div style={{ display: "grid", gap: 4, marginTop: 8 }}>
+              {mv.exercises.map((x, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: 12, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 4 }}>
+                  <span style={{ color: "#E0E0E0" }}>{x.name}</span><span style={{ whiteSpace: "nowrap" }}>{x.weeks[sel.week - 1] || ""}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </details>
+      ))}
       <div className="key"><span><i />Not logged</span><span><i className="p" />Partly</span><span><i className="d" />Logged</span><span><i className="n" />Up next</span></div>
 
       <div className="logger">
