@@ -802,6 +802,11 @@ RECONCILE_REPORT = "reconcile_report.json"
 # facility's history was deleted -- so refuse and report instead.
 RECONCILE_MAX_FRAC = 0.03
 RECONCILE_MAX_ABS = 300
+RECONCILE_MAX_TYPE_FRAC = 0.10   # abort if any one test type would lose >10%
+# Apply is DISABLED until the 2026-09-27 squat-jump mismatch is understood:
+# SJ/SLJ/DJ tests the store holds are not matching VALD's current list, so
+# an apply would delete real data. Flip only after diagnosing that.
+RECONCILE_APPLY_ENABLED = False
 
 
 def _rkey(pid, date, test_type):
@@ -855,13 +860,23 @@ def reconcile(apply=False):
     stale.sort(key=lambda r: (r["athlete"] or "", r["date"] or ""))
 
     cap = min(RECONCILE_MAX_ABS, max(1, int(total * RECONCILE_MAX_FRAC)))
-    aborted = len(stale) > cap
+    # Per-type guard. The global cap alone missed the 2026-09-27 failure: 181 of
+    # 209 squat jumps (87 percent) were flagged, but 223 total stayed under 300.
+    # Real deletions are scattered; losing a large share of ONE test type is the
+    # signature of a matching failure for that type.
+    from collections import Counter as _C
+    type_total = _C(t.get("testType") for a in athletes.values() for t in a.get("tests", []))
+    type_stale = _C(r["testType"] for r in stale)
+    wiped = {tp: f"{n}/{type_total[tp]}" for tp, n in type_stale.items()
+             if type_total[tp] >= 10 and n / type_total[tp] > RECONCILE_MAX_TYPE_FRAC}
+    aborted = len(stale) > cap or bool(wiped)
     report = {
         "generated": datetime.now(timezone.utc).isoformat(),
         "mode": "apply" if apply else "dry-run",
         "valdTests": len(vald), "storeTests": total,
         "staleCount": len(stale), "cap": cap,
-        "aborted": aborted, "applied": bool(apply and not aborted),
+        "aborted": aborted, "typeWipes": wiped,
+        "applied": bool(apply and not aborted and RECONCILE_APPLY_ENABLED),
         "stale": stale,
     }
     with open(RECONCILE_REPORT, "w") as f:
@@ -869,6 +884,8 @@ def reconcile(apply=False):
     log(f"VALD lists {len(vald)} tests; store holds {total}; {len(stale)} not in VALD (cap {cap}).")
     for r in stale[:50]:
         log(f"  {r['athlete']} {str(r['date'])[:10]} {r['testType']} wt={r['weightKg']} jh={r['bestJumpHeight']}")
+    if wiped:
+        log(f"ABORT: per-type wipe {wiped} looks like a matching failure, not deletions.")
     if aborted:
         # Return 0 (not exit 1) so the workflow still commits the report and a
         # human can see why; the store itself is untouched.
@@ -876,7 +893,11 @@ def reconcile(apply=False):
             "deletions. Store NOT modified; read reconcile_report.json.")
         return
     if not apply:
-        log("DRY RUN complete. Store NOT modified. Re-run with [reconcile-apply] to remove.")
+        log("DRY RUN complete. Store NOT modified.")
+        return
+    if not RECONCILE_APPLY_ENABLED:
+        log("REFUSED: reconcile apply is disabled (RECONCILE_APPLY_ENABLED=False) "
+            "pending the squat-jump matching fix. Store NOT modified.")
         return
     drop = {_rkey(r["profileId"], r["date"], r["testType"]) for r in stale}
     for pid, ath in athletes.items():

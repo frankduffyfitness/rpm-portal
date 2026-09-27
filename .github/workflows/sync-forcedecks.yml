@@ -59,7 +59,10 @@ jobs:
 
       - name: Run VALD Sync
         run: |
-          MSG="$(git log -1 --pretty=%B)"
+          # Subject line ONLY (%s, not %B). Grepping the whole body let explanatory
+          # prose that merely MENTIONED a tag trigger it: on 2026-09-27 a commit
+          # describing a dry run ran a destructive apply and removed 223 tests.
+          MSG="$(git log -1 --pretty=%s)"
           ARGS=""
           [ "${{ github.event.inputs.full_sync }}" == "true" ] && ARGS="--full"
           # A metric-definition change needs a re-pull of existing tests (an
