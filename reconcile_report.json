@@ -1,1 +1,2019 @@
-{"note": "Written by vald_sync.py --reconcile. Tracked on purpose: the sync workflow resets to origin/main and only commits tracked-file changes, so an untracked report would be discarded."}
+{
+ "generated": "2026-09-27T03:57:48.382566+00:00",
+ "mode": "apply",
+ "valdTests": 19918,
+ "storeTests": 20065,
+ "staleCount": 223,
+ "cap": 300,
+ "aborted": false,
+ "applied": true,
+ "stale": [
+  {
+   "athlete": "Alex Hago",
+   "profileId": "5d64b81f-4b56-42f4-8e57-4bc6bd796061",
+   "date": "2025-11-25T21:08:25.115415Z",
+   "testType": "SJ",
+   "weightKg": 63.1,
+   "bestJumpHeight": 14.35,
+   "trials": 1
+  },
+  {
+   "athlete": "Alex Hago",
+   "profileId": "5d64b81f-4b56-42f4-8e57-4bc6bd796061",
+   "date": "2026-01-03T16:14:48.711685Z",
+   "testType": "SJ",
+   "weightKg": 62.6,
+   "bestJumpHeight": 12.52,
+   "trials": 1
+  },
+  {
+   "athlete": "Alex Rosario",
+   "profileId": "9aa11391-256d-4048-9f5d-681859f57121",
+   "date": "2025-10-07T23:48:56.724009Z",
+   "testType": "SJ",
+   "weightKg": 74.07,
+   "bestJumpHeight": 19.54,
+   "trials": 3
+  },
+  {
+   "athlete": "Amber Mangold",
+   "profileId": "a8c16881-58dd-4388-a2f3-3c4d47d0021a",
+   "date": "2026-02-11T20:25:56.048042Z",
+   "testType": "SJ",
+   "weightKg": 69.22,
+   "bestJumpHeight": 9.41,
+   "trials": 1
+  },
+  {
+   "athlete": "Ami Epstein",
+   "profileId": "3131499a-f40e-4014-b2b5-c89408b932d6",
+   "date": "2025-12-30T18:51:56.696002Z",
+   "testType": "SJ",
+   "weightKg": 82.22,
+   "bestJumpHeight": 0.98,
+   "trials": 1
+  },
+  {
+   "athlete": "Amy Welsh",
+   "profileId": "28f7bcb7-5335-4197-b366-e75265272a25",
+   "date": "2026-07-24T21:52:10.967538Z",
+   "testType": "SJ",
+   "weightKg": 64.46,
+   "bestJumpHeight": 9.43,
+   "trials": 1
+  },
+  {
+   "athlete": "Anaya Sanchez",
+   "profileId": "884cb7ea-a052-4209-a5f6-d45ee9f2bd71",
+   "date": "2026-07-13T22:08:36.199964Z",
+   "testType": "SJ",
+   "weightKg": 35.45,
+   "bestJumpHeight": 34.72,
+   "trials": 1
+  },
+  {
+   "athlete": "Anthony Plascoff",
+   "profileId": "b6ba77a8-67e1-4225-aca8-3ef1f2940d67",
+   "date": "2025-10-31T18:06:53.493355Z",
+   "testType": "SJ",
+   "weightKg": 67.54,
+   "bestJumpHeight": 16.62,
+   "trials": 1
+  },
+  {
+   "athlete": "Antonio Porcelli",
+   "profileId": "657af5bf-d8f5-46de-af4f-6128086ccac6",
+   "date": "2026-01-15T22:55:48.276337Z",
+   "testType": "SJ",
+   "weightKg": 84.2,
+   "bestJumpHeight": 15.73,
+   "trials": 1
+  },
+  {
+   "athlete": "Antonio Porcelli",
+   "profileId": "657af5bf-d8f5-46de-af4f-6128086ccac6",
+   "date": "2026-02-26T23:07:10.010233Z",
+   "testType": "SJ",
+   "weightKg": 81.43,
+   "bestJumpHeight": 16.93,
+   "trials": 2
+  },
+  {
+   "athlete": "Antonio Porcelli",
+   "profileId": "657af5bf-d8f5-46de-af4f-6128086ccac6",
+   "date": "2026-02-28T00:43:06.808136Z",
+   "testType": "SJ",
+   "weightKg": 82.53,
+   "bestJumpHeight": 15.37,
+   "trials": 1
+  },
+  {
+   "athlete": "Antonio Porcelli",
+   "profileId": "657af5bf-d8f5-46de-af4f-6128086ccac6",
+   "date": "2026-03-12T23:01:02.351042Z",
+   "testType": "SJ",
+   "weightKg": 81.15,
+   "bestJumpHeight": 16.98,
+   "trials": 2
+  },
+  {
+   "athlete": "Antonio Porcelli",
+   "profileId": "657af5bf-d8f5-46de-af4f-6128086ccac6",
+   "date": "2026-04-09T17:20:53.414383Z",
+   "testType": "SJ",
+   "weightKg": 79.86,
+   "bestJumpHeight": 17.02,
+   "trials": 1
+  },
+  {
+   "athlete": "Aryanna Hernandez",
+   "profileId": "29ca0b52-d214-4693-bd1e-b2ba95035e6d",
+   "date": "2025-10-07T21:34:46.195025Z",
+   "testType": "SJ",
+   "weightKg": 67.53,
+   "bestJumpHeight": 15.18,
+   "trials": 1
+  },
+  {
+   "athlete": "Bayram Hot",
+   "profileId": "7adb33da-9d49-47a8-b9a1-4f045538e51b",
+   "date": "2025-11-28T17:58:52.36963Z",
+   "testType": "HJ",
+   "weightKg": 93.64,
+   "bestJumpHeight": 0,
+   "trials": 2
+  },
+  {
+   "athlete": "Bobby Connolly",
+   "profileId": "72a90d89-ada1-409a-9b3e-94afd64a85b9",
+   "date": "2026-06-02T23:21:16.856327Z",
+   "testType": "CMJ",
+   "weightKg": 78.92,
+   "bestJumpHeight": 9.91,
+   "trials": 6
+  },
+  {
+   "athlete": "Bobby Connolly",
+   "profileId": "72a90d89-ada1-409a-9b3e-94afd64a85b9",
+   "date": "2026-08-04T19:21:49.834481Z",
+   "testType": "SLJ",
+   "weightKg": 76.3,
+   "bestJumpHeight": 10.24,
+   "trials": 1
+  },
+  {
+   "athlete": "Braden Eddy",
+   "profileId": "95a1ffe1-e689-4b2d-a334-46b588e7f7f1",
+   "date": "2026-07-09T23:12:25.248408Z",
+   "testType": "SJ",
+   "weightKg": 61.87,
+   "bestJumpHeight": 4.92,
+   "trials": 1
+  },
+  {
+   "athlete": "Brendan Mackay",
+   "profileId": "fc21e8a0-061d-479e-9b97-98b5b50e0dc5",
+   "date": "2026-08-06T15:48:33.990586Z",
+   "testType": "SJ",
+   "weightKg": 78.4,
+   "bestJumpHeight": 15.21,
+   "trials": 1
+  },
+  {
+   "athlete": "CJ Burke",
+   "profileId": "60e4b1d6-1a0a-45f9-9d45-2e9991fbee57",
+   "date": "2025-10-21T18:55:53.255971Z",
+   "testType": "SJ",
+   "weightKg": 96.88,
+   "bestJumpHeight": 1.36,
+   "trials": 1
+  },
+  {
+   "athlete": "CJ Burke",
+   "profileId": "60e4b1d6-1a0a-45f9-9d45-2e9991fbee57",
+   "date": "2026-06-10T19:18:05.852881Z",
+   "testType": "SLJ",
+   "weightKg": 92.54,
+   "bestJumpHeight": 14.09,
+   "trials": 1
+  },
+  {
+   "athlete": "Carlos Sanchez",
+   "profileId": "5626e217-61e9-41be-ae7d-93bdb19094a1",
+   "date": "2025-09-27T16:13:53.84025Z",
+   "testType": "SJ",
+   "weightKg": 92.16,
+   "bestJumpHeight": 13.93,
+   "trials": 1
+  },
+  {
+   "athlete": "Carlos Sanchez",
+   "profileId": "5626e217-61e9-41be-ae7d-93bdb19094a1",
+   "date": "2025-10-14T19:49:15.22481Z",
+   "testType": "SJ",
+   "weightKg": 91.41,
+   "bestJumpHeight": 13.53,
+   "trials": 1
+  },
+  {
+   "athlete": "Charlie Brady",
+   "profileId": "a2863d1b-bd20-4a00-9365-c5c288374605",
+   "date": "2025-08-30T13:45:57.244281Z",
+   "testType": "SJ",
+   "weightKg": 86.57,
+   "bestJumpHeight": 12.8,
+   "trials": 16
+  },
+  {
+   "athlete": "Charlie Droesch",
+   "profileId": "548812a6-3b47-4935-aaf1-a6649f2b403d",
+   "date": "2026-06-10T21:11:25.411542Z",
+   "testType": "SJ",
+   "weightKg": 82.16,
+   "bestJumpHeight": 10.85,
+   "trials": 1
+  },
+  {
+   "athlete": "Charlie Droesch",
+   "profileId": "548812a6-3b47-4935-aaf1-a6649f2b403d",
+   "date": "2026-07-07T14:00:53.629931Z",
+   "testType": "SJ",
+   "weightKg": 84.99,
+   "bestJumpHeight": 11.17,
+   "trials": 1
+  },
+  {
+   "athlete": "Chayse McBride",
+   "profileId": "09e3eddb-c2fc-4157-8a89-7f96e612e577",
+   "date": "2025-11-05T22:25:04.175003Z",
+   "testType": "SJ",
+   "weightKg": 68.96,
+   "bestJumpHeight": 19.36,
+   "trials": 1
+  },
+  {
+   "athlete": "Chris Martinez-Toribio",
+   "profileId": "44cacb86-fa42-47fe-becf-b9facec08582",
+   "date": "2025-11-03T21:32:31.032495Z",
+   "testType": "SJ",
+   "weightKg": 106.02,
+   "bestJumpHeight": 12.21,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Peralta",
+   "profileId": "efb27f32-9a6b-4482-9fbc-6de5d1bd08c0",
+   "date": "2025-09-19T22:59:24.163841Z",
+   "testType": "SJ",
+   "weightKg": 76.53,
+   "bestJumpHeight": 18.62,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Peralta",
+   "profileId": "efb27f32-9a6b-4482-9fbc-6de5d1bd08c0",
+   "date": "2025-11-20T00:20:29.336344Z",
+   "testType": "SJ",
+   "weightKg": 74.93,
+   "bestJumpHeight": 18.83,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Peralta",
+   "profileId": "efb27f32-9a6b-4482-9fbc-6de5d1bd08c0",
+   "date": "2025-12-06T15:31:28.332146Z",
+   "testType": "SJ",
+   "weightKg": 75.47,
+   "bestJumpHeight": 20.6,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Peralta",
+   "profileId": "efb27f32-9a6b-4482-9fbc-6de5d1bd08c0",
+   "date": "2025-12-18T00:21:00.806472Z",
+   "testType": "SJ",
+   "weightKg": 74.09,
+   "bestJumpHeight": 18.35,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Peralta",
+   "profileId": "efb27f32-9a6b-4482-9fbc-6de5d1bd08c0",
+   "date": "2026-06-02T21:58:27.372637Z",
+   "testType": "SJ",
+   "weightKg": 71.12,
+   "bestJumpHeight": 19.19,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2025-09-02T18:49:58.230976Z",
+   "testType": "SJ",
+   "weightKg": 71.83,
+   "bestJumpHeight": 14.63,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2025-10-22T19:40:44.554882Z",
+   "testType": "SJ",
+   "weightKg": 71.04,
+   "bestJumpHeight": 17.33,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2025-10-24T19:31:11.661856Z",
+   "testType": "SJ",
+   "weightKg": 71.91,
+   "bestJumpHeight": 15.16,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-02-14T14:48:43.569735Z",
+   "testType": "SJ",
+   "weightKg": 74,
+   "bestJumpHeight": 15.59,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-02-18T19:41:19.606391Z",
+   "testType": "SJ",
+   "weightKg": 73.64,
+   "bestJumpHeight": 17.79,
+   "trials": 2
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-02-20T19:42:04.539891Z",
+   "testType": "SJ",
+   "weightKg": 73.66,
+   "bestJumpHeight": 17.71,
+   "trials": 2
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-02-27T23:24:13.928486Z",
+   "testType": "SJ",
+   "weightKg": 74.39,
+   "bestJumpHeight": 19.09,
+   "trials": 2
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-03-02T21:23:13.271509Z",
+   "testType": "SJ",
+   "weightKg": 73.13,
+   "bestJumpHeight": 15.91,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-03-16T22:18:51.453607Z",
+   "testType": "SJ",
+   "weightKg": 73.77,
+   "bestJumpHeight": 17.38,
+   "trials": 1
+  },
+  {
+   "athlete": "Christian Sanchez",
+   "profileId": "d8ac27af-3ef0-47af-a5ec-84f6e869f423",
+   "date": "2026-07-24T18:11:27.43363Z",
+   "testType": "SJ",
+   "weightKg": 77.51,
+   "bestJumpHeight": 16.56,
+   "trials": 3
+  },
+  {
+   "athlete": "Connor Tam",
+   "profileId": "3ca523ad-89e0-4c20-82bd-b1444f84296e",
+   "date": "2026-07-31T14:36:49.609811Z",
+   "testType": "SJ",
+   "weightKg": 84.58,
+   "bestJumpHeight": 13.56,
+   "trials": 2
+  },
+  {
+   "athlete": "Costa Bournias",
+   "profileId": "b3ddeb65-089b-4daa-b373-ac495203a684",
+   "date": "2026-05-27T20:01:45.201565Z",
+   "testType": "SLJ",
+   "weightKg": 73.14,
+   "bestJumpHeight": 3.91,
+   "trials": 1
+  },
+  {
+   "athlete": "Darren Espinal",
+   "profileId": "8768ec51-9ec0-4ec3-89af-1d4e811cb959",
+   "date": "2026-07-13T16:52:10.244167Z",
+   "testType": "SJ",
+   "weightKg": 98.61,
+   "bestJumpHeight": 13.28,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-10-23T21:29:56.598365Z",
+   "testType": "SJ",
+   "weightKg": 59.67,
+   "bestJumpHeight": 11.81,
+   "trials": 3
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-11-12T23:17:54.74048Z",
+   "testType": "SJ",
+   "weightKg": 59.59,
+   "bestJumpHeight": 11.33,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-11-15T16:05:21.31032Z",
+   "testType": "SJ",
+   "weightKg": 58.96,
+   "bestJumpHeight": 11.24,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-11-18T22:14:50.492526Z",
+   "testType": "SJ",
+   "weightKg": 59.56,
+   "bestJumpHeight": 10.71,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-11-20T23:00:43.898186Z",
+   "testType": "SJ",
+   "weightKg": 59.32,
+   "bestJumpHeight": 11.17,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-12-13T16:11:16.992186Z",
+   "testType": "SJ",
+   "weightKg": 58.73,
+   "bestJumpHeight": 12.65,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-12-20T15:48:53.576213Z",
+   "testType": "SJ",
+   "weightKg": 58.46,
+   "bestJumpHeight": 12.59,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2025-12-23T22:56:02.38831Z",
+   "testType": "SJ",
+   "weightKg": 58.84,
+   "bestJumpHeight": 11.84,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-01-06T22:52:02.683374Z",
+   "testType": "SJ",
+   "weightKg": 57.31,
+   "bestJumpHeight": 12.31,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-01-10T16:13:03.143329Z",
+   "testType": "SJ",
+   "weightKg": 58.34,
+   "bestJumpHeight": 11.11,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-01-13T22:34:37.407749Z",
+   "testType": "SJ",
+   "weightKg": 58.19,
+   "bestJumpHeight": 12.54,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-01-15T22:43:56.279255Z",
+   "testType": "SJ",
+   "weightKg": 58.63,
+   "bestJumpHeight": 11.79,
+   "trials": 3
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-01-21T22:42:16.371088Z",
+   "testType": "SJ",
+   "weightKg": 57.85,
+   "bestJumpHeight": 11.69,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-01-22T22:26:26.737604Z",
+   "testType": "SJ",
+   "weightKg": 58.25,
+   "bestJumpHeight": 12.38,
+   "trials": 3
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-02-03T22:19:24.281579Z",
+   "testType": "SJ",
+   "weightKg": 57.68,
+   "bestJumpHeight": 11.53,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-02-07T16:03:48.573487Z",
+   "testType": "SJ",
+   "weightKg": 57.7,
+   "bestJumpHeight": 11.55,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-02-24T23:09:31.423667Z",
+   "testType": "SJ",
+   "weightKg": 58.46,
+   "bestJumpHeight": 11.35,
+   "trials": 3
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-03-02T23:23:09.791435Z",
+   "testType": "SJ",
+   "weightKg": 58.16,
+   "bestJumpHeight": 11.77,
+   "trials": 2
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-03-24T21:16:46.226669Z",
+   "testType": "SJ",
+   "weightKg": 58.76,
+   "bestJumpHeight": 10.94,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-04-02T16:43:28.777202Z",
+   "testType": "SJ",
+   "weightKg": 58.16,
+   "bestJumpHeight": 11.16,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-04-13T22:39:04.450053Z",
+   "testType": "SJ",
+   "weightKg": 57.77,
+   "bestJumpHeight": 11.26,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-04-20T21:22:12.908252Z",
+   "testType": "SJ",
+   "weightKg": 59.02,
+   "bestJumpHeight": 10.99,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Mackay",
+   "profileId": "bb224fde-e572-4fae-8fa6-a55d4bb0074d",
+   "date": "2026-07-01T14:29:59.294781Z",
+   "testType": "LAH",
+   "weightKg": 60.22,
+   "bestJumpHeight": 0,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Payano",
+   "profileId": "9e8fab3f-5833-486a-b26f-88b96de29081",
+   "date": "2025-12-12T00:33:54.832855Z",
+   "testType": "SJ",
+   "weightKg": 77.14,
+   "bestJumpHeight": 18.24,
+   "trials": 1
+  },
+  {
+   "athlete": "Dylan Payano",
+   "profileId": "9e8fab3f-5833-486a-b26f-88b96de29081",
+   "date": "2026-07-30T19:36:27.437949Z",
+   "testType": "SLJ",
+   "weightKg": 75.91,
+   "bestJumpHeight": 1.41,
+   "trials": 1
+  },
+  {
+   "athlete": "Elian Carrasco",
+   "profileId": "5ab21329-06d3-47b0-ba60-15d4ae2bd5bb",
+   "date": "2026-07-13T21:15:43.157631Z",
+   "testType": "SJ",
+   "weightKg": 89.37,
+   "bestJumpHeight": 26.07,
+   "trials": 1
+  },
+  {
+   "athlete": "Francesca Albergo",
+   "profileId": "cfc14776-db2e-43c9-b047-81210594d6a2",
+   "date": "2025-12-03T22:47:49.445276Z",
+   "testType": "SJ",
+   "weightKg": 45.47,
+   "bestJumpHeight": 6.26,
+   "trials": 1
+  },
+  {
+   "athlete": "Frank Orlando",
+   "profileId": "962eda85-2eed-4fba-bbbd-011714b10e6e",
+   "date": "2026-01-29T19:52:42.796107Z",
+   "testType": "SJ",
+   "weightKg": 75.97,
+   "bestJumpHeight": 17.73,
+   "trials": 1
+  },
+  {
+   "athlete": "GP Scaccia",
+   "profileId": "92d903c8-0d0f-45b5-83d4-2d0769cc3192",
+   "date": "2025-12-10T21:12:11.310996Z",
+   "testType": "SJ",
+   "weightKg": 78.81,
+   "bestJumpHeight": 7.44,
+   "trials": 1
+  },
+  {
+   "athlete": "Gavin Laya-Vetell",
+   "profileId": "97a8675a-1889-4e67-9781-844873ea1ed7",
+   "date": "2026-02-03T21:00:59.953364Z",
+   "testType": "SJ",
+   "weightKg": 91.85,
+   "bestJumpHeight": 15.77,
+   "trials": 1
+  },
+  {
+   "athlete": "Giamby Alvarez",
+   "profileId": "616d0aa0-a079-4924-bb32-7807f31a5d7d",
+   "date": "2025-09-27T15:37:25.970983Z",
+   "testType": "SJ",
+   "weightKg": 89.12,
+   "bestJumpHeight": 11.73,
+   "trials": 1
+  },
+  {
+   "athlete": "Giamby Alvarez",
+   "profileId": "616d0aa0-a079-4924-bb32-7807f31a5d7d",
+   "date": "2026-01-15T22:46:54.369537Z",
+   "testType": "SJ",
+   "weightKg": 89.32,
+   "bestJumpHeight": 13.36,
+   "trials": 1
+  },
+  {
+   "athlete": "Henry Hilger",
+   "profileId": "efab2a4f-e8de-4d88-be8e-3ecc9957b04d",
+   "date": "2026-07-21T18:39:22.593813Z",
+   "testType": "DJ",
+   "weightKg": 84.7,
+   "bestJumpHeight": 13.76,
+   "trials": 2
+  },
+  {
+   "athlete": "Hudson Pallay",
+   "profileId": "be951992-8c4d-41c2-8d68-9cf60155028b",
+   "date": "2025-08-19T15:11:38.350984Z",
+   "testType": "SJ",
+   "weightKg": 71.57,
+   "bestJumpHeight": 15.14,
+   "trials": 3
+  },
+  {
+   "athlete": "Hunter Tien",
+   "profileId": "4525dd75-7bce-4ada-a5aa-35120af62484",
+   "date": "2025-10-30T21:09:09.287646Z",
+   "testType": "SJ",
+   "weightKg": 63.48,
+   "bestJumpHeight": 5.8,
+   "trials": 1
+  },
+  {
+   "athlete": "Hunter Tien",
+   "profileId": "4525dd75-7bce-4ada-a5aa-35120af62484",
+   "date": "2025-11-07T22:07:06.850117Z",
+   "testType": "SJ",
+   "weightKg": 63.66,
+   "bestJumpHeight": 6.2,
+   "trials": 1
+  },
+  {
+   "athlete": "Hunter Tien",
+   "profileId": "4525dd75-7bce-4ada-a5aa-35120af62484",
+   "date": "2025-11-13T19:52:29.500602Z",
+   "testType": "SJ",
+   "weightKg": 64.08,
+   "bestJumpHeight": 6.86,
+   "trials": 2
+  },
+  {
+   "athlete": "Hunter Tien",
+   "profileId": "4525dd75-7bce-4ada-a5aa-35120af62484",
+   "date": "2026-03-13T20:25:54.518775Z",
+   "testType": "SJ",
+   "weightKg": 64.17,
+   "bestJumpHeight": 5.91,
+   "trials": 1
+  },
+  {
+   "athlete": "Hunter Tien",
+   "profileId": "4525dd75-7bce-4ada-a5aa-35120af62484",
+   "date": "2026-06-11T20:32:07.844908Z",
+   "testType": "SJ",
+   "weightKg": 60.73,
+   "bestJumpHeight": 8.39,
+   "trials": 1
+  },
+  {
+   "athlete": "Isaiah Rubin-Patel",
+   "profileId": "9afe9696-5b6f-41c2-84ee-6f3bc18d6288",
+   "date": "2025-10-27T18:44:05.014376Z",
+   "testType": "SJ",
+   "weightKg": 79.07,
+   "bestJumpHeight": 12.69,
+   "trials": 1
+  },
+  {
+   "athlete": "Ishaan Neogi",
+   "profileId": "ef0ae109-173b-492e-b56a-8db8270bcbe9",
+   "date": "2026-01-09T00:28:23.447051Z",
+   "testType": "SJ",
+   "weightKg": 39.21,
+   "bestJumpHeight": 10.28,
+   "trials": 1
+  },
+  {
+   "athlete": "Ishaan Neogi",
+   "profileId": "ef0ae109-173b-492e-b56a-8db8270bcbe9",
+   "date": "2026-03-12T20:24:47.315439Z",
+   "testType": "SJ",
+   "weightKg": 40.4,
+   "bestJumpHeight": 12.0,
+   "trials": 1
+  },
+  {
+   "athlete": "Ishaan Neogi",
+   "profileId": "ef0ae109-173b-492e-b56a-8db8270bcbe9",
+   "date": "2026-03-16T20:18:28.672766Z",
+   "testType": "SJ",
+   "weightKg": 40.45,
+   "bestJumpHeight": 12.97,
+   "trials": 1
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-01-15T22:11:19.810179Z",
+   "testType": "SJ",
+   "weightKg": 82.35,
+   "bestJumpHeight": 12.64,
+   "trials": 2
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-01-23T00:23:26.847742Z",
+   "testType": "SJ",
+   "weightKg": 80.47,
+   "bestJumpHeight": 14.31,
+   "trials": 6
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-01-24T15:33:36.592173Z",
+   "testType": "SJ",
+   "weightKg": 82.92,
+   "bestJumpHeight": 13.56,
+   "trials": 1
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-01-30T22:18:55.570915Z",
+   "testType": "SJ",
+   "weightKg": 81.6,
+   "bestJumpHeight": 13.73,
+   "trials": 1
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-02-03T22:14:31.214559Z",
+   "testType": "SJ",
+   "weightKg": 81.6,
+   "bestJumpHeight": 13.75,
+   "trials": 5
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-02-06T00:56:06.853432Z",
+   "testType": "SJ",
+   "weightKg": 82.48,
+   "bestJumpHeight": 13.79,
+   "trials": 4
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-02-06T22:15:52.438418Z",
+   "testType": "SJ",
+   "weightKg": 83.31,
+   "bestJumpHeight": 12.5,
+   "trials": 2
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-02-12T21:40:46.759705Z",
+   "testType": "SJ",
+   "weightKg": 81.71,
+   "bestJumpHeight": 14.16,
+   "trials": 2
+  },
+  {
+   "athlete": "Ivan Victorio",
+   "profileId": "8dfdfb57-789d-466f-8d88-c8afd1790208",
+   "date": "2026-06-17T23:45:46.535846Z",
+   "testType": "SJ",
+   "weightKg": 82.48,
+   "bestJumpHeight": 14.64,
+   "trials": 1
+  },
+  {
+   "athlete": "Jace Congemi",
+   "profileId": "d769d03c-cded-4b3d-bb3c-5341744ce8a8",
+   "date": "2025-10-03T21:52:14.427759Z",
+   "testType": "SJ",
+   "weightKg": 40.1,
+   "bestJumpHeight": 10.91,
+   "trials": 1
+  },
+  {
+   "athlete": "Jace Congemi",
+   "profileId": "d769d03c-cded-4b3d-bb3c-5341744ce8a8",
+   "date": "2026-05-18T22:12:38.403954Z",
+   "testType": "SJ",
+   "weightKg": 45.25,
+   "bestJumpHeight": 14.66,
+   "trials": 1
+  },
+  {
+   "athlete": "Jace Congemi",
+   "profileId": "d769d03c-cded-4b3d-bb3c-5341744ce8a8",
+   "date": "2026-05-26T22:07:21.842413Z",
+   "testType": "SLJ",
+   "weightKg": 45.05,
+   "bestJumpHeight": 0.08,
+   "trials": 1
+  },
+  {
+   "athlete": "Jacob Matias",
+   "profileId": "e859801d-d1da-46b5-beed-e7e273ab6f95",
+   "date": "2026-07-27T15:43:13.065792Z",
+   "testType": "SJ",
+   "weightKg": 68.5,
+   "bestJumpHeight": 16.26,
+   "trials": 6
+  },
+  {
+   "athlete": "Jadiel Quezada",
+   "profileId": "69302dd2-c36c-4d5a-bc4c-2230a3287f88",
+   "date": "2026-02-02T20:47:35.938505Z",
+   "testType": "SJ",
+   "weightKg": 78.92,
+   "bestJumpHeight": 18.69,
+   "trials": 3
+  },
+  {
+   "athlete": "Jadiel Quezada",
+   "profileId": "69302dd2-c36c-4d5a-bc4c-2230a3287f88",
+   "date": "2026-02-09T20:42:35.59823Z",
+   "testType": "SJ",
+   "weightKg": 78.71,
+   "bestJumpHeight": 18.47,
+   "trials": 1
+  },
+  {
+   "athlete": "Jadiel Quezada",
+   "profileId": "69302dd2-c36c-4d5a-bc4c-2230a3287f88",
+   "date": "2026-02-11T21:06:21.134328Z",
+   "testType": "SJ",
+   "weightKg": 77.98,
+   "bestJumpHeight": 18.24,
+   "trials": 1
+  },
+  {
+   "athlete": "Jadiel Quezada",
+   "profileId": "69302dd2-c36c-4d5a-bc4c-2230a3287f88",
+   "date": "2026-02-25T20:48:19.737672Z",
+   "testType": "SJ",
+   "weightKg": 79.63,
+   "bestJumpHeight": 17.46,
+   "trials": 1
+  },
+  {
+   "athlete": "Jason Peacock",
+   "profileId": "d1620dea-4fc6-44bd-9692-058f4ae1fb1f",
+   "date": "2025-12-09T00:04:38.825863Z",
+   "testType": "SJ",
+   "weightKg": 46.06,
+   "bestJumpHeight": 11.6,
+   "trials": 1
+  },
+  {
+   "athlete": "Jayleen Torres",
+   "profileId": "6256882a-091d-4f51-a559-a5904e0c6b14",
+   "date": "2026-02-02T20:35:27.19896Z",
+   "testType": "SJ",
+   "weightKg": 79.44,
+   "bestJumpHeight": 6.84,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2025-12-18T23:53:20.025013Z",
+   "testType": "SJ",
+   "weightKg": 95.48,
+   "bestJumpHeight": 14.74,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2025-12-22T22:14:58.553023Z",
+   "testType": "SJ",
+   "weightKg": 95.64,
+   "bestJumpHeight": 14.59,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2026-01-05T23:13:28.922535Z",
+   "testType": "SJ",
+   "weightKg": 96.53,
+   "bestJumpHeight": 14.17,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2026-01-06T23:43:01.393843Z",
+   "testType": "SJ",
+   "weightKg": 98.2,
+   "bestJumpHeight": 14.61,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2026-01-08T23:27:32.215159Z",
+   "testType": "SJ",
+   "weightKg": 96.37,
+   "bestJumpHeight": 15.37,
+   "trials": 3
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2026-01-12T21:58:27.33964Z",
+   "testType": "SJ",
+   "weightKg": 97.21,
+   "bestJumpHeight": 13.93,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2026-01-30T21:20:59.366257Z",
+   "testType": "SJ",
+   "weightKg": 97.16,
+   "bestJumpHeight": 16.77,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey DiMaria",
+   "profileId": "d23179f5-1fb9-49c5-8ce6-0aeb19525fb3",
+   "date": "2026-08-07T15:25:57.570362Z",
+   "testType": "SLJ",
+   "weightKg": 92.2,
+   "bestJumpHeight": 7.15,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey Frazzetta",
+   "profileId": "5b8e5e59-ffa2-49a4-b455-b601e9acc6c5",
+   "date": "2026-06-01T19:47:57.633594Z",
+   "testType": "SLJ",
+   "weightKg": 89.72,
+   "bestJumpHeight": 6.29,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey Muzio",
+   "profileId": "012f65d7-5be2-447d-a5cc-da6011c718ff",
+   "date": "2025-09-06T15:07:42.981771Z",
+   "testType": "SJ",
+   "weightKg": 80.66,
+   "bestJumpHeight": 12.58,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey Muzio",
+   "profileId": "012f65d7-5be2-447d-a5cc-da6011c718ff",
+   "date": "2026-02-12T23:38:39.283754Z",
+   "testType": "SJ",
+   "weightKg": 86.46,
+   "bestJumpHeight": 12.35,
+   "trials": 1
+  },
+  {
+   "athlete": "Joey Ramos",
+   "profileId": "d3a8355f-7379-43fb-a707-068b47809a39",
+   "date": "2026-07-17T16:58:56.868691Z",
+   "testType": "DJ",
+   "weightKg": 80.28,
+   "bestJumpHeight": 9.4,
+   "trials": 2
+  },
+  {
+   "athlete": "Julian Diaz",
+   "profileId": "0e9486aa-a849-47ef-b428-8fc3593c64a2",
+   "date": "2026-06-26T19:54:49.07786Z",
+   "testType": "SLJ",
+   "weightKg": 79.92,
+   "bestJumpHeight": 7.95,
+   "trials": 1
+  },
+  {
+   "athlete": "Julian Minaya",
+   "profileId": "80b58ee6-5b3f-434c-812e-4d0443c0ea9f",
+   "date": "2025-10-22T18:33:10.302358Z",
+   "testType": "SJ",
+   "weightKg": 89.88,
+   "bestJumpHeight": 19.29,
+   "trials": 4
+  },
+  {
+   "athlete": "Justin Garcia",
+   "profileId": "8d904d5a-a316-4e7c-b3ed-3598758b6ae3",
+   "date": "2026-06-16T20:37:11.582036Z",
+   "testType": "SJ",
+   "weightKg": 85.88,
+   "bestJumpHeight": 34.2,
+   "trials": 1
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-03-12T23:13:02.163936Z",
+   "testType": "SJ",
+   "weightKg": 93.02,
+   "bestJumpHeight": 13.61,
+   "trials": 2
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-03-20T18:09:39.980568Z",
+   "testType": "SJ",
+   "weightKg": 92.35,
+   "bestJumpHeight": 13.91,
+   "trials": 7
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-04-29T23:12:26.94466Z",
+   "testType": "SJ",
+   "weightKg": 92.29,
+   "bestJumpHeight": 13.69,
+   "trials": 1
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-05-06T23:16:10.85227Z",
+   "testType": "SJ",
+   "weightKg": 90.24,
+   "bestJumpHeight": 13.82,
+   "trials": 1
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-05-12T00:08:21.973441Z",
+   "testType": "SJ",
+   "weightKg": 90.57,
+   "bestJumpHeight": 14.56,
+   "trials": 1
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-05-22T21:13:08.719077Z",
+   "testType": "SJ",
+   "weightKg": 87.25,
+   "bestJumpHeight": 15.79,
+   "trials": 2
+  },
+  {
+   "athlete": "Justin Medina",
+   "profileId": "8033d67c-d058-4394-b33d-dc976c5a08e7",
+   "date": "2026-06-25T18:58:31.706278Z",
+   "testType": "SJ",
+   "weightKg": 89.61,
+   "bestJumpHeight": 13.5,
+   "trials": 1
+  },
+  {
+   "athlete": "Kaleb Liriano",
+   "profileId": "e2b343d1-40ef-4583-ac5f-b65a52f4136a",
+   "date": "2026-01-09T00:25:31.797131Z",
+   "testType": "SJ",
+   "weightKg": 69.18,
+   "bestJumpHeight": 9.75,
+   "trials": 1
+  },
+  {
+   "athlete": "Kaleb Liriano",
+   "profileId": "e2b343d1-40ef-4583-ac5f-b65a52f4136a",
+   "date": "2026-01-16T00:17:46.649316Z",
+   "testType": "SJ",
+   "weightKg": 68.99,
+   "bestJumpHeight": 10.12,
+   "trials": 1
+  },
+  {
+   "athlete": "Laith Mirza",
+   "profileId": "a67294e1-fcec-4d6c-a844-33d024eaca2e",
+   "date": "2026-04-18T15:54:17.062998Z",
+   "testType": "SJ",
+   "weightKg": 62.95,
+   "bestJumpHeight": 14.83,
+   "trials": 1
+  },
+  {
+   "athlete": "Liam Brower",
+   "profileId": "9f265973-5a8a-4ec6-adbe-6fc73c34cd72",
+   "date": "2026-06-27T15:47:46.245867Z",
+   "testType": "LAH",
+   "weightKg": 85.14,
+   "bestJumpHeight": 0,
+   "trials": 1
+  },
+  {
+   "athlete": "Liam Brower",
+   "profileId": "9f265973-5a8a-4ec6-adbe-6fc73c34cd72",
+   "date": "2026-08-13T23:13:52.572075Z",
+   "testType": "SLJ",
+   "weightKg": 85.62,
+   "bestJumpHeight": 4.27,
+   "trials": 1
+  },
+  {
+   "athlete": "Lucas Sookpaul",
+   "profileId": "7ba88f0a-9a65-4f77-8a45-5c4b5c056eeb",
+   "date": "2025-08-28T17:13:00.519971Z",
+   "testType": "SJ",
+   "weightKg": 54.17,
+   "bestJumpHeight": 4.77,
+   "trials": 6
+  },
+  {
+   "athlete": "Luke Mendez",
+   "profileId": "a1af3460-f65c-402f-884f-5894fbd51cc3",
+   "date": "2026-07-22T23:04:06.737656Z",
+   "testType": "SLJ",
+   "weightKg": 65.73,
+   "bestJumpHeight": 2.2,
+   "trials": 1
+  },
+  {
+   "athlete": "Mason Choe",
+   "profileId": "f72980ed-3d61-4852-ac49-9dc9b6b029fb",
+   "date": "2026-05-12T21:45:37.623259Z",
+   "testType": "SJ",
+   "weightKg": 40.68,
+   "bestJumpHeight": 44.74,
+   "trials": 1
+  },
+  {
+   "athlete": "Mason Figueroa",
+   "profileId": "1d961827-6fd5-4c73-9fad-e88d031b4478",
+   "date": "2026-06-01T20:12:01.095559Z",
+   "testType": "SLJ",
+   "weightKg": 78.08,
+   "bestJumpHeight": 8.91,
+   "trials": 1
+  },
+  {
+   "athlete": "Mason Morello",
+   "profileId": "a9018134-2fae-4677-9ba6-e6a142960475",
+   "date": "2026-07-25T14:45:07.570529Z",
+   "testType": "SJ",
+   "weightKg": 82.11,
+   "bestJumpHeight": 15.96,
+   "trials": 3
+  },
+  {
+   "athlete": "Mason Morello",
+   "profileId": "a9018134-2fae-4677-9ba6-e6a142960475",
+   "date": "2026-07-28T14:12:41.784341Z",
+   "testType": "PPU",
+   "weightKg": 82.33,
+   "bestJumpHeight": 0,
+   "trials": 3
+  },
+  {
+   "athlete": "Mason Morello",
+   "profileId": "a9018134-2fae-4677-9ba6-e6a142960475",
+   "date": "2026-07-28T14:14:58.578067Z",
+   "testType": "SJ",
+   "weightKg": 82.29,
+   "bestJumpHeight": 14.65,
+   "trials": 1
+  },
+  {
+   "athlete": "Mason Morello",
+   "profileId": "a9018134-2fae-4677-9ba6-e6a142960475",
+   "date": "2026-07-29T14:49:50.515226Z",
+   "testType": "SJ",
+   "weightKg": 81.07,
+   "bestJumpHeight": 17.4,
+   "trials": 6
+  },
+  {
+   "athlete": "Mason Morello",
+   "profileId": "a9018134-2fae-4677-9ba6-e6a142960475",
+   "date": "2026-07-31T14:18:45.48527Z",
+   "testType": "SJ",
+   "weightKg": 82.12,
+   "bestJumpHeight": 18.07,
+   "trials": 6
+  },
+  {
+   "athlete": "Mason Patience",
+   "profileId": "25cc80af-51a9-4a09-b3eb-b451086ea944",
+   "date": "2026-01-05T21:13:56.150679Z",
+   "testType": "SJ",
+   "weightKg": 88.65,
+   "bestJumpHeight": 13.04,
+   "trials": 1
+  },
+  {
+   "athlete": "Mason Patience",
+   "profileId": "25cc80af-51a9-4a09-b3eb-b451086ea944",
+   "date": "2026-08-10T19:29:29.239743Z",
+   "testType": "SLJ",
+   "weightKg": 91.03,
+   "bestJumpHeight": 2.6,
+   "trials": 1
+  },
+  {
+   "athlete": "Mason Patience",
+   "profileId": "25cc80af-51a9-4a09-b3eb-b451086ea944",
+   "date": "2026-08-19T21:26:27.970133Z",
+   "testType": "SLJ",
+   "weightKg": 92.85,
+   "bestJumpHeight": 63.71,
+   "trials": 1
+  },
+  {
+   "athlete": "Matt Haviland",
+   "profileId": "391b7f6e-9dcb-4753-95fb-ec2f0da3baa0",
+   "date": "2026-06-19T19:57:46.022336Z",
+   "testType": "SLJ",
+   "weightKg": 72.13,
+   "bestJumpHeight": 4.4,
+   "trials": 1
+  },
+  {
+   "athlete": "Matt Haviland",
+   "profileId": "391b7f6e-9dcb-4753-95fb-ec2f0da3baa0",
+   "date": "2026-06-25T19:47:08.007491Z",
+   "testType": "SLJ",
+   "weightKg": 73.51,
+   "bestJumpHeight": 3.28,
+   "trials": 1
+  },
+  {
+   "athlete": "Matt Haviland",
+   "profileId": "391b7f6e-9dcb-4753-95fb-ec2f0da3baa0",
+   "date": "2026-08-18T16:52:13.918071Z",
+   "testType": "CMJ",
+   "weightKg": 71.68,
+   "bestJumpHeight": 20.88,
+   "trials": 7
+  },
+  {
+   "athlete": "Matthew Mamak",
+   "profileId": "28399c31-52ff-49c7-aa13-534f69bb6540",
+   "date": "2026-06-30T19:05:37.52453Z",
+   "testType": "LAH",
+   "weightKg": 78.86,
+   "bestJumpHeight": 0,
+   "trials": 1
+  },
+  {
+   "athlete": "Matthew Mamak",
+   "profileId": "28399c31-52ff-49c7-aa13-534f69bb6540",
+   "date": "2026-07-16T19:09:20.409742Z",
+   "testType": "DJ",
+   "weightKg": 81.1,
+   "bestJumpHeight": 10.59,
+   "trials": 3
+  },
+  {
+   "athlete": "Micah Liu",
+   "profileId": "3f002ca7-f08d-4d23-8249-623b84bf47e5",
+   "date": "2026-07-02T21:46:13.600956Z",
+   "testType": "SJ",
+   "weightKg": 74.41,
+   "bestJumpHeight": 13.41,
+   "trials": 1
+  },
+  {
+   "athlete": "Michael Scilla",
+   "profileId": "4fca3665-d65c-4ed0-9ec6-7826201d2f22",
+   "date": "2026-05-13T19:23:43.867393Z",
+   "testType": "SLJ",
+   "weightKg": 51.54,
+   "bestJumpHeight": 9.12,
+   "trials": 1
+  },
+  {
+   "athlete": "Mike Rizzo",
+   "profileId": "c5157900-0637-4ec2-a0b3-3545d9b6e33b",
+   "date": "2025-10-30T20:44:27.709486Z",
+   "testType": "SJ",
+   "weightKg": 54.89,
+   "bestJumpHeight": 12.88,
+   "trials": 1
+  },
+  {
+   "athlete": "Mike Rizzo",
+   "profileId": "c5157900-0637-4ec2-a0b3-3545d9b6e33b",
+   "date": "2026-02-03T23:16:42.94955Z",
+   "testType": "SJ",
+   "weightKg": 58.03,
+   "bestJumpHeight": 63.29,
+   "trials": 1
+  },
+  {
+   "athlete": "Miles Bohn",
+   "profileId": "86b7d47c-3ee8-4281-9be9-3b6f8bce37c2",
+   "date": "2026-05-14T21:30:00.642744Z",
+   "testType": "SLJ",
+   "weightKg": 65.78,
+   "bestJumpHeight": 6.91,
+   "trials": 1
+  },
+  {
+   "athlete": "Miles Bohn",
+   "profileId": "86b7d47c-3ee8-4281-9be9-3b6f8bce37c2",
+   "date": "2026-07-24T18:59:55.685811Z",
+   "testType": "SLJ",
+   "weightKg": 67.13,
+   "bestJumpHeight": 5.45,
+   "trials": 1
+  },
+  {
+   "athlete": "Miles Bohn",
+   "profileId": "86b7d47c-3ee8-4281-9be9-3b6f8bce37c2",
+   "date": "2026-07-24T18:59:55.685811Z",
+   "testType": "SJ",
+   "weightKg": 67.13,
+   "bestJumpHeight": 9.08,
+   "trials": 1
+  },
+  {
+   "athlete": "Nick Padilla",
+   "profileId": "d2838f7d-f7fb-49fe-bae3-68243dc31441",
+   "date": "2025-11-03T19:30:42.396219Z",
+   "testType": "SJ",
+   "weightKg": 95.23,
+   "bestJumpHeight": 15.4,
+   "trials": 3
+  },
+  {
+   "athlete": "Nick Padilla",
+   "profileId": "d2838f7d-f7fb-49fe-bae3-68243dc31441",
+   "date": "2025-11-10T21:45:09.775511Z",
+   "testType": "SJ",
+   "weightKg": 94.5,
+   "bestJumpHeight": 9.66,
+   "trials": 1
+  },
+  {
+   "athlete": "Nicky Callonas",
+   "profileId": "09c6fd06-9607-472d-b792-5870773b601e",
+   "date": "2026-02-20T17:39:50.46965Z",
+   "testType": "SJ",
+   "weightKg": 82.37,
+   "bestJumpHeight": 10.81,
+   "trials": 1
+  },
+  {
+   "athlete": "Nikhil Parikh",
+   "profileId": "18cdedc3-1d9e-47cc-813d-06bfb30fb206",
+   "date": "2026-07-20T17:56:29.49769Z",
+   "testType": "DJ",
+   "weightKg": 83.15,
+   "bestJumpHeight": 10.19,
+   "trials": 1
+  },
+  {
+   "athlete": "Niki Eckert",
+   "profileId": "eb8407d0-f532-4626-963a-d02cee8773b8",
+   "date": "2025-12-26T14:49:27.635412Z",
+   "testType": "SJ",
+   "weightKg": 26.74,
+   "bestJumpHeight": 0.14,
+   "trials": 1
+  },
+  {
+   "athlete": "Noah DeJesus",
+   "profileId": "3c366358-0dd5-4694-912e-b20131f23b04",
+   "date": "2026-08-03T21:59:56.768712Z",
+   "testType": "SJ",
+   "weightKg": 57.9,
+   "bestJumpHeight": 14.92,
+   "trials": 1
+  },
+  {
+   "athlete": "Patrick Rodriguez",
+   "profileId": "1dfc4339-ab71-4cd4-b0b1-744f448ef55e",
+   "date": "2026-06-29T17:36:33.012766Z",
+   "testType": "SLJ",
+   "weightKg": 81.58,
+   "bestJumpHeight": 11.51,
+   "trials": 1
+  },
+  {
+   "athlete": "Phil Albergo",
+   "profileId": "e70677e2-20a5-40b8-bf34-e9e3b2ddbde6",
+   "date": "2026-06-15T19:57:02.235766Z",
+   "testType": "SLJ",
+   "weightKg": 82.95,
+   "bestJumpHeight": 4.0,
+   "trials": 1
+  },
+  {
+   "athlete": "Ricky Gutierrez",
+   "profileId": "87027c1e-1429-4b8a-a1d6-5025aeb6b733",
+   "date": "2026-05-14T20:08:12.153491Z",
+   "testType": "SJ",
+   "weightKg": 47.44,
+   "bestJumpHeight": 12.69,
+   "trials": 1
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2025-12-17T21:03:52.724104Z",
+   "testType": "SJ",
+   "weightKg": 99.5,
+   "bestJumpHeight": 14.22,
+   "trials": 1
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-02-02T21:03:55.165583Z",
+   "testType": "SJ",
+   "weightKg": 100.79,
+   "bestJumpHeight": 16.25,
+   "trials": 2
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-02-04T21:12:00.176275Z",
+   "testType": "SJ",
+   "weightKg": 100.07,
+   "bestJumpHeight": 16.55,
+   "trials": 1
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-02-06T21:52:49.733003Z",
+   "testType": "SJ",
+   "weightKg": 99.52,
+   "bestJumpHeight": 17.74,
+   "trials": 1
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-02-11T21:16:27.819986Z",
+   "testType": "SJ",
+   "weightKg": 97.9,
+   "bestJumpHeight": 17.47,
+   "trials": 4
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-02-13T22:11:18.64416Z",
+   "testType": "SJ",
+   "weightKg": 100.09,
+   "bestJumpHeight": 15.76,
+   "trials": 3
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-03-13T20:47:47.720735Z",
+   "testType": "SJ",
+   "weightKg": 98.66,
+   "bestJumpHeight": 26.45,
+   "trials": 4
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-04-13T21:46:40.855715Z",
+   "testType": "SJ",
+   "weightKg": 97.48,
+   "bestJumpHeight": 15.37,
+   "trials": 1
+  },
+  {
+   "athlete": "Rob Stingone",
+   "profileId": "7fb96b76-06c7-4bfc-a6a4-05c99199a01d",
+   "date": "2026-04-23T20:04:56.884981Z",
+   "testType": "SJ",
+   "weightKg": 95.77,
+   "bestJumpHeight": 17.37,
+   "trials": 1
+  },
+  {
+   "athlete": "Rocco Mileo",
+   "profileId": "0f1495c2-4a3f-4d34-a102-b2bc1ca3bf4d",
+   "date": "2025-11-12T21:32:02.014681Z",
+   "testType": "SJ",
+   "weightKg": 85,
+   "bestJumpHeight": 13.89,
+   "trials": 1
+  },
+  {
+   "athlete": "Rocco Mileo",
+   "profileId": "0f1495c2-4a3f-4d34-a102-b2bc1ca3bf4d",
+   "date": "2026-01-06T23:35:14.799355Z",
+   "testType": "SJ",
+   "weightKg": 85.75,
+   "bestJumpHeight": 14.0,
+   "trials": 1
+  },
+  {
+   "athlete": "Scarlett Molina",
+   "profileId": "aa3ef13c-720e-4041-8911-f03d764bd9e5",
+   "date": "2026-07-01T21:47:19.180142Z",
+   "testType": "SJ",
+   "weightKg": 19.4,
+   "bestJumpHeight": 0.27,
+   "trials": 2
+  },
+  {
+   "athlete": "Scarlett Molina",
+   "profileId": "aa3ef13c-720e-4041-8911-f03d764bd9e5",
+   "date": "2026-07-15T23:10:28.787823Z",
+   "testType": "SJ",
+   "weightKg": 6.66,
+   "bestJumpHeight": 505.36,
+   "trials": 1
+  },
+  {
+   "athlete": "Scottie Nieto",
+   "profileId": "e3c4767e-ceaf-460d-847b-d7d9d1c7f004",
+   "date": "2025-12-09T21:43:35.115912Z",
+   "testType": "SJ",
+   "weightKg": 58.36,
+   "bestJumpHeight": 1.3,
+   "trials": 1
+  },
+  {
+   "athlete": "Scottie Nieto",
+   "profileId": "e3c4767e-ceaf-460d-847b-d7d9d1c7f004",
+   "date": "2026-01-21T20:40:03.303002Z",
+   "testType": "SJ",
+   "weightKg": 58.45,
+   "bestJumpHeight": 14.83,
+   "trials": 1
+  },
+  {
+   "athlete": "Sebastian Ingram",
+   "profileId": "bf2186d2-9062-45a2-b8be-3b7a4157389b",
+   "date": "2026-08-28T22:07:45.465096Z",
+   "testType": "CMJ",
+   "weightKg": 88.93,
+   "bestJumpHeight": 14.15,
+   "trials": 7
+  },
+  {
+   "athlete": "Sebastian Perez",
+   "profileId": "0b32b3a1-ce2e-4766-ae7e-b0a90bd6737f",
+   "date": "2025-10-20T20:14:05.855721Z",
+   "testType": "SJ",
+   "weightKg": 35.88,
+   "bestJumpHeight": 10.94,
+   "trials": 1
+  },
+  {
+   "athlete": "Sebastian Pitt",
+   "profileId": "b7f16c97-b26c-48f9-80f4-37df479abccf",
+   "date": "2026-04-16T23:10:03.350432Z",
+   "testType": "SJ",
+   "weightKg": 96.66,
+   "bestJumpHeight": 18.45,
+   "trials": 1
+  },
+  {
+   "athlete": "Sebastian Sanchez",
+   "profileId": "8f8611f3-e310-47d9-a20c-b55f870471e0",
+   "date": "2026-08-04T23:27:11.567986Z",
+   "testType": "SJ",
+   "weightKg": 102.59,
+   "bestJumpHeight": 6.57,
+   "trials": 1
+  },
+  {
+   "athlete": "Shea O\u2019Sullivan",
+   "profileId": "5d345f9a-d395-450a-9175-9c34c36d9c56",
+   "date": "2026-06-22T22:19:11.291232Z",
+   "testType": "SLJ",
+   "weightKg": 79.89,
+   "bestJumpHeight": 2.06,
+   "trials": 1
+  },
+  {
+   "athlete": "Shea O\u2019Sullivan",
+   "profileId": "5d345f9a-d395-450a-9175-9c34c36d9c56",
+   "date": "2026-07-29T21:39:59.436829Z",
+   "testType": "SLJ",
+   "weightKg": 83.77,
+   "bestJumpHeight": 6.05,
+   "trials": 1
+  },
+  {
+   "athlete": "Steven Mazza",
+   "profileId": "abf26019-ba6d-4c10-9acc-91f6a98ce040",
+   "date": "2026-06-27T01:42:09.505975Z",
+   "testType": "SJ",
+   "weightKg": 87.97,
+   "bestJumpHeight": 17.67,
+   "trials": 1
+  },
+  {
+   "athlete": "Steven Schlosser",
+   "profileId": "ddc720c0-4bc1-4938-b3e4-03ca727be0a2",
+   "date": "2026-03-11T23:25:46.062796Z",
+   "testType": "SJ",
+   "weightKg": 67.02,
+   "bestJumpHeight": 12.15,
+   "trials": 1
+  },
+  {
+   "athlete": "Tanner Gola",
+   "profileId": "5d3fc9d8-5d69-44a6-bfa1-f186ffa3c2ed",
+   "date": "2026-06-30T23:22:36.690135Z",
+   "testType": "SLJ",
+   "weightKg": 70.74,
+   "bestJumpHeight": 6.71,
+   "trials": 2
+  },
+  {
+   "athlete": "Thomas DiGiovanna",
+   "profileId": "e71a04f1-0b7d-4ef5-a9d4-d5c8d62cb171",
+   "date": "2026-07-20T23:15:25.318958Z",
+   "testType": "SLJ",
+   "weightKg": 85.8,
+   "bestJumpHeight": 4.29,
+   "trials": 1
+  },
+  {
+   "athlete": "Thomas DiGiovanna",
+   "profileId": "e71a04f1-0b7d-4ef5-a9d4-d5c8d62cb171",
+   "date": "2026-07-23T23:35:50.82108Z",
+   "testType": "SLJ",
+   "weightKg": 86.76,
+   "bestJumpHeight": 364.19,
+   "trials": 1
+  },
+  {
+   "athlete": "Thomas LoBello",
+   "profileId": "5b1dfdb4-e3d1-480a-8daa-9557d60aefd8",
+   "date": "2025-12-10T22:44:54.538005Z",
+   "testType": "SJ",
+   "weightKg": 78.41,
+   "bestJumpHeight": 16.51,
+   "trials": 1
+  },
+  {
+   "athlete": "Thomas LoBello",
+   "profileId": "5b1dfdb4-e3d1-480a-8daa-9557d60aefd8",
+   "date": "2026-07-06T21:54:32.22802Z",
+   "testType": "SJ",
+   "weightKg": 75.14,
+   "bestJumpHeight": 21.09,
+   "trials": 2
+  },
+  {
+   "athlete": "Tiana Hernandez",
+   "profileId": "99a50569-f5b4-4449-9f45-0759bdafc180",
+   "date": "2026-06-19T14:52:39.662547Z",
+   "testType": "SJ",
+   "weightKg": 38.68,
+   "bestJumpHeight": 9.9,
+   "trials": 1
+  },
+  {
+   "athlete": "Timmy Stines",
+   "profileId": "f690addd-79a6-40ed-b4cc-d21a2d36cf83",
+   "date": "2026-05-11T20:07:28.840292Z",
+   "testType": "SJ",
+   "weightKg": 62.91,
+   "bestJumpHeight": 18.66,
+   "trials": 3
+  },
+  {
+   "athlete": "Toren Choudri",
+   "profileId": "092df31a-9194-410a-9e77-a1830a623f46",
+   "date": "2026-03-16T19:23:24.728262Z",
+   "testType": "SLJ",
+   "weightKg": 89.65,
+   "bestJumpHeight": 11.2,
+   "trials": 6
+  },
+  {
+   "athlete": "Tyler Koenig",
+   "profileId": "437dfb19-f3fc-47a6-94a4-588da787d788",
+   "date": "2026-07-22T13:54:47.969162Z",
+   "testType": "DJ",
+   "weightKg": 75.57,
+   "bestJumpHeight": 10.21,
+   "trials": 3
+  },
+  {
+   "athlete": "Vince Orlando",
+   "profileId": "754d38ae-2270-43d6-94ac-c468196d27f6",
+   "date": "2026-06-11T22:47:59.786745Z",
+   "testType": "SLJ",
+   "weightKg": 43.93,
+   "bestJumpHeight": 2.69,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2025-12-10T21:08:50.625026Z",
+   "testType": "SJ",
+   "weightKg": 70.13,
+   "bestJumpHeight": 15.44,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2025-12-15T22:10:47.20626Z",
+   "testType": "SJ",
+   "weightKg": 69.48,
+   "bestJumpHeight": 15.87,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2025-12-23T19:18:16.199999Z",
+   "testType": "SJ",
+   "weightKg": 68.34,
+   "bestJumpHeight": 15.27,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2025-12-29T15:50:10.651032Z",
+   "testType": "SJ",
+   "weightKg": 68.93,
+   "bestJumpHeight": 14.49,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2026-01-28T21:05:43.142867Z",
+   "testType": "SJ",
+   "weightKg": 67.91,
+   "bestJumpHeight": 17.3,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2026-01-30T20:43:42.092813Z",
+   "testType": "SJ",
+   "weightKg": 68.53,
+   "bestJumpHeight": 16.4,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2026-02-03T21:58:52.215303Z",
+   "testType": "SJ",
+   "weightKg": 68.52,
+   "bestJumpHeight": 17.02,
+   "trials": 1
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2026-02-04T21:22:32.944614Z",
+   "testType": "SJ",
+   "weightKg": 69.62,
+   "bestJumpHeight": 15.83,
+   "trials": 2
+  },
+  {
+   "athlete": "Vincent D\u2019Andrea",
+   "profileId": "5bb1cc9b-fbc6-4262-929d-48bd8b47c89b",
+   "date": "2026-02-07T14:30:03.086646Z",
+   "testType": "SJ",
+   "weightKg": 68.9,
+   "bestJumpHeight": 16.74,
+   "trials": 1
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2025-11-01T16:24:29.087261Z",
+   "testType": "SJ",
+   "weightKg": 48.03,
+   "bestJumpHeight": 8.95,
+   "trials": 1
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2025-11-15T16:29:15.79015Z",
+   "testType": "SJ",
+   "weightKg": 49.17,
+   "bestJumpHeight": 8.73,
+   "trials": 2
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2025-11-29T17:02:28.630582Z",
+   "testType": "SJ",
+   "weightKg": 49.43,
+   "bestJumpHeight": 8.86,
+   "trials": 2
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2025-12-11T21:25:35.90571Z",
+   "testType": "SJ",
+   "weightKg": 48.11,
+   "bestJumpHeight": 9.56,
+   "trials": 1
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2025-12-15T20:39:40.709661Z",
+   "testType": "SJ",
+   "weightKg": 47.78,
+   "bestJumpHeight": 9.66,
+   "trials": 1
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2025-12-20T15:17:35.32761Z",
+   "testType": "SJ",
+   "weightKg": 48.21,
+   "bestJumpHeight": 8.93,
+   "trials": 1
+  },
+  {
+   "athlete": "Westry Robinson",
+   "profileId": "5195020e-8227-4767-88bf-a683b0fc200a",
+   "date": "2026-05-27T18:31:54.644284Z",
+   "testType": "SJ",
+   "weightKg": 49.89,
+   "bestJumpHeight": 9.67,
+   "trials": 2
+  },
+  {
+   "athlete": "Xavier Orozco",
+   "profileId": "d8e782ae-7fb8-42e8-aea7-fb0cb50f6007",
+   "date": "2025-12-26T16:16:32.608071Z",
+   "testType": "SJ",
+   "weightKg": 84.06,
+   "bestJumpHeight": 13.14,
+   "trials": 1
+  },
+  {
+   "athlete": "Yadi Molina",
+   "profileId": "26d4f670-a3a3-4212-abdc-77311ce3ffff",
+   "date": "2025-12-01T21:46:38.895049Z",
+   "testType": "SJ",
+   "weightKg": 63.5,
+   "bestJumpHeight": 5.81,
+   "trials": 1
+  },
+  {
+   "athlete": "Yadi Molina",
+   "profileId": "26d4f670-a3a3-4212-abdc-77311ce3ffff",
+   "date": "2025-12-05T22:08:07.011637Z",
+   "testType": "SJ",
+   "weightKg": 63.15,
+   "bestJumpHeight": 9.36,
+   "trials": 3
+  },
+  {
+   "athlete": "Yadi Molina",
+   "profileId": "26d4f670-a3a3-4212-abdc-77311ce3ffff",
+   "date": "2025-12-12T22:19:49.661917Z",
+   "testType": "SJ",
+   "weightKg": 63.01,
+   "bestJumpHeight": 5.87,
+   "trials": 1
+  },
+  {
+   "athlete": "Zach Uysal",
+   "profileId": "7ddbb5f1-d383-45e1-b4ca-309e42969726",
+   "date": "2026-08-04T20:21:20.073804Z",
+   "testType": "SLJ",
+   "weightKg": 77.93,
+   "bestJumpHeight": 5.69,
+   "trials": 1
+  },
+  {
+   "athlete": "Zachary Weinschel",
+   "profileId": "4072e630-ee38-444c-ab3f-e7e7d973ef82",
+   "date": "2026-05-15T18:53:44.203215Z",
+   "testType": "SLJ",
+   "weightKg": 77.48,
+   "bestJumpHeight": 0.36,
+   "trials": 1
+  }
+ ]
+}
