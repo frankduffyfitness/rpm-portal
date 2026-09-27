@@ -796,7 +796,105 @@ def refresh_groups_only(profiles):
         log(f"  {c}")
 
 
+RECONCILE_REPORT = "reconcile_report.json"
+# A real cleanup removes a handful of tests. Pruning more than this means the
+# match is broken (date format drift, a truncated VALD page), not that half the
+# facility's history was deleted -- so refuse and report instead.
+RECONCILE_MAX_FRAC = 0.03
+RECONCILE_MAX_ABS = 300
+
+
+def _rkey(pid, date, test_type):
+    # Whole-second precision: VALD drops trailing zeros from fractional seconds,
+    # so the same test is stored as .92786Z in one sync and .927860Z in another.
+    # A collision here can only KEEP a stale test, never drop a live one.
+    return (pid, (date or "")[:19], test_type or "")
+
+
+def reconcile(apply=False):
+    """Remove tests deleted in VALD that the additive sync never drops.
+
+    The incremental sync only ever appends, so a session deleted at source --
+    e.g. Sebastian Ingram's 2026-08-28 CMJ, a 196-lb weigh-in against his usual
+    207-212 that inflated jump height to 14.2 in -- stays in the portal forever.
+    This lists VALD's CURRENT tests (metadata only, no per-test trial fetch, so
+    it is cheap) and diffs the store against it.
+
+    Dry run by default: writes reconcile_report.json and changes nothing. Only
+    `--reconcile-apply` removes anything, and it refuses when the removal count
+    looks like a matching bug rather than real deletions.
+    """
+    log("=" * 50)
+    log(f"RECONCILE ({'APPLY' if apply else 'DRY RUN'}): store vs VALD current test list")
+    log("=" * 50)
+    if not os.path.exists(OUTPUT_FILE):
+        log(f"ERROR: {OUTPUT_FILE} missing -- nothing to reconcile.")
+        sys.exit(1)
+    token = authenticate()
+    vald = fetch_tests(token, "2020-01-01T00:00:00Z")
+    if not vald:
+        log("ABORT: VALD returned zero tests; never reconcile against an empty list.")
+        sys.exit(1)
+    live = {_rkey(t.get("profileId"), t.get("recordedDateUtc"), t.get("testType")) for t in vald}
+
+    with open(OUTPUT_FILE) as f:
+        data = json.load(f)
+    athletes = data.get("athletes", {})
+    total = sum(len(a.get("tests", [])) for a in athletes.values())
+    stale = []
+    for pid, ath in athletes.items():
+        for t in ath.get("tests", []):
+            if _rkey(pid, t.get("date"), t.get("testType")) in live:
+                continue
+            ms = [x.get("metrics", {}) for x in t.get("trials", [])]
+            jh = max((m.get("jumpHeight") or 0) for m in ms) if ms else None
+            stale.append({"athlete": ath.get("name"), "profileId": pid,
+                          "date": t.get("date"), "testType": t.get("testType"),
+                          "weightKg": t.get("weight"), "bestJumpHeight": jh,
+                          "trials": len(t.get("trials", []))})
+    stale.sort(key=lambda r: (r["athlete"] or "", r["date"] or ""))
+
+    cap = min(RECONCILE_MAX_ABS, max(1, int(total * RECONCILE_MAX_FRAC)))
+    aborted = len(stale) > cap
+    report = {
+        "generated": datetime.now(timezone.utc).isoformat(),
+        "mode": "apply" if apply else "dry-run",
+        "valdTests": len(vald), "storeTests": total,
+        "staleCount": len(stale), "cap": cap,
+        "aborted": aborted, "applied": bool(apply and not aborted),
+        "stale": stale,
+    }
+    with open(RECONCILE_REPORT, "w") as f:
+        json.dump(report, f, indent=1, default=str)
+    log(f"VALD lists {len(vald)} tests; store holds {total}; {len(stale)} not in VALD (cap {cap}).")
+    for r in stale[:50]:
+        log(f"  {r['athlete']} {str(r['date'])[:10]} {r['testType']} wt={r['weightKg']} jh={r['bestJumpHeight']}")
+    if aborted:
+        # Return 0 (not exit 1) so the workflow still commits the report and a
+        # human can see why; the store itself is untouched.
+        log(f"ABORT: {len(stale)} > cap {cap}. Looks like a matching bug, not real "
+            "deletions. Store NOT modified; read reconcile_report.json.")
+        return
+    if not apply:
+        log("DRY RUN complete. Store NOT modified. Re-run with [reconcile-apply] to remove.")
+        return
+    drop = {_rkey(r["profileId"], r["date"], r["testType"]) for r in stale}
+    for pid, ath in athletes.items():
+        ath["tests"] = [t for t in ath.get("tests", [])
+                        if _rkey(pid, t.get("date"), t.get("testType")) not in drop]
+    meta = data.setdefault("meta", {})
+    meta["totalTests"] = sum(len(a.get("tests", [])) for a in athletes.values())
+    meta["syncDate"] = datetime.now(timezone.utc).isoformat()
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(data, f, separators=(',', ':'), default=str)
+    log(f"APPLIED: removed {len(stale)} tests; store now {meta['totalTests']}.")
+
+
 def main():
+    if "--reconcile-apply" in sys.argv:
+        return reconcile(apply=True)
+    if "--reconcile" in sys.argv:
+        return reconcile(apply=False)
     if "--refresh-cmj" in sys.argv:
         return refresh_cmj()
     if "--refresh-hop" in sys.argv:

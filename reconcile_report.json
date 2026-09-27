@@ -1,0 +1,1 @@
+{"note": "Written by vald_sync.py --reconcile. Tracked on purpose: the sync workflow resets to origin/main and only commits tracked-file changes, so an untracked report would be discarded."}
