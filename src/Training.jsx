@@ -849,6 +849,7 @@ function Board({ pw, athletes, onOpen, onLocked }) {
             {fmtFormat(r.format) || "No format"}
             {i && <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span>}
           </div>
+          {r.draft && !r.done && <div style={{ fontSize: 11, color: "#4FFFB0", marginTop: 3, fontWeight: 600 }}>{r.draft}</div>}
         </button>
         <div style={{ display: "grid", justifyItems: "end", gap: 3 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: dueColor, whiteSpace: "nowrap" }}>{due}</div>

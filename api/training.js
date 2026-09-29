@@ -31,7 +31,9 @@
  * POST {op:"revokeLinks", id}            turns off every link for that athlete        coach
  *
  * Program board (programs due to be written; typed in the portal, coach only):
- *   boardrows                hash   rowId -> {name, athlete?, format, due, coach, done, doneAt, created}
+ *   boardrows                hash   rowId -> {name, athlete?, format, due, coach, done, doneAt, created, draft?}
+ *                                   draft = note from the Mac's due-day drafting run ("Drafted ... ");
+ *                                   kept on edits that don't send it.
  * GET  ?op=board                         -> {rows: [...], status: {rowId: log progress}}   coach
  * POST {op:"boardPut", row}              (adds, or updates row.id)  -> {row}               coach
  * POST {op:"boardDelete", rowId}                                                          coach
@@ -185,7 +187,8 @@ async function write(body, who) {
     const [cur] = await redis([["HGET", "boardrows", rid]]);
     const prev = parse(cur) || {};
     const now = new Date().toISOString();
-    const doc = { ...row, created: prev.created || now, doneAt: row.done ? prev.doneAt || now : null };
+    const draft = "draft" in body.row ? str(body.row.draft, 200) || null : prev.draft || null;
+    const doc = { ...row, draft, created: prev.created || now, doneAt: row.done ? prev.doneAt || now : null };
     await redis([["HSET", "boardrows", rid, json(doc)]]);
     return { row: { id: rid, ...doc } };
   }
