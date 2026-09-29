@@ -749,6 +749,78 @@ export function AthleteLogPage({ ctx, logo }) {
   );
 }
 
+// ─── Program board (the coaches' Google Sheet, synced by an Apps Script) ──────
+const COACH_COLOR = { Frank: "#6FCF97", Alchi: "#F2C94C", Ricky: "#60A5FA" };
+const BOARD_KEY_LS = "rpm_board_coach";
+const dayDiff = (iso) => Math.round((new Date(iso + "T00:00:00") - new Date(todayIso() + "T00:00:00")) / 864e5);
+function dueLabel(iso) {
+  if (!iso) return ["TBD", "#6B7280"];
+  const d = dayDiff(iso);
+  if (d < 0) return [`${-d} day${d === -1 ? "" : "s"} late`, "#FF6B6B"];
+  if (d === 0) return ["Today", "#4FFFB0"];
+  if (d === 1) return ["Tomorrow", "#4FFFB0"];
+  return [shortDate(iso), d <= 7 ? "#E0E0E0" : "#8A8F98"];
+}
+function fmtFormat(f) {
+  const m = /^(\d)\s*x\s*(\d)/i.exec(f || "");
+  if (!m) return f || "";
+  const [t, r] = [+m[1], +m[2]];
+  return `${t} day${t === 1 ? "" : "s"}` + (r === t ? ", all at RPM" : `, ${r} at RPM`) + (/\(.+\)/.test(f) ? " " + f.match(/\(.+\)/)[0] : "");
+}
+function Board({ pw, onOpen, onLocked }) {
+  const [data, setData] = useState(null);
+  const [coach, setCoach] = useState(() => { try { return localStorage.getItem(BOARD_KEY_LS) || "All"; } catch (e) { return "All"; } });
+  useEffect(() => {
+    let live = true;
+    api(pw, { query: { op: "board" } }).then((d) => live && setData(d)).catch((e) => { if (e.status === 401) onLocked(); });
+    return () => { live = false; };
+  }, [pw]);
+  if (!data || !data.board) return null;
+  const pick = (c) => { setCoach(c); try { localStorage.setItem(BOARD_KEY_LS, c); } catch (e) {} };
+  const all = data.board.tabs.flatMap((t) => t.rows.map((r) => ({ ...r, tab: t.tab, info: data.status[`${t.tab}|${r.row}`] || null })));
+  const mine = all.filter((r) => coach === "All" || r.coach === coach);
+  const open = mine.filter((r) => !r.done).sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999") || a.name.localeCompare(b.name));
+  const written = mine.length - open.length;
+  const mins = Math.max(0, Math.round((Date.now() - new Date(data.board.updatedAt)) / 6e4));
+  const ago = mins < 1 ? "just now" : mins < 60 ? `${mins} min ago` : mins < 1440 ? `${Math.round(mins / 60)} hr ago` : `${Math.round(mins / 1440)} days ago`;
+  return (
+    <div style={{ marginBottom: 22 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Programs due</div>
+        <div style={{ fontSize: 11, color: "#6B7280" }}>From the program board · synced {ago}</div>
+      </div>
+      <div className="tabs" style={{ margin: "10px 0" }}>
+        {["All", "Frank", "Alchi", "Ricky"].map((c) => (
+          <button key={c} aria-pressed={coach === c} onClick={() => pick(c)} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            {c !== "All" && <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />}{c}
+          </button>
+        ))}
+      </div>
+      <div style={{ fontSize: 11, color: "#6B7280", marginBottom: 8 }}>{open.length} to write · {written} written</div>
+      {open.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "12px 0" }}>Nothing open on the board.</div>}
+      {open.map((r) => {
+        const [due, dueColor] = dueLabel(r.due);
+        const i = r.info;
+        const ready = i && i.total && i.logged >= i.total;
+        return (
+          <div key={r.tab + r.row} role={i ? "button" : undefined} tabIndex={i ? 0 : undefined}
+            onClick={i ? () => onOpen(i.id) : undefined} onKeyDown={i ? (e) => { if (e.key === "Enter") onOpen(i.id); } : undefined}
+            style={{ display: "grid", gridTemplateColumns: "4px minmax(0,1fr) auto", gap: 12, alignItems: "center", padding: "10px 12px 10px 0", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, cursor: i ? "pointer" : "default", overflow: "hidden" }}>
+            <div style={{ alignSelf: "stretch", margin: "-10px 0", background: COACH_COLOR[r.coach] || "rgba(255,255,255,0.08)" }} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{i ? i.name : r.name}</div>
+              <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
+                {fmtFormat(r.format)}{i ? <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span> : " · not in the training log"}
+              </div>
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: dueColor, whiteSpace: "nowrap" }}>{due}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Entry ───────────────────────────────────────────────────────────────────
 export default function TrainingSection({ ctx }) {
   const [pw, setPwState] = useState(getPw);
@@ -775,6 +847,8 @@ export default function TrainingSection({ ctx }) {
               <div style={{ fontSize: 12, color: "#6B7280" }}>{index.length} athlete{index.length === 1 ? "" : "s"} with a program loaded</div>
               <button onClick={() => lock()} style={{ border: "1px solid rgba(255,255,255,0.08)", background: "none", color: "#6B7280", fontSize: 11, borderRadius: 8, padding: "5px 10px", cursor: "pointer" }}>Lock</button>
             </div>
+            <Board pw={pw} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
+            <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Training log</div>
             {index.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No programs loaded yet.</div>}
             {[...index].sort((a, b) => a.name.localeCompare(b.name)).map((a) => {
               const ms = a.months || [];

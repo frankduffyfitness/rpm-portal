@@ -29,6 +29,12 @@
  * POST {op:"putProgram", id, month, doc} (replaces; loader scripts)                   coach
  * POST {op:"createLink", id}             -> {token} (shown once)                      coach
  * POST {op:"revokeLinks", id}            turns off every link for that athlete        coach
+ *
+ * Program board (the coaches' Google Sheet): an Apps Script inside the Sheet posts its
+ * open tabs with BOARD_KEY (Vercel env, Sensitive), a key that can do nothing else.
+ *   board                    string {tabs: [{tab, rows: [{row, name, format, due, done, coach}]}], updatedAt}
+ * POST {op:"putBoard", tabs}             -> {status: [{tab, row, text}]} for the Sheet   board
+ * GET  ?op=board                         -> {board, status: {"<tab>|<row>": {...}}}        coach
  */
 import crypto from "crypto";
 
@@ -39,12 +45,14 @@ const MAX_JSON = 200 * 1024;
 
 const sha = (s) => crypto.createHash("sha256").update(s).digest("hex");
 
-// -> {role: "coach"} | {role: "athlete", id} | null
+const same = (want, got) => !!want && crypto.timingSafeEqual(Buffer.from(sha(want), "hex"), Buffer.from(sha(got), "hex"));
+
+// -> {role: "coach"} | {role: "board"} | {role: "athlete", id} | null
 async function whoIs(req) {
   const got = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
   if (!got || got.length > 200) return null;
-  const want = process.env.STAFF_PASSWORD || "";
-  if (want && crypto.timingSafeEqual(Buffer.from(sha(want), "hex"), Buffer.from(sha(got), "hex"))) return { role: "coach" };
+  if (same(process.env.STAFF_PASSWORD || "", got)) return { role: "coach" };
+  if (same(process.env.BOARD_KEY || "", got)) return { role: "board" };
   if (!/^a_[A-Za-z0-9_-]{20,}$/.test(got)) return null;
   const [rec] = await redis([["GET", `atoken:${sha(got)}`]]);
   const r = parse(rec);
@@ -88,6 +96,81 @@ async function athlete(id) {
   const programs = {}, logs = {};
   ms.forEach((m, i) => { programs[m] = parse(res[2 * i]); logs[m] = pairs(res[2 * i + 1]); });
   return { athlete: { id, ...parse(a) }, programs, logs };
+}
+
+// ─── Program board ───────────────────────────────────────────────────────────
+const COACHES = ["Frank", "Alchi", "Ricky"];
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+const str = (v, n) => String(v == null ? "" : v).trim().slice(0, n);
+const bare = (s) => str(s, 120).toLowerCase().normalize("NFKD").replace(/[^a-z\s-]/g, "").replace(/\s+/g, " ").trim();
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monName = (m) => MON[+m.slice(5) - 1];
+
+function cleanBoard(tabs) {
+  if (!Array.isArray(tabs) || tabs.length > 24) throw fail(400, "Bad board");
+  return tabs.map((t) => {
+    if (!t || !Array.isArray(t.rows) || t.rows.length > 400) throw fail(400, "Bad board tab");
+    return {
+      tab: str(t.tab, 60),
+      rows: t.rows.map((r) => ({
+        row: Number.isInteger(r.row) && r.row > 0 ? r.row : 0,
+        name: str(r.name, 60),
+        format: str(r.format, 40),
+        due: DAY.test(r.due || "") ? r.due : null,
+        done: !!r.done,
+        coach: COACHES.includes(r.coach) ? r.coach : null,
+      })).filter((r) => r.row && r.name),
+    };
+  });
+}
+
+// Board names are "Last, I." or just "Last". An athlete doc can pin one with boardName.
+function matcher(athletes) {
+  const list = Object.entries(athletes).filter(([, a]) => a && a.name).map(([id, a]) => {
+    const full = bare(a.name);
+    return { id, full, first: full.split(" ")[0] || "", pin: a.boardName ? bare(a.boardName) : null };
+  });
+  return (boardName) => {
+    const b = bare(boardName);
+    const pinned = list.filter((a) => a.pin && a.pin === b);
+    if (pinned.length === 1) return pinned[0].id;
+    const [last, init = ""] = str(boardName, 60).split(",").map(bare);
+    if (!last) return null;
+    const hits = list.filter((a) => !a.pin && (a.full === last || a.full.endsWith(" " + last)) && (!init || a.first.startsWith(init[0])));
+    return hits.length === 1 ? hits[0].id : null;
+  };
+}
+
+// Per matched athlete: the newest month with sessions logged, and any newer program.
+async function boardStatus(tabs) {
+  const [ath] = await redis([["HGETALL", "athletes"]]);
+  const athletes = pairs(ath);
+  const find = matcher(athletes);
+  const rowIds = tabs.flatMap((t) => t.rows.map((r) => [t.tab, r.row, find(r.name)])).filter((x) => x[2]);
+  const ids = [...new Set(rowIds.map((x) => x[2]))];
+  const monthLists = ids.length ? await redis(ids.map((id) => ["SMEMBERS", `months:${id}`])) : [];
+  const pairsList = ids.flatMap((id, i) => (monthLists[i] || []).sort().map((m) => [id, m]));
+  const res = pairsList.length ? await redis(pairsList.flatMap(([id, m]) => [["GET", `program:${id}:${m}`], ["HGETALL", `log:${id}:${m}`]])) : [];
+  const per = {};
+  pairsList.forEach(([id, m], i) => {
+    const prog = parse(res[2 * i]), log = pairs(res[2 * i + 1]);
+    const done = (s) => s && !s.skipped && (s.load != null || s.reps != null || s.done);
+    const logged = Object.entries(log).filter(([k, s]) => k[0] === "d" && s && Object.values(s.entries || {}).some((cells) => (cells || []).some(done))).length;
+    (per[id] = per[id] || []).push({ month: m, logged, total: ((prog && prog.days) || []).length * 4 });
+  });
+  const info = {};
+  for (const id of ids) {
+    const ms = per[id] || [];
+    const withLogs = ms.filter((x) => x.logged > 0);
+    const cur = withLogs[withLogs.length - 1] || ms[ms.length - 1];
+    if (!cur) continue;
+    const next = ms.filter((x) => x.month > cur.month).map((x) => x.month);
+    const text = `Portal: ${monName(cur.month)} ${cur.logged}/${cur.total} logged` + (next.length ? ` · ${next.map(monName).join(", ")} in portal` : "");
+    info[id] = { id, name: athletes[id].name, month: cur.month, logged: cur.logged, total: cur.total, next, text };
+  }
+  const status = {};
+  for (const [tab, row, id] of rowIds) if (info[id]) status[`${tab}|${row}`] = info[id];
+  return status;
 }
 
 async function write(body, who) {
@@ -144,11 +227,25 @@ export default async function handler(req, res) {
   try {
     const who = await whoIs(req);
     if (!who) return res.status(401).json({ error: "Staff password or athlete link required" });
+    if (who.role === "board") {
+      const body = req.method === "POST" ? (typeof req.body === "string" ? JSON.parse(req.body) : req.body) : null;
+      if (!body || body.op !== "putBoard") throw fail(403, "Not allowed");
+      const tabs = cleanBoard(body.tabs);
+      const updatedAt = new Date().toISOString();
+      await redis([["SET", "board", json({ tabs, updatedAt })]]);
+      const status = await boardStatus(tabs);
+      return res.status(200).json({ ok: true, updatedAt, status: Object.entries(status).map(([k, v]) => { const i = k.lastIndexOf("|"); return { tab: k.slice(0, i), row: +k.slice(i + 1), text: v.text }; }) });
+    }
     if (req.method === "GET") {
       const op = req.query.op;
       if (op === "me" && who.role === "athlete") return res.status(200).json(await athlete(who.id));
       if (who.role !== "coach") throw fail(403, "Not allowed");
       if (op === "index") return res.status(200).json(await index());
+      if (op === "board") {
+        const [b] = await redis([["GET", "board"]]);
+        const board = parse(b);
+        return res.status(200).json({ board, status: board ? await boardStatus(board.tabs) : {} });
+      }
       if (op === "athlete") return res.status(200).json(await athlete(req.query.id));
       if (op === "linkStatus") {
         if (!ID.test(req.query.id || "")) throw fail(400, "Bad athlete id");
