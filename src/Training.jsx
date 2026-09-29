@@ -328,9 +328,13 @@ function Progress({ A, M, ctx }) {
 }
 
 // ─── Logger ──────────────────────────────────────────────────────────────────
-function Logger({ A, M, ctx, pw, onSaved, onLocked }) {
+function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
   const nx = M.nextSession() || M.sessions[0];
-  const [sel, setSel] = useState(nx ? { month: nx.month, day: nx.day, week: nx.week } : null);
+  const [sel, setSel] = useState(() => {
+    const m = start && /^d(\d+)w(\d+)$/.exec(start.key || "");
+    if (m && A.programs[start.month] && A.programs[start.month].days.some((x) => x.day === +m[1])) return { month: start.month, day: +m[1], week: +m[2] };
+    return nx ? { month: nx.month, day: nx.day, week: nx.week } : null;
+  });
   const [drafts, setDrafts] = useState({});
   const [toast, setToast] = useState(null);
   const timers = useRef({}), writing = useRef({}), again = useRef({}), latest = useRef({}), toastT = useRef(null);
@@ -669,7 +673,7 @@ function AthleteLinks({ A, pw, onLocked }) {
 }
 
 // ─── Athlete ─────────────────────────────────────────────────────────────────
-function AthleteView({ id, pw, ctx, onBack, onLocked }) {
+function AthleteView({ id, pw, ctx, onBack, onLocked, start }) {
   const [A, setA] = useState(null);
   const [err, setErr] = useState(null);
   const [tab, setTab] = useState("log");
@@ -693,7 +697,7 @@ function AthleteView({ id, pw, ctx, onBack, onLocked }) {
       <div className="tabs">
         {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
       </div>
-      {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={pw} onSaved={onSaved} onLocked={onLocked} /> : <Progress A={A} M={M} ctx={ctx} />}
+      {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={pw} onSaved={onSaved} onLocked={onLocked} start={start} /> : <Progress A={A} M={M} ctx={ctx} />}
       <AthleteLinks A={A} pw={pw} onLocked={onLocked} />
     </div>
   );
@@ -745,6 +749,60 @@ export function AthleteLogPage({ ctx, logo }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─── New from athletes (saves made from athletes' own links) ─────────────────
+const agoText = (iso) => {
+  const mins = Math.max(0, Math.round((Date.now() - new Date(iso)) / 6e4));
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  if (mins < 1440) return `${Math.round(mins / 60)} hr ago`;
+  const d = Math.round(mins / 1440);
+  return d === 1 ? "yesterday" : `${d} days ago`;
+};
+const sessLabel = (key) => {
+  const m = /^([dm])(\d+)w(\d+)$/.exec(key || "");
+  if (!m) return key;
+  return m[1] === "d" ? `Day ${m[2]} · Week ${m[3]}` : `Movement Day · Week ${m[3]}`;
+};
+function Updates({ pw, onOpen, onLocked }) {
+  const [items, setItems] = useState(null);
+  const load = () => api(pw, { query: { op: "activity" } }).then((d) => setItems(d.updates)).catch((e) => { if (e.status === 401) onLocked(); });
+  useEffect(() => {
+    load();
+    const vis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", vis);
+    return () => document.removeEventListener("visibilitychange", vis);
+  }, [pw]);
+  if (!items || !items.length) return null;
+  const seen = (id) => { setItems((xs) => xs.filter((x) => x.id !== id)); api(pw, { body: { op: "activitySeen", id } }).catch(() => {}); };
+  return (
+    <div style={{ marginBottom: 20, border: "1px solid rgba(79,255,176,0.35)", background: "rgba(79,255,176,0.05)", borderRadius: 14, padding: "12px 12px 6px" }}>
+      <div style={{ marginBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#4FFFB0", display: "inline-block" }} />
+          <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>New from athletes</div>
+        </div>
+        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{items.length} athlete{items.length === 1 ? "" : "s"} logged since you last checked</div>
+      </div>
+      {items.map((u) => {
+        const lifts = u.sessions.filter((x) => x.key[0] === "d");
+        const first = lifts[0] || u.sessions[0];
+        return (
+          <div key={u.id} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "9px 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{u.name} <span style={{ fontSize: 11, fontWeight: 500, color: "#6B7280" }}>{agoText(u.last)}</span></div>
+              <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 2 }}>{u.sessions.slice(0, 4).map((x) => `${sessLabel(x.key)} (${monShort(x.month)})`).join(", ")}{u.sessions.length > 4 ? ` +${u.sessions.length - 4} more` : ""}</div>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button className="tb" style={{ borderColor: "#4FFFB0", color: "#4FFFB0" }} onClick={() => { seen(u.id); onOpen(u.id, first); }}>Check weights</button>
+              <button className="tb" onClick={() => seen(u.id)} aria-label={`Dismiss ${u.name}`}>Dismiss</button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -919,6 +977,7 @@ export default function TrainingSection({ ctx }) {
   const [index, setIndex] = useState(null);
   const [err, setErr] = useState(null);
   const [sel, setSel] = useState(null);
+  const [start, setStart] = useState(null);
   const lock = (msg) => { setPw(""); setPwState(""); setIndex(null); setSel(null); setErr(msg || null); };
   useEffect(() => {
     if (!pw) return;
@@ -930,7 +989,7 @@ export default function TrainingSection({ ctx }) {
   const body = !pw
     ? <Unlock error={err} onUnlock={(v) => { setPw(v); setPwState(v); setErr(null); }} />
     : sel
-      ? <AthleteView id={sel} pw={pw} ctx={ctx} onBack={() => { setSel(null); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
+      ? <AthleteView key={sel + (start ? start.month + start.key : "")} id={sel} start={start} pw={pw} ctx={ctx} onBack={() => { setSel(null); setStart(null); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
       : !index
         ? <div style={{ fontSize: 13, color: err ? "#F97362" : "#6B7280", padding: "20px 0" }}>{err || "Loading…"}</div>
         : (
@@ -939,6 +998,7 @@ export default function TrainingSection({ ctx }) {
               <div style={{ fontSize: 12, color: "#6B7280" }}>{index.length} athlete{index.length === 1 ? "" : "s"} with a program loaded</div>
               <button onClick={() => lock()} style={{ border: "1px solid rgba(255,255,255,0.08)", background: "none", color: "#6B7280", fontSize: 11, borderRadius: 8, padding: "5px 10px", cursor: "pointer" }}>Lock</button>
             </div>
+            <Updates pw={pw} onOpen={(id, s) => { setStart(s || null); setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
             <Board pw={pw} athletes={index} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
             <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Training log</div>
             {index.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No programs loaded yet.</div>}

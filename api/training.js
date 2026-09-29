@@ -30,6 +30,12 @@
  * POST {op:"createLink", id}             -> {token} (shown once)                      coach
  * POST {op:"revokeLinks", id}            turns off every link for that athlete        coach
  *
+ * Athlete activity (remote athletes saving from their link, for the coach's "New from athletes"):
+ *   activity                 list   newest first, {id, month, keys, at}, capped at 500
+ *   activity:seen            hash   athlete id -> ISO time the coach last checked them
+ * GET  ?op=activity                      -> {updates: [{id, name, sessions, last}]}       coach
+ * POST {op:"activitySeen", id}                                                            coach
+ *
  * Program board (programs due to be written; typed in the portal, coach only):
  *   boardrows                hash   rowId -> {name, athlete?, format, due, coach, done, doneAt, created, draft?}
  *                                   draft = note from the Mac's due-day drafting run ("Drafted ... ");
@@ -168,6 +174,21 @@ async function boardStatus(rows) {
   return status;
 }
 
+// Unseen athlete saves, one entry per athlete, each session listed once (latest save).
+async function activity() {
+  const [list, seen, ath] = await redis([["LRANGE", "activity", 0, 499], ["HGETALL", "activity:seen"], ["HGETALL", "athletes"]]);
+  const seenAt = {};
+  for (let i = 0; seen && i < seen.length; i += 2) seenAt[seen[i]] = seen[i + 1];
+  const athletes = pairs(ath), by = {};
+  for (const raw of list || []) {
+    const e = parse(raw);
+    if (!e || !athletes[e.id] || (seenAt[e.id] && e.at <= seenAt[e.id])) continue;
+    const u = (by[e.id] = by[e.id] || { id: e.id, name: athletes[e.id].name, last: e.at, sessions: [] });
+    for (const key of e.keys || []) if (!u.sessions.some((x) => x.month === e.month && x.key === key)) u.sessions.push({ month: e.month, key, at: e.at });
+  }
+  return { updates: Object.values(by).sort((a, b) => b.last.localeCompare(a.last)) };
+}
+
 async function boardRows() {
   const [h] = await redis([["HGETALL", "boardrows"]]);
   return Object.entries(pairs(h)).filter(([, r]) => r).map(([id, r]) => ({ id, ...r }));
@@ -195,6 +216,10 @@ async function write(body, who) {
   const id = who.role === "athlete" ? who.id : body && body.id;  // a link only ever writes its own athlete
   if (!ID.test(id || "")) throw fail(400, "Bad athlete id");
   if (who.role === "athlete" && op !== "saveSessions") throw fail(403, "Not allowed");
+  if (op === "activitySeen") {
+    await redis([["HSET", "activity:seen", id, new Date().toISOString()]]);
+    return { ok: true };
+  }
   if (op === "saveSessions") {
     if (!MONTH.test(month || "")) throw fail(400, "Bad month");
     const entries = Object.entries(body.sessions || {});
@@ -202,7 +227,10 @@ async function write(body, who) {
     const [exists] = await redis([["SISMEMBER", `months:${id}`, month]]);
     if (!exists) throw fail(404, "No program for that month");
     const now = new Date().toISOString();
-    await redis([["HSET", `log:${id}:${month}`, ...entries.flatMap(([k, v]) => [k, json({ ...v, updatedAt: now })])]]);
+    const by = who.role === "athlete" ? { by: "athlete" } : {};
+    const cmds = [["HSET", `log:${id}:${month}`, ...entries.flatMap(([k, v]) => [k, json({ ...v, ...by, updatedAt: now })])]];
+    if (who.role === "athlete") cmds.push(["LPUSH", "activity", json({ id, month, keys: entries.map(([k]) => k), at: now })], ["LTRIM", "activity", 0, 499]);
+    await redis(cmds);
     return { ok: true, updatedAt: now };
   }
   if (op === "patchAthlete") {
@@ -249,6 +277,7 @@ export default async function handler(req, res) {
       if (op === "me" && who.role === "athlete") return res.status(200).json(await athlete(who.id));
       if (who.role !== "coach") throw fail(403, "Not allowed");
       if (op === "index") return res.status(200).json(await index());
+      if (op === "activity") return res.status(200).json(await activity());
       if (op === "board") {
         const rows = await boardRows();
         return res.status(200).json({ rows, status: await boardStatus(rows) });
