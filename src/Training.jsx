@@ -762,7 +762,9 @@ function dueLabel(iso) {
   if (d === 1) return ["Tomorrow", "#4FFFB0"];
   return [shortDate(iso), d <= 7 ? "#E0E0E0" : "#8A8F98"];
 }
+const isTbd = (v) => /^\s*tbd\s*$/i.test(v || "");
 function fmtFormat(f) {
+  if (!f || isTbd(f)) return "Frequency TBD";
   const m = /^(\d)\s*x\s*(\d)/i.exec(f || "");
   if (!m) return f || "";
   const [t, r] = [+m[1], +m[2]];
@@ -792,7 +794,7 @@ function parseDue(text) {
 const mdOf = (iso) => (iso ? `${+iso.slice(5, 7)}/${+iso.slice(8, 10)}` : "");
 const inp = { border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "8px 10px", fontSize: 14, width: "100%", minWidth: 0 };
 function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
-  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? mdOf(row.due) : "", coach: row ? row.coach : defCoach }));
+  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? (row.due ? mdOf(row.due) : "TBD") : "", coach: row ? row.coach : defCoach }));
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const due = parseDue(f.due);
@@ -805,6 +807,11 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
     setBusy(false);
   };
   const lab = { fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280", display: "grid", gap: 4 };
+  const tbdBtn = (k) => (
+    <button type="button" aria-pressed={isTbd(f[k])} onClick={() => setF({ ...f, [k]: isTbd(f[k]) ? "" : "TBD" })}
+      style={{ border: "1px solid " + (isTbd(f[k]) ? "#4FFFB0" : "rgba(255,255,255,0.14)"), background: isTbd(f[k]) ? "rgba(79,255,176,0.12)" : "transparent", color: isTbd(f[k]) ? "#4FFFB0" : "#8A8F98", borderRadius: 7, padding: "1px 7px", fontSize: 10, fontWeight: 700, letterSpacing: ".04em" }}>TBD</button>
+  );
+  const head = (text, k) => <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{text}</span>{tbdBtn(k)}</div>;
   return (
     <form onSubmit={submit} style={{ padding: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 12, marginBottom: 8, display: "grid", gap: 10 }}>
       <label style={lab}>Athlete
@@ -812,14 +819,14 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
       </label>
       <datalist id="rpm-board-athletes">{athletes.map((a) => <option key={a.id} value={a.name} />)}</datalist>
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 10 }}>
-        <label style={lab}>Format
-          <input style={inp} value={f.format} onChange={set("format")} placeholder="4x2" />
-        </label>
-        <label style={lab}>Due
-          <input style={{ ...inp, ...(due === undefined ? { borderColor: "#F97362" } : {}) }} value={f.due} onChange={set("due")} placeholder="9/30" inputMode="text" autoComplete="off" />
-        </label>
+        <div style={lab}>{head("Format", "format")}
+          <input aria-label="Format" style={{ ...inp, ...(isTbd(f.format) ? { color: "#8A8F98" } : {}) }} value={f.format} onChange={set("format")} placeholder="4x2" />
+        </div>
+        <div style={lab}>{head("Due", "due")}
+          <input aria-label="Due" style={{ ...inp, ...(due === undefined ? { borderColor: "#F97362" } : isTbd(f.due) ? { color: "#8A8F98" } : {}) }} value={f.due} onChange={set("due")} placeholder="9/30" inputMode="text" autoComplete="off" />
+        </div>
       </div>
-      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{f.format ? fmtFormat(f.format) : "Days a week x days at RPM, like 4x2"}{" · "}{due === undefined ? <span style={{ color: "#F97362" }}>Type the due date like 9/30</span> : due ? new Date(due + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "no date = TBD"}</div>
+      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{f.format ? fmtFormat(f.format) : "Days a week x days at RPM, like 4x2"}{" · "}{due === undefined ? <span style={{ color: "#F97362" }}>Type the due date like 9/30</span> : due ? new Date(due + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Start date TBD"}</div>
       <div className="seg" role="group" aria-label="Coach">
         {COACHES.map((c) => (
           <button type="button" key={c} aria-pressed={f.coach === c} onClick={() => setF({ ...f, coach: c })}>
@@ -868,7 +875,7 @@ function Board({ pw, athletes, onOpen, onLocked }) {
         <button onClick={() => setEdit(r.id)} style={{ minWidth: 0, textAlign: "left", background: "none", border: 0, padding: 0 }} aria-label={`Edit ${r.athleteName || r.name}`}>
           <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textDecoration: r.done ? "line-through" : "none" }}>{r.athleteName || r.name}</div>
           <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
-            {fmtFormat(r.format) || "No format"}
+            {fmtFormat(r.format)}
             {i && <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span>}
           </div>
           {r.draft && !r.done && <div style={{ fontSize: 11, color: "#4FFFB0", marginTop: 3, fontWeight: 600 }}>{r.draft}</div>}
