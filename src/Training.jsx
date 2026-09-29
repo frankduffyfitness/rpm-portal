@@ -852,7 +852,7 @@ function parseDue(text) {
 const mdOf = (iso) => (iso ? `${+iso.slice(5, 7)}/${+iso.slice(8, 10)}` : "");
 const inp = { border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "8px 10px", fontSize: 14, width: "100%", minWidth: 0 };
 function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
-  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? (row.due ? mdOf(row.due) : "TBD") : "", coach: row ? row.coach : defCoach }));
+  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? (row.due ? mdOf(row.due) : "TBD") : "", coach: row ? row.coach : defCoach, recap: row ? row.recap || "" : "", focus: row ? row.focus || "" : "" }));
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const due = parseDue(f.due);
@@ -861,7 +861,7 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
     if (!f.name.trim() || busy || due === undefined) return;
     const hit = athletes.find((a) => a.name.toLowerCase() === f.name.trim().toLowerCase());
     setBusy(true);
-    await onSave({ ...(row ? { id: row.id, done: row.done } : {}), name: f.name.trim(), athlete: hit ? hit.id : null, format: f.format.trim(), due, coach: f.coach });
+    await onSave({ ...(row ? { id: row.id, done: row.done } : {}), name: f.name.trim(), athlete: hit ? hit.id : null, format: f.format.trim(), due, coach: f.coach, recap: f.recap, focus: f.focus });
     setBusy(false);
   };
   const lab = { fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280", display: "grid", gap: 4 };
@@ -892,6 +892,13 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
           </button>
         ))}
       </div>
+      <label style={lab}>How last month went
+        <textarea style={{ ...inp, minHeight: 64, resize: "vertical", fontSize: 13, lineHeight: 1.4, textTransform: "none", letterSpacing: 0, fontWeight: 400 }} value={f.recap} onChange={set("recap")} placeholder="Hip felt good, missed week 3, SSB moved well..." />
+      </label>
+      <label style={lab}>Focus for this program
+        <textarea style={{ ...inp, minHeight: 64, resize: "vertical", fontSize: 13, lineHeight: 1.4, textTransform: "none", letterSpacing: 0, fontWeight: 400 }} value={f.focus} onChange={set("focus")} placeholder="Keep conventional only, push trap bar, more single-leg..." />
+      </label>
+      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>The draft reads these word for word, the same as telling Claude in chat.</div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button type="submit" disabled={busy || !f.name.trim() || due === undefined} style={{ padding: "8px 18px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 13, fontWeight: 700 }}>{row ? "Save" : "Add to board"}</button>
         <button type="button" className="tb" onClick={onCancel}>Cancel</button>
@@ -936,6 +943,7 @@ function Board({ pw, athletes, onOpen, onLocked }) {
             {fmtFormat(r.format)}
             {i && <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span>}
           </div>
+          {(r.recap || r.focus) && !r.done && <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{"Notes: "}{r.focus || r.recap}</div>}
           {r.draft && !r.done && <div style={{ fontSize: 11, color: "#4FFFB0", marginTop: 3, fontWeight: 600 }}>{r.draft}</div>}
         </button>
         <div style={{ display: "grid", justifyItems: "end", gap: 3 }}>
