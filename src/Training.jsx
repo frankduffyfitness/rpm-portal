@@ -769,17 +769,39 @@ function fmtFormat(f) {
   const extra = f.slice(m[0].length).trim();
   return `${t} day${t === 1 ? "" : "s"}` + (r === t ? ", all at RPM" : `, ${r} at RPM`) + (extra ? " " + extra : "");
 }
+// Due dates are typed as month/day ("9/30", "1/5", "Oct 3"); the year is whichever puts
+// the date closest to today, so in December "1/5" means next January.
+const MON_FULL = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+function parseDue(text) {
+  const t = String(text || "").trim().toLowerCase();
+  if (!t || t === "tbd") return null;
+  let m, d;
+  let x = /^(\d{1,2})\s*[\/.-]\s*(\d{1,2})(?:\s*[\/.-]\s*\d{2,4})?$/.exec(t);
+  if (x) { m = +x[1]; d = +x[2]; }
+  else if ((x = /^([a-z]{3})[a-z]*\.?\s*(\d{1,2})$/.exec(t))) { m = MON_FULL.indexOf(x[1]) + 1; d = +x[2]; }
+  if (!m || m > 12 || !d || d > 31) return undefined;
+  const today = new Date(todayIso() + "T00:00:00");
+  let best = null;
+  for (const y of [today.getFullYear() - 1, today.getFullYear(), today.getFullYear() + 1]) {
+    const dt = new Date(y, m - 1, d);
+    if (dt.getMonth() !== m - 1) continue;   // Feb 30 and friends
+    if (!best || Math.abs(dt - today) < Math.abs(best - today)) best = dt;
+  }
+  return best ? best.toLocaleDateString("en-CA") : undefined;
+}
+const mdOf = (iso) => (iso ? `${+iso.slice(5, 7)}/${+iso.slice(8, 10)}` : "");
 const inp = { border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "8px 10px", fontSize: 14, width: "100%", minWidth: 0 };
 function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
-  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? row.due || "" : "", coach: row ? row.coach : defCoach }));
+  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? mdOf(row.due) : "", coach: row ? row.coach : defCoach }));
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const due = parseDue(f.due);
   const submit = async (e) => {
     e.preventDefault();
-    if (!f.name.trim() || busy) return;
+    if (!f.name.trim() || busy || due === undefined) return;
     const hit = athletes.find((a) => a.name.toLowerCase() === f.name.trim().toLowerCase());
     setBusy(true);
-    await onSave({ ...(row ? { id: row.id, done: row.done } : {}), name: f.name.trim(), athlete: hit ? hit.id : null, format: f.format.trim(), due: f.due || null, coach: f.coach });
+    await onSave({ ...(row ? { id: row.id, done: row.done } : {}), name: f.name.trim(), athlete: hit ? hit.id : null, format: f.format.trim(), due, coach: f.coach });
     setBusy(false);
   };
   const lab = { fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280", display: "grid", gap: 4 };
@@ -794,10 +816,10 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
           <input style={inp} value={f.format} onChange={set("format")} placeholder="4x2" />
         </label>
         <label style={lab}>Due
-          <input style={{ ...inp, colorScheme: "dark" }} type="date" value={f.due} onChange={set("due")} />
+          <input style={{ ...inp, ...(due === undefined ? { borderColor: "#F97362" } : {}) }} value={f.due} onChange={set("due")} placeholder="9/30" inputMode="text" autoComplete="off" />
         </label>
       </div>
-      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{f.format ? fmtFormat(f.format) : "Days a week x days at RPM, like 4x2"}{f.due ? "" : " · no date = TBD"}</div>
+      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{f.format ? fmtFormat(f.format) : "Days a week x days at RPM, like 4x2"}{" · "}{due === undefined ? <span style={{ color: "#F97362" }}>Type the due date like 9/30</span> : due ? new Date(due + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "no date = TBD"}</div>
       <div className="seg" role="group" aria-label="Coach">
         {COACHES.map((c) => (
           <button type="button" key={c} aria-pressed={f.coach === c} onClick={() => setF({ ...f, coach: c })}>
@@ -806,7 +828,7 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
         ))}
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button type="submit" disabled={busy || !f.name.trim()} style={{ padding: "8px 18px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 13, fontWeight: 700 }}>{row ? "Save" : "Add to board"}</button>
+        <button type="submit" disabled={busy || !f.name.trim() || due === undefined} style={{ padding: "8px 18px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 13, fontWeight: 700 }}>{row ? "Save" : "Add to board"}</button>
         <button type="button" className="tb" onClick={onCancel}>Cancel</button>
         {row && <button type="button" className="tb" style={{ marginLeft: "auto" }} onClick={() => { if (window.confirm(`Remove ${f.name} from the board?`)) onDelete(row.id); }}>Remove</button>}
       </div>
