@@ -749,9 +749,10 @@ export function AthleteLogPage({ ctx, logo }) {
   );
 }
 
-// ─── Program board (the coaches' Google Sheet, synced by an Apps Script) ──────
+// ─── Program board (programs due to be written; typed here, coach only) ────
+const COACHES = ["Frank", "Alchi", "Ricky"];
 const COACH_COLOR = { Frank: "#6FCF97", Alchi: "#F2C94C", Ricky: "#60A5FA" };
-const BOARD_KEY_LS = "rpm_board_coach";
+const BOARD_COACH = "rpm_board_coach";
 const dayDiff = (iso) => Math.round((new Date(iso + "T00:00:00") - new Date(todayIso() + "T00:00:00")) / 864e5);
 function dueLabel(iso) {
   if (!iso) return ["TBD", "#6B7280"];
@@ -765,58 +766,119 @@ function fmtFormat(f) {
   const m = /^(\d)\s*x\s*(\d)/i.exec(f || "");
   if (!m) return f || "";
   const [t, r] = [+m[1], +m[2]];
-  return `${t} day${t === 1 ? "" : "s"}` + (r === t ? ", all at RPM" : `, ${r} at RPM`) + (/\(.+\)/.test(f) ? " " + f.match(/\(.+\)/)[0] : "");
+  const extra = f.slice(m[0].length).trim();
+  return `${t} day${t === 1 ? "" : "s"}` + (r === t ? ", all at RPM" : `, ${r} at RPM`) + (extra ? " " + extra : "");
 }
-function Board({ pw, onOpen, onLocked }) {
+const inp = { border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "8px 10px", fontSize: 14, width: "100%", minWidth: 0 };
+function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
+  const [f, setF] = useState(() => ({ name: row ? (row.athleteName || row.name) : "", format: row ? row.format : "", due: row ? row.due || "" : "", coach: row ? row.coach : defCoach }));
+  const [busy, setBusy] = useState(false);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!f.name.trim() || busy) return;
+    const hit = athletes.find((a) => a.name.toLowerCase() === f.name.trim().toLowerCase());
+    setBusy(true);
+    await onSave({ ...(row ? { id: row.id, done: row.done } : {}), name: f.name.trim(), athlete: hit ? hit.id : null, format: f.format.trim(), due: f.due || null, coach: f.coach });
+    setBusy(false);
+  };
+  const lab = { fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280", display: "grid", gap: 4 };
+  return (
+    <form onSubmit={submit} style={{ padding: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 12, marginBottom: 8, display: "grid", gap: 10 }}>
+      <label style={lab}>Athlete
+        <input style={inp} value={f.name} onChange={set("name")} list="rpm-board-athletes" autoFocus placeholder="Name" />
+      </label>
+      <datalist id="rpm-board-athletes">{athletes.map((a) => <option key={a.id} value={a.name} />)}</datalist>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 10 }}>
+        <label style={lab}>Format
+          <input style={inp} value={f.format} onChange={set("format")} placeholder="4x2" />
+        </label>
+        <label style={lab}>Due
+          <input style={{ ...inp, colorScheme: "dark" }} type="date" value={f.due} onChange={set("due")} />
+        </label>
+      </div>
+      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{f.format ? fmtFormat(f.format) : "Days a week x days at RPM, like 4x2"}{f.due ? "" : " · no date = TBD"}</div>
+      <div className="seg" role="group" aria-label="Coach">
+        {COACHES.map((c) => (
+          <button type="button" key={c} aria-pressed={f.coach === c} onClick={() => setF({ ...f, coach: c })}>
+            <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />{c}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button type="submit" disabled={busy || !f.name.trim()} style={{ padding: "8px 18px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 13, fontWeight: 700 }}>{row ? "Save" : "Add to board"}</button>
+        <button type="button" className="tb" onClick={onCancel}>Cancel</button>
+        {row && <button type="button" className="tb" style={{ marginLeft: "auto" }} onClick={() => { if (window.confirm(`Remove ${f.name} from the board?`)) onDelete(row.id); }}>Remove</button>}
+      </div>
+    </form>
+  );
+}
+function Board({ pw, athletes, onOpen, onLocked }) {
   const [data, setData] = useState(null);
-  const [coach, setCoach] = useState(() => { try { return localStorage.getItem(BOARD_KEY_LS) || "All"; } catch (e) { return "All"; } });
-  useEffect(() => {
-    let live = true;
-    api(pw, { query: { op: "board" } }).then((d) => live && setData(d)).catch((e) => { if (e.status === 401) onLocked(); });
-    return () => { live = false; };
-  }, [pw]);
-  if (!data || !data.board) return null;
-  const pick = (c) => { setCoach(c); try { localStorage.setItem(BOARD_KEY_LS, c); } catch (e) {} };
-  const all = data.board.tabs.flatMap((t) => t.rows.map((r) => ({ ...r, tab: t.tab, info: data.status[`${t.tab}|${r.row}`] || null })));
-  const mine = all.filter((r) => coach === "All" || r.coach === coach);
+  const [err, setErr] = useState(null);
+  const [edit, setEdit] = useState(null);   // null | "new" | row id
+  const [showDone, setShowDone] = useState(false);
+  const [coach, setCoach] = useState(() => { try { return localStorage.getItem(BOARD_COACH) || "All"; } catch (e) { return "All"; } });
+  const load = () => api(pw, { query: { op: "board" } }).then((d) => { setData(d); setErr(null); }).catch((e) => { if (e.status === 401) onLocked(); else setErr(e.message); });
+  useEffect(() => { load(); }, [pw]);
+  const call = async (body) => {
+    try { await api(pw, { body }); setEdit(null); await load(); }
+    catch (e) { if (e.status === 401) onLocked(); else setErr(e.message); }
+  };
+  const save = (row) => call({ op: "boardPut", row });
+  const toggle = (r) => call({ op: "boardPut", row: { id: r.id, name: r.name, athlete: r.athlete, format: r.format, due: r.due, coach: r.coach, done: !r.done } });
+  const pick = (c) => { setCoach(c); try { localStorage.setItem(BOARD_COACH, c); } catch (e) {} };
+  if (!data) return err ? <div style={{ fontSize: 12, color: "#F97362", marginBottom: 16 }}>{err}</div> : null;
+  const rows = data.rows.map((r) => ({ ...r, info: data.status[r.id] || null, athleteName: (data.status[r.id] || {}).name }));
+  const mine = rows.filter((r) => coach === "All" || r.coach === coach);
   const open = mine.filter((r) => !r.done).sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999") || a.name.localeCompare(b.name));
-  const written = mine.length - open.length;
-  const mins = Math.max(0, Math.round((Date.now() - new Date(data.board.updatedAt)) / 6e4));
-  const ago = mins < 1 ? "just now" : mins < 60 ? `${mins} min ago` : mins < 1440 ? `${Math.round(mins / 60)} hr ago` : `${Math.round(mins / 1440)} days ago`;
+  const cutoff = new Date(Date.now() - 45 * 864e5).toISOString();
+  const done = mine.filter((r) => r.done && (r.doneAt || "") >= cutoff).sort((a, b) => (b.doneAt || "").localeCompare(a.doneAt || ""));
+  const defCoach = coach === "All" ? "Frank" : coach;
+  const Row = (r) => {
+    if (edit === r.id) return <BoardForm key={r.id} row={r} athletes={athletes} defCoach={defCoach} onSave={save} onDelete={(id) => call({ op: "boardDelete", rowId: id })} onCancel={() => setEdit(null)} />;
+    const [due, dueColor] = r.done ? [`Written ${shortDate((r.doneAt || "").slice(0, 10))}`, "#6B7280"] : dueLabel(r.due);
+    const i = r.info;
+    const ready = i && i.total && i.logged >= i.total;
+    return (
+      <div key={r.id} style={{ display: "grid", gridTemplateColumns: "4px minmax(0,1fr) auto auto", gap: 10, alignItems: "center", padding: "10px 10px 10px 0", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, overflow: "hidden", opacity: r.done ? 0.6 : 1 }}>
+        <div style={{ alignSelf: "stretch", margin: "-10px 0", background: COACH_COLOR[r.coach] || "rgba(255,255,255,0.08)" }} />
+        <button onClick={() => setEdit(r.id)} style={{ minWidth: 0, textAlign: "left", background: "none", border: 0, padding: 0 }} aria-label={`Edit ${r.athleteName || r.name}`}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textDecoration: r.done ? "line-through" : "none" }}>{r.athleteName || r.name}</div>
+          <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
+            {fmtFormat(r.format) || "No format"}
+            {i && <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span>}
+          </div>
+        </button>
+        <div style={{ display: "grid", justifyItems: "end", gap: 3 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: dueColor, whiteSpace: "nowrap" }}>{due}</div>
+          {i && <button className="tb" style={{ padding: "2px 8px", fontSize: 10 }} onClick={() => onOpen(i.id)}>Log {"›"}</button>}
+        </div>
+        <button onClick={() => toggle(r)} aria-pressed={!!r.done} title={r.done ? "Mark not written" : "Mark written"} aria-label={r.done ? "Mark not written" : "Mark written"}
+          style={{ width: 30, height: 30, borderRadius: 9, border: "1px solid " + (r.done ? "#4FFFB0" : "rgba(255,255,255,0.14)"), background: r.done ? "rgba(79,255,176,0.12)" : "transparent", color: r.done ? "#4FFFB0" : "#4A4F57", fontSize: 15, fontWeight: 800, padding: 0 }}>{"✓"}</button>
+      </div>
+    );
+  };
   return (
     <div style={{ marginBottom: 22 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Programs due</div>
-        <div style={{ fontSize: 11, color: "#6B7280" }}>From the program board · synced {ago}</div>
+        {edit !== "new" && <button className="tb" onClick={() => setEdit("new")}>+ Add program</button>}
       </div>
       <div className="tabs" style={{ margin: "10px 0" }}>
-        {["All", "Frank", "Alchi", "Ricky"].map((c) => (
+        {["All", ...COACHES].map((c) => (
           <button key={c} aria-pressed={coach === c} onClick={() => pick(c)} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             {c !== "All" && <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />}{c}
           </button>
         ))}
       </div>
-      <div style={{ fontSize: 11, color: "#6B7280", marginBottom: 8 }}>{open.length} to write · {written} written</div>
-      {open.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "12px 0" }}>Nothing open on the board.</div>}
-      {open.map((r) => {
-        const [due, dueColor] = dueLabel(r.due);
-        const i = r.info;
-        const ready = i && i.total && i.logged >= i.total;
-        return (
-          <div key={r.tab + r.row} role={i ? "button" : undefined} tabIndex={i ? 0 : undefined}
-            onClick={i ? () => onOpen(i.id) : undefined} onKeyDown={i ? (e) => { if (e.key === "Enter") onOpen(i.id); } : undefined}
-            style={{ display: "grid", gridTemplateColumns: "4px minmax(0,1fr) auto", gap: 12, alignItems: "center", padding: "10px 12px 10px 0", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, cursor: i ? "pointer" : "default", overflow: "hidden" }}>
-            <div style={{ alignSelf: "stretch", margin: "-10px 0", background: COACH_COLOR[r.coach] || "rgba(255,255,255,0.08)" }} />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{i ? i.name : r.name}</div>
-              <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
-                {fmtFormat(r.format)}{i ? <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span> : " · not in the training log"}
-              </div>
-            </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: dueColor, whiteSpace: "nowrap" }}>{due}</div>
-          </div>
-        );
-      })}
+      {err && <div style={{ fontSize: 12, color: "#F97362", marginBottom: 8 }}>{err}</div>}
+      {edit === "new" && <BoardForm athletes={athletes} defCoach={defCoach} onSave={save} onCancel={() => setEdit(null)} />}
+      <div style={{ fontSize: 11, color: "#6B7280", marginBottom: 8 }}>{open.length} to write{done.length ? ` · ${done.length} written lately` : ""} · tap a name to edit, {"✓"} when it's written</div>
+      {open.length === 0 && edit !== "new" && <div style={{ fontSize: 13, color: "#6B7280", padding: "12px 0" }}>Nothing due. Add the next program with + Add program.</div>}
+      {open.map(Row)}
+      {done.length > 0 && <button className="tb" style={{ margin: "4px 0 8px" }} onClick={() => setShowDone(!showDone)}>{showDone ? "Hide written" : `Show written (${done.length})`}</button>}
+      {showDone && done.map(Row)}
     </div>
   );
 }
@@ -847,7 +909,7 @@ export default function TrainingSection({ ctx }) {
               <div style={{ fontSize: 12, color: "#6B7280" }}>{index.length} athlete{index.length === 1 ? "" : "s"} with a program loaded</div>
               <button onClick={() => lock()} style={{ border: "1px solid rgba(255,255,255,0.08)", background: "none", color: "#6B7280", fontSize: 11, borderRadius: 8, padding: "5px 10px", cursor: "pointer" }}>Lock</button>
             </div>
-            <Board pw={pw} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
+            <Board pw={pw} athletes={index} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
             <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Training log</div>
             {index.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No programs loaded yet.</div>}
             {[...index].sort((a, b) => a.name.localeCompare(b.name)).map((a) => {
