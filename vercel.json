@@ -5,6 +5,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/modelportal",
+      "destination": "/index.html"
+    },
+    {
       "source": "/log",
       "destination": "/index.html"
     },

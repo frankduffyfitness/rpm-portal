@@ -5188,7 +5188,15 @@ function ArsenalSection() {
   return <ArsenalLeaderboard onPick={(n) => { setPick(n); window.scrollTo(0, 0); }} />;
 }
 
-function DynamoPage() {
+// Two staff windows (Frank, 2026-09-30): the Model Portal (/modelportal: CMJ,
+// DynaMo, Velo Model, Arsenal) and the Coach Portal (/coachportal: training
+// logs, Programs due, remote intakes). Each header links to the other.
+const PORTALS = {
+  model: { title: "Model Portal", path: "/modelportal", other: { title: "Coach Portal", path: "/coachportal" } },
+  coach: { title: "Coach Portal", path: "/coachportal", other: { title: "Model Portal", path: "/modelportal" } },
+};
+function DynamoPage({ portal = "model" }) {
+  const P = PORTALS[portal];
   const [ok, setOk] = useState(() => { try { return sessionStorage.getItem("dyn_ok") === "1"; } catch (e) { return false; } });
   const [pw, setPw] = useState("");
   const [err, setErr] = useState(false);
@@ -5207,18 +5215,21 @@ function DynamoPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <img src={RPM_LOGO} alt="RPM Strength" title="Back to Athlete Portal" onClick={() => { window.location.href = "/"; }} style={{ height: 30, width: "auto", cursor: "pointer" }} />
         <div style={{ width: 1, height: 22, background: "rgba(255,255,255,0.12)" }} />
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Coach Portal</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{P.title}</div>
         <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#4FFFB0", background: "rgba(79,255,176,0.1)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 6, padding: "2px 6px" }}>STAFF</div>
+        <a href={P.other.path} style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "#8A8F98", textDecoration: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 10px", whiteSpace: "nowrap" }}>{P.other.title} {"→"}</a>
       </div>
       {child}
       <div style={{ height: 48 }} />
     </div>
   );
+  // The Coach Portal's data sits behind the staff password (TrainingSection's own unlock).
+  if (portal === "coach") return shell(<TrainingSection ctx={{ _FH, CMJ_BY_CANON, VELO_BY_CANON, BW_DATA, canonName }} />);
   if (!ok) {
     return shell(
       <form onSubmit={submit} style={{ marginTop: 44, textAlign: "center" }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Staff access</div>
-        <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 18, lineHeight: 1.5 }}>Enter the password to view the coach dashboard: DynaMo, Velo Model, Arsenal, CMJ Strategy, and Training.</div>
+        <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 18, lineHeight: 1.5 }}>Enter the password to view the models: CMJ, DynaMo, Velo Model and Arsenal.</div>
         <input type="password" value={pw} autoFocus onChange={(e) => { setPw(e.target.value); setErr(false); }} placeholder="Password" style={{ width: "100%", maxWidth: 280, padding: "12px 14px", border: "1px solid " + (err ? "#F97362" : "rgba(255,255,255,0.1)"), borderRadius: 10, background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, outline: "none", textAlign: "center", boxSizing: "border-box" }} />
         <div><button type="submit" style={{ marginTop: 14, padding: "11px 30px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Unlock</button></div>
         {err && <div style={{ fontSize: 12, color: "#F97362", marginTop: 12 }}>Incorrect password.</div>}
@@ -5232,7 +5243,7 @@ function DynamoPage() {
           Nothing was deleted: InjurySection, INJURY_LIST and the render line
           below are all intact, so restoring is just putting ["injury",
           "\u{1FA79} Injury"] back in this array. */}
-      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"], ["training", "🏋️ Training"]].map(([k, l]) => (
+      {[["strategy", "🦵 CMJ"], ["dynamo", "💪 DynaMo"], ["model", "⚾ Velo Model"], ["arsenal", "🎯 Arsenal"]].map(([k, l]) => (
         <button key={k} onClick={() => { setDynTab(k); if (k !== "dynamo") setSel(null); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
           background: dynTab === k ? "rgba(79,255,176,0.12)" : "transparent", color: dynTab === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
       ))}
@@ -5250,7 +5261,6 @@ function DynamoPage() {
     {dynTab === "model" && <VeloModelSection />}
     {dynTab === "arsenal" && <ArsenalSection />}
     {dynTab === "strategy" && <CmjSection />}
-    {dynTab === "training" && <TrainingSection ctx={{ _FH, CMJ_BY_CANON, VELO_BY_CANON, BW_DATA, canonName }} />}
     {/* unreachable while the tab is hidden; kept so restore is one line */}
     {dynTab === "injury" && <InjurySection />}
   </>);
@@ -5272,15 +5282,21 @@ export default function App() {
   const [showVeloReport, setShowVeloReport] = useState(false);
   const [hopCmpG, setHopCmpG] = useState(null);
   const [standG, setStandG] = useState("all");
-  // Coach's portal lives at /coachportal (rewrite in vercel.json); the old
-  // #dynamo hash keeps working so existing staff bookmarks don't break.
-  const [isDynamo] = useState(() => { try { return /^\/coachportal\/?$/i.test(window.location.pathname) || /dynamo/i.test(window.location.hash); } catch (e) { return false; } });
+  // Staff windows (rewrites in vercel.json): /modelportal = the models, /coachportal =
+  // training. The old #dynamo hash was the models page, so it opens the Model Portal.
+  const [staffPortal] = useState(() => {
+    try {
+      if (/^\/modelportal\/?$/i.test(window.location.pathname) || /dynamo/i.test(window.location.hash)) return "model";
+      if (/^\/coachportal\/?$/i.test(window.location.pathname)) return "coach";
+    } catch (e) {}
+    return null;
+  });
   // Athletes log their own program at /log#t=<link key> (rewrite in vercel.json).
   const [isAthleteLog] = useState(() => { try { return /^\/log\/?$/i.test(window.location.pathname); } catch (e) { return false; } });
   const [isIntake] = useState(() => { try { return /^\/intake\/?$/i.test(window.location.pathname); } catch (e) { return false; } });
   if (isAthleteLog) return <AthleteLogPage ctx={{ _FH, CMJ_BY_CANON, VELO_BY_CANON, BW_DATA, canonName }} logo={RPM_LOGO} />;
   if (isIntake) return <IntakePage logo={RPM_LOGO} />;
-  if (isDynamo) return <DynamoPage />;
+  if (staffPortal) return <DynamoPage portal={staffPortal} />;
 
   // Shared print: every .rpt-page prints as exactly one letter sheet, measured
   // and zoom-fitted individually. Used by both report entry points (CMJ/Hop tab
