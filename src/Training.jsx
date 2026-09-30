@@ -980,6 +980,147 @@ function Board({ pw, athletes, onOpen, onLocked }) {
   );
 }
 
+// ─── Schedule (the Coach Portal's day view) ─────────────────────────────────
+// Events are typed in the portal (Frank, 2026-09-30); new programs come straight
+// from the Programs due board on their due date.
+const EVENT_TYPES = [
+  { key: "Evaluation", icon: "📋", color: "#4FFFB0" },
+  { key: "Bullpen", icon: "⚾", color: "#60A5FA" },
+  { key: "Force plate testing", icon: "📈", color: "#F2C94C" },
+  { key: "Remote call", icon: "📞", color: "#C084FC" },
+  { key: "Other", icon: "•", color: "#8A8F98" },
+];
+const typeOf = (k) => EVENT_TYPES.find((t) => t.key === k) || EVENT_TYPES[EVENT_TYPES.length - 1];
+const addDaysLocal = (iso, n) => { const d = new Date(iso + "T00:00:00"); d.setDate(d.getDate() + n); return d.toLocaleDateString("en-CA"); };
+const mondayOf = (iso) => { const d = new Date(iso + "T00:00:00"); return addDaysLocal(iso, -((d.getDay() + 6) % 7)); };
+const fmtTime = (t) => { if (!t) return ""; const [h, m] = t.split(":").map(Number); return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
+const longDay = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+
+function EventForm({ ev, day, athletes, onSave, onDelete, onCancel }) {
+  const [f, setF] = useState(() => ({ type: ev ? ev.type : "Evaluation", athlete: ev ? ev.athlete : "", date: mdOf(ev ? ev.date : day), time: ev ? ev.time || "" : "", coach: ev ? ev.coach : "Frank", notes: ev ? ev.notes || "" : "" }));
+  const [busy, setBusy] = useState(false);
+  const date = parseDue(f.date);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const lab = { fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280", display: "grid", gap: 4 };
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!date || busy) return;
+    setBusy(true);
+    await onSave({ ...(ev ? { id: ev.id } : {}), type: f.type, athlete: f.athlete.trim(), date, time: f.time || null, coach: f.coach, notes: f.notes.trim() });
+    setBusy(false);
+  };
+  return (
+    <form onSubmit={submit} style={{ padding: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(79,255,176,0.25)", borderRadius: 12, marginBottom: 10, display: "grid", gap: 10 }}>
+      <div className="seg" role="group" aria-label="Type" style={{ flexWrap: "wrap" }}>
+        {EVENT_TYPES.map((t) => <button type="button" key={t.key} aria-pressed={f.type === t.key} onClick={() => setF({ ...f, type: t.key })}>{t.icon} {t.key}</button>)}
+      </div>
+      <label style={lab}>Athlete
+        <input style={inp} value={f.athlete} onChange={set("athlete")} list="rpm-sched-athletes" placeholder="Name (optional for staff events)" />
+      </label>
+      <datalist id="rpm-sched-athletes">{athletes.map((a) => <option key={a.id} value={a.name} />)}</datalist>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 10 }}>
+        <label style={lab}>Date
+          <input style={{ ...inp, ...(date ? {} : { borderColor: "#F97362" }) }} value={f.date} onChange={set("date")} placeholder="9/30" autoComplete="off" />
+        </label>
+        <label style={lab}>Time
+          <input style={{ ...inp, colorScheme: "dark" }} type="time" value={f.time} onChange={set("time")} />
+        </label>
+      </div>
+      <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{date ? longDay(date) : "Type the date like 9/30"}{f.time ? ` · ${fmtTime(f.time)}` : " · any time"}</div>
+      <div className="seg" role="group" aria-label="Coach">
+        {COACHES.map((c) => (
+          <button type="button" key={c} aria-pressed={f.coach === c} onClick={() => setF({ ...f, coach: c })}>
+            <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />{c}
+          </button>
+        ))}
+      </div>
+      <label style={lab}>Notes
+        <textarea style={{ ...inp, minHeight: 54, resize: "vertical", fontSize: 13, textTransform: "none", letterSpacing: 0, fontWeight: 400 }} value={f.notes} onChange={set("notes")} placeholder="Mound 2, bring the Pocket Radar" />
+      </label>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button type="submit" disabled={busy || !date} style={{ padding: "8px 18px", border: "none", borderRadius: 10, background: "#4FFFB0", color: "#0A0C10", fontSize: 13, fontWeight: 700 }}>{ev ? "Save" : "Add to schedule"}</button>
+        <button type="button" className="tb" onClick={onCancel}>Cancel</button>
+        {ev && <button type="button" className="tb" style={{ marginLeft: "auto" }} onClick={() => { if (window.confirm("Remove this from the schedule?")) onDelete(ev.id); }}>Remove</button>}
+      </div>
+    </form>
+  );
+}
+
+function Schedule({ pw, athletes, onOpenPrograms, onLocked }) {
+  const [day, setDay] = useState(todayIso);
+  const [data, setData] = useState(null);
+  const [edit, setEdit] = useState(null);   // null | "new" | event
+  const [err, setErr] = useState(null);
+  const week = mondayOf(day);
+  const load = () => api(pw, { query: { op: "schedule", from: week, to: addDaysLocal(week, 6) } }).then((d) => { setData(d); setErr(null); })
+    .catch((e) => { if (e.status === 401) onLocked(); else setErr(e.message); });
+  useEffect(() => { load(); }, [pw, week]);
+  const call = async (body) => {
+    try { await api(pw, { body }); setEdit(null); await load(); }
+    catch (e) { if (e.status === 401) onLocked(); else setErr(e.message); }
+  };
+  const days = Array.from({ length: 7 }, (_, i) => addDaysLocal(week, i));
+  const countOn = (d) => data ? data.events.filter((e) => e.date === d).length + data.programs.filter((p) => p.due === d).length : 0;
+  const events = data ? data.events.filter((e) => e.date === day).sort((a, b) => (a.time || "").localeCompare(b.time || "")) : [];
+  const programs = data ? data.programs.filter((p) => p.due === day) : [];
+  const today = todayIso();
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{day === today ? "Today" : longDay(day).split(",")[0]} <span style={{ fontSize: 12, fontWeight: 600, color: "#6B7280" }}>{longDay(day).split(", ").slice(1).join(", ")}</span></div>
+        {edit !== "new" && <button className="tb" onClick={() => setEdit("new")}>+ Add</button>}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "22px repeat(7, minmax(0,1fr)) 22px", gap: 4, alignItems: "center", margin: "12px 0 6px" }}>
+        <button className="tb" style={{ padding: "6px 0" }} aria-label="Previous week" onClick={() => setDay(addDaysLocal(week, -7))}>{"‹"}</button>
+        {days.map((d) => {
+          const on = d === day, n = countOn(d);
+          const dt = new Date(d + "T00:00:00");
+          return (
+            <button key={d} onClick={() => setDay(d)} aria-pressed={on} style={{ border: `1px solid ${on ? "#4FFFB0" : d === today ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.06)"}`, background: on ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", borderRadius: 10, padding: "6px 0 5px", color: on ? "#4FFFB0" : "#E0E0E0", cursor: "pointer" }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: on ? "#4FFFB0" : "#6B7280" }}>{dt.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2)}</div>
+              <div style={{ fontSize: 15, fontWeight: 800 }}>{dt.getDate()}</div>
+              <div style={{ height: 6, display: "flex", justifyContent: "center", gap: 2, marginTop: 1 }}>{Array.from({ length: Math.min(n, 3) }, (_, i) => <i key={i} style={{ width: 4, height: 4, borderRadius: 2, background: on ? "#4FFFB0" : "#8A8F98", display: "inline-block" }} />)}</div>
+            </button>
+          );
+        })}
+        <button className="tb" style={{ padding: "6px 0" }} aria-label="Next week" onClick={() => setDay(addDaysLocal(week, 7))}>{"›"}</button>
+      </div>
+      {day !== today && <button className="tb" style={{ marginBottom: 8 }} onClick={() => setDay(today)}>Back to today</button>}
+      {err && <div style={{ fontSize: 12, color: "#F97362", margin: "6px 0" }}>{err}</div>}
+      {edit === "new" && <EventForm day={day} athletes={athletes} onSave={(event) => call({ op: "scheduleSave", event })} onCancel={() => setEdit(null)} />}
+      {!data ? <div style={{ fontSize: 13, color: "#6B7280", padding: "12px 0" }}>Loading…</div> : (
+        <div style={{ marginTop: 6 }}>
+          {programs.length === 0 && events.length === 0 && edit !== "new" && <div style={{ fontSize: 13, color: "#6B7280", padding: "14px 0" }}>Nothing scheduled. Add an evaluation, bullpen or testing session with + Add.</div>}
+          {programs.map((p) => (
+            <div key={"p" + p.id} role="button" tabIndex={0} onClick={onOpenPrograms} onKeyDown={(e) => { if (e.key === "Enter") onOpenPrograms(); }} style={{ display: "grid", gridTemplateColumns: "4px 64px minmax(0,1fr)", gap: 10, alignItems: "center", padding: "10px 10px 10px 0", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, cursor: "pointer", overflow: "hidden" }}>
+              <div style={{ alignSelf: "stretch", margin: "-10px 0", background: COACH_COLOR[p.coach] || "rgba(255,255,255,0.08)" }} />
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#6B7280" }}>Due</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#4FFFB0" }}>🗂 New program</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginTop: 1 }}>{p.name}</div>
+                <div style={{ fontSize: 11, color: "#6B7280", marginTop: 1 }}>{fmtFormat(p.format)}{p.draft ? ` · ${p.draft}` : ""}</div>
+              </div>
+            </div>
+          ))}
+          {events.map((e) => edit && edit !== "new" && edit.id === e.id
+            ? <EventForm key={e.id} ev={e} day={day} athletes={athletes} onSave={(event) => call({ op: "scheduleSave", event })} onDelete={(id) => call({ op: "scheduleDelete", eventId: id })} onCancel={() => setEdit(null)} />
+            : (
+              <div key={e.id} role="button" tabIndex={0} onClick={() => setEdit(e)} onKeyDown={(k) => { if (k.key === "Enter") setEdit(e); }} style={{ display: "grid", gridTemplateColumns: "4px 64px minmax(0,1fr)", gap: 10, alignItems: "center", padding: "10px 10px 10px 0", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, cursor: "pointer", overflow: "hidden" }}>
+                <div style={{ alignSelf: "stretch", margin: "-10px 0", background: COACH_COLOR[e.coach] || "rgba(255,255,255,0.08)" }} />
+                <div style={{ fontSize: 12, fontWeight: 700, color: e.time ? "#E0E0E0" : "#6B7280", whiteSpace: "nowrap" }}>{e.time ? fmtTime(e.time) : "Any time"}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: typeOf(e.type).color }}>{typeOf(e.type).icon} {e.type}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginTop: 1 }}>{e.athlete || "Staff"}</div>
+                  {e.notes && <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 1 }}>{e.notes}</div>}
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Entry ───────────────────────────────────────────────────────────────────
 export default function TrainingSection({ ctx }) {
   const [pw, setPwState] = useState(getPw);
@@ -987,6 +1128,8 @@ export default function TrainingSection({ ctx }) {
   const [err, setErr] = useState(null);
   const [sel, setSel] = useState(null);
   const [start, setStart] = useState(null);
+  const [tab, setTabState] = useState(() => { try { return localStorage.getItem("rpm_coach_tab") || "schedule"; } catch (e) { return "schedule"; } });
+  const setTab = (t) => { setTabState(t); try { localStorage.setItem("rpm_coach_tab", t); } catch (e) {} };
   const lock = (msg) => { setPw(""); setPwState(""); setIndex(null); setSel(null); setErr(msg || null); };
   useEffect(() => {
     if (!pw) return;
@@ -1008,8 +1151,15 @@ export default function TrainingSection({ ctx }) {
               <button onClick={() => lock()} style={{ border: "1px solid rgba(255,255,255,0.08)", background: "none", color: "#6B7280", fontSize: 11, borderRadius: 8, padding: "5px 10px", cursor: "pointer" }}>Lock</button>
             </div>
             <Updates pw={pw} onOpen={(id, s) => { setStart(s || null); setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
-            <Board pw={pw} athletes={index} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
-            <IntakesPanel pw={pw} onLocked={() => lock("Your staff password changed. Enter it again.")} />
+            <div className="tabs" style={{ marginTop: 0 }}>
+              {[["schedule", "📅 Schedule"], ["programs", "📋 Programs"], ["intakes", "📝 Intakes"], ["log", "🏋️ Log"]].map(([k, l]) => (
+                <button key={k} aria-pressed={tab === k} onClick={() => setTab(k)} style={{ flex: 1, padding: "8px 4px" }}>{l}</button>
+              ))}
+            </div>
+            {tab === "schedule" && <Schedule pw={pw} athletes={index} onOpenPrograms={() => setTab("programs")} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
+            {tab === "programs" && <Board pw={pw} athletes={index} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
+            {tab === "intakes" && <IntakesPanel pw={pw} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
+            {tab === "log" && <>
             <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Training log</div>
             {index.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No programs loaded yet.</div>}
             {[...index].sort((a, b) => a.name.localeCompare(b.name)).map((a) => {
@@ -1022,6 +1172,7 @@ export default function TrainingSection({ ctx }) {
                 </div>
               );
             })}
+            </>}
           </div>
         );
   return <div className="tl"><style>{CSS}</style>{body}</div>;

@@ -46,6 +46,13 @@
  * GET  ?op=intake                        -> that intake (label, status, answers)           intake link
  * POST {op:"saveIntake", answers, final} saves a draft, or submits when final             intake link
  *
+ * Schedule (the Coach Portal's daily schedule; typed in the portal, coach only):
+ *   schedule                 hash   eventId -> {id, date, time, type, athlete, coach, notes, created}
+ * GET  ?op=schedule&from=YYYY-MM-DD&to=YYYY-MM-DD -> {events, programs}  (programs = open
+ *                                   board rows due in the range, shown as "new program" items)
+ * POST {op:"scheduleSave", event}        (adds, or updates event.id)  -> {event}          coach
+ * POST {op:"scheduleDelete", eventId}                                                     coach
+ *
  * Program board (programs due to be written; typed in the portal, coach only):
  *   boardrows                hash   rowId -> {name, athlete?, format, due, coach, done, doneAt, created,
  *                                   draft?, recap?, focus?}
@@ -239,6 +246,27 @@ async function boardRows() {
 
 async function write(body, who) {
   const { op, month } = body || {};
+  if (op === "scheduleSave" || op === "scheduleDelete") {
+    if (who.role !== "coach") throw fail(403, "Not allowed");
+    if (op === "scheduleDelete") {
+      if (!RID.test(body.eventId || "")) throw fail(400, "Bad event");
+      await redis([["HDEL", "schedule", body.eventId]]);
+      return { ok: true };
+    }
+    const e = body.event || {};
+    if (!DAY.test(e.date || "")) throw fail(400, "Event needs a date");
+    if (!str(e.type, 40)) throw fail(400, "Event needs a type");
+    const eid = RID.test(e.id || "") ? e.id : crypto.randomBytes(6).toString("hex");
+    const [cur] = await redis([["HGET", "schedule", eid]]);
+    const prev = parse(cur) || {};
+    const doc = {
+      id: eid, date: e.date, time: /^\d{2}:\d{2}$/.test(e.time || "") ? e.time : null,
+      type: str(e.type, 40), athlete: str(e.athlete, 80), coach: COACHES.includes(e.coach) ? e.coach : null,
+      notes: str(e.notes, 1000), created: prev.created || new Date().toISOString(),
+    };
+    await redis([["HSET", "schedule", eid, json(doc)]]);
+    return { event: doc };
+  }
   if (op === "createIntake" || op === "deleteIntake") {
     if (who.role !== "coach") throw fail(403, "Not allowed");
     if (op === "deleteIntake") {
@@ -353,6 +381,15 @@ export default async function handler(req, res) {
       if (op === "index") return res.status(200).json(await index());
       if (op === "activity") return res.status(200).json(await activity());
       if (op === "intakes") return res.status(200).json(await intakeList());
+      if (op === "schedule") {
+        const from = DAY.test(req.query.from || "") ? req.query.from : null, to = DAY.test(req.query.to || "") ? req.query.to : null;
+        if (!from || !to) throw fail(400, "Bad range");
+        const [h] = await redis([["HGETALL", "schedule"]]);
+        const events = Object.values(pairs(h)).filter((e) => e && e.date >= from && e.date <= to);
+        const programs = (await boardRows()).filter((r) => !r.done && r.due && r.due >= from && r.due <= to)
+          .map((r) => ({ id: r.id, due: r.due, name: r.name, format: r.format, coach: r.coach, draft: r.draft || null }));
+        return res.status(200).json({ events, programs });
+      }
       if (op === "board") {
         const rows = await boardRows();
         return res.status(200).json({ rows, status: await boardStatus(rows) });
