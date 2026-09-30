@@ -5,6 +5,7 @@
 // data, passed in as `ctx` by App.jsx (this file is never touched by the 6-hour
 // generator, which only splices const markers in App.jsx).
 import { useEffect, useMemo, useRef, useState } from "react";
+import { IntakesPanel } from "./Intake.jsx";
 
 const PW_KEY = "rpm_staff_pw";
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -1008,6 +1009,7 @@ export default function TrainingSection({ ctx }) {
             </div>
             <Updates pw={pw} onOpen={(id, s) => { setStart(s || null); setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
             <Board pw={pw} athletes={index} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
+            <IntakesPanel pw={pw} onLocked={() => lock("Your staff password changed. Enter it again.")} />
             <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Training log</div>
             {index.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No programs loaded yet.</div>}
             {[...index].sort((a, b) => a.name.localeCompare(b.name)).map((a) => {

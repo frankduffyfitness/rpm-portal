@@ -7,6 +7,10 @@
     {
       "source": "/log",
       "destination": "/index.html"
+    },
+    {
+      "source": "/intake",
+      "destination": "/index.html"
     }
   ]
 }

@@ -36,6 +36,16 @@
  * GET  ?op=activity                      -> {updates: [{id, name, sessions, last}]}       coach
  * POST {op:"activitySeen", id}                                                            coach
  *
+ * Remote intake (the questionnaire new remote athletes fill out before their call):
+ *   intakes                  hash   intakeId -> {id, label, created, status: sent|draft|submitted,
+ *                                   updatedAt, submittedAt, answers}
+ *   itoken:<sha256(token)>   string {id}  intake link key -> intake (key starts "i_")
+ * POST {op:"createIntake", label}        -> {id, token} (shown once)                     coach
+ * GET  ?op=intakes                       -> {intakes: [...]}                               coach
+ * POST {op:"deleteIntake", intakeId}                                                      coach
+ * GET  ?op=intake                        -> that intake (label, status, answers)           intake link
+ * POST {op:"saveIntake", answers, final} saves a draft, or submits when final             intake link
+ *
  * Program board (programs due to be written; typed in the portal, coach only):
  *   boardrows                hash   rowId -> {name, athlete?, format, due, coach, done, doneAt, created,
  *                                   draft?, recap?, focus?}
@@ -58,11 +68,16 @@ const sha = (s) => crypto.createHash("sha256").update(s).digest("hex");
 
 const same = (want, got) => !!want && crypto.timingSafeEqual(Buffer.from(sha(want), "hex"), Buffer.from(sha(got), "hex"));
 
-// -> {role: "coach"} | {role: "athlete", id} | null
+// -> {role: "coach"} | {role: "athlete", id} | {role: "intake", id} | null
 async function whoIs(req) {
   const got = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
   if (!got || got.length > 200) return null;
   if (same(process.env.STAFF_PASSWORD || "", got)) return { role: "coach" };
+  if (/^i_[A-Za-z0-9_-]{20,}$/.test(got)) {
+    const [rec] = await redis([["GET", `itoken:${sha(got)}`]]);
+    const r = parse(rec);
+    return r && RID.test(r.id || "") ? { role: "intake", id: r.id } : null;
+  }
   if (!/^a_[A-Za-z0-9_-]{20,}$/.test(got)) return null;
   const [rec] = await redis([["GET", `atoken:${sha(got)}`]]);
   const r = parse(rec);
@@ -192,6 +207,31 @@ async function activity() {
   return { updates: Object.values(by).sort((a, b) => b.last.localeCompare(a.last)) };
 }
 
+const publicIntake = (r) => {
+  const { tokenHash, ...rest } = r || {};
+  return rest;
+};
+
+async function intakeList() {
+  const [h] = await redis([["HGETALL", "intakes"]]);
+  const list = Object.values(pairs(h)).filter(Boolean).map(publicIntake);
+  return { intakes: list.sort((a, b) => (b.submittedAt || b.updatedAt || b.created).localeCompare(a.submittedAt || a.updatedAt || a.created)) };
+}
+
+async function intakeSave(id, body) {
+  const [cur] = await redis([["HGET", "intakes", id]]);
+  const rec = parse(cur);
+  if (!rec) throw fail(404, "This intake link was removed. Ask RPM for a new one.");
+  const answers = body && typeof body.answers === "object" && !Array.isArray(body.answers) ? body.answers : null;
+  if (!answers) throw fail(400, "Bad answers");
+  const now = new Date().toISOString();
+  const next = { ...rec, answers, updatedAt: now };
+  if (body.final) { next.status = "submitted"; next.submittedAt = now; }
+  else if (rec.status !== "submitted") next.status = "draft";
+  await redis([["HSET", "intakes", id, json(next)]]);
+  return { ok: true, status: next.status, updatedAt: now };
+}
+
 async function boardRows() {
   const [h] = await redis([["HGETALL", "boardrows"]]);
   return Object.entries(pairs(h)).filter(([, r]) => r).map(([id, r]) => ({ id, ...r }));
@@ -199,6 +239,22 @@ async function boardRows() {
 
 async function write(body, who) {
   const { op, month } = body || {};
+  if (op === "createIntake" || op === "deleteIntake") {
+    if (who.role !== "coach") throw fail(403, "Not allowed");
+    if (op === "deleteIntake") {
+      if (!RID.test(body.intakeId || "")) throw fail(400, "Bad intake");
+      const [cur] = await redis([["HGET", "intakes", body.intakeId]]);
+      const rec = parse(cur);
+      await redis([["HDEL", "intakes", body.intakeId], ...(rec && rec.tokenHash ? [["DEL", `itoken:${rec.tokenHash}`]] : [])]);
+      return { ok: true };
+    }
+    const iid = crypto.randomBytes(6).toString("hex");
+    const token = "i_" + crypto.randomBytes(24).toString("base64url");
+    const h = sha(token);
+    const doc = { id: iid, label: str(body.label, 80) || "New athlete", created: new Date().toISOString(), status: "sent", tokenHash: h };
+    await redis([["HSET", "intakes", iid, json(doc)], ["SET", `itoken:${h}`, json({ id: iid })]]);
+    return { id: iid, token };
+  }
   if (op === "boardPut" || op === "boardDelete") {
     if (who.role !== "coach") throw fail(403, "Not allowed");
     if (op === "boardDelete") {
@@ -275,12 +331,28 @@ export default async function handler(req, res) {
   try {
     const who = await whoIs(req);
     if (!who) return res.status(401).json({ error: "Staff password or athlete link required" });
+    if (who.role === "intake") {
+      if (req.method === "GET" && req.query.op === "intake") {
+        const [cur] = await redis([["HGET", "intakes", who.id]]);
+        const rec = parse(cur);
+        if (!rec) throw fail(404, "This intake link was removed. Ask RPM for a new one.");
+        const { label, status, answers, submittedAt, updatedAt } = rec;
+        return res.status(200).json({ label, status, answers: answers || {}, submittedAt: submittedAt || null, updatedAt: updatedAt || null });
+      }
+      if (req.method === "POST") {
+        const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+        if (!body || body.op !== "saveIntake") throw fail(403, "Not allowed");
+        return res.status(200).json(await intakeSave(who.id, body));
+      }
+      throw fail(403, "Not allowed");
+    }
     if (req.method === "GET") {
       const op = req.query.op;
       if (op === "me" && who.role === "athlete") return res.status(200).json(await athlete(who.id));
       if (who.role !== "coach") throw fail(403, "Not allowed");
       if (op === "index") return res.status(200).json(await index());
       if (op === "activity") return res.status(200).json(await activity());
+      if (op === "intakes") return res.status(200).json(await intakeList());
       if (op === "board") {
         const rows = await boardRows();
         return res.status(200).json({ rows, status: await boardStatus(rows) });
