@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-09-29T20:58:25Z",
+ "lastSyncedAt": "2026-09-30T20:29:27Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -120359,6 +120359,142 @@
   "Jose Pino": {
    "name": "Jose Pino",
    "sessions": [
+    {
+     "date": "2026-09-30",
+     "sessionType": "Pitching practice",
+     "total": 7,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 3,
+       "veloMin": 79.4,
+       "veloMax": 81.9,
+       "veloAvg": 80.9,
+       "spinMin": 2063.7,
+       "spinMax": 2140.2,
+       "spinAvg": 2113.1,
+       "ivb": 20.5,
+       "hb": 4.2,
+       "hbMaxAbs": 6.1,
+       "vertMovMaxAbs": 29.1,
+       "relH": 5.9,
+       "relSide": 1.7,
+       "ext": 5.5,
+       "effAvg": 70
+      },
+      {
+       "name": "Changeup",
+       "count": 4,
+       "veloMin": 72.5,
+       "veloMax": 75.3,
+       "veloAvg": 73.9,
+       "spinMin": 1410.7,
+       "spinMax": 1666.8,
+       "spinAvg": 1526.1,
+       "ivb": 10.6,
+       "hb": 10.9,
+       "hbMaxAbs": 16.8,
+       "vertMovMaxAbs": 42.9,
+       "relH": 5.8,
+       "relSide": 1.8,
+       "ext": 5.6,
+       "effAvg": 48
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 81.9,
+       "spin": 2140.0,
+       "tilt": "12:30",
+       "ivb": 22.8,
+       "hb": 6.1,
+       "ext": 5.67,
+       "relH": 6.0,
+       "relSide": 1.58,
+       "eff": 74,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 81.4,
+       "spin": 2135.0,
+       "tilt": "12:15",
+       "ivb": 22.4,
+       "hb": 4.2,
+       "ext": 5.42,
+       "relH": 5.83,
+       "relSide": 1.75,
+       "eff": 73,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 72.5,
+       "spin": 1582.0,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 5.33,
+       "relH": 5.75,
+       "relSide": 1.83,
+       "eff": 40,
+       "type": "Changeup"
+      },
+      {
+       "no": 4,
+       "velo": 73.4,
+       "spin": 1445.0,
+       "tilt": "2:00",
+       "ivb": 10.3,
+       "hb": 16.8,
+       "ext": 5.67,
+       "relH": 5.75,
+       "relSide": 2.0,
+       "eff": null,
+       "type": "Changeup"
+      },
+      {
+       "no": 5,
+       "velo": 75.3,
+       "spin": 1667.0,
+       "tilt": "12:45",
+       "ivb": 11.0,
+       "hb": 5.0,
+       "ext": 5.83,
+       "relH": 5.75,
+       "relSide": 1.83,
+       "eff": 53,
+       "type": "Changeup"
+      },
+      {
+       "no": 6,
+       "velo": 74.5,
+       "spin": 1411.0,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": null,
+       "relH": 5.92,
+       "relSide": 1.42,
+       "eff": 51,
+       "type": "Changeup"
+      },
+      {
+       "no": 7,
+       "velo": 79.4,
+       "spin": 2064.0,
+       "tilt": "12:15",
+       "ivb": 16.3,
+       "hb": 2.3,
+       "ext": 5.5,
+       "relH": 5.75,
+       "relSide": 1.75,
+       "eff": 64,
+       "type": "Fastball"
+      }
+     ]
+    },
     {
      "date": "2026-09-28",
      "sessionType": "Pitching practice",
