@@ -131,7 +131,7 @@ async function athlete(id) {
 }
 
 // ─── Program board ───────────────────────────────────────────────────────────
-const COACHES = ["Frank", "Alchi", "Ricky"];
+const COACHES = ["Frank", "Alchi", "Ricky", "Hack"];
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const str = (v, n) => String(v == null ? "" : v).trim().slice(0, n);
 const bare = (s) => str(s, 120).toLowerCase().normalize("NFKD").replace(/[^a-z\s-]/g, "").replace(/\s+/g, " ").trim();

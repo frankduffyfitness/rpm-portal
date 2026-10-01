@@ -809,8 +809,8 @@ function Updates({ pw, onOpen, onLocked }) {
 }
 
 // ─── Program board (programs due to be written; typed here, coach only) ────
-const COACHES = ["Frank", "Alchi", "Ricky"];
-const COACH_COLOR = { Frank: "#6FCF97", Alchi: "#F2C94C", Ricky: "#60A5FA" };
+const COACHES = ["Frank", "Alchi", "Ricky", "Hack"];
+const COACH_COLOR = { Frank: "#6FCF97", Alchi: "#F2C94C", Ricky: "#60A5FA", Hack: "#FF9F43" };
 const BOARD_COACH = "rpm_board_coach";
 const dayDiff = (iso) => Math.round((new Date(iso + "T00:00:00") - new Date(todayIso() + "T00:00:00")) / 864e5);
 function dueLabel(iso) {
@@ -886,7 +886,7 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
         </div>
       </div>
       <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{f.format ? fmtFormat(f.format) : "Days a week x days at RPM, like 4x2"}{" · "}{due === undefined ? <span style={{ color: "#F97362" }}>Type the due date like 9/30</span> : due ? new Date(due + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "Start date TBD"}</div>
-      <div className="seg" role="group" aria-label="Coach">
+      <div className="seg" role="group" aria-label="Coach" style={{ flexWrap: "wrap" }}>
         {COACHES.map((c) => (
           <button type="button" key={c} aria-pressed={f.coach === c} onClick={() => setF({ ...f, coach: c })}>
             <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />{c}
@@ -962,7 +962,7 @@ function Board({ pw, athletes, onOpen, onLocked }) {
         <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Programs due</div>
         {edit !== "new" && <button className="tb" onClick={() => setEdit("new")}>+ Add program</button>}
       </div>
-      <div className="tabs" style={{ margin: "10px 0" }}>
+      <div className="tabs" style={{ margin: "10px 0", flexWrap: "wrap" }}>
         {["All", ...COACHES].map((c) => (
           <button key={c} aria-pressed={coach === c} onClick={() => pick(c)} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             {c !== "All" && <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />}{c}
@@ -1027,7 +1027,7 @@ function EventForm({ ev, day, athletes, onSave, onDelete, onCancel }) {
         </label>
       </div>
       <div style={{ fontSize: 11, color: "#6B7280", marginTop: -4 }}>{date ? longDay(date) : "Type the date like 9/30"}{f.time ? ` · ${fmtTime(f.time)}` : " · any time"}</div>
-      <div className="seg" role="group" aria-label="Coach">
+      <div className="seg" role="group" aria-label="Coach" style={{ flexWrap: "wrap" }}>
         {COACHES.map((c) => (
           <button type="button" key={c} aria-pressed={f.coach === c} onClick={() => setF({ ...f, coach: c })}>
             <i style={{ width: 8, height: 8, borderRadius: 2, background: COACH_COLOR[c], display: "inline-block" }} />{c}
