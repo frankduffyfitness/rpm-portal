@@ -119,6 +119,7 @@ VELO_BULLPEN_LABELS = {
     ("Thomas Corkery", "2026-09-23"): "Low Effort",    # sub-max effort pen (Frank, 2026-09-23)
     ("Joey Ramos", "2026-09-26"): "Rehab",             # short slope session (Frank, 2026-09-26)
     ("John Turner", "2026-09-28"): "Rehab",            # short slope session (Frank, 2026-09-29)
+    ("Will McDuffy", "2026-10-01"): "Rehab",           # short slope, first throws back (Frank, 2026-10-01)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
     # Return-to-throw thrown from the BOTTOM HALF of the portable mound's slope,
