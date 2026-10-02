@@ -1,4 +1,4 @@
-# sync-trigger: 2026-09-23 Sophia Conrath group fix (added High School)
+# sync-trigger: 2026-10-02 pull Elias Cruz + Adam Benavides profiles
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
