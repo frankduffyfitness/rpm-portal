@@ -27,6 +27,16 @@ const isBodyweight = (name) => !LOADED.test(name || "");
 const isAmrap = (reps) => /amrap/i.test(String(reps || ""));
 const num = (v) => { const x = parseFloat(String(v).replace(",", ".")); return Number.isFinite(x) ? x : null; };
 
+// A number box that keeps what the athlete typed. A plain controlled input that
+// stores num(text) drops a trailing "." on every keystroke ("27." becomes 27), so
+// 27.5 lb dumbbells and RPE 7.5 could never be entered. The box keeps its own
+// text and only re-syncs when the saved value changes from outside (Fill sets).
+function NumInput({ value, onValue, ...rest }) {
+  const [text, setText] = useState(value == null ? "" : String(value));
+  useEffect(() => { if (num(text) !== (value ?? null)) setText(value == null ? "" : String(value)); }, [value]);
+  return <input {...rest} inputMode="decimal" value={text} onChange={(e) => { const t = e.target.value.replace(/[^0-9.,]/g, ""); setText(t); onValue(num(t)); }} />;
+}
+
 // ─── API ─────────────────────────────────────────────────────────────────────
 function getPw() { try { return localStorage.getItem(PW_KEY) || ""; } catch (e) { return ""; } }
 function setPw(v) { try { v ? localStorage.setItem(PW_KEY, v) : localStorage.removeItem(PW_KEY); } catch (e) {} }
@@ -172,7 +182,7 @@ const CSS = `
 .tl .field{display:grid;gap:3px}
 .tl .field label{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
 .tl .field input{border:1px solid var(--rule2);border-radius:10px;background:var(--field);color:var(--ink);padding:7px 9px;min-width:0;font-size:13px}
-.tl .field input[type=number]{width:88px}
+.tl .field input[type=number],.tl #tl-bw{width:88px}
 .tl .src{font-size:10px;color:var(--mut)}
 .tl .dpick{display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:11px;color:var(--mut);flex-basis:100%}
 .tl details{padding:10px 14px;border-top:1px solid var(--rule);font-size:12px;color:var(--mut2)}
@@ -521,7 +531,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
           <div><div className="eb">{prog.label} · Week {sel.week}</div><h3>Day {sel.day}</h3></div>
           <div className="meta">
             <div className="field"><label htmlFor="tl-date">Date</label><input id="tl-date" type="date" value={log.date || ""} onChange={(e) => change((l) => { l.date = e.target.value; })} /></div>
-            <div className="field"><label htmlFor="tl-bw">Bodyweight</label><input id="tl-bw" type="number" inputMode="decimal" step="0.1" placeholder="lb" value={bwShown ?? ""} onChange={(e) => change((l) => { l.bodyweight = num(e.target.value); })} /><span className="src">{bwSrc}</span></div>
+            <div className="field"><label htmlFor="tl-bw">Bodyweight</label><NumInput id="tl-bw" placeholder="lb" value={bwShown ?? null} onValue={(v) => change((l) => { l.bodyweight = v; })} /><span className="src">{bwSrc}</span></div>
           </div>
           {!log.date && (
             <div className="dpick"><span>{choices.length ? "Which day was this? Force Decks days:" : "Date:"}</span>
@@ -585,7 +595,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
                   return (
                     <div key={i} className={`set ${setDone(s) ? "filled" : ""}`}>
                       <span className="n">{i + 1 > wk.sets ? "+" : ""}{i + 1}</span>
-                      <input className="load" inputMode="decimal" aria-label={`${name} set ${i + 1} load, lb`} placeholder={ph} value={s.load ?? ""} onChange={(e) => setCell(ex.slot, i, "load", num(e.target.value))} />
+                      <NumInput className="load" aria-label={`${name} set ${i + 1} load, lb`} placeholder={ph} value={s.load ?? null} onValue={(v) => setCell(ex.slot, i, "load", v)} />
                       {wk.repsN != null || isAmrap(wk.reps) || s.reps != null
                         ? <input className="reps" inputMode="numeric" aria-label={`${name} set ${i + 1} reps`} placeholder={`×${wk.repsN ?? ""}`} value={s.reps ?? ""} onChange={(e) => setCell(ex.slot, i, "reps", num(e.target.value))} />
                         : <button className="rt" aria-pressed={!!s.done} aria-label={`Mark ${name} set ${i + 1} done`} onClick={() => setCell(ex.slot, i, "done", !s.done)}>{s.done ? "✓ " : ""}{wk.reps.replace("seconds", "sec").replace("yards", "yd")}</button>}
@@ -615,7 +625,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
                     <button className="tb" onClick={() => change((l) => { const arr = (l.entries[ex.slot] = l.entries[ex.slot] || []); while (arr.length < Math.max(wk.sets, arr.length)) arr.push(null); arr.push(null); })}>+ Set</button>
                   </span>
                 </div>
-                {wk.repsN != null && <div className="rpe"><input inputMode="decimal" aria-label={`${name} RPE`} value={(log.rpe || {})[ex.slot] ?? ""} onChange={(e) => change((l) => { l.rpe = { ...(l.rpe || {}), [ex.slot]: num(e.target.value) }; })} /><label>RPE</label></div>}
+                {wk.repsN != null && <div className="rpe"><NumInput aria-label={`${name} RPE`} value={(log.rpe || {})[ex.slot] ?? null} onValue={(v) => change((l) => { l.rpe = { ...(l.rpe || {}), [ex.slot]: v }; })} /><label>RPE</label></div>}
               </div>
               {callout && <div className="callout">{callout}</div>}
             </div>
