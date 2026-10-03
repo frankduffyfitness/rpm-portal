@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-02T19:51:36.069845+00:00",
+    "syncDate": "2026-10-03T00:21:50.820725+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 96
+    "totalAthletes": 97
   },
   "athletes": {
     "Joey Muzio": {
@@ -15916,6 +15916,72 @@
           "erIr": {
             "left": null,
             "right": 0.91
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Elias Cruz": {
+      "name": "Elias Cruz",
+      "group": "hs",
+      "dob": "2010-01-21",
+      "tests": [
+        {
+          "date": "2026-10-02",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                414.6
+              ],
+              "peakLbs": [
+                null,
+                93.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3254
+              ],
+              "ttp": [
+                null,
+                0.7
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                443.2
+              ],
+              "peakLbs": [
+                null,
+                99.6
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3544
+              ],
+              "ttp": [
+                null,
+                0.54
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
