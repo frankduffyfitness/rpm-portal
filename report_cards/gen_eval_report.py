@@ -91,6 +91,109 @@ def row(label, val, desc, pct):
     </div>"""
 
 
+def velo_page(src, name, grp, female, logo, updated):
+    """Page 2: velo model projection vs actual, where he sits among his level,
+    and the bullpen by pitch type. Returns "" when there is nothing to show.
+
+    Deliberately carries NO arsenal grades (Shape+/Strike+/Overall): a new arm
+    is held at the first-pen gate until the coach logs a blind slot, and this
+    card is often generated before that happens.
+    """
+    m = re.search(r"const _VM = (\{.*?\});\n", src, re.S)
+    vm = json.loads(m.group(1)) if m else None
+    tm = re.search(r"const _TMR = (\{.*?\});\n", src, re.S)
+    tmr = json.loads(tm.group(1)) if tm else {}
+    row_ = next((r for r in (vm or {}).get("rows", []) if r[0] == name), None)
+    sessions = tmr.get(name) or []
+    if not row_ and not sessions:
+        return ""
+    first = name.split()[0]
+    parts = []
+
+    if row_ and not female:
+        actual, pred, resid = row_[5], row_[8], row_[9]
+        band_ = vm["rmse"]
+        if resid > band_:
+            verdict, vcol = "Arm ahead of his engine", "#1B7F4B"
+            vtext = (f"{first} throws {resid:.1f} mph harder than his force plate profile predicts, "
+                     "beyond the model's typical error. His delivery is converting what he has very efficiently.")
+        elif resid < -band_:
+            verdict, vcol = "Engine ahead of his arm", "#B7791F"
+            vtext = (f"His force plate profile supports about {pred:.1f} mph, {-resid:.1f} more than he threw. "
+                     "That gap is velocity his body can already produce that the delivery is not yet using.")
+        else:
+            verdict, vcol = "On model", "#1B2A44"
+            vtext = (f"{first} throws about what his force plate profile predicts "
+                     f"({'+' if resid >= 0 else ''}{resid:.1f} mph, inside the model's &plusmn;{band_} typical error). "
+                     "Velocity gains from here should track gains in strength and power.")
+        pool = [r for r in vm["rows"] if r[1] == grp and r[5] is not None and r[8] is not None]
+        lvl = GROUP_LABEL.get(grp, grp)
+        pct = lambda v, xs: round(100 * sum(1 for x in xs if x < v) / len(xs)) if xs else None
+        p_act = pct(actual, [r[5] for r in pool])
+        p_pred = pct(pred, [r[8] for r in pool])
+
+        # Scatter: projected (x) vs actual (y), identical axes so on-model is the diagonal.
+        W, H, P = 330, 300, 34
+        vals = [r[5] for r in pool] + [r[8] for r in pool]
+        lo, hi = min(vals) - 2, max(vals) + 2
+        X = lambda v: P + (v - lo) / (hi - lo) * (W - 2 * P)
+        Y = lambda v: H - P - (v - lo) / (hi - lo) * (H - 2 * P)
+        g = []
+        g.append(f'<polygon points="{X(lo)},{Y(lo+band_)} {X(hi-band_)},{Y(hi)} {X(hi)},{Y(hi)} '
+                 f'{X(hi)},{Y(hi-band_)} {X(lo+band_)},{Y(lo)} {X(lo)},{Y(lo)}" fill="#EEF2F7"/>')
+        g.append(f'<line x1="{X(lo)}" y1="{Y(lo)}" x2="{X(hi)}" y2="{Y(hi)}" stroke="#B9C2CE" stroke-dasharray="4 3"/>')
+        t = int(lo) + (5 - int(lo) % 5) % 5
+        while t <= hi:
+            g.append(f'<text x="{X(t)}" y="{H-P+13}" font-size="8" fill="#98A0AA" text-anchor="middle">{t}</text>')
+            g.append(f'<text x="{P-6}" y="{Y(t)+3}" font-size="8" fill="#98A0AA" text-anchor="end">{t}</text>')
+            t += 5
+        for r in pool:
+            if r[0] != name:
+                g.append(f'<circle cx="{X(r[8]):.1f}" cy="{Y(r[5]):.1f}" r="3.2" fill="#C5CCD6"/>')
+        g.append(f'<circle cx="{X(pred):.1f}" cy="{Y(actual):.1f}" r="6.5" fill="#DD5228" stroke="#fff" stroke-width="2"/>')
+        lx = X(pred) + (10 if X(pred) < W - 90 else -10)
+        g.append(f'<text x="{lx:.1f}" y="{Y(actual)-9:.1f}" font-size="9.5" font-weight="800" fill="#DD5228" '
+                 f'text-anchor="{"start" if X(pred) < W - 90 else "end"}">{first}</text>')
+        g.append(f'<text x="{W/2}" y="{H-4}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6">PROJECTED FROM FORCE PLATE (mph)</text>')
+        g.append(f'<text x="9" y="{H/2}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6" transform="rotate(-90 9 {H/2})">ACTUAL PEAK FASTBALL (mph)</text>')
+        svg = f'<svg viewBox="0 0 {W} {H}" style="width:100%;display:block">{"".join(g)}</svg>'
+
+        parts.append(f"""
+<div class="sect">Velocity vs Force Plate Profile</div>
+<div class="scap">RPM velocity model &middot; peak fastball predicted from concentric impulse and RSI-modified</div>
+<div class="vrow">
+  <div class="vbox"><div class="vl">ACTUAL PEAK FB</div><div class="vv">{actual:.1f}<span class="u"> mph</span></div><div class="vs">{p_act}{ordinal(p_act)} pct of RPM {lvl} pitchers</div></div>
+  <div class="vbox"><div class="vl">PROJECTED FROM ENGINE</div><div class="vv">{pred:.1f}<span class="u"> &plusmn; {band_}</span></div><div class="vs">{p_pred}{ordinal(p_pred)} pct engine among {lvl} pitchers</div></div>
+  <div class="vbox"><div class="vl">DIFFERENCE</div><div class="vv" style="color:{vcol}">{'+' if resid >= 0 else ''}{resid:.1f}<span class="u"> mph</span></div><div class="vs" style="color:{vcol};font-weight:700">{verdict}</div></div>
+</div>
+<div class="cols" style="align-items:flex-start;margin-top:10px">
+  <div class="col">{svg}<div class="scap" style="text-align:center;margin-top:2px">{len(pool)} RPM {lvl} pitchers. Shaded band = model's typical error (&plusmn;{band_} mph). Above the band = arm ahead of engine.</div></div>
+  <div class="col"><div class="summary" style="margin-top:4px"><div class="sumhd">{verdict}</div><div class="sumtx">{vtext}<br><br>The model reads two numbers from the countermovement jump: concentric impulse (how much force he puts into the ground) and RSI-modified (how quickly). Across RPM pitchers those two explain about {round(vm['r2']*100)}% of the differences in peak velocity. It is a guide to where his ceiling sits right now, not a prediction of a single outing.</div></div></div>
+</div>""")
+
+    if sessions:
+        s0 = sessions[0]
+        trs = "".join(
+            f"<tr><td><b>{t[0]}</b></td><td>{t[1]}</td><td>{t[2]}</td><td>{t[3]}</td>"
+            f"<td>{t[6] if t[6] is not None else '&ndash;'}</td>"
+            f"<td>{t[4] if t[4] is not None else '&ndash;'}</td><td>{t[5] if t[5] is not None else '&ndash;'}</td>"
+            f"<td>{t[7]}</td><td>{t[8]}</td></tr>" for t in s0["types"])
+        parts.append(f"""
+<div class="sect">Bullpen &middot; {s0['df']}</div>
+<div class="scap">TrackMan &middot; {s0['tot']} pitches &middot; velocity in mph, movement in inches, release in feet</div>
+<table class="pt"><tr><th>PITCH</th><th>#</th><th>AVG VELO</th><th>MAX VELO</th><th>SPIN</th><th>IND. VERT</th><th>HORZ</th><th>EXTENSION</th><th>REL. HEIGHT</th></tr>{trs}</table>""")
+
+    return f"""
+<div class="page" style="page-break-before:always">
+<div class="tophdr"><img src="{logo}" style="height:30px" alt="RPM Strength"><div class="gen">Generated {updated}<br>rpmstrength.coach</div></div>
+<div class="rule"></div>
+<div class="idrow"><div><div class="aname">{name}</div><div class="asub">{GROUP_LABEL.get(grp, grp)} &middot; Pitching Profile</div></div>
+<div><div class="rtitle">Velocity &amp; Bullpen</div><div class="rsub">TrackMan + VALD ForceDecks</div></div></div>
+{"".join(parts)}
+<div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: TrackMan &middot; VALD ForceDecks &middot; RPM velocity model</span></div>
+</div>"""
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("athlete")
@@ -138,8 +241,8 @@ def main():
         lt = phy[1]   # [bw, jh, ci, ci100, peakPower, peakPowerBM, meanPowerBM, rsi]
         for idx, key, label, unit, desc in (
             (4, "peakPower", "Peak Power", "W", "Peak mechanical power in the jump. Raw engine output."),
-            (5, "peakPowerBM", "Peak Power / BM", "W/kg", "Peak power per kilo of bodyweight — power independent of size."),
-            (3, "conImpulse100", "Impulse @ 100ms", "N&middot;s", "Drive produced in the first tenth of a second — how fast force arrives."),
+            (5, "peakPowerBM", "Peak Power / BM", "W/kg", "Peak power per kilo of bodyweight: power independent of size."),
+            (3, "conImpulse100", "Impulse @ 100ms", "N&middot;s", "Drive produced in the first tenth of a second, which shows how fast force arrives."),
         ):
             if lt[idx] is not None and norms.get(key):
                 rows.append((label, f"{round(lt[idx],1)} <span class='u'>{unit}</span>", desc, cP(lt[idx], norms[key])))
@@ -193,6 +296,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
 .bscale{{display:flex;justify-content:space-between;font-size:6.5px;color:#98A0AA;margin-top:2px}}
 .summary{{margin-top:16px;background:#F4F5F7;border-left:3px solid #1B2A44;border-radius:0 8px 8px 0;padding:11px 14px}}
 .sumhd{{font-size:11px;font-weight:800;margin-bottom:3px}}.sumtx{{font-size:9.8px;color:#33405A;line-height:1.55}}
+.vrow{{display:flex;gap:12px;margin-top:6px}}.vbox{{flex:1;background:#F4F5F7;border-radius:8px;padding:10px 12px}}.vl{{font-size:8px;font-weight:800;letter-spacing:0.8px;color:#5B6470}}.vv{{font-size:24px;font-weight:800;margin-top:2px}}.vs{{font-size:8.5px;color:#5B6470;margin-top:2px}}table.pt{{width:100%;border-collapse:collapse;font-size:10px;margin-top:4px}}table.pt th{{text-align:left;font-size:7.5px;letter-spacing:0.6px;color:#5B6470;border-bottom:2px solid #1B2A44;padding:5px 6px}}table.pt td{{padding:6px;border-bottom:1px solid #E3E6EA}}
 .foot{{position:absolute;left:52px;right:52px;bottom:26px;border-top:1px solid #E3E6EA;padding-top:8px;display:flex;justify-content:space-between;font-size:8.5px;color:#98A0AA}}
 </style></head><body><div class="page">
 <div class="tophdr"><img src="{logo}" style="height:30px" alt="RPM Strength"><div class="gen">Generated {updated}<br>rpmstrength.coach</div></div>
@@ -211,7 +315,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
 <div class="summary"><div class="sumhd">{'What this baseline shows' if first else 'Where this athlete stands'}</div>
 <div class="sumtx">{{SUMMARY}}</div></div>
 <div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: VALD ForceDecks &middot; Percentiles vs {cohort}</span></div>
-</div></body></html>"""
+</div>{{VELO_PAGE}}</body></html>"""
 
     if a.summary:
         summary = a.summary
@@ -228,6 +332,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
                       "the value is in what the next test shows against it." if first else
                       "Percentiles move as the group changes, so read them alongside the raw numbers."))
     html = html.replace("{SUMMARY}", summary)
+    html = html.replace("{VELO_PAGE}", velo_page(src, name, grp, female, logo, updated))
 
     os.makedirs(a.out, exist_ok=True)
     out_html = os.path.join(a.out, f"{name} - RPM Evaluation Report.html")
