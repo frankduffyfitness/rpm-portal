@@ -1450,6 +1450,26 @@ def _velo_initials(name):
     return first + last
 
 
+VM_ALIASES = {
+    "Patrick Rodriguez": "Pat Rodriguez",
+    "Robert Romero": "Rob Romero",
+    "Zach Uysal": "Zachary Uysal",
+    "Bob Billiams": "Rob Williams",
+    "GLV": "Gavin Laya-Vetell",
+    "IRP": "Isaiah Rubin-Patel",
+    "Isaac Santana": "Issac Santana",
+    "Zachary Weinschel": "Zach Weinschel",
+    "George Cancel": "George Cancel Jr",
+}
+
+
+def _vm_norm(s):
+    import unicodedata
+    s = unicodedata.normalize("NFKC", str(s or "")).replace("\u2019", "'").strip()
+    s = " ".join(s.split())
+    return VM_ALIASES.get(s, s)
+
+
 def _velo_extract_groups_from_jsx(jsx_text):
     """Pull name → group from the existing _A/_HA/_VELO arrays.
 
@@ -1473,8 +1493,13 @@ def _velo_extract_groups_from_jsx(jsx_text):
         for row in rows:
             if isinstance(row, list) and len(row) > idx and isinstance(row[0], str):
                 # Don't overwrite — first source wins (so VALD-fresh _A trumps _VELO)
-                if row[0] not in out:
-                    out[row[0]] = row[idx]
+                # Normalised key: VALD and TrackMan spell some athletes differently
+                # ("Zach"/"Zachary" Uysal, "Robert"/"Rob" Romero, a curly apostrophe
+                # in O'Sullivan). Keyed raw, the VALD level never reached the
+                # TrackMan row and the day-one "hs" default stuck permanently.
+                k = _vm_norm(row[0])
+                if k not in out:
+                    out[k] = row[idx]
     return out
 
 
@@ -1585,7 +1610,7 @@ def gen_VELO(trackman_data, group_map, exclusions):
 
         # Manual GROUP_OVERRIDES win (consistent with CMJ/hop get_group); then the
         # name's existing classification from the jsx arrays; else default to HS.
-        group = GROUP_OVERRIDES.get(name) or group_map.get(name, "hs")
+        group = GROUP_OVERRIDES.get(name) or group_map.get(_vm_norm(name), "hs")
         initials = _velo_initials(name)
         sessions_count = len(sessions)  # total displayed sessions (post-exclusion)
 
@@ -2004,23 +2029,7 @@ VM_G_BAND = 4.2
 # validated slightly better in the refit; flip only with coach sign-off.
 VM_TARGET = "max"
 # Names spelled differently across ForceDecks / Dynamo / Trackman (SKILL.md).
-VM_ALIASES = {
-    "Patrick Rodriguez": "Pat Rodriguez",
-    "Robert Romero": "Rob Romero",
-    "Zach Uysal": "Zachary Uysal",
-    "Bob Billiams": "Rob Williams",
-    "GLV": "Gavin Laya-Vetell",
-    "IRP": "Isaiah Rubin-Patel",
-    "Isaac Santana": "Issac Santana",
-    "Zachary Weinschel": "Zach Weinschel",
-    "George Cancel": "George Cancel Jr",
-}
 
-def _vm_norm(s):
-    import unicodedata
-    s = unicodedata.normalize("NFKC", str(s or "")).replace("\u2019", "'").strip()
-    s = " ".join(s.split())
-    return VM_ALIASES.get(s, s)
 
 
 def gen_VM(fd_data, trackman_data, dynamo_list):
