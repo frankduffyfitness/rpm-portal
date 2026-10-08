@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-05 Matthew McCarrie force plate eval
+# sync-trigger: 2026-10-08 Matt Cassidy evaluation
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
