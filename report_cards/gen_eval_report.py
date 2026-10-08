@@ -128,13 +128,13 @@ def velo_page(src, name, grp, female, logo, updated):
                      "Velocity gains from here should track gains in strength and power.")
         pool = [r for r in vm["rows"] if r[1] == grp and r[5] is not None and r[8] is not None]
         lvl = GROUP_LABEL.get(grp, grp)
-        pct = lambda v, xs: round(100 * sum(1 for x in xs if x < v) / len(xs)) if xs else None
+        pct = lambda v, xs: max(1, min(99, round(100 * sum(1 for x in xs if x < v) / len(xs)))) if xs else None
         p_act = pct(actual, [r[5] for r in pool])
         p_pred = pct(pred, [r[8] for r in pool])
 
         # Scatter: projected (x) vs actual (y), identical axes so on-model is the diagonal.
         W, H, P = 330, 300, 34
-        vals = [r[5] for r in pool] + [r[8] for r in pool]
+        vals = [r[5] for r in pool] + [r[8] for r in pool] + [actual, pred]
         lo, hi = min(vals) - 2, max(vals) + 2
         X = lambda v: P + (v - lo) / (hi - lo) * (W - 2 * P)
         Y = lambda v: H - P - (v - lo) / (hi - lo) * (H - 2 * P)
@@ -321,7 +321,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
         summary = a.summary
     else:
         # Data-driven fallback: name the top and bottom of the profile honestly.
-        ranked = sorted(rows, key=lambda r: -r[3])
+        ranked = sorted([r for r in rows if r[0] != 'Bodyweight'] or rows, key=lambda r: -r[3])
         hi, lo = ranked[0], ranked[-1]
         strip = lambda t: re.sub(r"<[^>]+>", "", t).strip()
         summary = (f"<b>{name.split()[0]}'s standout number is {hi[0].lower()} at the "
