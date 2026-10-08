@@ -111,30 +111,47 @@ def velo_page(src, name, grp, female, logo, updated):
     parts = []
 
     if row_ and not female:
-        actual, pred, resid = row_[5], row_[8], row_[9]
-        band_ = vm["rmse"]
+        # Grip model whenever the athlete has a grip test (Frank, 2026-10-08: use it on
+        # every eval card from now on); force-plate-only Model A as the fallback.
+        # Row fields: [5] actual, [8] predA, [9] residA, [13] bw lbs,
+        #             [24] grip N, [25] predG, [26] residG.
+        has_grip = len(row_) > 26 and row_[24] is not None and row_[25] is not None
+        actual = row_[5]
+        if has_grip:
+            pred, resid, band_ = row_[25], row_[26], vm["gband"]
+            pidx = 25
+            grip_n = row_[24]
+            model_name = "force plate + grip"
+        else:
+            pred, resid, band_ = row_[8], row_[9], vm["rmse"]
+            pidx = 8
+            model_name = "force plate"
+        predA = row_[8]
         if resid > band_:
             verdict, vcol = "Arm ahead of his engine", "#1B7F4B"
-            vtext = (f"{first} throws {resid:.1f} mph harder than his force plate profile predicts, "
+            vtext = (f"{first} throws {resid:.1f} mph harder than his testing predicts, "
                      "beyond the model's typical error. His delivery is converting what he has very efficiently.")
         elif resid < -band_:
             verdict, vcol = "Engine ahead of his arm", "#B7791F"
-            vtext = (f"His force plate profile supports about {pred:.1f} mph, {-resid:.1f} more than he threw. "
+            vtext = (f"His testing supports about {pred:.1f} mph, {-resid:.1f} more than he threw. "
                      "That gap is velocity his body can already produce that the delivery is not yet using.")
         else:
             verdict, vcol = "On model", "#1B2A44"
-            vtext = (f"{first} throws about what his force plate profile predicts "
+            vtext = (f"{first} throws about what his testing predicts "
                      f"({'+' if resid >= 0 else ''}{resid:.1f} mph, inside the model's &plusmn;{band_} typical error). "
                      "Velocity gains from here should track gains in strength and power.")
-        pool = [r for r in vm["rows"] if r[1] == grp and r[5] is not None and r[8] is not None]
+        pool = [r for r in vm["rows"] if r[1] == grp and r[5] is not None and len(r) > pidx and r[pidx] is not None]
         lvl = GROUP_LABEL.get(grp, grp)
         pct = lambda v, xs: max(1, min(99, round(100 * sum(1 for x in xs if x < v) / len(xs)))) if xs else None
         p_act = pct(actual, [r[5] for r in pool])
-        p_pred = pct(pred, [r[8] for r in pool])
+        p_pred = pct(pred, [r[pidx] for r in pool])
+        if has_grip:
+            grips = [r[24] for r in pool if r[24] is not None]
+            p_grip = pct(grip_n, grips)
 
         # Scatter: projected (x) vs actual (y), identical axes so on-model is the diagonal.
         W, H, P = 330, 300, 34
-        vals = [r[5] for r in pool] + [r[8] for r in pool] + [actual, pred]
+        vals = [r[5] for r in pool] + [r[pidx] for r in pool] + [actual, pred]
         lo, hi = min(vals) - 2, max(vals) + 2
         X = lambda v: P + (v - lo) / (hi - lo) * (W - 2 * P)
         Y = lambda v: H - P - (v - lo) / (hi - lo) * (H - 2 * P)
@@ -149,26 +166,26 @@ def velo_page(src, name, grp, female, logo, updated):
             t += 5
         for r in pool:
             if r[0] != name:
-                g.append(f'<circle cx="{X(r[8]):.1f}" cy="{Y(r[5]):.1f}" r="3.2" fill="#C5CCD6"/>')
+                g.append(f'<circle cx="{X(r[pidx]):.1f}" cy="{Y(r[5]):.1f}" r="3.2" fill="#C5CCD6"/>')
         g.append(f'<circle cx="{X(pred):.1f}" cy="{Y(actual):.1f}" r="6.5" fill="#DD5228" stroke="#fff" stroke-width="2"/>')
         lx = X(pred) + (10 if X(pred) < W - 90 else -10)
         g.append(f'<text x="{lx:.1f}" y="{Y(actual)-9:.1f}" font-size="9.5" font-weight="800" fill="#DD5228" '
                  f'text-anchor="{"start" if X(pred) < W - 90 else "end"}">{first}</text>')
-        g.append(f'<text x="{W/2}" y="{H-4}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6">PROJECTED FROM FORCE PLATE (mph)</text>')
+        g.append(f'<text x="{W/2}" y="{H-4}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6">PROJECTED FROM {model_name.upper()} (mph)</text>')
         g.append(f'<text x="9" y="{H/2}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6" transform="rotate(-90 9 {H/2})">ACTUAL PEAK FASTBALL (mph)</text>')
         svg = f'<svg viewBox="0 0 {W} {H}" style="width:100%;display:block">{"".join(g)}</svg>'
 
         parts.append(f"""
-<div class="sect">Velocity vs Force Plate Profile</div>
-<div class="scap">RPM velocity model &middot; peak fastball predicted from concentric impulse and RSI-modified</div>
+<div class="sect">Projected vs Actual Velocity</div>
+<div class="scap">RPM velocity model &middot; peak fastball predicted from {'concentric impulse, RSI-modified and grip strength' if has_grip else 'concentric impulse and RSI-modified'}</div>
 <div class="vrow">
   <div class="vbox"><div class="vl">ACTUAL PEAK FB</div><div class="vv">{actual:.1f}<span class="u"> mph</span></div><div class="vs">{p_act}{ordinal(p_act)} pct of RPM {lvl} pitchers</div></div>
-  <div class="vbox"><div class="vl">PROJECTED FROM ENGINE</div><div class="vv">{pred:.1f}<span class="u"> &plusmn; {band_}</span></div><div class="vs">{p_pred}{ordinal(p_pred)} pct engine among {lvl} pitchers</div></div>
+  <div class="vbox"><div class="vl">PROJECTED{' WITH GRIP' if has_grip else ' FROM FORCE PLATE'}</div><div class="vv">{pred:.1f}<span class="u"> &plusmn; {band_}</span></div><div class="vs">{(f'Grip {grip_n:.0f} N ({grip_n/4.44822:.0f} lbs), {p_grip}{ordinal(p_grip)} pct. Force plate alone: {predA:.1f}') if has_grip else 'No grip test yet: force plate only'}</div></div>
   <div class="vbox"><div class="vl">DIFFERENCE</div><div class="vv" style="color:{vcol}">{'+' if resid >= 0 else ''}{resid:.1f}<span class="u"> mph</span></div><div class="vs" style="color:{vcol};font-weight:700">{verdict}</div></div>
 </div>
 <div class="cols" style="align-items:flex-start;margin-top:10px">
   <div class="col">{svg}<div class="scap" style="text-align:center;margin-top:2px">{len(pool)} RPM {lvl} pitchers. Shaded band = model's typical error (&plusmn;{band_} mph). Above the band = arm ahead of engine.</div></div>
-  <div class="col"><div class="summary" style="margin-top:4px"><div class="sumhd">{verdict}</div><div class="sumtx">{vtext}<br><br>The model reads two numbers from the countermovement jump: concentric impulse (how much force he puts into the ground) and RSI-modified (how quickly). Across RPM pitchers those two explain about {round(vm['r2']*100)}% of the differences in peak velocity. It is a guide to where his ceiling sits right now, not a prediction of a single outing.</div></div></div>
+  <div class="col"><div class="summary" style="margin-top:4px"><div class="sumhd">{verdict}</div><div class="sumtx">{vtext}<br><br>{('The model reads three numbers: concentric impulse and RSI-modified from the countermovement jump (how much force he puts into the ground, and how quickly), plus grip strength relative to bodyweight. Adding grip tightens the model&rsquo;s typical error to &plusmn;' + str(vm['gband']) + ' mph.') if has_grip else ('The model reads two numbers from the countermovement jump: concentric impulse (how much force he puts into the ground) and RSI-modified (how quickly). A grip test would add a third input and tighten the projection.')} It is a guide to where his ceiling sits right now, not a prediction of a single outing.</div></div></div>
 </div>""")
 
     if sessions:
