@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-08T10:22:16.350331+00:00",
+    "syncDate": "2026-10-08T20:13:00.603663+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 99
+    "totalAthletes": 100
   },
   "athletes": {
     "Joey Muzio": {
@@ -414,6 +414,65 @@
       "group": "stf",
       "dob": "1993-11-20",
       "tests": [
+        {
+          "date": "2026-10-08",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                546.9,
+                null
+              ],
+              "peakLbs": [
+                122.9,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                1326,
+                null
+              ],
+              "ttp": [
+                2.94,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                561.4,
+                null
+              ],
+              "peakLbs": [
+                126.2,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                1094,
+                null
+              ],
+              "ttp": [
+                4.43,
+                null
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-09-18",
           "type": "Shoulder Strength Baseline",
@@ -16259,6 +16318,49 @@
               "ttp": [
                 null,
                 1.06
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Matt Cassidy": {
+      "name": "Matt Cassidy",
+      "group": "col",
+      "dob": "2008-05-01",
+      "tests": [
+        {
+          "date": "2026-10-08",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                455.1
+              ],
+              "peakLbs": [
+                null,
+                102.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1215
+              ],
+              "ttp": [
+                null,
+                2.37
               ]
             }
           ],
