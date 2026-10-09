@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-09T10:21:50.823825+00:00",
+    "syncDate": "2026-10-09T20:03:49.412874+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 100
+    "totalAthletes": 101
   },
   "athletes": {
     "Joey Muzio": {
@@ -16384,6 +16384,72 @@
               "ttp": [
                 null,
                 0.88
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Mike Sirota": {
+      "name": "Mike Sirota",
+      "group": "pro",
+      "dob": "2003-06-16",
+      "tests": [
+        {
+          "date": "2026-10-09",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                682.4,
+                null
+              ],
+              "peakLbs": [
+                153.4,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                5124,
+                null
+              ],
+              "ttp": [
+                1.48,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                600.3
+              ],
+              "peakLbs": [
+                null,
+                135.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                4379
+              ],
+              "ttp": [
+                null,
+                0.79
               ]
             }
           ],
