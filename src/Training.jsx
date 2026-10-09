@@ -167,6 +167,7 @@ const CSS = `
 .tl .mgrid{display:grid;gap:3px;align-items:center}
 .tl .lab{font-size:9px;color:var(--faint);font-weight:600}
 .tl .cell{height:28px;border:1px solid var(--rule);background:rgba(255,255,255,.03);border-radius:6px;font-size:10px;font-weight:600;color:var(--mut);padding:0;position:relative}
+.tl .cell.lbl{font-size:9px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
 .tl .cell.partial{background:rgba(79,255,176,.22);border-color:transparent;color:var(--ink)}
 .tl .cell.done{background:var(--acc);border-color:var(--acc);color:#0A0C10}
 .tl .cell.next::after{content:"";position:absolute;inset:3px;border:1.5px dashed var(--acc);border-radius:4px}
@@ -470,6 +471,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
         {M.months.map((p) => {
           let dn = 0;
           const cells = [];
+          const labeled = p.days.some((x) => x.short);
           for (let w = 1; w <= 4; w++) {
             cells.push(<span key={"l" + w} className="lab">W{w}</span>);
             for (const dd of p.days) {
@@ -478,11 +480,11 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
               const cls = st.done === 0 ? "" : st.done >= st.rx ? "done" : "partial";
               const isNext = nx && nx.month === p.month && nx.day === dd.day && nx.week === w;
               const cur = sel.month === p.month && sel.day === dd.day && sel.week === w;
-              cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, day ${dd.day}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>D{dd.day}</button>);
+              cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
             }
           }
           return (
-            <div key={p.month}>
+            <div key={p.month} style={labeled ? { gridColumn: "1 / -1" } : null}>
               <div className="mh">{p.label.split(" ")[0]}<span>{dn}/{p.days.length * 4}</span></div>
               <div className="mgrid" style={{ gridTemplateColumns: `20px repeat(${p.days.length}, 1fr)` }}>{cells}</div>
             </div>
@@ -528,7 +530,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
 
       <div className="logger">
         <div className="lhead">
-          <div><div className="eb">{prog.label} · Week {sel.week}</div><h3>Day {sel.day}</h3></div>
+          <div><div className="eb">{prog.label} · Week {sel.week}</div><h3>{d.label || `Day ${sel.day}`}</h3></div>
           <div className="meta">
             <div className="field"><label htmlFor="tl-date">Date</label><input id="tl-date" type="date" value={log.date || ""} onChange={(e) => change((l) => { l.date = e.target.value; })} /></div>
             <div className="field"><label htmlFor="tl-bw">Bodyweight</label><NumInput id="tl-bw" placeholder="lb" value={bwShown ?? null} onValue={(v) => change((l) => { l.bodyweight = v; })} /><span className="src">{bwSrc}</span></div>
@@ -540,6 +542,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
             </div>
           )}
         </div>
+        {d.note && <div className="note" style={{ marginBottom: 10 }}>{d.note}</div>}
         {prog.warmup && prog.warmup.length > 0 && <details><summary>Warm-up ({prog.warmup.length})</summary><ul>{prog.warmup.map((x, i) => <li key={i}>{x}</li>)}</ul></details>}
         {d.prework && d.prework.length > 0 && <details><summary>Pre-work ({d.prework.length})</summary><ul>{d.prework.map((x, i) => <li key={i}>{x}</li>)}</ul></details>}
         {d.exercises.map((ex) => {
