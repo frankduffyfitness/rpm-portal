@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-09T20:03:49.412874+00:00",
+    "syncDate": "2026-10-10T00:41:03.976106+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 101
+    "totalAthletes": 103
   },
   "athletes": {
     "Joey Muzio": {
@@ -16451,11 +16451,258 @@
                 null,
                 0.79
               ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                553.3,
+                null
+              ],
+              "peakLbs": [
+                124.4,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                3956,
+                null
+              ],
+              "ttp": [
+                0.82,
+                null
+              ]
             }
           ],
           "erIr": {
             "left": null,
             "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Joe Santos": {
+      "name": "Joe Santos",
+      "group": "col",
+      "dob": "2006-04-27",
+      "tests": [
+        {
+          "date": "2026-10-09",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                163.2,
+                null
+              ],
+              "peakLbs": [
+                36.7,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                517,
+                null
+              ],
+              "ttp": [
+                5.0,
+                null
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                154,
+                null
+              ],
+              "peakLbs": [
+                34.6,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                554,
+                null
+              ],
+              "ttp": [
+                2.66,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                494,
+                null
+              ],
+              "peakLbs": [
+                111.1,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                3106,
+                null
+              ],
+              "ttp": [
+                1.06,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                515,
+                null
+              ],
+              "peakLbs": [
+                115.8,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                3444,
+                null
+              ],
+              "ttp": [
+                0.88,
+                null
+              ]
+            }
+          ],
+          "erIr": {
+            "left": 1.06,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Chris Parisi": {
+      "name": "Chris Parisi",
+      "group": "col",
+      "dob": "2008-09-02",
+      "tests": [
+        {
+          "date": "2026-10-09",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                182.6
+              ],
+              "peakLbs": [
+                null,
+                41.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1169
+              ],
+              "ttp": [
+                null,
+                0.38
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                null,
+                205.2
+              ],
+              "peakLbs": [
+                null,
+                46.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1117
+              ],
+              "ttp": [
+                null,
+                2.37
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                472.9
+              ],
+              "peakLbs": [
+                null,
+                106.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3375
+              ],
+              "ttp": [
+                null,
+                0.33
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                489.1
+              ],
+              "peakLbs": [
+                null,
+                110.0
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3476
+              ],
+              "ttp": [
+                null,
+                0.72
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": 0.89
           },
           "discomfortNote": "",
           "planNote": ""
