@@ -3,7 +3,9 @@
 // (doc: "RPM Remote Coaching Intake Questionnaire"). Coaches make a private link
 // in the Training tab; the athlete (with a parent if under 18) fills it out at
 // rpmstrength.coach/intake#t=<key>. Answers save as they go and land in the coach's
-// "Remote intakes" panel with the data tier and review flags worked out.
+// "Intakes" panel with the data tier and review flags worked out.
+// Two kinds: "remote" = the full 7-part questionnaire; "eval" = one short page of
+// basics for in-person evaluation sign-ups (Frank, 10/10/26).
 import { useEffect, useRef, useState } from "react";
 
 async function api(key, { query, body }) {
@@ -146,6 +148,32 @@ export const PARTS = [
   },
 ];
 
+// Eval sign-up: just the basics, one page.
+export const EVAL_PARTS = [
+  {
+    title: "Your info",
+    fields: [
+      { key: "name", label: "Athlete full name", type: "text", required: true },
+      { key: "dob", label: "Date of birth", type: "date", required: true },
+      { key: "gradYear", label: "Graduating class (year)", type: "text", half: true, placeholder: "2028" },
+      { key: "teams", label: "School and team(s)", type: "text", half: true },
+      { key: "positions", label: "Position(s)", type: "text", placeholder: "RHP / SS" },
+      { key: "throws", label: "Throws", type: "choice", options: ["Right", "Left"], half: true },
+      { key: "bats", label: "Bats", type: "choice", options: ["Right", "Left", "Switch"], half: true },
+      { key: "height", label: "Height", type: "text", half: true, placeholder: "5'10\"" },
+      { key: "weight", label: "Weight (lb)", type: "text", half: true },
+      { key: "athletePhone", label: "Athlete cell phone", type: "text", half: true },
+      { key: "athleteEmail", label: "Athlete email", type: "text", half: true },
+      { key: "parentName", label: "Parent or guardian name", type: "text", minorRequired: true },
+      { key: "parentPhone", label: "Parent or guardian cell phone", type: "text", half: true, minorRequired: true },
+      { key: "parentEmail", label: "Parent or guardian email", type: "text", half: true },
+      { key: "currentPain", label: "Any pain or injury right now (arm or anywhere else)?", type: "yesno", detail: "Where, and what happened?" },
+      { key: "heardFrom", label: "How did you hear about RPM?", type: "text" },
+    ],
+  },
+];
+export const partsFor = (kind) => (kind === "eval" ? EVAL_PARTS : PARTS);
+
 export const ageFrom = (dob) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dob || "")) return null;
   const b = new Date(dob + "T00:00:00"), n = new Date();
@@ -240,6 +268,7 @@ export function IntakePage({ logo }) {
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [kind, setKind] = useState("remote");
   const timer = useRef(null), latest = useRef(null);
   latest.current = a;
   const dead = "This intake link doesn't work anymore. Ask RPM for a new one.";
@@ -249,7 +278,7 @@ export function IntakePage({ logo }) {
     api(token, { query: { op: "intake" } }).then((d) => {
       const ans = { ...(d.answers || {}) };
       if (!ans.timezone) ans.timezone = guessTz();
-      setA(ans); setStatus(d.status);
+      setA(ans); setStatus(d.status); setKind(d.kind === "eval" ? "eval" : "remote");
     }).catch((e) => setErr(e.status === 401 ? dead : e.message));
   }, [token]);
 
@@ -267,13 +296,14 @@ export function IntakePage({ logo }) {
     timer.current = setTimeout(() => save(false), 1200);
   };
 
-  const part = PARTS[step];
+  const parts = partsFor(kind), isEval = kind === "eval";
+  const part = parts[step];
   const miss = a ? missing(part, a) : [];
   const next = async () => {
     setTried(true);
     if (miss.length) return;
     setTried(false);
-    if (step < PARTS.length - 1) { setStep(step + 1); window.scrollTo(0, 0); save(false); return; }
+    if (step < parts.length - 1) { setStep(step + 1); window.scrollTo(0, 0); save(false); return; }
     setBusy(true);
     const ok = await save(true);
     setBusy(false);
@@ -288,7 +318,7 @@ export function IntakePage({ logo }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
           {logo && <img src={logo} alt="RPM Strength" style={{ height: 30, width: "auto" }} />}
           <div style={{ width: 1, height: 22, background: C.line }} />
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>Remote Coaching Intake</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>{isEval ? "Evaluation Sign-Up" : "Remote Coaching Intake"}</div>
         </div>
         {children}
       </div>
@@ -302,8 +332,12 @@ export function IntakePage({ logo }) {
       <div>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: C.acc, textTransform: "uppercase" }}>Submitted</div>
         <div style={{ fontSize: 26, fontWeight: 800, color: C.ink, marginTop: 6, lineHeight: 1.15 }}>Thanks{a.name ? `, ${a.name.split(" ")[0]}` : ""}. We have your answers.</div>
-        <p style={{ fontSize: 15, color: C.mut, lineHeight: 1.55, marginTop: 12 }}>An RPM coach will read them and reach out to set up a 15-20 minute video call. We'll explain how the program works and answer your questions there.</p>
-        <p style={{ fontSize: 15, color: C.mut, lineHeight: 1.55 }}>Before training starts, we'll also send the informed consent form. Athletes under 18 need a parent or guardian to sign it.</p>
+        {isEval
+          ? <p style={{ fontSize: 15, color: C.mut, lineHeight: 1.55, marginTop: 12 }}>You're all set. We'll see you at your evaluation.</p>
+          : <>
+            <p style={{ fontSize: 15, color: C.mut, lineHeight: 1.55, marginTop: 12 }}>An RPM coach will read them and reach out to set up a 15-20 minute video call. We'll explain how the program works and answer your questions there.</p>
+            <p style={{ fontSize: 15, color: C.mut, lineHeight: 1.55 }}>Before training starts, we'll also send the informed consent form. Athletes under 18 need a parent or guardian to sign it.</p>
+          </>}
         <button type="button" onClick={() => setEditing(true)} style={{ ...chip(false), marginTop: 10 }}>Edit my answers</button>
       </div>,
     );
@@ -311,10 +345,10 @@ export function IntakePage({ logo }) {
 
   return wrap(
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: C.acc, textTransform: "uppercase" }}>Part {step + 1} of {PARTS.length}</div>
+      {parts.length > 1 && <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: C.acc, textTransform: "uppercase" }}>Part {step + 1} of {parts.length}</div>}
       <div style={{ fontSize: 26, fontWeight: 800, color: C.ink, marginTop: 4 }}>{part.title}</div>
-      <div style={{ display: "flex", gap: 4, margin: "12px 0 6px" }}>{PARTS.map((_, i) => <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? C.acc : "rgba(255,255,255,0.08)" }} />)}</div>
-      {step === 0 && <p style={{ fontSize: 14, color: C.mut, lineHeight: 1.5, marginTop: 12 }}>This takes about 15 minutes. Athletes under 18: please fill it out with a parent or guardian. Your answers save as you go, so you can come back to this link anytime.</p>}
+      {parts.length > 1 && <div style={{ display: "flex", gap: 4, margin: "12px 0 6px" }}>{parts.map((_, i) => <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? C.acc : "rgba(255,255,255,0.08)" }} />)}</div>}
+      {step === 0 && <p style={{ fontSize: 14, color: C.mut, lineHeight: 1.5, marginTop: 12 }}>{isEval ? "This takes about 2 minutes. Athletes under 18: add a parent or guardian's contact." : "This takes about 15 minutes. Athletes under 18: please fill it out with a parent or guardian."} Your answers save as you go, so you can come back to this link anytime.</p>}
       {part.note && <p style={{ fontSize: 14, color: C.mut, lineHeight: 1.5, marginTop: 12 }}>{part.note}</p>}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "20px 12px", marginTop: 18 }}>
         {part.fields.filter((f) => visible(f, a)).map((f) => (
@@ -327,7 +361,7 @@ export function IntakePage({ logo }) {
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 26 }}>
         {step > 0 && <button type="button" onClick={() => { setStep(step - 1); window.scrollTo(0, 0); }} style={chip(false)}>Back</button>}
         <button type="button" disabled={busy} onClick={next} style={{ flex: 1, border: "none", borderRadius: 10, background: C.acc, color: C.bg, fontSize: 15, fontWeight: 800, padding: "13px 16px", cursor: "pointer", fontFamily: "inherit" }}>
-          {step < PARTS.length - 1 ? "Next" : status === "submitted" ? "Save changes" : "Submit"}
+          {step < parts.length - 1 ? "Next" : status === "submitted" ? "Save changes" : "Submit"}
         </button>
       </div>
       <div style={{ fontSize: 12, color: C.faint, marginTop: 10, minHeight: 16 }}>{saved}</div>
@@ -351,6 +385,7 @@ export function IntakesPanel({ pw, onLocked }) {
   const [open, setOpen] = useState(null);
   const [making, setMaking] = useState(false);
   const [label, setLabel] = useState("");
+  const [newKind, setNewKind] = useState("eval");
   const [link, setLink] = useState(null);
   const [msg, setMsg] = useState(null);
   const load = () => api(pw, { query: { op: "intakes" } }).then((d) => setList(d.intakes)).catch((e) => { if (e.status === 401) onLocked(); });
@@ -360,7 +395,7 @@ export function IntakesPanel({ pw, onLocked }) {
   const create = async (e) => {
     e.preventDefault();
     try {
-      const d = await api(pw, { body: { op: "createIntake", label: label.trim() } });
+      const d = await api(pw, { body: { op: "createIntake", label: label.trim(), kind: newKind } });
       setLink({ url: `${window.location.origin}/intake#t=${d.token}`, label: label.trim() || "New athlete" });
       setLabel(""); setMaking(false); load();
     } catch (err) { if (err.status === 401) onLocked(); else setMsg(err.message); }
@@ -376,11 +411,14 @@ export function IntakesPanel({ pw, onLocked }) {
   return (
     <div style={{ marginBottom: 22 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Remote intakes {fresh ? <span style={{ fontSize: 11, color: C.acc, fontWeight: 700 }}> · {fresh} submitted</span> : null}</div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Intakes {fresh ? <span style={{ fontSize: 11, color: C.acc, fontWeight: 700 }}> · {fresh} submitted</span> : null}</div>
         {!making && <button className="tb" onClick={() => { setMaking(true); setLink(null); setMsg(null); }}>+ New intake link</button>}
       </div>
       {making && (
         <form onSubmit={create} style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+          <div className="seg" role="group" aria-label="Form" style={{ flex: "1 1 100%" }}>
+            {[["eval", "Eval sign-up (short)"], ["remote", "Remote client (full)"]].map(([k, t]) => <button type="button" key={k} aria-pressed={newKind === k} onClick={() => setNewKind(k)}>{t}</button>)}
+          </div>
           <input autoFocus value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Athlete or family name" style={{ ...input, flex: "1 1 180px", padding: "8px 10px", fontSize: 14 }} />
           <button type="submit" style={{ border: "none", borderRadius: 10, background: C.acc, color: C.bg, fontWeight: 700, padding: "8px 14px", cursor: "pointer" }}>Make link</button>
           <button type="button" className="tb" onClick={() => setMaking(false)}>Cancel</button>
@@ -395,10 +433,11 @@ export function IntakesPanel({ pw, onLocked }) {
       )}
       {msg && <div style={{ fontSize: 11, color: C.mut, marginTop: 8 }}>{msg}</div>}
       <div style={{ marginTop: 10 }}>
-        {list.length === 0 && <div style={{ fontSize: 12, color: C.mut2 }}>No intakes yet. Make a link for your next remote athlete.</div>}
+        {list.length === 0 && <div style={{ fontSize: 12, color: C.mut2 }}>No intakes yet. Make a link for your next athlete.</div>}
         {list.map((it) => {
           const a = it.answers || {};
-          const tier = it.answers ? intakeTier(a) : null;
+          const isEvalIt = it.kind === "eval";
+          const tier = it.answers && !isEvalIt ? intakeTier(a) : null;
           const flags = it.answers ? intakeFlags(a) : [];
           const age = ageFrom(a.dob);
           const isOpen = open === it.id;
@@ -406,7 +445,7 @@ export function IntakesPanel({ pw, onLocked }) {
             <div key={it.id} style={{ border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)", borderRadius: 12, padding: "10px 12px", marginBottom: 6 }}>
               <div role="button" tabIndex={0} onClick={() => setOpen(isOpen ? null : it.id)} onKeyDown={(e) => { if (e.key === "Enter") setOpen(isOpen ? null : it.id); }} style={{ cursor: "pointer" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{a.name || it.label}{age != null ? <span style={{ fontSize: 12, color: C.mut2, fontWeight: 500 }}> · {age}</span> : null}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{a.name || it.label}{age != null ? <span style={{ fontSize: 12, color: C.mut2, fontWeight: 500 }}> · {age}</span> : null}<span style={{ fontSize: 10, fontWeight: 700, color: C.mut2, marginLeft: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{isEvalIt ? "Eval" : "Remote"}</span></div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: it.status === "submitted" ? C.acc : C.mut2, whiteSpace: "nowrap" }}>
                     {it.status === "submitted" ? `Submitted ${when(it.submittedAt)}` : it.status === "draft" ? "In progress" : `Sent ${when(it.created)}`}
                   </div>
@@ -421,7 +460,7 @@ export function IntakesPanel({ pw, onLocked }) {
               {isOpen && (
                 <div style={{ marginTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
                   {!it.answers && <div style={{ fontSize: 12, color: C.mut2 }}>Not started yet.</div>}
-                  {it.answers && PARTS.map((p) => {
+                  {it.answers && partsFor(it.kind).map((p) => {
                     const rows = p.fields.filter((f) => visible(f, a)).map((f) => [f, answerText(f, a)]).filter(([, t]) => t);
                     if (!rows.length) return null;
                     return (

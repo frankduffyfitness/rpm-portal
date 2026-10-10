@@ -40,7 +40,7 @@
  *   intakes                  hash   intakeId -> {id, label, created, status: sent|draft|submitted,
  *                                   updatedAt, submittedAt, answers}
  *   itoken:<sha256(token)>   string {id}  intake link key -> intake (key starts "i_")
- * POST {op:"createIntake", label}        -> {id, token} (shown once)                     coach
+ * POST {op:"createIntake", label, kind?} -> {id, token} (shown once)                     coach
  * GET  ?op=intakes                       -> {intakes: [...]}                               coach
  * POST {op:"deleteIntake", intakeId}                                                      coach
  * GET  ?op=intake                        -> that intake (label, status, answers)           intake link
@@ -61,6 +61,7 @@
  *                                   went, what this program should focus on). Each is kept on writes
  *                                   that don't send it (the written check, the drafting run).
  * GET  ?op=board                         -> {rows: [...], status: {rowId: log progress}}   coach
+ * POST {op:"intakeKind", intakeId, kind: "eval"|"remote"}                              coach
  * POST {op:"boardPut", row}              (adds, or updates row.id)  -> {row}               coach
  * POST {op:"boardDelete", rowId}                                                          coach
  */
@@ -267,8 +268,16 @@ async function write(body, who) {
     await redis([["HSET", "schedule", eid, json(doc)]]);
     return { event: doc };
   }
-  if (op === "createIntake" || op === "deleteIntake") {
+  if (op === "createIntake" || op === "deleteIntake" || op === "intakeKind") {
     if (who.role !== "coach") throw fail(403, "Not allowed");
+    if (op === "intakeKind") {
+      if (!RID.test(body.intakeId || "") || !["eval", "remote"].includes(body.kind)) throw fail(400, "Bad intake");
+      const [cur] = await redis([["HGET", "intakes", body.intakeId]]);
+      const rec = parse(cur);
+      if (!rec) throw fail(404, "No such intake");
+      await redis([["HSET", "intakes", body.intakeId, json({ ...rec, kind: body.kind })]]);
+      return { ok: true };
+    }
     if (op === "deleteIntake") {
       if (!RID.test(body.intakeId || "")) throw fail(400, "Bad intake");
       const [cur] = await redis([["HGET", "intakes", body.intakeId]]);
@@ -279,7 +288,7 @@ async function write(body, who) {
     const iid = crypto.randomBytes(6).toString("hex");
     const token = "i_" + crypto.randomBytes(24).toString("base64url");
     const h = sha(token);
-    const doc = { id: iid, label: str(body.label, 80) || "New athlete", created: new Date().toISOString(), status: "sent", tokenHash: h };
+    const doc = { id: iid, label: str(body.label, 80) || "New athlete", kind: body.kind === "eval" ? "eval" : "remote", created: new Date().toISOString(), status: "sent", tokenHash: h };
     await redis([["HSET", "intakes", iid, json(doc)], ["SET", `itoken:${h}`, json({ id: iid })]]);
     return { id: iid, token };
   }
@@ -365,7 +374,7 @@ export default async function handler(req, res) {
         const rec = parse(cur);
         if (!rec) throw fail(404, "This intake link was removed. Ask RPM for a new one.");
         const { label, status, answers, submittedAt, updatedAt } = rec;
-        return res.status(200).json({ label, status, answers: answers || {}, submittedAt: submittedAt || null, updatedAt: updatedAt || null });
+        return res.status(200).json({ label, kind: rec.kind === "eval" ? "eval" : "remote", status, answers: answers || {}, submittedAt: submittedAt || null, updatedAt: updatedAt || null });
       }
       if (req.method === "POST") {
         const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
