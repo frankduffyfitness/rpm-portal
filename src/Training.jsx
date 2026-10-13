@@ -14,6 +14,10 @@ const monShort = (m) => MON[+m.slice(5) - 1];
 const round5 = (x) => Math.round(x / 5) * 5;
 const other = (s) => (s === "sumo" ? "conventional" : s === "conventional" ? "sumo" : null);
 const skey = (day, week) => `d${day}w${week}`;
+// Calendar programs (e.g. Jared Welch's daily mobility): sessions are keyed by date, d<day>t<YYYYMMDD>.
+const calKey = (day, date) => `d${day}t${date.replace(/-/g, "")}`;
+const isCal = (p) => !!(p && p.calendar);
+const calDate = (key) => { const m = /^d\d+t(\d{4})(\d{2})(\d{2})$/.exec(key || ""); return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
 const todayIso = () => new Date().toLocaleDateString("en-CA");
 const shortDate = (iso) => (iso ? new Date(iso + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "");
 const mdyToIso = (s) => { const [m, d, y] = s.split("/"); return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`; };
@@ -230,6 +234,16 @@ const CSS = `
 .tl .callout{margin-top:9px;font-size:12px;background:#16191E;border:1px solid var(--rule);border-radius:10px;padding:8px 10px;color:var(--mut2)}
 .tl .callout b{color:var(--ink)}
 .tl .foot{padding:12px 14px 14px;border-top:1px solid var(--rule);display:grid;gap:5px}
+.tl .calday{border:1px solid var(--rule);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:rgba(255,255,255,.02)}
+.tl .calday.today{border-color:rgba(79,255,176,.5)}
+.tl .cchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tl .cchip{position:relative;border:1px solid var(--rule2);background:transparent;border-radius:10px;padding:7px 11px;font-size:12px;font-weight:700;color:var(--mut);cursor:pointer}
+.tl .cchip.done{background:var(--acc);border-color:var(--acc);color:#0A0C10}
+.tl .cchip:disabled{cursor:default}
+.tl .cchip.msg::before{content:"";position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:#60A5FA}
+.tl .sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.65);overflow-y:auto;padding:20px 10px 40px}
+.tl .sheetin{max-width:560px;margin:0 auto;background:#0E1116;border:1px solid var(--rule);border-radius:16px;overflow:hidden}
+.tl .sheetin .logger{margin-top:0}
 .tl .thread{display:grid;gap:6px;max-height:340px;overflow-y:auto;padding:2px 0}
 .tl .bub{max-width:85%;justify-self:start;background:rgba(255,255,255,.05);border:1px solid var(--rule);border-radius:12px 12px 12px 4px;padding:7px 10px;font-size:13px;line-height:1.4;color:var(--ink);white-space:pre-wrap;word-break:break-word}
 .tl .bub.me{justify-self:end;background:rgba(79,255,176,.10);border-color:rgba(79,255,176,.3);border-radius:12px 12px 4px 12px}
@@ -415,7 +429,12 @@ function Thread({ A, role, month, sk, pw, note, focus, onA, onLocked }) {
 
 function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA = () => {} }) {
   const nx = M.nextSession() || M.sessions[0];
+  const calP = M.months.length && isCal(M.months[M.months.length - 1]) ? M.months[M.months.length - 1] : null;
+  const [calWeek, setCalWeek] = useState(0);
   const [sel, setSel] = useState(() => {
+    const cd = start && calDate(start.key);
+    if (cd && A.programs[start.month]) return { month: start.month, day: +/^d(\d+)/.exec(start.key)[1], week: 1, date: cd };
+    if (calP) return { month: calP.month, day: calP.days[0].day, week: 1, date: null };
     const m = start && /^d(\d+)w(\d+)$/.exec(start.key || "");
     if (m && A.programs[start.month] && A.programs[start.month].days.some((x) => x.day === +m[1])) return { month: start.month, day: +m[1], week: +m[2] };
     return nx ? { month: nx.month, day: nx.day, week: nx.week } : null;
@@ -462,9 +481,10 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
   const fdBw = (date) => (date ? bwMap[date] ?? null : null);
 
   if (!sel) return <div style={{ fontSize: 13, color: "#6B7280" }}>No program loaded for this athlete yet.</div>;
-  const k = `${sel.month}|${skey(sel.day, sel.week)}`;
-  const saved = M.logOf(sel.month, sel.day, sel.week);
-  const blank = { date: "", bodyweight: null, notes: "", entries: {}, rpe: {}, stance: {}, swaps: {} };
+  const sessK = sel.date ? calKey(sel.day, sel.date) : skey(sel.day, sel.week);
+  const k = `${sel.month}|${sessK}`;
+  const saved = sel.date ? (A.logs[sel.month] || {})[sessK] : M.logOf(sel.month, sel.day, sel.week);
+  const blank = { date: sel.date || "", bodyweight: null, notes: "", entries: {}, rpe: {}, stance: {}, swaps: {} };
   // Older or partial sessions (e.g. a note saved with no sets) may lack fields.
   const log = { ...blank, ...(drafts[k] || (saved ? JSON.parse(JSON.stringify(saved)) : {})) };
   for (const f of ["entries", "rpe", "stance", "swaps"]) if (!log[f] || typeof log[f] !== "object") log[f] = {};
@@ -551,77 +571,18 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
   const bwShown = log.bodyweight ?? fdBw(log.date);
   const bwSrc = log.bodyweight != null ? "Entered by you" : fdBw(log.date) != null ? "From Force Decks" : log.date ? "No Force Decks jump this day" : "Set the date to pull it";
 
-  return (
-    <div>
-      <div className="months">
-        {M.months.map((p) => {
-          let dn = 0;
-          const cells = [];
-          const labeled = p.days.some((x) => x.short);
-          for (let w = 1; w <= 4; w++) {
-            cells.push(<span key={"l" + w} className="lab">W{w}</span>);
-            for (const dd of p.days) {
-              const st = M.sessionStats(p, dd.day, w);
-              if (st.done > 0) dn++;
-              const cls = st.done === 0 ? "" : st.done >= st.rx ? "done" : "partial";
-              const isNext = nx && nx.month === p.month && nx.day === dd.day && nx.week === w;
-              const cur = sel.month === p.month && sel.day === dd.day && sel.week === w;
-              cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""} ${unreadFor(A, role, `${p.month}|${skey(dd.day, w)}`) ? "msg" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
-            }
-          }
-          return (
-            <div key={p.month} style={labeled ? { gridColumn: "1 / -1" } : null}>
-              <div className="mh">{p.label.split(" ")[0]}<span>{dn}/{p.days.length * 4}</span></div>
-              <div className="mgrid" style={{ gridTemplateColumns: `20px repeat(${p.days.length}, 1fr)` }}>{cells}</div>
-            </div>
-          );
-        })}
-      </div>
-      {(prog.movement || []).map((mv, mi) => {
-        const ml = mvLog(mi);
-        const ticked = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
-        return (
-          <details key={mi} style={{ marginTop: 14, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
-            <summary>{mv.label} · Week {sel.week}{" "}
-              <span style={{ fontSize: 11, fontWeight: 700, color: ticked ? "#4FFFB0" : "#6B7280", marginLeft: 6 }}>{ticked === mv.exercises.length ? "✓ logged" : ticked ? `${ticked}/${mv.exercises.length} done` : "not logged"}</span>
-            </summary>
-            <div style={{ fontSize: 12, color: "#8A8F98", marginTop: 8 }}>
-              {mv.warmup.length > 0 && <>
-                <div style={{ color: "#E0E0E0", fontWeight: 600 }}>{mv.warmup[0].endsWith(":") ? mv.warmup[0].slice(0, -1) : "Warm-up"}{mv.note ? ` (${mv.note.replace(/\.$/, "").toLowerCase()})` : ""}</div>
-                <ul>{mv.warmup.filter((x, i) => !(i === 0 && x.endsWith(":"))).map((x, i) => <li key={i}>{x}</li>)}</ul>
-              </>}
-              <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
-                {mv.exercises.map((x, i) => {
-                  const done = !!(((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done);
-                  return (
-                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 6 }}>
-                      <span style={{ color: "#E0E0E0", minWidth: 0 }}>{x.name}<span style={{ color: "#6B7280" }}>{x.weeks[sel.week - 1] ? ` · ${x.weeks[sel.week - 1]}` : ""}</span></span>
-                      <button className="tb" aria-pressed={done} style={done ? { borderColor: "#4FFFB0", color: "#4FFFB0", background: "rgba(79,255,176,0.12)" } : null}
-                        onClick={() => mvChange(mi, (l) => { l.entries[mvSlot(x, i)] = done ? [] : [{ load: null, reps: null, done: true }]; })}>{done ? "✓ Done" : "Done"}</button>
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginTop: 10 }}>
-                <button className="tb" onClick={() => mvChange(mi, (l) => { mv.exercises.forEach((x, i) => { l.entries[mvSlot(x, i)] = [{ load: null, reps: null, done: true }]; }); })}>Mark all done</button>
-                {ml.date && <span style={{ fontSize: 11, color: "#6B7280" }}>Logged {shortDate(ml.date)}</span>}
-              </div>
-              <textarea aria-label={`${mv.label} notes`} placeholder="Notes (optional)" value={ml.notes || ""} onChange={(e) => mvChange(mi, (l) => { l.notes = e.target.value; })}
-                style={{ width: "100%", minHeight: 44, marginTop: 8, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "7px 9px", fontSize: 12, resize: "vertical" }} />
-            </div>
-          </details>
-        );
-      })}
-      <div className="key"><span><i />Not logged</span><span><i className="p" />Partly</span><span><i className="d" />Logged</span><span><i className="n" />Up next</span></div>
-
+  const panel = (
       <div className="logger">
         <div className="lhead">
-          <div><div className="eb">{prog.label} · Week {sel.week}</div><h3>{d.label || `Day ${sel.day}`}</h3></div>
-          <div className="meta">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+            <div><div className="eb">{sel.date ? new Date(sel.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }) : `${prog.label} · Week ${sel.week}`}</div><h3>{d.label || `Day ${sel.day}`}</h3></div>
+            {sel.date && <button className="tb" onClick={() => setSel((x) => ({ ...x, date: null }))} style={{ borderColor: "#4FFFB0", color: "#4FFFB0" }}>Done</button>}
+          </div>
+          {!sel.date && <div className="meta">
             <div className="field"><label htmlFor="tl-date">Date</label><input id="tl-date" type="date" value={log.date || ""} onChange={(e) => change((l) => { l.date = e.target.value; })} /></div>
             <div className="field"><label htmlFor="tl-bw">Bodyweight</label><NumInput id="tl-bw" placeholder="lb" value={bwShown ?? null} onValue={(v) => change((l) => { l.bodyweight = v; })} /><span className="src">{bwSrc}</span></div>
-          </div>
-          {!log.date && (
+          </div>}
+          {!log.date && !sel.date && (
             <div className="dpick"><span>{choices.length ? "Which day was this? Force Decks days:" : "Date:"}</span>
               <button className="tb" onClick={() => change((l) => { l.date = todayIso(); })}>Today</button>
               {choices.map((c) => <button key={c} className="tb" onClick={() => change((l) => { l.date = c; })}>{new Date(c + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}</button>)}
@@ -720,8 +681,116 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
             </div>
           );
         })}
-        <Thread A={A} role={role} month={sel.month} sk={skey(sel.day, sel.week)} pw={pw} note={log.notes || ""} focus={!!(start && start.month === sel.month && start.key === skey(sel.day, sel.week) && start.msg)} onA={onA} onLocked={onLocked} />
+        <Thread A={A} role={role} month={sel.month} sk={sessK} pw={pw} note={log.notes || ""} focus={!!(start && start.month === sel.month && start.key === sessK && start.msg)} onA={onA} onLocked={onLocked} />
       </div>
+  );
+  if (calP) {
+    const base = new Date(); base.setHours(0, 0, 0, 0);
+    base.setDate(base.getDate() - ((base.getDay() + 6) % 7) + calWeek * 7);
+    const dates = [...Array(7)].map((_, i) => { const x = new Date(base); x.setDate(base.getDate() + i); return x.toLocaleDateString("en-CA"); });
+    const today = todayIso();
+    const logged = (date, day) => M.months.some((p) => { const l = (A.logs[p.month] || {})[calKey(day, date)]; return l && Object.values(l.entries || {}).some((c) => (c || []).some(Boolean)); });
+    const nWeek = dates.reduce((n, dt) => n + calP.days.filter((dd) => logged(dt, dd.day)).length, 0);
+    return (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, margin: "4px 0 10px" }}>
+          <button className="tb" onClick={() => setCalWeek(calWeek - 1)} aria-label="Previous week">‹</button>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{calWeek === 0 ? "This week" : `Week of ${new Date(dates[0] + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}</div>
+            <div style={{ fontSize: 11, color: "#6B7280" }}>{nWeek} session{nWeek === 1 ? "" : "s"} logged</div>
+          </div>
+          <button className="tb" disabled={calWeek >= 0} onClick={() => setCalWeek(calWeek + 1)} aria-label="Next week">›</button>
+        </div>
+        {dates.filter((dt) => dt <= today).reverse().map((dt) => {
+          const future = false;
+          return (
+            <div key={dt} className={`calday ${dt === today ? "today" : ""}`} style={future ? { opacity: 0.45 } : null}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{new Date(dt + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</div>
+                {dt === today && <span style={{ fontSize: 10, fontWeight: 700, color: "#4FFFB0", letterSpacing: ".06em" }}>TODAY</span>}
+              </div>
+              <div className="cchips">
+                {calP.days.map((dd) => {
+                  const done = logged(dt, dd.day);
+                  return (
+                    <button key={dd.day} disabled={future} aria-pressed={done} className={`cchip ${done ? "done" : ""} ${unreadFor(A, role, `${calP.month}|${calKey(dd.day, dt)}`) ? "msg" : ""}`}
+                      onClick={() => setSel({ month: calP.month, day: dd.day, week: 1, date: dt })}>{done ? "✓ " : ""}{dd.short || dd.label || `Day ${dd.day}`}</button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+        {sel.date && <div className="sheet" onClick={(e) => { if (e.target === e.currentTarget) setSel((x) => ({ ...x, date: null })); }}><div className="sheetin">{panel}</div></div>}
+        {toast && <div className={`toast ${toast.bad ? "bad" : ""}`} role="status">{toast.text}</div>}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="months">
+        {M.months.map((p) => {
+          let dn = 0;
+          const cells = [];
+          const labeled = p.days.some((x) => x.short);
+          for (let w = 1; w <= 4; w++) {
+            cells.push(<span key={"l" + w} className="lab">W{w}</span>);
+            for (const dd of p.days) {
+              const st = M.sessionStats(p, dd.day, w);
+              if (st.done > 0) dn++;
+              const cls = st.done === 0 ? "" : st.done >= st.rx ? "done" : "partial";
+              const isNext = nx && nx.month === p.month && nx.day === dd.day && nx.week === w;
+              const cur = sel.month === p.month && sel.day === dd.day && sel.week === w;
+              cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""} ${unreadFor(A, role, `${p.month}|${skey(dd.day, w)}`) ? "msg" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
+            }
+          }
+          return (
+            <div key={p.month} style={labeled ? { gridColumn: "1 / -1" } : null}>
+              <div className="mh">{p.label.split(" ")[0]}<span>{dn}/{p.days.length * 4}</span></div>
+              <div className="mgrid" style={{ gridTemplateColumns: `20px repeat(${p.days.length}, 1fr)` }}>{cells}</div>
+            </div>
+          );
+        })}
+      </div>
+      {(prog.movement || []).map((mv, mi) => {
+        const ml = mvLog(mi);
+        const ticked = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
+        return (
+          <details key={mi} style={{ marginTop: 14, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
+            <summary>{mv.label} · Week {sel.week}{" "}
+              <span style={{ fontSize: 11, fontWeight: 700, color: ticked ? "#4FFFB0" : "#6B7280", marginLeft: 6 }}>{ticked === mv.exercises.length ? "✓ logged" : ticked ? `${ticked}/${mv.exercises.length} done` : "not logged"}</span>
+            </summary>
+            <div style={{ fontSize: 12, color: "#8A8F98", marginTop: 8 }}>
+              {mv.warmup.length > 0 && <>
+                <div style={{ color: "#E0E0E0", fontWeight: 600 }}>{mv.warmup[0].endsWith(":") ? mv.warmup[0].slice(0, -1) : "Warm-up"}{mv.note ? ` (${mv.note.replace(/\.$/, "").toLowerCase()})` : ""}</div>
+                <ul>{mv.warmup.filter((x, i) => !(i === 0 && x.endsWith(":"))).map((x, i) => <li key={i}>{x}</li>)}</ul>
+              </>}
+              <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
+                {mv.exercises.map((x, i) => {
+                  const done = !!(((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done);
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 6 }}>
+                      <span style={{ color: "#E0E0E0", minWidth: 0 }}>{x.name}<span style={{ color: "#6B7280" }}>{x.weeks[sel.week - 1] ? ` · ${x.weeks[sel.week - 1]}` : ""}</span></span>
+                      <button className="tb" aria-pressed={done} style={done ? { borderColor: "#4FFFB0", color: "#4FFFB0", background: "rgba(79,255,176,0.12)" } : null}
+                        onClick={() => mvChange(mi, (l) => { l.entries[mvSlot(x, i)] = done ? [] : [{ load: null, reps: null, done: true }]; })}>{done ? "✓ Done" : "Done"}</button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginTop: 10 }}>
+                <button className="tb" onClick={() => mvChange(mi, (l) => { mv.exercises.forEach((x, i) => { l.entries[mvSlot(x, i)] = [{ load: null, reps: null, done: true }]; }); })}>Mark all done</button>
+                {ml.date && <span style={{ fontSize: 11, color: "#6B7280" }}>Logged {shortDate(ml.date)}</span>}
+              </div>
+              <textarea aria-label={`${mv.label} notes`} placeholder="Notes (optional)" value={ml.notes || ""} onChange={(e) => mvChange(mi, (l) => { l.notes = e.target.value; })}
+                style={{ width: "100%", minHeight: 44, marginTop: 8, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, background: "#13161B", color: "#fff", padding: "7px 9px", fontSize: 12, resize: "vertical" }} />
+            </div>
+          </details>
+        );
+      })}
+      <div className="key"><span><i />Not logged</span><span><i className="p" />Partly</span><span><i className="d" />Logged</span><span><i className="n" />Up next</span></div>
+
+      {panel}
       {toast && <div className={`toast ${toast.bad ? "bad" : ""}`} role="status">{toast.text}</div>}
     </div>
   );
@@ -793,7 +862,7 @@ function AthleteView({ id, pw, ctx, onBack, onLocked, start }) {
       <div style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginTop: 3 }}>{A.athlete.name}</div>
       <div style={{ fontSize: 12, color: "#8A9099", marginTop: 5 }}>{range} · {logged} of {M.sessions.length} sessions logged{A.athlete.trainingMax ? ` · training max ${A.athlete.trainingMax}` : ""}</div>
       <div className="tabs">
-        {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
+        {[["log", "📝 Log a session"], ...(M.months.some(isCal) ? [] : [["progress", "📈 Progress"]])].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
       </div>
       {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={pw} onSaved={onSaved} onLocked={onLocked} start={start} role="coach" onA={onA} /> : <Progress A={A} M={M} ctx={ctx} />}
       <AthleteLinks A={A} pw={pw} onLocked={onLocked} />
@@ -825,7 +894,7 @@ export function AthleteLogPage({ ctx, logo }) {
   const M = useMemo(() => (A ? model(A) : null), [A]);
   const onSaved = (month, sk, body) => setA((a) => ({ ...a, logs: { ...a.logs, [month]: { ...(a.logs[month] || {}), [sk]: body } } }));
   const onA = (fn) => setA((a) => fn(a));
-  const replies = A ? Object.entries(A.messages || {}).filter(([f]) => /^\d{4}-\d{2}\|d\d+w\d+$/.test(f) && unreadFor(A, "athlete", f))
+  const replies = A ? Object.entries(A.messages || {}).filter(([f]) => /^\d{4}-\d{2}\|d\d+(w\d+|t\d{8})$/.test(f) && unreadFor(A, "athlete", f))
     .map(([f, t]) => { const [month, key] = f.split("|"); const last = [...t].reverse().find((m) => m.by === "coach"); return { month, key, last }; })
     .filter((x) => x.last).sort((x, y) => y.last.at.localeCompare(x.last.at)) : [];
   return (
@@ -860,7 +929,7 @@ export function AthleteLogPage({ ctx, logo }) {
               </div>
             )}
             <div className="tabs">
-              {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
+              {[["log", "📝 Log a session"], ...(M.months.some(isCal) ? [] : [["progress", "📈 Progress"]])].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
             </div>
             {tab === "log" ? <Logger key={jump ? jump.n : "x"} A={A} M={M} ctx={ctx} pw={token} onSaved={onSaved} onLocked={() => setErr(dead)} start={jump} role="athlete" onA={onA} /> : <Progress A={A} M={M} ctx={ctx} />}
             <div style={{ fontSize: 11, color: "#4A4F57", margin: "24px 0 40px", lineHeight: 1.5 }}>Your sets save as you type. Only you and your coach can see this log.</div>
@@ -881,6 +950,8 @@ const agoText = (iso) => {
   return d === 1 ? "yesterday" : `${d} days ago`;
 };
 const sessLabel = (key) => {
+  const cd = calDate(key);
+  if (cd) return `Day ${/^d(\d+)/.exec(key)[1]} · ${new Date(cd + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
   const m = /^([dm])(\d+)w(\d+)$/.exec(key || "");
   if (!m) return key;
   return m[1] === "d" ? `Day ${m[2]} · Week ${m[3]}` : `Movement Day · Week ${m[3]}`;

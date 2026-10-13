@@ -80,7 +80,7 @@ import crypto from "crypto";
 
 const ID = /^[a-z0-9][a-z0-9-]{0,80}$/;
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
-const SKEY = /^[dm]\d{1,2}w\d{1,2}$/;   // d<day>w<week> lift days, m<n>w<week> movement days
+const SKEY = /^([dm]\d{1,2}w\d{1,2}|d\d{1,2}t\d{8})$/;  // d<day>w<week> lift days, m<n>w<week> movement days, d<day>t<YYYYMMDD> calendar programs
 const MAX_JSON = 200 * 1024;
 
 const sha = (s) => crypto.createHash("sha256").update(s).digest("hex");
