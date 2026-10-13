@@ -36,6 +36,15 @@
  * GET  ?op=activity                      -> {updates: [{id, name, sessions, last}]}       coach
  * POST {op:"activitySeen", id}                                                            coach
  *
+ * Session messages (coach <-> athlete thread under each session, Frank 10/12/26):
+ *   msgs:<id>                hash   "<month>|<skey>" -> [{mid, by: athlete|coach, coach?, text, at}]
+ *   msgseen:<id>             hash   "<month>|<skey>|<athlete|coach>" -> ISO time that side last read it
+ * Kept apart from log:<id>:<month> so a set save can never overwrite a message.
+ * GET  ?op=messages[&id=<id>]            -> {messages, seen}                              coach, athlete (own)
+ * POST {op:"postMessage", id, month, key, text, coach?} -> {message}                      coach, athlete (own id)
+ * POST {op:"messageSeen", id, month, key}                                                 coach, athlete (own id)
+ * Athlete messages also go on the activity list ({..., msg}) for "New from athletes".
+ *
  * Remote intake (the questionnaire new remote athletes fill out before their call):
  *   intakes                  hash   intakeId -> {id, label, created, status: sent|draft|submitted,
  *                                   updatedAt, submittedAt, answers}
@@ -128,7 +137,14 @@ async function athlete(id) {
   const res = ms.length ? await redis(ms.flatMap((m) => [["GET", `program:${id}:${m}`], ["HGETALL", `log:${id}:${m}`]])) : [];
   const programs = {}, logs = {};
   ms.forEach((m, i) => { programs[m] = parse(res[2 * i]); logs[m] = pairs(res[2 * i + 1]); });
-  return { athlete: { id, ...parse(a) }, programs, logs };
+  return { athlete: { id, ...parse(a) }, programs, logs, ...(await messages(id)) };
+}
+
+async function messages(id) {
+  const [m, s] = await redis([["HGETALL", `msgs:${id}`], ["HGETALL", `msgseen:${id}`]]);
+  const seen = {};
+  for (let i = 0; s && i < s.length; i += 2) seen[s[i]] = s[i + 1];
+  return { messages: pairs(m), seen };
 }
 
 // ─── Program board ───────────────────────────────────────────────────────────
@@ -210,7 +226,11 @@ async function activity() {
     const e = parse(raw);
     if (!e || !athletes[e.id] || (seenAt[e.id] && e.at <= seenAt[e.id])) continue;
     const u = (by[e.id] = by[e.id] || { id: e.id, name: athletes[e.id].name, last: e.at, sessions: [] });
-    for (const key of e.keys || []) if (!u.sessions.some((x) => x.month === e.month && x.key === key)) u.sessions.push({ month: e.month, key, at: e.at });
+    for (const key of e.keys || []) {
+      const x = u.sessions.find((y) => y.month === e.month && y.key === key);
+      if (!x) u.sessions.push({ month: e.month, key, at: e.at, ...(e.msg ? { msg: e.msg } : {}) });
+      else if (e.msg && !x.msg) x.msg = e.msg;  // newest first, so the first message seen is the latest
+    }
   }
   return { updates: Object.values(by).sort((a, b) => b.last.localeCompare(a.last)) };
 }
@@ -311,7 +331,27 @@ async function write(body, who) {
   }
   const id = who.role === "athlete" ? who.id : body && body.id;  // a link only ever writes its own athlete
   if (!ID.test(id || "")) throw fail(400, "Bad athlete id");
-  if (who.role === "athlete" && op !== "saveSessions") throw fail(403, "Not allowed");
+  if (who.role === "athlete" && !["saveSessions", "postMessage", "messageSeen"].includes(op)) throw fail(403, "Not allowed");
+  if (op === "postMessage" || op === "messageSeen") {
+    if (!MONTH.test(month || "") || !SKEY.test(body.key || "")) throw fail(400, "Bad session");
+    const role = who.role === "athlete" ? "athlete" : "coach";
+    const field = `${month}|${body.key}`;
+    const now = new Date().toISOString();
+    if (op === "messageSeen") {
+      await redis([["HSET", `msgseen:${id}`, `${field}|${role}`, now]]);
+      return { ok: true, at: now };
+    }
+    const text = str(body.text, 2000);
+    if (!text) throw fail(400, "Empty message");
+    const [exists, cur] = await redis([["SISMEMBER", `months:${id}`, month], ["HGET", `msgs:${id}`, field]]);
+    if (!exists) throw fail(404, "No program for that month");
+    const msg = { mid: crypto.randomBytes(4).toString("hex"), by: role, ...(role === "coach" ? { coach: COACHES.includes(body.coach) ? body.coach : "Coach" } : {}), text, at: now };
+    const thread = [...(parse(cur) || []), msg].slice(-200);
+    const cmds = [["HSET", `msgs:${id}`, field, json(thread)], ["HSET", `msgseen:${id}`, `${field}|${role}`, now]];
+    if (role === "athlete") cmds.push(["LPUSH", "activity", json({ id, month, keys: [body.key], at: now, msg: text.slice(0, 140) })], ["LTRIM", "activity", 0, 499]);
+    await redis(cmds);
+    return { message: msg };
+  }
   if (op === "activitySeen") {
     await redis([["HSET", "activity:seen", id, new Date().toISOString()]]);
     return { ok: true };
@@ -386,6 +426,7 @@ export default async function handler(req, res) {
     if (req.method === "GET") {
       const op = req.query.op;
       if (op === "me" && who.role === "athlete") return res.status(200).json(await athlete(who.id));
+      if (op === "messages" && who.role === "athlete") return res.status(200).json(await messages(who.id));
       if (who.role !== "coach") throw fail(403, "Not allowed");
       if (op === "index") return res.status(200).json(await index());
       if (op === "activity") return res.status(200).json(await activity());
@@ -404,6 +445,10 @@ export default async function handler(req, res) {
         return res.status(200).json({ rows, status: await boardStatus(rows) });
       }
       if (op === "athlete") return res.status(200).json(await athlete(req.query.id));
+      if (op === "messages") {
+        if (!ID.test(req.query.id || "")) throw fail(400, "Bad athlete id");
+        return res.status(200).json(await messages(req.query.id));
+      }
       if (op === "linkStatus") {
         if (!ID.test(req.query.id || "")) throw fail(400, "Bad athlete id");
         const [n] = await redis([["SCARD", `atokens:${req.query.id}`]]);

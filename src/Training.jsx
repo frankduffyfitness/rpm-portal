@@ -230,6 +230,12 @@ const CSS = `
 .tl .callout{margin-top:9px;font-size:12px;background:#16191E;border:1px solid var(--rule);border-radius:10px;padding:8px 10px;color:var(--mut2)}
 .tl .callout b{color:var(--ink)}
 .tl .foot{padding:12px 14px 14px;border-top:1px solid var(--rule);display:grid;gap:5px}
+.tl .thread{display:grid;gap:6px;max-height:340px;overflow-y:auto;padding:2px 0}
+.tl .bub{max-width:85%;justify-self:start;background:rgba(255,255,255,.05);border:1px solid var(--rule);border-radius:12px 12px 12px 4px;padding:7px 10px;font-size:13px;line-height:1.4;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.tl .bub.me{justify-self:end;background:rgba(79,255,176,.10);border-color:rgba(79,255,176,.3);border-radius:12px 12px 4px 12px}
+.tl .bub.note{background:transparent;border-style:dashed;color:var(--mut)}
+.tl .bub .who{font-size:10px;font-weight:700;color:var(--mut2);margin-bottom:2px}
+.tl .cell.msg::before{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:#60A5FA}
 .tl .foot textarea{width:100%;min-height:60px;border:1px solid var(--rule2);border-radius:10px;background:var(--field);color:var(--ink);padding:8px 10px;resize:vertical;font-size:13px}
 .tl .toast{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--acc);color:#0A0C10;font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;pointer-events:none}
 .tl .toast.bad{background:var(--warn);color:#fff}
@@ -340,7 +346,74 @@ function Progress({ A, M, ctx }) {
 }
 
 // ─── Logger ──────────────────────────────────────────────────────────────────
-function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
+// ─── Session messages (coach <-> athlete thread under each session) ─────────
+const unreadFor = (A, role, field) => {
+  const t = (A.messages || {})[field] || [];
+  const seen = (A.seen || {})[`${field}|${role}`] || "";
+  return t.some((m) => m.by !== role && m.at > seen);
+};
+const MSG_COACH = "rpm_msg_coach";
+const msgTime = (iso) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+function Thread({ A, role, month, sk, pw, note, focus, onA, onLocked }) {
+  const field = `${month}|${sk}`;
+  const thread = (A.messages || {})[field] || [];
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [coach, setCoach] = useState(() => { try { return localStorage.getItem(MSG_COACH) || localStorage.getItem("rpm_board_coach") || "Frank"; } catch (e) { return "Frank"; } });
+  const box = useRef(null);
+  const unread = unreadFor(A, role, field);
+  useEffect(() => {
+    if (!unread) return;
+    const now = new Date().toISOString();
+    onA((a) => ({ ...a, seen: { ...(a.seen || {}), [`${field}|${role}`]: now } }));
+    api(pw, { body: { op: "messageSeen", id: A.athlete.id, month, key: sk } }).catch(() => {});
+  }, [field, unread]);
+  useEffect(() => { if (focus && box.current) box.current.scrollIntoView({ behavior: "smooth", block: "center" }); }, [focus]);
+  const send = async () => {
+    const t = text.trim();
+    if (!t || busy) return;
+    setBusy(true); setErr(null);
+    try {
+      const r = await api(pw, { body: { op: "postMessage", id: A.athlete.id, month, key: sk, text: t, ...(role === "coach" ? { coach } : {}) } });
+      onA((a) => ({ ...a, messages: { ...(a.messages || {}), [field]: [...((a.messages || {})[field] || []), r.message] }, seen: { ...(a.seen || {}), [`${field}|${role}`]: r.message.at } }));
+      setText("");
+    } catch (e) { if (e.status === 401) onLocked(); else setErr("Not sent. Check your connection and try again."); }
+    setBusy(false);
+  };
+  const pickCoach = (c) => { setCoach(c); try { localStorage.setItem(MSG_COACH, c); } catch (e) {} };
+  return (
+    <div className="foot" ref={box}>
+      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280" }}>Messages</div>
+      <div className="thread">
+        {note && <div className="bub note"><div className="who">Session note</div>{note}</div>}
+        {thread.length === 0 && !note && <div style={{ fontSize: 12, color: "#4A4F57" }}>{role === "coach" ? "No messages on this session yet." : "Questions about this session? Message your coach here."}</div>}
+        {thread.map((m) => {
+          const mine = m.by === role;
+          const color = m.by === "coach" ? COACH_COLOR[m.coach] || "#8A8F98" : "#8A8F98";
+          return (
+            <div key={m.mid} className={`bub ${mine ? "me" : ""}`}>
+              <div className="who" style={{ color }}>{m.by === "coach" ? m.coach : A.athlete.name.split(" ")[0]} · {msgTime(m.at)}</div>
+              {m.text}
+            </div>
+          );
+        })}
+      </div>
+      {role === "coach" && (
+        <div className="seg" role="group" aria-label="Reply as" style={{ flexWrap: "wrap" }}>
+          {COACHES.map((c) => <button key={c} aria-pressed={coach === c} onClick={() => pickCoach(c)}>{c}</button>)}
+        </div>
+      )}
+      <div style={{ display: "flex", gap: 6, alignItems: "flex-end" }}>
+        <textarea aria-label="Message" rows={2} placeholder={role === "coach" ? `Message ${A.athlete.name.split(" ")[0]}` : "Message your coach: how it moved, anything that hurt"} value={text} onChange={(e) => setText(e.target.value)} style={{ minHeight: 44 }} />
+        <button className="tb" disabled={busy || !text.trim()} onClick={send} style={{ borderColor: "#4FFFB0", color: "#4FFFB0", whiteSpace: "nowrap" }}>{busy ? "Sending" : "Send"}</button>
+      </div>
+      {err && <div style={{ fontSize: 11, color: "#F97362" }}>{err}</div>}
+    </div>
+  );
+}
+
+function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA = () => {} }) {
   const nx = M.nextSession() || M.sessions[0];
   const [sel, setSel] = useState(() => {
     const m = start && /^d(\d+)w(\d+)$/.exec(start.key || "");
@@ -364,6 +437,19 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
     setDrafts((o) => ({ ...restored, ...o }));
     mine.forEach(([key]) => save(key));
   }, []);
+
+  // New messages while the page is open (every 20 s, only when visible).
+  useEffect(() => {
+    const pull = () => {
+      if (document.visibilityState !== "visible") return;
+      api(pw, { query: role === "coach" ? { op: "messages", id: A.athlete.id } : { op: "messages" } })
+        .then((d) => onA((a) => ({ ...a, messages: d.messages, seen: { ...d.seen, ...Object.fromEntries(Object.entries(a.seen || {}).filter(([k, v]) => v > (d.seen[k] || ""))) } })))
+        .catch(() => {});
+    };
+    const t = setInterval(pull, 20000);
+    document.addEventListener("visibilitychange", pull);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", pull); };
+  }, [A.athlete.id]);
 
   // Force Decks bodyweight by date (portal's filtered bodyweight history)
   const fdName = (ctx.CMJ_BY_CANON[ctx.canonName(A.athlete.name)] || {}).name || A.athlete.name;
@@ -480,7 +566,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
               const cls = st.done === 0 ? "" : st.done >= st.rx ? "done" : "partial";
               const isNext = nx && nx.month === p.month && nx.day === dd.day && nx.week === w;
               const cur = sel.month === p.month && sel.day === dd.day && sel.week === w;
-              cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
+              cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""} ${unreadFor(A, role, `${p.month}|${skey(dd.day, w)}`) ? "msg" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
             }
           }
           return (
@@ -634,10 +720,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start }) {
             </div>
           );
         })}
-        <div className="foot">
-          <label htmlFor="tl-notes" style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "#6B7280" }}>Session notes</label>
-          <textarea id="tl-notes" placeholder="How it moved, bar speed, anything that hurt" value={log.notes || ""} onChange={(e) => change((l) => { l.notes = e.target.value; })} />
-        </div>
+        <Thread A={A} role={role} month={sel.month} sk={skey(sel.day, sel.week)} pw={pw} note={log.notes || ""} focus={!!(start && start.month === sel.month && start.key === skey(sel.day, sel.week) && start.msg)} onA={onA} onLocked={onLocked} />
       </div>
       {toast && <div className={`toast ${toast.bad ? "bad" : ""}`} role="status">{toast.text}</div>}
     </div>
@@ -700,6 +783,7 @@ function AthleteView({ id, pw, ctx, onBack, onLocked, start }) {
   if (err) return <div><button style={backBtn} onClick={onBack}>{"←"} All athletes</button><div style={{ fontSize: 13, color: "#F97362" }}>{err}</div></div>;
   if (!A || !M) return <div style={{ fontSize: 13, color: "#6B7280", padding: "20px 0" }}>Loading…</div>;
   const onSaved = (month, sk, body) => setA((a) => ({ ...a, logs: { ...a.logs, [month]: { ...(a.logs[month] || {}), [sk]: body } } }));
+  const onA = (fn) => setA((a) => fn(a));
   const logged = M.sessions.filter((s) => M.sessionStats(A.programs[s.month], s.day, s.week).done > 0).length;
   const range = M.months.length > 1 ? `${M.months[0].label.split(" ")[0]} to ${M.months[M.months.length - 1].label}` : (M.months[0] || {}).label || "";
   return (
@@ -711,7 +795,7 @@ function AthleteView({ id, pw, ctx, onBack, onLocked, start }) {
       <div className="tabs">
         {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
       </div>
-      {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={pw} onSaved={onSaved} onLocked={onLocked} start={start} /> : <Progress A={A} M={M} ctx={ctx} />}
+      {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={pw} onSaved={onSaved} onLocked={onLocked} start={start} role="coach" onA={onA} /> : <Progress A={A} M={M} ctx={ctx} />}
       <AthleteLinks A={A} pw={pw} onLocked={onLocked} />
     </div>
   );
@@ -732,6 +816,7 @@ export function AthleteLogPage({ ctx, logo }) {
   const [A, setA] = useState(null);
   const [err, setErr] = useState(null);
   const [tab, setTab] = useState("log");
+  const [jump, setJump] = useState(null);
   const dead = "This link doesn't work anymore. Ask Coach Frank for a new one.";
   useEffect(() => {
     if (!token) { setErr("Open the link Coach Frank sent you to see your program."); return; }
@@ -739,6 +824,10 @@ export function AthleteLogPage({ ctx, logo }) {
   }, [token]);
   const M = useMemo(() => (A ? model(A) : null), [A]);
   const onSaved = (month, sk, body) => setA((a) => ({ ...a, logs: { ...a.logs, [month]: { ...(a.logs[month] || {}), [sk]: body } } }));
+  const onA = (fn) => setA((a) => fn(a));
+  const replies = A ? Object.entries(A.messages || {}).filter(([f]) => /^\d{4}-\d{2}\|d\d+w\d+$/.test(f) && unreadFor(A, "athlete", f))
+    .map(([f, t]) => { const [month, key] = f.split("|"); const last = [...t].reverse().find((m) => m.by === "coach"); return { month, key, last }; })
+    .filter((x) => x.last).sort((x, y) => y.last.at.localeCompare(x.last.at)) : [];
   return (
     <div style={{ minHeight: "100vh", background: "#0A0C10", fontFamily: "'DM Sans','Helvetica Neue',sans-serif", color: "#E0E0E0", maxWidth: 560, margin: "0 auto", padding: "0 18px" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -755,10 +844,25 @@ export function AthleteLogPage({ ctx, logo }) {
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{A.athlete.name}</div>
             <div style={{ fontSize: 12, color: "#8A9099", marginTop: 5 }}>{M.months.map((p) => p.label).join(" · ")}</div>
+            {replies.length > 0 && (
+              <div style={{ marginTop: 14, border: "1px solid rgba(96,165,250,0.4)", background: "rgba(96,165,250,0.06)", borderRadius: 14, padding: "10px 12px 4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#60A5FA", display: "inline-block" }} />
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>New from your coach</div>
+                </div>
+                {replies.map((r) => (
+                  <button key={r.month + r.key} onClick={() => { setTab("log"); setJump({ month: r.month, key: r.key, msg: true, n: Date.now() }); }}
+                    style={{ display: "block", width: "100%", textAlign: "left", background: "transparent", border: 0, borderTop: "1px solid rgba(255,255,255,0.06)", padding: "8px 0", cursor: "pointer", color: "inherit", font: "inherit" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: COACH_COLOR[r.last.coach] || "#fff" }}>{r.last.coach} replied · {sessLabel(r.key)} ({monShort(r.month)})</div>
+                    <div style={{ fontSize: 13, color: "#E0E0E0", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.last.text}</div>
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="tabs">
               {[["log", "📝 Log a session"], ["progress", "📈 Progress"]].map(([k2, l]) => <button key={k2} aria-pressed={tab === k2} onClick={() => setTab(k2)}>{l}</button>)}
             </div>
-            {tab === "log" ? <Logger A={A} M={M} ctx={ctx} pw={token} onSaved={onSaved} onLocked={() => setErr(dead)} /> : <Progress A={A} M={M} ctx={ctx} />}
+            {tab === "log" ? <Logger key={jump ? jump.n : "x"} A={A} M={M} ctx={ctx} pw={token} onSaved={onSaved} onLocked={() => setErr(dead)} start={jump} role="athlete" onA={onA} /> : <Progress A={A} M={M} ctx={ctx} />}
             <div style={{ fontSize: 11, color: "#4A4F57", margin: "24px 0 40px", lineHeight: 1.5 }}>Your sets save as you type. Only you and your coach can see this log.</div>
           </div>
         )}
@@ -799,19 +903,21 @@ function Updates({ pw, onOpen, onLocked }) {
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#4FFFB0", display: "inline-block" }} />
           <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>New from athletes</div>
         </div>
-        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{items.length} athlete{items.length === 1 ? "" : "s"} logged since you last checked</div>
+        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{items.length} athlete{items.length === 1 ? "" : "s"} logged or messaged since you last checked</div>
       </div>
       {items.map((u) => {
         const lifts = u.sessions.filter((x) => x.key[0] === "d");
-        const first = lifts[0] || u.sessions[0];
+        const msg = u.sessions.find((x) => x.msg);
+        const first = msg ? { ...msg, msg: true } : lifts[0] || u.sessions[0];
         return (
           <div key={u.id} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "9px 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{u.name} <span style={{ fontSize: 11, fontWeight: 500, color: "#6B7280" }}>{agoText(u.last)}</span></div>
+              {msg && <div style={{ fontSize: 12, color: "#E0E0E0", marginTop: 3 }}>💬 {sessLabel(msg.key)}: “{msg.msg}”</div>}
               <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 2 }}>{u.sessions.slice(0, 4).map((x) => `${sessLabel(x.key)} (${monShort(x.month)})`).join(", ")}{u.sessions.length > 4 ? ` +${u.sessions.length - 4} more` : ""}</div>
             </div>
             <div style={{ display: "flex", gap: 6 }}>
-              <button className="tb" style={{ borderColor: "#4FFFB0", color: "#4FFFB0" }} onClick={() => { seen(u.id); onOpen(u.id, first); }}>Check weights</button>
+              <button className="tb" style={{ borderColor: "#4FFFB0", color: "#4FFFB0" }} onClick={() => { seen(u.id); onOpen(u.id, first); }}>{msg ? "Read & reply" : "Check weights"}</button>
               <button className="tb" onClick={() => seen(u.id)} aria-label={`Dismiss ${u.name}`}>Dismiss</button>
             </div>
           </div>
