@@ -70,7 +70,9 @@
  *                                   went, what this program should focus on). Each is kept on writes
  *                                   that don't send it (the written check, the drafting run).
  * GET  ?op=board                         -> {rows: [...], status: {rowId: log progress}}   coach
- * POST {op:"intakeKind", intakeId, kind: "eval"|"remote"}                              coach
+ * POST {op:"createIntakes", labels: [..], kind, event?} -> {made: [{id, label, token}]}     coach
+ * POST {op:"intakeUpdate", intakeId, kind?, event?, reviewed?, archived?} -> {intake}       coach
+ *   (intake docs may carry kind eval|remote, event "Oct 17 Eval", reviewedAt, archived)
  * POST {op:"boardPut", row}              (adds, or updates row.id)  -> {row}               coach
  * POST {op:"boardDelete", rowId}                                                          coach
  */
@@ -288,15 +290,20 @@ async function write(body, who) {
     await redis([["HSET", "schedule", eid, json(doc)]]);
     return { event: doc };
   }
-  if (op === "createIntake" || op === "deleteIntake" || op === "intakeKind") {
+  if (["createIntake", "createIntakes", "deleteIntake", "intakeKind", "intakeUpdate"].includes(op)) {
     if (who.role !== "coach") throw fail(403, "Not allowed");
-    if (op === "intakeKind") {
-      if (!RID.test(body.intakeId || "") || !["eval", "remote"].includes(body.kind)) throw fail(400, "Bad intake");
+    if (op === "intakeKind" || op === "intakeUpdate") {
+      if (!RID.test(body.intakeId || "")) throw fail(400, "Bad intake");
       const [cur] = await redis([["HGET", "intakes", body.intakeId]]);
       const rec = parse(cur);
       if (!rec) throw fail(404, "No such intake");
-      await redis([["HSET", "intakes", body.intakeId, json({ ...rec, kind: body.kind })]]);
-      return { ok: true };
+      const next = { ...rec };
+      if (["eval", "remote"].includes(body.kind)) next.kind = body.kind;
+      if ("event" in body) next.event = str(body.event, 60) || null;
+      if ("reviewed" in body) next.reviewedAt = body.reviewed ? new Date().toISOString() : null;
+      if ("archived" in body) next.archived = !!body.archived;
+      await redis([["HSET", "intakes", body.intakeId, json(next)]]);
+      return { intake: publicIntake(next) };
     }
     if (op === "deleteIntake") {
       if (!RID.test(body.intakeId || "")) throw fail(400, "Bad intake");
@@ -305,12 +312,21 @@ async function write(body, who) {
       await redis([["HDEL", "intakes", body.intakeId], ...(rec && rec.tokenHash ? [["DEL", `itoken:${rec.tokenHash}`]] : [])]);
       return { ok: true };
     }
-    const iid = crypto.randomBytes(6).toString("hex");
-    const token = "i_" + crypto.randomBytes(24).toString("base64url");
-    const h = sha(token);
-    const doc = { id: iid, label: str(body.label, 80) || "New athlete", kind: body.kind === "eval" ? "eval" : "remote", created: new Date().toISOString(), status: "sent", tokenHash: h };
-    await redis([["HSET", "intakes", iid, json(doc)], ["SET", `itoken:${h}`, json({ id: iid })]]);
-    return { id: iid, token };
+    const kind = body.kind === "eval" ? "eval" : "remote";
+    const event = kind === "eval" ? str(body.event, 60) || null : null;
+    const labels = op === "createIntakes" ? (Array.isArray(body.labels) ? body.labels : []).map((l) => str(l, 80)).filter(Boolean).slice(0, 60) : [str(body.label, 80) || "New athlete"];
+    if (!labels.length) throw fail(400, "Add at least one name");
+    const made = [], cmds = [];
+    for (const label of labels) {
+      const iid = crypto.randomBytes(6).toString("hex");
+      const token = "i_" + crypto.randomBytes(24).toString("base64url");
+      const h = sha(token);
+      const doc = { id: iid, label, kind, ...(event ? { event } : {}), created: new Date().toISOString(), status: "sent", tokenHash: h };
+      cmds.push(["HSET", "intakes", iid, json(doc)], ["SET", `itoken:${h}`, json({ id: iid })]);
+      made.push({ id: iid, label, token });
+    }
+    await redis(cmds);
+    return op === "createIntakes" ? { made } : made[0];
   }
   if (op === "boardPut" || op === "boardDelete") {
     if (who.role !== "coach") throw fail(403, "Not allowed");

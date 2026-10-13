@@ -380,107 +380,193 @@ function answerText(f, a) {
   return t;
 }
 
+const STAGES = [["new", "Not started"], ["draft", "In progress"], ["submitted", "Submitted"], ["reviewed", "Reviewed"]];
+const stageOf = (it) => (it.reviewedAt ? "reviewed" : it.status === "submitted" ? "submitted" : it.status === "draft" ? "draft" : "new");
+const stageColor = { new: C.mut2, draft: "#F2C94C", submitted: C.acc, reviewed: "#60A5FA" };
+const PANEL_VIEW = "rpm_intake_view";
+const NO_EVENT = "No event";
+
+function IntakeRow({ it, open, setOpen, events, act, remove }) {
+  const a = it.answers || {};
+  const isEvalIt = it.kind === "eval";
+  const tier = it.answers && !isEvalIt ? intakeTier(a) : null;
+  const flags = it.answers ? intakeFlags(a) : [];
+  const age = ageFrom(a.dob);
+  const st = stageOf(it);
+  const [moving, setMoving] = useState(false);
+  const [ev, setEv] = useState(it.event || "");
+  const when = (iso) => (iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "");
+  const stText = st === "reviewed" ? `Reviewed ${when(it.reviewedAt)}` : st === "submitted" ? `Submitted ${when(it.submittedAt)}` : st === "draft" ? "In progress" : `Sent ${when(it.created)}`;
+  return (
+    <div style={{ border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)", borderRadius: 12, padding: "10px 12px", marginBottom: 6, opacity: it.archived ? 0.6 : 1 }}>
+      <div role="button" tabIndex={0} onClick={() => setOpen(open ? null : it.id)} onKeyDown={(e) => { if (e.key === "Enter") setOpen(open ? null : it.id); }} style={{ cursor: "pointer" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", minWidth: 0 }}>{a.name || it.label}{age != null ? <span style={{ fontSize: 12, color: C.mut2, fontWeight: 500 }}> · {age}</span> : null}{it.archived ? <span style={{ fontSize: 10, color: C.mut2, fontWeight: 700, marginLeft: 6 }}>ARCHIVED</span> : null}</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: stageColor[st], whiteSpace: "nowrap" }}>{stText}</div>
+        </div>
+        {(tier || flags.length > 0) && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+            {tier && <span style={{ fontSize: 10, fontWeight: 700, color: C.acc, border: `1px solid rgba(79,255,176,0.35)`, borderRadius: 6, padding: "2px 6px" }}>{tier.text}</span>}
+            {flags.map((fl) => <span key={fl.text} style={{ fontSize: 10, fontWeight: 700, color: flagColor[fl.level], border: `1px solid ${flagColor[fl.level]}55`, borderRadius: 6, padding: "2px 6px" }}>{fl.text}</span>)}
+          </div>
+        )}
+      </div>
+      {open && (
+        <div style={{ marginTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
+          {!it.answers && <div style={{ fontSize: 12, color: C.mut2 }}>Not started yet.</div>}
+          {it.answers && partsFor(it.kind).map((p) => {
+            const rows = p.fields.filter((f) => visible(f, a)).map((f) => [f, answerText(f, a)]).filter(([, t]) => t);
+            if (!rows.length) return null;
+            return (
+              <div key={p.title} style={{ marginBottom: 10 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: C.mut, margin: "6px 0 4px" }}>{p.title}</div>
+                {rows.map(([f, t]) => (
+                  <div key={f.key} style={{ fontSize: 12, lineHeight: 1.45, marginBottom: 4 }}>
+                    <span style={{ color: C.mut2 }}>{f.label}</span><br /><span style={{ color: C.ink2 }}>{t}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+            {it.status === "submitted" && <button className="tb" onClick={() => act(it, { reviewed: !it.reviewedAt })} style={!it.reviewedAt ? { borderColor: "#60A5FA", color: "#60A5FA" } : null}>{it.reviewedAt ? "Mark not reviewed" : "Mark reviewed"}</button>}
+            <button className="tb" onClick={() => act(it, { archived: !it.archived })}>{it.archived ? "Unarchive" : "Archive"}</button>
+            {isEvalIt && !moving && <button className="tb" onClick={() => setMoving(true)}>Move to event</button>}
+            <button className="tb" onClick={() => act(it, { kind: isEvalIt ? "remote" : "eval" })}>{isEvalIt ? "Switch to remote form" : "Switch to eval form"}</button>
+            <button className="tb" onClick={() => remove(it)}>Delete</button>
+          </div>
+          {moving && (
+            <form onSubmit={(e) => { e.preventDefault(); act(it, { event: ev.trim() }); setMoving(false); }} style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+              <input list="rpm-events" value={ev} onChange={(e) => setEv(e.target.value)} placeholder="Oct 17 Eval" style={{ ...input, flex: "1 1 160px", padding: "7px 10px", fontSize: 13 }} />
+              <button type="submit" className="tb">Save</button>
+              <button type="button" className="tb" onClick={() => setMoving(false)}>Cancel</button>
+            </form>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function IntakesPanel({ pw, onLocked }) {
   const [list, setList] = useState(null);
   const [open, setOpen] = useState(null);
+  const [view, setView] = useState(() => { try { return localStorage.getItem(PANEL_VIEW) || "eval"; } catch (e) { return "eval"; } });
+  const [stage, setStage] = useState("all");
+  const [showArch, setShowArch] = useState(false);
+  const [collapsed, setCollapsed] = useState({});
   const [making, setMaking] = useState(false);
-  const [label, setLabel] = useState("");
-  const [newKind, setNewKind] = useState("eval");
-  const [link, setLink] = useState(null);
+  const [names, setNames] = useState("");
+  const [event, setEvent] = useState("");
+  const [made, setMade] = useState(null);
   const [msg, setMsg] = useState(null);
   const load = () => api(pw, { query: { op: "intakes" } }).then((d) => setList(d.intakes)).catch((e) => { if (e.status === 401) onLocked(); });
   useEffect(() => { load(); }, [pw]);
   if (!list) return null;
 
+  const pickView = (v) => { setView(v); setOpen(null); try { localStorage.setItem(PANEL_VIEW, v); } catch (e) {} };
+  const kindOf = (it) => (it.kind === "eval" ? "eval" : "remote");
+  const events = [...new Set(list.filter((i) => i.event).map((i) => i.event))];
   const create = async (e) => {
     e.preventDefault();
+    const labels = names.split("\n").map((x) => x.trim()).filter(Boolean);
+    if (!labels.length) { setMsg("Add at least one name."); return; }
     try {
-      const d = await api(pw, { body: { op: "createIntake", label: label.trim(), kind: newKind } });
-      setLink({ url: `${window.location.origin}/intake#t=${d.token}`, label: label.trim() || "New athlete" });
-      setLabel(""); setMaking(false); load();
+      const d = await api(pw, { body: { op: "createIntakes", labels, kind: view, event: view === "eval" ? event.trim() : "" } });
+      setMade(d.made.map((m) => ({ label: m.label, url: `${window.location.origin}/intake#t=${m.token}` })));
+      setNames(""); setMaking(false); setMsg(null); load();
     } catch (err) { if (err.status === 401) onLocked(); else setMsg(err.message); }
+  };
+  const act = async (it, patch) => {
+    setList((xs) => xs.map((x) => (x.id === it.id ? { ...x, ...("reviewed" in patch ? { reviewedAt: patch.reviewed ? new Date().toISOString() : null } : {}), ...("archived" in patch ? { archived: patch.archived } : {}), ...("event" in patch ? { event: patch.event || null } : {}), ...("kind" in patch ? { kind: patch.kind } : {}) } : x)));
+    try { await api(pw, { body: { op: "intakeUpdate", intakeId: it.id, ...patch } }); load(); } catch (err) { if (err.status === 401) onLocked(); else { setMsg(err.message); load(); } }
+  };
+  const archiveEvent = async (name, arch) => {
+    const ids = list.filter((i) => kindOf(i) === "eval" && (i.event || NO_EVENT) === name).map((i) => i.id);
+    setList((xs) => xs.map((x) => (ids.includes(x.id) ? { ...x, archived: arch } : x)));
+    try { for (const id of ids) await api(pw, { body: { op: "intakeUpdate", intakeId: id, archived: arch } }); load(); } catch (err) { setMsg(err.message); load(); }
   };
   const remove = async (it) => {
     if (!window.confirm(`Delete ${it.answers?.name || it.label}'s intake? Their link stops working and the answers are removed.`)) return;
     try { await api(pw, { body: { op: "deleteIntake", intakeId: it.id } }); setOpen(null); load(); } catch (err) { setMsg(err.message); }
   };
-  const copy = async () => { try { await navigator.clipboard.writeText(link.url); setMsg("Copied. Text or email it to the athlete or parent."); } catch (e) { setMsg("Press and hold the link to copy it."); } };
-  const fresh = list.filter((i) => i.status === "submitted").length;
-  const when = (iso) => (iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "");
+  const copyAll = async () => {
+    const text = made.map((m) => `${m.label}: ${m.url}`).join("\n");
+    try { await navigator.clipboard.writeText(text); setMsg("Copied. Send each athlete their own link."); } catch (e) { setMsg("Press and hold a link to copy it."); }
+  };
+
+  const mine = list.filter((i) => kindOf(i) === view);
+  const live = mine.filter((i) => showArch || !i.archived);
+  const counts = Object.fromEntries(STAGES.map(([k]) => [k, live.filter((i) => stageOf(i) === k).length]));
+  const shown = live.filter((i) => stage === "all" || stageOf(i) === stage);
+  const archivedN = mine.filter((i) => i.archived).length;
+  const evalTotal = list.filter((i) => kindOf(i) === "eval" && !i.archived).length, remoteTotal = list.filter((i) => kindOf(i) === "remote" && !i.archived).length;
+  const rowProps = (it) => ({ key: it.id, it, open: open === it.id, setOpen, events, act, remove });
+
+  let body;
+  if (view === "eval") {
+    const groups = {};
+    for (const it of shown) (groups[it.event || NO_EVENT] = groups[it.event || NO_EVENT] || []).push(it);
+    const order = Object.keys(groups).sort((x, y) => (x === NO_EVENT) - (y === NO_EVENT) || (groups[y][0].created || "").localeCompare(groups[x][0].created || ""));
+    body = order.map((name) => {
+      const all = mine.filter((i) => (i.event || NO_EVENT) === name && (showArch || !i.archived));
+      const done = all.filter((i) => ["submitted", "reviewed"].includes(stageOf(i))).length;
+      const allArch = all.length > 0 && all.every((i) => i.archived);
+      const isCol = collapsed[name];
+      return (
+        <div key={name} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "10px 10px 4px", marginBottom: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: isCol ? 6 : 8 }}>
+            <button onClick={() => setCollapsed((c) => ({ ...c, [name]: !c[name] }))} style={{ background: "transparent", border: 0, color: "#fff", fontSize: 14, fontWeight: 800, cursor: "pointer", padding: 0, textAlign: "left", fontFamily: "inherit" }}>
+              {isCol ? "▸" : "▾"} {name} <span style={{ fontSize: 11, fontWeight: 600, color: done === all.length && all.length ? C.acc : C.mut }}>· {done} of {all.length} submitted</span>
+            </button>
+            {name !== NO_EVENT && <button className="tb" onClick={() => archiveEvent(name, !allArch)}>{allArch ? "Unarchive event" : "Archive event"}</button>}
+          </div>
+          {!isCol && groups[name].map((it) => <IntakeRow {...rowProps(it)} />)}
+        </div>
+      );
+    });
+  } else {
+    body = shown.map((it) => <IntakeRow {...rowProps(it)} />);
+  }
 
   return (
     <div style={{ marginBottom: 22 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>Intakes {fresh ? <span style={{ fontSize: 11, color: C.acc, fontWeight: 700 }}> · {fresh} submitted</span> : null}</div>
-        {!making && <button className="tb" onClick={() => { setMaking(true); setLink(null); setMsg(null); }}>+ New intake link</button>}
+      <datalist id="rpm-events">{events.map((e) => <option key={e} value={e} />)}</datalist>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div className="seg" role="group" aria-label="Intake type">
+          <button aria-pressed={view === "eval"} onClick={() => pickView("eval")}>Evals · {evalTotal}</button>
+          <button aria-pressed={view === "remote"} onClick={() => pickView("remote")}>Remote clients · {remoteTotal}</button>
+        </div>
+        {!making && <button className="tb" onClick={() => { setMaking(true); setMade(null); setMsg(null); }}>+ New {view === "eval" ? "eval links" : "intake link"}</button>}
       </div>
       {making && (
-        <form onSubmit={create} style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-          <div className="seg" role="group" aria-label="Form" style={{ flex: "1 1 100%" }}>
-            {[["eval", "Eval sign-up (short)"], ["remote", "Remote client (full)"]].map(([k, t]) => <button type="button" key={k} aria-pressed={newKind === k} onClick={() => setNewKind(k)}>{t}</button>)}
+        <form onSubmit={create} style={{ display: "grid", gap: 8, marginTop: 10 }}>
+          {view === "eval" && <input list="rpm-events" value={event} onChange={(e) => setEvent(e.target.value)} placeholder="Event, e.g. Oct 17 Eval" style={{ ...input, padding: "8px 10px", fontSize: 14 }} />}
+          <textarea autoFocus value={names} onChange={(e) => setNames(e.target.value)} rows={view === "eval" ? 4 : 1} placeholder={view === "eval" ? "Athlete names, one per line" : "Athlete or family name"} style={{ ...input, padding: "8px 10px", fontSize: 14, resize: "vertical" }} />
+          <div style={{ display: "flex", gap: 8 }}>
+            <button type="submit" style={{ border: "none", borderRadius: 10, background: C.acc, color: C.bg, fontWeight: 700, padding: "8px 14px", cursor: "pointer" }}>Make link{view === "eval" ? "s" : ""}</button>
+            <button type="button" className="tb" onClick={() => setMaking(false)}>Cancel</button>
           </div>
-          <input autoFocus value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Athlete or family name" style={{ ...input, flex: "1 1 180px", padding: "8px 10px", fontSize: 14 }} />
-          <button type="submit" style={{ border: "none", borderRadius: 10, background: C.acc, color: C.bg, fontWeight: 700, padding: "8px 14px", cursor: "pointer" }}>Make link</button>
-          <button type="button" className="tb" onClick={() => setMaking(false)}>Cancel</button>
         </form>
       )}
-      {link && (
+      {made && (
         <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
-          <div style={{ fontSize: 11, color: C.mut }}>Intake link for {link.label}. Shown once, copy it now:</div>
-          <div style={{ fontSize: 11, color: C.ink2, background: C.field, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 10px", wordBreak: "break-all", userSelect: "all" }}>{link.url}</div>
-          <div><button className="tb" onClick={copy}>Copy link</button></div>
+          <div style={{ fontSize: 11, color: C.mut }}>{made.length === 1 ? "Link" : `${made.length} links`} shown once. Copy {made.length === 1 ? "it" : "them"} now:</div>
+          {made.map((m) => (
+            <div key={m.url} style={{ fontSize: 11, color: C.ink2, background: C.field, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 10px", wordBreak: "break-all", userSelect: "all" }}><b>{m.label}</b><br />{m.url}</div>
+          ))}
+          <div><button className="tb" onClick={copyAll}>Copy {made.length === 1 ? "link" : "all"}</button></div>
         </div>
       )}
       {msg && <div style={{ fontSize: 11, color: C.mut, marginTop: 8 }}>{msg}</div>}
-      <div style={{ marginTop: 10 }}>
-        {list.length === 0 && <div style={{ fontSize: 12, color: C.mut2 }}>No intakes yet. Make a link for your next athlete.</div>}
-        {list.map((it) => {
-          const a = it.answers || {};
-          const isEvalIt = it.kind === "eval";
-          const tier = it.answers && !isEvalIt ? intakeTier(a) : null;
-          const flags = it.answers ? intakeFlags(a) : [];
-          const age = ageFrom(a.dob);
-          const isOpen = open === it.id;
-          return (
-            <div key={it.id} style={{ border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)", borderRadius: 12, padding: "10px 12px", marginBottom: 6 }}>
-              <div role="button" tabIndex={0} onClick={() => setOpen(isOpen ? null : it.id)} onKeyDown={(e) => { if (e.key === "Enter") setOpen(isOpen ? null : it.id); }} style={{ cursor: "pointer" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{a.name || it.label}{age != null ? <span style={{ fontSize: 12, color: C.mut2, fontWeight: 500 }}> · {age}</span> : null}<span style={{ fontSize: 10, fontWeight: 700, color: C.mut2, marginLeft: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{isEvalIt ? "Eval" : "Remote"}</span></div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: it.status === "submitted" ? C.acc : C.mut2, whiteSpace: "nowrap" }}>
-                    {it.status === "submitted" ? `Submitted ${when(it.submittedAt)}` : it.status === "draft" ? "In progress" : `Sent ${when(it.created)}`}
-                  </div>
-                </div>
-                {(tier || flags.length > 0) && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-                    {tier && <span style={{ fontSize: 10, fontWeight: 700, color: C.acc, border: `1px solid rgba(79,255,176,0.35)`, borderRadius: 6, padding: "2px 6px" }}>{tier.text}</span>}
-                    {flags.map((fl) => <span key={fl.text} style={{ fontSize: 10, fontWeight: 700, color: flagColor[fl.level], border: `1px solid ${flagColor[fl.level]}55`, borderRadius: 6, padding: "2px 6px" }}>{fl.text}</span>)}
-                  </div>
-                )}
-              </div>
-              {isOpen && (
-                <div style={{ marginTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
-                  {!it.answers && <div style={{ fontSize: 12, color: C.mut2 }}>Not started yet.</div>}
-                  {it.answers && partsFor(it.kind).map((p) => {
-                    const rows = p.fields.filter((f) => visible(f, a)).map((f) => [f, answerText(f, a)]).filter(([, t]) => t);
-                    if (!rows.length) return null;
-                    return (
-                      <div key={p.title} style={{ marginBottom: 10 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: C.mut, margin: "6px 0 4px" }}>{p.title}</div>
-                        {rows.map(([f, t]) => (
-                          <div key={f.key} style={{ fontSize: 12, lineHeight: 1.45, marginBottom: 4 }}>
-                            <span style={{ color: C.mut2 }}>{f.label}</span><br /><span style={{ color: C.ink2 }}>{t}</span>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })}
-                  <button className="tb" onClick={() => remove(it)} style={{ marginTop: 4 }}>Delete intake</button>
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", margin: "12px 0 10px" }}>
+        {[["all", "All", live.length], ...STAGES.map(([k, t]) => [k, t, counts[k]])].map(([k, t, n]) => (
+          <button key={k} className="tb" aria-pressed={stage === k} onClick={() => setStage(k)} style={stage === k ? { borderColor: k === "all" ? "#fff" : stageColor[k], color: k === "all" ? "#fff" : stageColor[k] } : null}>{t} · {n}</button>
+        ))}
+        {archivedN > 0 && <label style={{ fontSize: 11, color: C.mut, display: "flex", alignItems: "center", gap: 5, marginLeft: 4 }}><input type="checkbox" checked={showArch} onChange={(e) => setShowArch(e.target.checked)} /> Show archived ({archivedN})</label>}
       </div>
+      {shown.length === 0 && <div style={{ fontSize: 12, color: C.mut2 }}>{mine.length === 0 ? (view === "eval" ? "No eval sign-ups yet. Make links for your next eval." : "No remote intakes yet. Make a link for your next remote athlete.") : "Nothing here with this filter."}</div>}
+      {body}
     </div>
   );
 }
