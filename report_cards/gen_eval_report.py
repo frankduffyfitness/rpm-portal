@@ -211,6 +211,65 @@ def velo_page(src, name, grp, female, logo, updated):
 </div>"""
 
 
+def model_summary(src, name, grp, rows, first):
+    """Callout written around the RPM velocity model (Frank, 2026-10-14): talk about
+    the numbers the model reads (concentric impulse, RSI-modified, grip), not
+    whatever metric happens to rank highest or lowest (peak power isn't in the model)."""
+    fn = name.split()[0]
+    strip = lambda t: re.sub(r"<[^>]+>", "", t).strip()
+    by = {r[0]: r for r in rows}
+    levers = {
+        "concentric impulse": "more drive into the ground, which comes from lower-body strength and force production",
+        "RSI-modified": "producing that force faster, which comes from jumping, landing and reactive work",
+        "grip strength": "grip and forearm strength",
+    }
+    inputs = []
+    if by.get("Concentric Impulse"):
+        r = by["Concentric Impulse"]; inputs.append(("concentric impulse", r[3], strip(r[1])))
+    if by.get("RSI-modified"):
+        r = by["RSI-modified"]; inputs.append(("RSI-modified", r[3], strip(r[1])))
+    m = re.search(r"const _VM = (\{.*?\});\n", src, re.S)
+    vm = json.loads(m.group(1)) if m else {}
+    row_ = next((r for r in vm.get("rows", []) if r[0] == name), None)
+    has_grip = bool(row_ and len(row_) > 26 and row_[24] is not None and row_[25] is not None)
+    if has_grip:
+        pool = [r for r in vm["rows"] if r[1] == grp and len(r) > 24 and r[24] is not None]
+        grips = [r[24] for r in pool]
+        p_grip = max(1, min(99, round(100 * sum(1 for x in grips if x < row_[24]) / len(grips)))) if grips else None
+        if p_grip:
+            inputs.append(("grip strength", p_grip, f"{round(row_[24] / 4.448)} lbs"))
+    if not inputs:
+        return "Every number here comes from a single session, so treat it as the starting line."
+    lo = min(inputs, key=lambda x: x[1])
+    hi = max(inputs, key=lambda x: x[1])
+    parts = [f"{n} ({p}{ordinal(p)} percentile, {v})" for n, p, v in inputs]
+    listing = parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + (", and " if len(parts) > 2 else " and ") + parts[-1]
+    count = {1: "one number", 2: "two numbers", 3: "three numbers"}.get(len(inputs), f"{len(inputs)} numbers")
+    out = (f"<b>Our velocity model reads {count} from this evaluation:</b> {listing}. "
+           f"{lo[0][0].upper() + lo[0][1:]} is the lowest, so it is {fn}'s biggest lever on velocity right now: "
+           f"{levers[lo[0]]}.")
+    if hi is not lo and hi[1] >= 50:
+        out += f" {hi[0][0].upper() + hi[0][1:]} is already a strength."
+    if row_ and row_[5] is not None:
+        actual = row_[5]
+        pred, resid, band_ = (row_[25], row_[26], vm.get("gband")) if has_grip else (row_[8], row_[9], vm.get("rmse"))
+        if pred is not None and resid is not None and band_:
+            if resid > band_:
+                out += (f" {fn} threw {actual:.1f} mph against a projected {pred:.1f}, so the arm is ahead of the engine: "
+                        "the delivery is efficient, and more velocity has to come from raising these numbers.")
+            elif resid < -band_:
+                out += (f" {fn} threw {actual:.1f} mph against a projected {pred:.1f}, so the engine is ahead of the arm: "
+                        "there is velocity these numbers already support that the delivery is not using yet.")
+            else:
+                out += (f" {fn} threw {actual:.1f} mph against a projected {pred:.1f}, right on model, "
+                        "so raising these numbers is the most direct path to more velocity.")
+    else:
+        out += " Once there is a TrackMan bullpen on file, the model shows how actual velocity compares to what these numbers predict."
+    if first:
+        out += " These are first-session numbers: the next test shows whether they are moving."
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("athlete")
@@ -337,17 +396,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
     if a.summary:
         summary = a.summary
     else:
-        # Data-driven fallback: name the top and bottom of the profile honestly.
-        ranked = sorted([r for r in rows if r[0] != 'Bodyweight'] or rows, key=lambda r: -r[3])
-        hi, lo = ranked[0], ranked[-1]
-        strip = lambda t: re.sub(r"<[^>]+>", "", t).strip()
-        summary = (f"<b>{name.split()[0]}'s standout number is {hi[0].lower()} at the "
-                   f"{hi[3]}{ordinal(hi[3])} percentile ({strip(hi[1])}).</b> The lowest of the set is "
-                   f"{lo[0].lower()} at the {lo[3]}{ordinal(lo[3])} ({strip(lo[1])}), which is the natural "
-                   f"place to aim training first. "
-                   + ("Every number here comes from a single session, so treat it as the starting line: "
-                      "the value is in what the next test shows against it." if first else
-                      "Percentiles move as the group changes, so read them alongside the raw numbers."))
+        summary = model_summary(src, name, grp, rows, first)
     html = html.replace("{SUMMARY}", summary)
     html = html.replace("{VELO_PAGE}", velo_page(src, name, grp, female, logo, updated))
 
