@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-08 Matt Cassidy evaluation
+# sync-trigger: 2026-10-14 Jacob Ephross evaluation
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
