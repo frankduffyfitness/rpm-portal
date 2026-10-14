@@ -244,7 +244,7 @@ def main():
     rows += [
         ("Jump Height", f"{cmj['jh']}&Prime;",
          "How high the athlete jumps. The headline measure of lower-body power.", cP(cmj["jh"], norms["cmjHeight"])),
-        ("RSI-modified", f"{cmj['rsi']}",
+        ("RSI-modified", f"{cmj['rsi']:.2f}",
          "Jump height relative to time on the ground. Explosiveness per second of effort.", cP(cmj["rsi"], norms["rsiMod"])),
         ("Concentric Impulse", f"{cmj['ci']} <span class='u'>N&middot;s</span>",
          "Total drive applied through the push-off. Closely tied to takeoff velocity.", cP(cmj["ci"], norms["conImpulse"])),
