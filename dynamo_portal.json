@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-14T19:16:03.914224+00:00",
+    "syncDate": "2026-10-14T21:36:08.770080+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 104
+    "totalAthletes": 105
   },
   "athletes": {
     "Joey Muzio": {
@@ -14493,6 +14493,65 @@
       "dob": "2010-10-23",
       "tests": [
         {
+          "date": "2026-10-14",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                443.7
+              ],
+              "peakLbs": [
+                null,
+                99.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2457
+              ],
+              "ttp": [
+                null,
+                1.71
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                402.7
+              ],
+              "peakLbs": [
+                null,
+                90.5
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2345
+              ],
+              "ttp": [
+                null,
+                1.89
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-08-19",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -17199,6 +17258,72 @@
           "erIr": {
             "left": null,
             "right": 0.75
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Jacob Ephross": {
+      "name": "Jacob Ephross",
+      "group": "hs",
+      "dob": "2010-02-11",
+      "tests": [
+        {
+          "date": "2026-10-14",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                361.7
+              ],
+              "peakLbs": [
+                null,
+                81.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2335
+              ],
+              "ttp": [
+                null,
+                1.13
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                436.7
+              ],
+              "peakLbs": [
+                null,
+                98.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2373
+              ],
+              "ttp": [
+                null,
+                0.94
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
