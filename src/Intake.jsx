@@ -537,21 +537,21 @@ export function IntakesPanel({ pw, onLocked }) {
           <button aria-pressed={view === "eval"} onClick={() => pickView("eval")}>Evals · {evalTotal}</button>
           <button aria-pressed={view === "remote"} onClick={() => pickView("remote")}>Remote clients · {remoteTotal}</button>
         </div>
-        {!making && <button className="tb" onClick={() => { setMaking(true); setMade(null); setMsg(null); }}>+ New {view === "eval" ? "eval links" : "intake link"}</button>}
+        {!making && <button className="tb" onClick={() => { setMaking(true); setMade(null); setMsg(null); }}>+ New {view === "eval" ? "eval intake forms" : "remote intake form"}</button>}
       </div>
       {making && (
         <form onSubmit={create} style={{ display: "grid", gap: 8, marginTop: 10 }}>
           {view === "eval" && <input list="rpm-events" value={event} onChange={(e) => setEvent(e.target.value)} placeholder="Event, e.g. Oct 17 Eval" style={{ ...input, padding: "8px 10px", fontSize: 14 }} />}
           <textarea autoFocus value={names} onChange={(e) => setNames(e.target.value)} rows={view === "eval" ? 4 : 1} placeholder={view === "eval" ? "Athlete names, one per line" : "Athlete or family name"} style={{ ...input, padding: "8px 10px", fontSize: 14, resize: "vertical" }} />
           <div style={{ display: "flex", gap: 8 }}>
-            <button type="submit" style={{ border: "none", borderRadius: 10, background: C.acc, color: C.bg, fontWeight: 700, padding: "8px 14px", cursor: "pointer" }}>Make link{view === "eval" ? "s" : ""}</button>
+            <button type="submit" style={{ border: "none", borderRadius: 10, background: C.acc, color: C.bg, fontWeight: 700, padding: "8px 14px", cursor: "pointer" }}>Make intake form{view === "eval" ? "s" : ""}</button>
             <button type="button" className="tb" onClick={() => setMaking(false)}>Cancel</button>
           </div>
         </form>
       )}
       {made && (
         <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
-          <div style={{ fontSize: 11, color: C.mut }}>{made.length === 1 ? "Link" : `${made.length} links`} shown once. Copy {made.length === 1 ? "it" : "them"} now:</div>
+          <div style={{ fontSize: 11, color: C.mut }}>{made.length === 1 ? "Intake form link" : `${made.length} intake form links`}, one per athlete. Shown once, copy {made.length === 1 ? "it" : "them"} now:</div>
           {made.map((m) => (
             <div key={m.url} style={{ fontSize: 11, color: C.ink2, background: C.field, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 10px", wordBreak: "break-all", userSelect: "all" }}><b>{m.label}</b><br />{m.url}</div>
           ))}
@@ -565,7 +565,7 @@ export function IntakesPanel({ pw, onLocked }) {
         ))}
         {archivedN > 0 && <label style={{ fontSize: 11, color: C.mut, display: "flex", alignItems: "center", gap: 5, marginLeft: 4 }}><input type="checkbox" checked={showArch} onChange={(e) => setShowArch(e.target.checked)} /> Show archived ({archivedN})</label>}
       </div>
-      {shown.length === 0 && <div style={{ fontSize: 12, color: C.mut2 }}>{mine.length === 0 ? (view === "eval" ? "No eval sign-ups yet. Make links for your next eval." : "No remote intakes yet. Make a link for your next remote athlete.") : "Nothing here with this filter."}</div>}
+      {shown.length === 0 && <div style={{ fontSize: 12, color: C.mut2 }}>{mine.length === 0 ? (view === "eval" ? "No eval intake forms yet. Make them for your next eval." : "No remote intakes yet. Make a link for your next remote athlete.") : "Nothing here with this filter."}</div>}
       {body}
     </div>
   );
