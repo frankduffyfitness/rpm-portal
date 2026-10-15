@@ -3797,19 +3797,12 @@ function VmSlider({ label, unit, value, onChange, min, max, fit, step, dec, sub 
   );
 }
 
-// What-if chart (Frank, 2026-10-15): the slider page drawn as a chart that
-// moves with the sliders. X = the input the coach picks with the tabs (fixed
-// while sliding, Frank 2026-10-15), Y = peak FB. The roster sits behind as faded dots (actual velo
-// vs that input), the model line is drawn holding every other slider at its
-// live value, so moving RSI visibly lifts the impulse line. Hollow ring =
-// baseline (his numbers, or the pinned eval baseline); solid dot = live
-// projection. Model A is the line on Impulse and RSI; the grip axis draws the
-// provisional A+grip read, since Model A has no grip term.
-const VM_AXES = {
-  ci: { l: "Impulse", u: "N·s", dec: 0, k: "ci", to: (v) => v, from: (v) => v },
-  rsi: { l: "RSI-mod", u: "", dec: 2, k: "rsi", to: (v) => v, from: (v) => v },
-  grip: { l: "Grip", u: "lbs", dec: 0, k: "grip", to: (v) => v / VM_N_PER_LB, from: (v) => v * VM_N_PER_LB },
-};
+// What-if chart (Frank, 2026-10-15, v3): ONE fixed chart. X = the model's
+// prediction (every slider folded into one number), Y = peak FB, a fixed 1:1
+// line with the ±band. Axes are set from the roster and never rescale; the
+// sliders only slide the dot along the line. Frank rejected per-metric axes:
+// a line that tilts with the other sliders is too much to explain to
+// athletes and parents.
 const vmNice = (lo, hi, n) => {
   const raw = (hi - lo) / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
   const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw) || raw;
@@ -3817,85 +3810,63 @@ const vmNice = (lo, hi, n) => {
   for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) out.push(Math.round(t / step) * step);
   return out;
 };
+const VM_CHART_PTS = VM_ROWS.filter(r => r.velo != null && r.predA != null && !r.thin);
+const VM_CHART_DOM = (() => {
+  const v = VM_CHART_PTS.flatMap(r => [r.velo, r.predA]);
+  return [Math.floor(Math.min(...v)) - 3, Math.ceil(Math.max(...v)) + 3];
+})();
 
-function VmWhatIfChart({ axis, setAxis, live, base, bounds, hasGrip, name, actual }) {
+function VmWhatIfChart({ livePred, basePred, livePredG, name, actual }) {
   const [hover, setHover] = useState(null);
-  const ax = VM_AXES[axis];
-  const W = 340, H = 230, PL = 34, PR = 12, PT = 14, PB = 30;
-  const [b0, b1] = bounds[axis];
-  const x0 = ax.to(b0), x1 = ax.to(b1);
-  const X = (v) => PL + ((v - x0) / (x1 - x0)) * (W - PL - PR);
-  const useG = axis === "grip";
-  const band = useG ? _VM.gband : VM_BAND;
-  const pred = (inp) => useG ? vmPredG(inp.ci, inp.rsi, inp.grip, inp.bw) : vmPredA(inp.ci, inp.rsi);
-  const at = (v) => pred({ ...live, [axis]: ax.from(v) });
-  const pts = VM_ROWS.filter(r => r[ax.k] != null && r.velo != null && !r.thin);
-  const ys = [...pts.map(r => r.velo), at(x0) - band, at(x1) + band, pred(live), pred(base)];
-  if (actual != null) ys.push(actual);
-  const y0 = Math.floor(Math.min(...ys)) - 2, y1 = Math.ceil(Math.max(...ys)) + 2;
-  const Y = (v) => H - PB - ((Math.min(Math.max(v, y0), y1) - y0) / (y1 - y0)) * (H - PB - PT);
-  const lx = ax.to(live[axis]), bx = ax.to(base[axis]);
-  const lp = pred(live), bp = pred(base);
-  const [f0, f1] = VM_RANGE[axis === "grip" ? "grip" : axis].map(ax.to);
-  const bandPts = `${X(x0)},${Y(at(x0) + band)} ${X(x1)},${Y(at(x1) + band)} ${X(x1)},${Y(at(x1) - band)} ${X(x0)},${Y(at(x0) - band)}`;
-  const tabs = ["ci", "rsi", ...(hasGrip ? ["grip"] : [])];
-  const h = hover != null ? pts[hover] : null;
-  const up = lp - bp;
+  const W = 340, H = 250, PL = 34, PR = 12, PT = 12, PB = 30;
+  const [lo, hi] = VM_CHART_DOM;
+  const cl = (v) => Math.min(Math.max(v, lo), hi);
+  const X = (v) => PL + ((cl(v) - lo) / (hi - lo)) * (W - PL - PR);
+  const Y = (v) => H - PB - ((cl(v) - lo) / (hi - lo)) * (H - PB - PT);
+  const e = VM_BAND;
+  const band = `${X(lo)},${Y(lo + e)} ${X(hi - e)},${Y(hi)} ${X(hi)},${Y(hi)} ${X(hi)},${Y(hi - e)} ${X(lo + e)},${Y(lo)} ${X(lo)},${Y(lo)}`;
+  const ticks = vmNice(lo, hi, 5);
+  const moved = Math.abs(livePred - basePred) >= 0.05;
+  const h = hover != null ? VM_CHART_PTS[hover] : null;
   return (
     <div style={{ marginBottom: 14 }}>
-      <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-        {tabs.map(t => (
-          <button key={t} onClick={() => setAxis(t)} style={{ flex: 1, padding: "5px 0", borderRadius: 8, fontSize: 10.5, fontWeight: 700, cursor: "pointer",
-            border: `1px solid ${axis === t ? "rgba(79,255,176,0.45)" : "rgba(255,255,255,0.08)"}`,
-            background: axis === t ? "rgba(79,255,176,0.08)" : "none", color: axis === t ? "#4FFFB0" : "#8A8F98" }}>{VM_AXES[t].l}</button>
-        ))}
-      </div>
       <div style={{ position: "relative" }}>
         <svg viewBox={`0 0 ${W} ${H}`} style={{ display: "block", width: "100%" }}>
-          {/* outside the tested range: shaded so extrapolation is visible */}
-          {f0 > x0 && <rect x={X(x0)} y={PT} width={X(f0) - X(x0)} height={H - PB - PT} fill="rgba(255,176,32,0.05)" />}
-          {f1 < x1 && <rect x={X(f1)} y={PT} width={X(x1) - X(f1)} height={H - PB - PT} fill="rgba(255,176,32,0.05)" />}
-          {vmNice(y0, y1, 5).map(t => (<g key={"y" + t}>
+          {ticks.map(t => (<g key={t}>
             <line x1={PL} y1={Y(t)} x2={W - PR} y2={Y(t)} stroke="rgba(255,255,255,0.05)" />
+            <line x1={X(t)} y1={PT} x2={X(t)} y2={H - PB} stroke="rgba(255,255,255,0.05)" />
             <text x={PL - 5} y={Y(t) + 3} textAnchor="end" style={{ fontSize: 8, fill: "#4A4F57", fontFamily: "DM Sans" }}>{t}</text>
+            <text x={X(t)} y={H - PB + 12} textAnchor="middle" style={{ fontSize: 8, fill: "#4A4F57", fontFamily: "DM Sans" }}>{t}</text>
           </g>))}
-          {vmNice(x0, x1, 5).map(t => (
-            <text key={"x" + t} x={X(t)} y={H - PB + 12} textAnchor="middle" style={{ fontSize: 8, fill: "#4A4F57", fontFamily: "DM Sans" }}>{ax.dec ? t.toFixed(ax.dec === 2 ? 1 : 0) : t}</text>
-          ))}
-          {pts.map((r, i) => r.name === name ? null : (
-            <circle key={i} cx={X(ax.to(r[ax.k]))} cy={Y(r.velo)} r={hover === i ? 4.5 : 2.6}
+          {VM_CHART_PTS.map((r, i) => r.name === name ? null : (
+            <circle key={i} cx={X(r.predA)} cy={Y(r.velo)} r={hover === i ? 4.5 : 2.6}
               fill={hover === i ? "#B8BDC4" : "rgba(255,255,255,0.16)"}
               onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} />
           ))}
-          <polygon points={bandPts} fill="rgba(79,255,176,0.07)" />
-          <line x1={X(x0)} y1={Y(at(x0))} x2={X(x1)} y2={Y(at(x1))} stroke="#4FFFB0" strokeWidth="1.6" strokeDasharray={useG ? "5 3" : undefined} />
-          {/* baseline -> live */}
-          {Math.abs(lx - bx) > 1e-6 || Math.abs(up) >= 0.05 ? (
-            <path d={`M${X(bx)},${Y(bp)} L${X(lx)},${Y(bp)} L${X(lx)},${Y(lp)}`} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="2 2" />
-          ) : null}
-          {/* his actual velo at his baseline inputs: the gap to the ring is his residual */}
-          {actual != null && <line x1={X(bx)} y1={Y(actual)} x2={X(bx)} y2={Y(bp)} stroke="rgba(255,255,255,0.25)" strokeWidth="1" />}
-          {actual != null && <circle cx={X(bx)} cy={Y(actual)} r="4.5" fill="#fff" stroke="#0A0C10" strokeWidth="1.5" />}
-          <circle cx={X(bx)} cy={Y(bp)} r="8" fill="#0A0C10" stroke="#fff" strokeWidth="1.6" />
-          <circle cx={X(lx)} cy={Y(lp)} r="6" fill="#4FFFB0" stroke="#0A0C10" strokeWidth="2" />
-          <text x={Math.min(X(lx) + 9, W - PR - 2)} y={Y(lp) - 8} textAnchor={X(lx) > W - 70 ? "end" : "start"} style={{ fontSize: 10, fontWeight: 800, fill: "#4FFFB0", fontFamily: "DM Sans" }}>{lp.toFixed(1)}</text>
-          <text x={(PL + W - PR) / 2} y={H - 4} textAnchor="middle" style={{ fontSize: 8.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>{ax.l.toUpperCase()}{ax.u ? ` (${ax.u.toUpperCase()})` : ""}</text>
-          <text x={9} y={(PT + H - PB) / 2} textAnchor="middle" transform={`rotate(-90 9 ${(PT + H - PB) / 2})`} style={{ fontSize: 8.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>PEAK FB (MPH)</text>
+          <polygon points={band} fill="rgba(79,255,176,0.07)" />
+          <line x1={X(lo)} y1={Y(lo)} x2={X(hi)} y2={Y(hi)} stroke="#4FFFB0" strokeWidth="1.6" />
+          {actual != null && <line x1={X(basePred)} y1={Y(actual)} x2={X(basePred)} y2={Y(basePred)} stroke="rgba(255,255,255,0.25)" strokeWidth="1" />}
+          {actual != null && <circle cx={X(basePred)} cy={Y(actual)} r="4.5" fill="#fff" stroke="#0A0C10" strokeWidth="1.5" />}
+          {livePredG != null && <rect x={X(livePredG) - 4} y={Y(livePredG) - 4} width="8" height="8" transform={`rotate(45 ${X(livePredG)} ${Y(livePredG)})`} fill="none" stroke="#B8BDC4" strokeWidth="1.3" />}
+          <circle cx={X(basePred)} cy={Y(basePred)} r="8" fill="#0A0C10" stroke="#fff" strokeWidth="1.6" />
+          <circle cx={X(livePred)} cy={Y(livePred)} r="6" fill="#4FFFB0" stroke="#0A0C10" strokeWidth="2" />
+          <text x={X(livePred) - 10} y={Y(livePred) - 8} textAnchor="end" style={{ fontSize: 10, fontWeight: 800, fill: "#4FFFB0", fontFamily: "DM Sans" }}>{livePred.toFixed(1)}</text>
+          <text x={(PL + W - PR) / 2} y={H - 4} textAnchor="middle" style={{ fontSize: 8.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>MODEL PREDICTION (MPH)</text>
+          <text x={9} y={(PT + H - PB) / 2} textAnchor="middle" transform={`rotate(-90 9 ${(PT + H - PB) / 2})`} style={{ fontSize: 8.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>ACTUAL PEAK FB (MPH)</text>
         </svg>
         {h && (
           <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 10px", pointerEvents: "none", whiteSpace: "nowrap" }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{h.name}</span>
-            <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {ax.to(h[ax.k]).toFixed(ax.dec)} {ax.u} {"·"} {h.velo} mph</span>
+            <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {h.velo} actual, {h.predA.toFixed(1)} predicted</span>
           </div>
         )}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", fontSize: 9, color: "#6B7280", marginTop: 4 }}>
         <span><span style={{ color: "#4FFFB0" }}>{"●"}</span> projection</span>
-        <span><span style={{ color: "#fff" }}>{"○"}</span> {name ? "his current prediction" : "pinned baseline"}</span>
+        {moved && <span><span style={{ color: "#fff" }}>{"○"}</span> {name ? "his current prediction" : "pinned baseline"}</span>}
         {name && <span><span style={{ color: "#fff" }}>{"●"}</span> his actual</span>}
-        <span><span style={{ color: "#4FFFB0" }}>{useG ? "- -" : "━"}</span> {useG ? "grip read" : "Model A"}, other sliders held {"±"}{band}</span>
+        {livePredG != null && <span><span style={{ color: "#B8BDC4" }}>{"◇"}</span> with grip</span>}
         <span><span style={{ color: "rgba(255,255,255,0.35)" }}>{"●"}</span> roster</span>
-        <span><span style={{ color: "#FFB020" }}>{"▮"}</span> outside tested range</span>
       </div>
     </div>
   );
@@ -3933,7 +3904,6 @@ function VmAthleteCard({ r, onBack }) {
   const hasGrip = r.grip != null && r.predG != null && hasBw;
   const gB = hasGrip ? pad(VM_RANGE.grip, 0.15, 50) : null;
   const [grip, setGrip] = useState(hasGrip ? r.grip : 0);
-  const [axis, setAxis] = useState("ci");
 
   const gi = GROUPS[r.group] || {};
 
@@ -4042,9 +4012,7 @@ function VmAthleteCard({ r, onBack }) {
       <div style={card}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>What if</div>
         <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14 }}>Slide the testing inputs and watch the Model A prediction{hasGrip ? ", with the provisional grip read beneath it" : ""}. {cur ? "Sliders start from his current 6-week testing." : "Sliders start from his all-time bests."}{hasGrip ? " Grip starts from his lifetime best and enters per kg, so bodyweight moves the with-grip line too." : ""}</div>
-        <VmWhatIfChart axis={axis} setAxis={setAxis} hasGrip={hasGrip} name={r.name} actual={velo0}
-          live={{ ci, rsi, grip, bw }} base={{ ci: ci0, rsi: rsi0, grip: r.grip, bw: r.bw }}
-          bounds={{ ci: ciB, rsi: rsiB, grip: gB }} />
+        <VmWhatIfChart name={r.name} actual={velo0} livePred={livePred} basePred={curPred} livePredG={hasGrip ? livePredG : null} />
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => setCi(v)} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => setRsi(v)} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
         {hasGrip && (
@@ -4109,7 +4077,6 @@ function VmSandboxCard() {
   const [rsi, setRsi] = useState(d0.rsi);
   const [er, setEr] = useState(d0.er);
   const [grip, setGrip] = useState(d0.grip);
-  const [axis, setAxis] = useState("ci");
 
   const livePred = vmPredA(ci, rsi);
   const pinPred = vmPredA(pin.ci, pin.rsi);
@@ -4132,9 +4099,7 @@ function VmSandboxCard() {
         <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14, lineHeight: 1.5 }}>
           For evals: set a pitcher&rsquo;s tested numbers, tap Pin as baseline, then slide to project. Linked to nobody, saved nowhere.
         </div>
-        <VmWhatIfChart axis={axis} setAxis={setAxis} hasGrip={true} name={null}
-          live={{ ci, rsi, grip, bw }} base={{ ci: pin.ci, rsi: pin.rsi, grip: pin.grip != null ? pin.grip : d0.grip, bw: pin.bw }}
-          bounds={{ ci: ciB, rsi: rsiB, grip: gB }} />
+        <VmWhatIfChart name={null} livePred={livePred} basePred={pinPred} livePredG={livePredG} />
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => setCi(v)} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => setRsi(v)} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
         <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => setGrip(v * VM_N_PER_LB)} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} />
