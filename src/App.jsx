@@ -3798,8 +3798,8 @@ function VmSlider({ label, unit, value, onChange, min, max, fit, step, dec, sub 
 }
 
 // What-if chart (Frank, 2026-10-15): the slider page drawn as a chart that
-// moves with the sliders. X = whichever input was moved last (or the tab the
-// coach picks), Y = peak FB. The roster sits behind as faded dots (actual velo
+// moves with the sliders. X = the input the coach picks with the tabs (fixed
+// while sliding, Frank 2026-10-15), Y = peak FB. The roster sits behind as faded dots (actual velo
 // vs that input), the model line is drawn holding every other slider at its
 // live value, so moving RSI visibly lifts the impulse line. Hollow ring =
 // baseline (his numbers, or the pinned eval baseline); solid dot = live
@@ -4045,16 +4045,16 @@ function VmAthleteCard({ r, onBack }) {
         <VmWhatIfChart axis={axis} setAxis={setAxis} hasGrip={hasGrip} name={r.name} actual={velo0}
           live={{ ci, rsi, grip, bw }} base={{ ci: ci0, rsi: rsi0, grip: r.grip, bw: r.bw }}
           bounds={{ ci: ciB, rsi: rsiB, grip: gB }} />
-        <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => { setCi(v); setAxis("ci"); }} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
-        <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => { setRsi(v); setAxis("rsi"); }} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
+        <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => setCi(v)} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
+        <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => setRsi(v)} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
         {hasGrip && (
-          <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => { setGrip(v * VM_N_PER_LB); setAxis("grip"); }} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} sub={`his best ${Math.round(r.grip / VM_N_PER_LB)}`} />
+          <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => setGrip(v * VM_N_PER_LB)} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} sub={`his best ${Math.round(r.grip / VM_N_PER_LB)}`} />
         )}
         {hasBw && (
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
             <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility's measured rate. It never moves RSI.</div>
-            <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={(v) => { setBw(v); setAxis("ci"); }} min={r.bw - 30} max={r.bw + 30} step={1} dec={0} sub={`current ${Math.round(r.bw)}`} />
+            <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={(v) => setBw(v)} min={r.bw - 30} max={r.bw + 30} step={1} dec={0} sub={`current ${Math.round(r.bw)}`} />
             <div style={{ fontSize: 9.5, color: "#6B7280", lineHeight: 1.55, marginTop: -6 }}>Holds only if you keep your jump. Gaining weight while jump height drops more than about 0.4 cm per pound nets zero.</div>
           </div>
         )}
@@ -4135,13 +4135,13 @@ function VmSandboxCard() {
         <VmWhatIfChart axis={axis} setAxis={setAxis} hasGrip={true} name={null}
           live={{ ci, rsi, grip, bw }} base={{ ci: pin.ci, rsi: pin.rsi, grip: pin.grip != null ? pin.grip : d0.grip, bw: pin.bw }}
           bounds={{ ci: ciB, rsi: rsiB, grip: gB }} />
-        <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => { setCi(v); setAxis("ci"); }} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
-        <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => { setRsi(v); setAxis("rsi"); }} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
-        <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => { setGrip(v * VM_N_PER_LB); setAxis("grip"); }} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} />
+        <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => setCi(v)} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
+        <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => setRsi(v)} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
+        <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => setGrip(v * VM_N_PER_LB)} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} />
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 4 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
           <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility&rsquo;s measured rate. It never moves RSI. The with-grip line also reads grip per kg, so added weight at the same grip lowers it.</div>
-          <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={(v) => { setBw(v); setAxis("ci"); }} min={120} max={280} step={1} dec={0} sub={`baseline ${Math.round(pin.bw)}`} />
+          <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={(v) => setBw(v)} min={120} max={280} step={1} dec={0} sub={`baseline ${Math.round(pin.bw)}`} />
           <div style={{ fontSize: 9.5, color: "#6B7280", lineHeight: 1.55, marginTop: -6 }}>Holds only if you keep your jump. Gaining weight while jump height drops more than about 0.4 cm per pound nets zero.</div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 12, textAlign: "center" }}>
