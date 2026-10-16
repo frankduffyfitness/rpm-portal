@@ -91,6 +91,71 @@ def row(label, val, desc, pct):
     </div>"""
 
 
+def grip_rows(src, name, grp):
+    """Page-1 grip rows under the CMJ column (Frank, 2026-10-16): best-side peak
+    squeeze and squeeze RFD from DynaMo, same row format as the CMJ metrics.
+    Peak percentile uses the velo-model pool when the athlete has a _VM grip row,
+    so the number matches the summary callout and the velo page exactly;
+    otherwise (and for RFD always) it is rank-based against same-group athletes
+    in dynamo_portal.json."""
+    path = os.path.join(REPO, "dynamo_portal.json")
+    if not os.path.exists(path):
+        return []
+    try:
+        data = json.load(open(path))
+    except Exception:
+        return []
+    aths = data.get("athletes", data) if isinstance(data, dict) else data
+    items = list(aths.values()) if isinstance(aths, dict) else list(aths)
+
+    def squeeze(a):
+        peaks, rfds = [], []
+        for t in a.get("tests", []):
+            for mv in t.get("movements", []):
+                if mv.get("name") != "Grip Squeeze":
+                    continue
+                peaks += [v for v in (mv.get("peakN") or []) if v is not None]
+                rfds += [v for v in (mv.get("rfd") or []) if v is not None]
+        return (max(peaks) if peaks else None, max(rfds) if rfds else None)
+
+    want = " ".join(name.split()).casefold()
+    me = next((a for a in items
+               if " ".join((a.get("name") or "").split()).casefold() == want), None)
+    if not me:
+        return []
+    peak_n, rfd = squeeze(me)
+    if peak_n is None:
+        return []
+
+    def rank_pct(v, pool):
+        if not pool:
+            return None
+        return max(1, min(99, round(100 * sum(1 for x in pool if x < v) / len(pool))))
+
+    p_peak = None
+    m = re.search(r"const _VM = (\{.*?\});\n", src, re.S)
+    vm = json.loads(m.group(1)) if m else {}
+    row_ = next((r for r in vm.get("rows", []) if r[0] == name), None)
+    if row_ and len(row_) > 24 and row_[24] is not None:
+        pool = [r[24] for r in vm["rows"] if r[1] == grp and len(r) > 24 and r[24] is not None]
+        p_peak = rank_pct(row_[24], pool)
+    grp_sq = [squeeze(a) for a in items if a.get("group") == grp]
+    if p_peak is None:
+        p_peak = rank_pct(peak_n, [p for p, _ in grp_sq if p is not None])
+
+    out = []
+    if p_peak:
+        out.append(("Peak Grip Squeeze", f"{round(peak_n / 4.448)} <span class='u'>lbs</span>",
+                    "Strongest squeeze on the handheld dynamometer, best side. Hand and forearm "
+                    "strength: the third input in our velocity model.", p_peak))
+    p_rfd = rank_pct(rfd, [r for _, r in grp_sq if r is not None]) if rfd else None
+    if p_rfd:
+        out.append(("Grip RFD", f"{round(rfd)} <span class='u'>N/s</span>",
+                    "How fast squeeze force builds. Rate of force development in the hand and forearm.",
+                    p_rfd))
+    return out
+
+
 def velo_page(src, name, grp, female, logo, updated):
     """Page 2: velo model projection vs actual, where he sits among his level,
     and the bullpen by pitch type. Returns "" when there is nothing to show.
@@ -238,6 +303,12 @@ def model_summary(src, name, grp, rows, first):
         p_grip = max(1, min(99, round(100 * sum(1 for x in grips if x < row_[24]) / len(grips)))) if grips else None
         if p_grip:
             inputs.append(("grip strength", p_grip, f"{round(row_[24] / 4.448)} lbs"))
+    else:
+        # No bullpen yet, so no _VM row: a grip test from the eval still counts as a
+        # model input (Frank, 2026-10-08). Same source and pool as the page-1 rows.
+        gp = next((r for r in grip_rows(src, name, grp) if r[0] == "Peak Grip Squeeze"), None)
+        if gp:
+            inputs.append(("grip strength", gp[3], strip(gp[1])))
     if not inputs:
         return "Every number here comes from a single session, so treat it as the starting line."
     lo = min(inputs, key=lambda x: x[1])
@@ -337,6 +408,11 @@ def main():
 
     logo = re.search(r'const RPM_LOGO_DARK = "(data:image/png;base64,[^"]+)"', src).group(1)
     fonts = open(FONT).read()
+    grip = grip_rows(src, name, grp)
+    grip_html = ('<div class="sect">Grip Strength</div>'
+                 '<div class="scap">Hand &amp; forearm strength &middot; VALD DynaMo</div>'
+                 + "".join(row(*r) for r in grip)) if grip else ""
+
     first = sessions == 1
     title = "New Athlete Evaluation" if first else "Athlete Evaluation Report"
     sub = f"First session &middot; {latest}" if first else f"{sessions} sessions &middot; latest {latest}"
@@ -383,6 +459,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
 <div class="cols"><div class="col">
   <div class="sect">Countermovement Jump</div><div class="scap">Lower-body explosive power &middot; VALD ForceDecks</div>
   {''.join(row(*r) for r in rows[:len(rows)//2 + len(rows)%2])}
+  {grip_html}
 </div><div class="col">
   <div class="sect">{'Hop Test (Reactivity)' if hop_rows else 'Power &amp; Rate'}</div>
   <div class="scap">{'Repeated-hop reactive ability' if hop_rows else 'How much, and how fast'}</div>
@@ -390,7 +467,7 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
 </div></div>
 <div class="summary"><div class="sumhd">{'What this baseline shows' if first else 'Where this athlete stands'}</div>
 <div class="sumtx">{{SUMMARY}}</div></div>
-<div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: VALD ForceDecks &middot; Percentiles vs {cohort}</span></div>
+<div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: VALD ForceDecks{' &middot; VALD DynaMo' if grip_html else ''} &middot; Percentiles vs {cohort}</span></div>
 </div>{{VELO_PAGE}}</body></html>"""
 
     if a.summary:
