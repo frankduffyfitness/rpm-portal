@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-16 Goose Plummer + Cayden King evaluations
+# sync-trigger: 2026-10-17 evening pull, eval-day reports
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
