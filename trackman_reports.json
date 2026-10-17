@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-10-16T23:37:26Z",
+ "lastSyncedAt": "2026-10-17T16:57:12Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -125268,6 +125268,134 @@
   "John Turner": {
    "name": "John Turner",
    "sessions": [
+    {
+     "date": "2026-10-17",
+     "sessionType": "Pitching practice",
+     "total": 5,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 1,
+       "veloMin": 65.0,
+       "veloMax": 65.0,
+       "veloAvg": 65.0,
+       "spinMin": 1740.7,
+       "spinMax": 1740.7,
+       "spinAvg": 1740.7,
+       "ivb": 25.9,
+       "hb": -2.8,
+       "hbMaxAbs": 2.8,
+       "vertMovMaxAbs": 42.2,
+       "relH": 5.1,
+       "relSide": -1.5,
+       "ext": 5.6,
+       "effAvg": 82
+      },
+      {
+       "name": "Changeup",
+       "count": 3,
+       "veloMin": 58.4,
+       "veloMax": 60.1,
+       "veloAvg": 59.1,
+       "spinMin": 1251.9,
+       "spinMax": 1416.3,
+       "spinAvg": 1353.0,
+       "ivb": 15.4,
+       "hb": -10.5,
+       "hbMaxAbs": 13.3,
+       "vertMovMaxAbs": 70.9,
+       "relH": 5.0,
+       "relSide": -1.6,
+       "ext": 5.4,
+       "effAvg": 71
+      },
+      {
+       "name": "Curveball",
+       "count": 1,
+       "veloMin": 55.4,
+       "veloMax": 55.4,
+       "veloAvg": 55.4,
+       "spinMin": 1688.4,
+       "spinMax": 1688.4,
+       "spinAvg": 1688.4,
+       "ivb": 6.4,
+       "hb": 10.5,
+       "hbMaxAbs": 10.5,
+       "vertMovMaxAbs": 106.0,
+       "relH": 4.9,
+       "relSide": -1.6,
+       "ext": 4.5,
+       "effAvg": 59
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 65.0,
+       "spin": 1741.0,
+       "tilt": "11:45",
+       "ivb": 25.9,
+       "hb": -2.8,
+       "ext": 5.67,
+       "relH": 5.08,
+       "relSide": null,
+       "eff": 82,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 60.1,
+       "spin": 1391.0,
+       "tilt": "10:15",
+       "ivb": 10.8,
+       "hb": -13.3,
+       "ext": 5.25,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 76,
+       "type": "Changeup"
+      },
+      {
+       "no": 3,
+       "velo": 58.4,
+       "spin": 1252.0,
+       "tilt": "10:30",
+       "ivb": null,
+       "hb": null,
+       "ext": 5.42,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 71,
+       "type": "Changeup"
+      },
+      {
+       "no": 4,
+       "velo": 58.7,
+       "spin": 1416.0,
+       "tilt": "11:15",
+       "ivb": 20.0,
+       "hb": -7.6,
+       "ext": 5.75,
+       "relH": 5.0,
+       "relSide": null,
+       "eff": 67,
+       "type": "Changeup"
+      },
+      {
+       "no": 5,
+       "velo": 55.4,
+       "spin": 1688.0,
+       "tilt": "4:00",
+       "ivb": -6.4,
+       "hb": 10.5,
+       "ext": 4.5,
+       "relH": 4.92,
+       "relSide": null,
+       "eff": 59,
+       "type": "Curveball"
+      }
+     ]
+    },
     {
      "date": "2026-10-12",
      "sessionType": "Pitching practice",
