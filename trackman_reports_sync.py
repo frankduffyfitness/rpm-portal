@@ -58,15 +58,18 @@ def _num(tok):
 
 
 def _feet(tok):
-    """5'8\" → 5.67 ft; 5' → 5.0; '-' → None."""
+    """5'8\" → 5.67 ft; 5' → 5.0; -6\" → -0.5; -1'1\" → -1.08; 0\" → 0.0; '-' → None.
+
+    Release-side values are usually inches-only and often negative, which the
+    original feet'inches\" pattern rejected — that's why relSide came through
+    null on every per-pitch row before 2026-10-17."""
     if not tok or tok == '-':
         return None
-    m = re.match(r"^(\d+)'(?:(\d+)\")?$", tok)
-    if not m:
+    m = re.match(r"^(-?)(?:(\d+)')?(?:(\d+)\")?$", tok)
+    if not m or (m.group(2) is None and m.group(3) is None):
         return None
-    ft = int(m.group(1))
-    inches = int(m.group(2)) if m.group(2) else 0
-    return round(ft + inches / 12, 2)
+    v = int(m.group(2) or 0) + int(m.group(3) or 0) / 12
+    return round(-v if m.group(1) else v, 2)
 
 
 def _pct(tok):
@@ -143,6 +146,143 @@ def parse_pitches(all_text):
             "relSide": _feet(toks[7]), "eff": _pct(toks[8]),
         })
     return pitches
+
+
+# ─── Location-plot extraction ────────────────────────────────────────────────
+# The per-pitch table has no plate-location columns; the only location data in
+# the report is the dot plot on page 1. The dots are vector circle paths, so we
+# recover them with PyMuPDF: calibrate the Location axes from their numeric
+# tick labels, read each dot's center and ring color, and map colors to pitch
+# types via the page's own legend. Optional dependency: without pymupdf the
+# sync still runs and sessions simply carry no "locations".
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    fitz = None
+
+
+def _dot_drawings(page):
+    """Small circular paths → (cx, cy, color). A pitch dot is one path of
+    Bézier curves with a near-square bbox a few points wide; the ring (stroke)
+    color carries the pitch type, with fill as fallback."""
+    dots = []
+    for d in page.get_drawings():
+        r = d["rect"]
+        if not (2 < r.width < 12 and 2 < r.height < 12):
+            continue
+        if abs(r.width - r.height) > 2.5:
+            continue
+        if not any(it[0] == "c" for it in d["items"]):
+            continue
+        # Fill carries the type color on every TrackMan dot; stroke sometimes
+        # doesn't (the velo-panel legend rings its dot in black). Fall back to
+        # stroke only for hollow (missing or near-white fill) dots.
+        fill, stroke = d.get("fill"), d.get("color")
+        col = fill if fill and min(fill) < 0.9 else stroke
+        if col is None:
+            continue
+        dots.append((r.x0 + r.width / 2, r.y0 + r.height / 2,
+                     tuple(round(c, 3) for c in col)))
+    return dots
+
+
+def _linfit(pairs):
+    """Least-squares pixel→value map from (pixel, value) tick pairs."""
+    n = len(pairs)
+    sx = sum(p for p, _ in pairs); sv = sum(v for _, v in pairs)
+    sxx = sum(p * p for p, _ in pairs); sxv = sum(p * v for p, v in pairs)
+    den = n * sxx - sx * sx
+    if not den:
+        return None
+    a = (n * sxv - sx * sv) / den
+    b = (sv - a * sx) / n
+    return lambda px: a * px + b
+
+
+def extract_locations(path, type_names):
+    """[{x, z, type}] in feet from the page-1 Location plot, [] when the plot,
+    pymupdf, or a usable calibration is missing. Never raises."""
+    if fitz is None:
+        return []
+    try:
+        doc = fitz.open(path)
+        page = doc[0]
+        words = page.get_text("words")
+        dots = _dot_drawings(page)
+
+        def title(s):
+            c = [w for w in words if w[4] == s]
+            return c[0] if c else None
+
+        loc, rel = title("Location"), title("Release")
+        if not loc or not rel or rel[1] <= loc[3]:
+            return []
+        region = fitz.Rect(loc[0] - 30, loc[3], page.rect.x1, rel[1] - 2)
+
+        nums = []
+        for w in words:
+            if not (region.x0 <= w[0] and w[2] <= region.x1
+                    and region.y0 <= w[1] and w[3] <= region.y1):
+                continue
+            try:
+                nums.append((w, float(w[4])))
+            except ValueError:
+                continue
+        if len(nums) < 4:
+            return []
+        maxy = max((t[0][1] + t[0][3]) / 2 for t in nums)
+        xticks = [t for t in nums if abs((t[0][1] + t[0][3]) / 2 - maxy) < 5]
+        rest = [t for t in nums if t not in xticks]
+        if len(xticks) < 2 or not rest:
+            return []
+        maxx = max((t[0][0] + t[0][2]) / 2 for t in rest)
+        yticks = [t for t in rest if abs((t[0][0] + t[0][2]) / 2 - maxx) < 6]
+        if len(yticks) < 2:
+            return []
+        fx = _linfit([(((w[0] + w[2]) / 2), v) for w, v in xticks])
+        fy = _linfit([(((w[1] + w[3]) / 2), v) for w, v in yticks])
+        if not fx or not fy:
+            return []
+
+        # Legend: each type name has its ring dot just left of the text.
+        legend = {}
+        for w in words:
+            name = {"ChangeUp": "Changeup"}.get(w[4], w[4])
+            if name not in type_names:
+                continue
+            cy = (w[1] + w[3]) / 2
+            for cx, dy, col in dots:
+                if abs(dy - cy) < 4 and 0 < w[0] - cx < 25:
+                    legend.setdefault(name, col)
+                    break
+        if not legend:
+            return []
+
+        def nearest_type(col):
+            best = None
+            for n, c in legend.items():
+                d = sum((a - b) ** 2 for a, b in zip(col, c))
+                if best is None or d < best[0]:
+                    best = (d, n)
+            return best[1] if best and best[0] < 0.12 else None
+
+        out = []
+        for cx, cy, col in dots:
+            if not (region.x0 <= cx <= region.x1 and region.y0 <= cy <= region.y1):
+                continue
+            t = nearest_type(col)
+            if t is None:
+                continue
+            x, z = fx(cx), fy(cy)
+            if abs(x) > 5 or not -1 <= z <= 8:
+                continue
+            out.append({"x": round(x, 2), "z": round(z, 2), "type": t})
+        doc.close()
+        return out
+    except Exception as ex:
+        print(f"  WARN location extraction failed for "
+              f"{os.path.basename(path)}: {ex}", file=sys.stderr)
+        return []
 
 
 def assign_types(pitches, types, log_prefix=""):
@@ -260,8 +400,9 @@ def parse_report(path, athlete_name):
               f"{len(pitches)} pitch rows, report says {total}", file=sys.stderr)
     assign_types(pitches, types, log_prefix=f"  [{date}]")
 
+    locations = extract_locations(path, {t["name"] for t in types})
     return {"date": date, "sessionType": stype, "total": total,
-            "types": types, "pitches": pitches}
+            "types": types, "pitches": pitches, "locations": locations}
 
 
 def main():

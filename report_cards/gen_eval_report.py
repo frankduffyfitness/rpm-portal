@@ -276,6 +276,125 @@ def velo_page(src, name, grp, female, logo, updated):
 </div>"""
 
 
+PITCH_COLORS = {"Fastball": "#C0392B", "Sinker": "#E67E22", "Cutter": "#8D6E4B",
+                "Slider": "#CDA715", "Sweeper": "#7D3C98", "Curveball": "#2E6FBA",
+                "Changeup": "#1B7F4B", "Splitter": "#16A085"}
+P_OTHER = "#5B6470"
+
+
+def _scatter_panel(pts, xr, yr, ticks_x, ticks_y, unit, zero_axes=False, zone=False):
+    """One square SVG scatter: light grid, optional zero cross / strike zone,
+    4px dots with a white ring so overlapping pitches stay separable."""
+    W = H = 224
+    PAD = 20
+    x0, x1 = xr
+    y0, y1 = yr
+    sx = lambda v: PAD + (v - x0) / (x1 - x0) * (W - 2 * PAD)
+    sy = lambda v: H - PAD - (v - y0) / (y1 - y0) * (H - 2 * PAD)
+    e = [f'<rect x="0" y="0" width="{W}" height="{H}" fill="#FFFFFF"/>']
+    for tv in ticks_x:
+        X = sx(tv)
+        e.append(f'<line x1="{X:.1f}" y1="{PAD}" x2="{X:.1f}" y2="{H - PAD}" stroke="#EEF0F3"/>')
+        e.append(f'<text x="{X:.1f}" y="{H - PAD + 11}" font-size="7" fill="#98A0AA" text-anchor="middle">{tv:g}</text>')
+    for tv in ticks_y:
+        Y = sy(tv)
+        e.append(f'<line x1="{PAD}" y1="{Y:.1f}" x2="{W - PAD}" y2="{Y:.1f}" stroke="#EEF0F3"/>')
+        e.append(f'<text x="{PAD - 4}" y="{Y + 2.5:.1f}" font-size="7" fill="#98A0AA" text-anchor="end">{tv:g}</text>')
+    if zero_axes:
+        e.append(f'<line x1="{sx(0):.1f}" y1="{PAD}" x2="{sx(0):.1f}" y2="{H - PAD}" stroke="#C6CBD2"/>')
+        e.append(f'<line x1="{PAD}" y1="{sy(0):.1f}" x2="{W - PAD}" y2="{sy(0):.1f}" stroke="#C6CBD2"/>')
+    if zone:
+        # 17-inch plate → ±0.71 ft; typical zone 1.5–3.4 ft, with the 3x3 grid.
+        zx0, zx1, zy0, zy1 = sx(-0.708), sx(0.708), sy(3.4), sy(1.5)
+        e.append(f'<rect x="{zx0:.1f}" y="{zy0:.1f}" width="{zx1 - zx0:.1f}" height="{zy1 - zy0:.1f}" fill="none" stroke="#5B6470" stroke-width="1.2"/>')
+        for f_ in (1 / 3, 2 / 3):
+            X = zx0 + (zx1 - zx0) * f_
+            Y = zy0 + (zy1 - zy0) * f_
+            e.append(f'<line x1="{X:.1f}" y1="{zy0:.1f}" x2="{X:.1f}" y2="{zy1:.1f}" stroke="#C6CBD2" stroke-width="0.8"/>')
+            e.append(f'<line x1="{zx0:.1f}" y1="{Y:.1f}" x2="{zx1:.1f}" y2="{Y:.1f}" stroke="#C6CBD2" stroke-width="0.8"/>')
+    for x, y, c in pts:
+        if x0 <= x <= x1 and y0 <= y <= y1:
+            e.append(f'<circle cx="{sx(x):.1f}" cy="{sy(y):.1f}" r="4" fill="{c}" stroke="#fff" stroke-width="1.2"/>')
+    e.append(f'<text x="{W - PAD}" y="{PAD - 7}" font-size="7" fill="#98A0AA" text-anchor="end">{unit}</text>')
+    return f'<svg viewBox="0 0 {W} {H}" width="{W}" height="{H}">' + "".join(e) + "</svg>"
+
+
+def charts_page(name, grp, logo, updated):
+    """Page 3 (Frank, 2026-10-17): movement plot, release point and pitch
+    location for the latest session, from trackman_reports.json. Movement and
+    release come from the per-pitch table; location dots are the ones recovered
+    from the report's own location plot (trackman_reports_sync.extract_locations),
+    so a dot exists only where TrackMan plotted one. Returns "" when the athlete
+    has no session or nothing plottable."""
+    path = os.path.join(REPO, "trackman_reports.json")
+    if not os.path.exists(path):
+        return ""
+    try:
+        data = json.load(open(path))
+    except Exception:
+        return ""
+    want = " ".join(name.split()).casefold()
+    ath = next((a for a in data.get("athletes", {}).values()
+                if " ".join(a.get("name", "").split()).casefold() == want), None)
+    if not ath or not ath.get("sessions"):
+        return ""
+    s = ath["sessions"][0]  # newest first
+    color = lambda t: PITCH_COLORS.get(t, P_OTHER)
+    mov = [(p["hb"], p["ivb"], color(p["type"])) for p in s["pitches"]
+           if p.get("hb") is not None and p.get("ivb") is not None]
+    rel = [(p["relSide"], p["relH"], color(p["type"])) for p in s["pitches"]
+           if p.get("relSide") is not None and p.get("relH") is not None]
+    locs = [(l["x"], l["z"], color(l["type"])) for l in s.get("locations", [])]
+    if not (mov or rel or locs):
+        return ""
+    try:
+        from datetime import datetime as _dt
+        datef = _dt.strptime(s["date"], "%Y-%m-%d").strftime("%b %-d, %Y")
+    except Exception:
+        datef = s["date"]
+
+    legend = "".join(
+        f'<span style="white-space:nowrap;margin-right:14px;font-size:9px">'
+        f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
+        f'background:{color(t["name"])};margin-right:4px"></span><b>{t["name"]}</b> ({t["count"]})</span>'
+        for t in s["types"])
+
+    def span(pts, i, lo, hi):
+        """Widen a default axis range just enough to keep every point on it."""
+        vals = [p[i] for p in pts]
+        return (min(lo, min(vals) - 0.3), max(hi, max(vals) + 0.3))
+
+    panels = []
+    if mov:
+        panels.append(("Movement", f"Induced vertical vs horizontal break, per pitch &middot; {len(mov)} of {s['total']} tracked",
+                       _scatter_panel(mov, span(mov, 0, -25, 25), span(mov, 1, -25, 25),
+                                      (-16, 0, 16), (-16, 0, 16), "in", zero_axes=True)))
+    if rel:
+        panels.append(("Release Point", f"Release side vs height, per pitch &middot; {len(rel)} of {s['total']} tracked",
+                       _scatter_panel(rel, span(rel, 0, -4, 4), span(rel, 1, 0, 7.5),
+                                      (-2, 0, 2), (2, 4, 6), "ft")))
+    if locs:
+        panels.append(("Location", f"Plate location with strike zone &middot; {len(locs)} pitches plotted",
+                       _scatter_panel(locs, span(locs, 0, -2.6, 2.6), span(locs, 1, 0, 5),
+                                      (-2, 0, 2), (2, 4), "ft", zone=True)))
+    cols = "".join(
+        f'<div class="col" style="text-align:center"><div class="sect" style="text-align:left">{t}</div>'
+        f'<div class="scap" style="text-align:left">{cap}</div>{svg}</div>'
+        for t, cap, svg in panels)
+
+    return f"""
+<div class="page" style="page-break-before:always">
+<div class="tophdr"><img src="{logo}" style="height:30px" alt="RPM Strength"><div class="gen">Generated {updated}<br>rpmstrength.coach</div></div>
+<div class="rule"></div>
+<div class="idrow"><div><div class="aname">{name}</div><div class="asub">{GROUP_LABEL.get(grp, grp)} &middot; Pitch Charts &middot; {datef}</div></div>
+<div><div class="rtitle">Movement &middot; Release &middot; Location</div><div class="rsub">TrackMan &middot; {s['total']} pitches</div></div></div>
+<div style="margin:10px 0 2px">{legend}</div>
+<div class="cols" style="align-items:flex-start">{cols}</div>
+<div class="scap" style="margin-top:8px">Axes follow the TrackMan session report: movement in inches, release and location in feet. Location dots are the pitches TrackMan plotted on the report's own location chart.</div>
+<div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: TrackMan session report</span></div>
+</div>"""
+
+
 def model_summary(src, name, grp, rows, first):
     """Callout written around the RPM velocity model (Frank, 2026-10-14): talk about
     the numbers the model reads (concentric impulse, RSI-modified, grip), not
@@ -468,14 +587,17 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
 <div class="summary"><div class="sumhd">{'What this baseline shows' if first else 'Where this athlete stands'}</div>
 <div class="sumtx">{{SUMMARY}}</div></div>
 <div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: VALD ForceDecks{' &middot; VALD DynaMo' if grip_html else ''} &middot; Percentiles vs {cohort}</span></div>
-</div>{{VELO_PAGE}}</body></html>"""
+</div>{{VELO_PAGE}}{{CHARTS_PAGE}}</body></html>"""
 
     if a.summary:
         summary = a.summary
     else:
         summary = model_summary(src, name, grp, rows, first)
     html = html.replace("{SUMMARY}", summary)
-    html = html.replace("{VELO_PAGE}", velo_page(src, name, grp, female, logo, updated))
+    vp = velo_page(src, name, grp, female, logo, updated)
+    html = html.replace("{VELO_PAGE}", vp)
+    # Pitch charts ride only on cards that already carry a pitching profile.
+    html = html.replace("{CHARTS_PAGE}", charts_page(name, grp, logo, updated) if vp else "")
 
     os.makedirs(a.out, exist_ok=True)
     out_html = os.path.join(a.out, f"{name} - RPM Evaluation Report.html")
