@@ -1462,6 +1462,8 @@ VM_ALIASES = {
     "Isaac Santana": "Issac Santana",
     "Zachary Weinschel": "Zach Weinschel",
     "George Cancel": "George Cancel Jr",
+    # TrackMan entry is "Jaymin"; VALD and Frank use "Jamin" (2026-10-17).
+    "Jaymin Rose": "Jamin Rose",
 }
 
 
@@ -1722,6 +1724,7 @@ def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
     aths = trackman_data.setdefault("athletes", {})
     added = 0
     for name, r in (rep.get("athletes") or {}).items():
+        name = _vm_norm(name)  # TrackMan spellings -> portal spellings (VM_ALIASES)
         ath = aths.setdefault(name, {"sessions": []})
         have = {s["date"] for s in ath["sessions"]}
         # An athlete can log TWO report sessions on one date (Brendan Ott threw
