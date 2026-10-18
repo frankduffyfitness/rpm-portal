@@ -465,7 +465,7 @@ def sweep_cmj():
     log("=" * 50)
     token = authenticate()
     profiles = fetch_profiles(token)
-    names = {(p.get("profileId") or p.get("id")): profile_name(p) for p in profiles}
+    names = {pid: profile_name(p) for pid, p in profiles.items()}  # fetch_profiles returns a dict keyed by profileId
     all_tests = fetch_tests(token, "2020-01-01T00:00:00Z")
     cmj = [t for t in all_tests if t.get("testType") == "CMJ"]
     log(f"CMJ tests: {len(cmj)} of {len(all_tests)}")
