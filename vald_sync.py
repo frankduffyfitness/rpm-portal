@@ -387,6 +387,118 @@ def fetch_all_trials_parallel(token, tests, workers=5):
     return out
 
 
+# -- 2026-10-18 CMJ Takeoff-family sweep (Frank's go). One-off pull of the
+# eccentric sub-phase / concentric-rate family that the stored metric set
+# never covered, written to sweeps/<date>.json.gz for the pre-registered
+# velo-model screen (median-of-sessions for rate metrics; rank-based and
+# drop-top-3 robustness). Trial limb only. Never merged into the store.
+SWEEP_CMJ_IDS = {
+    6553711: {"name": "Active Stiffness Index", "unit": "", "scale": 1},
+    6553601: {"name": "Average Force", "unit": "N", "scale": 1},
+    13303862: {"name": "Average Power", "unit": "W", "scale": 1},
+    6553670: {"name": "Braking Phase Duration:Concentric Duration", "unit": "%", "scale": 1},
+    6553674: {"name": "Concentric Impulse-50ms", "unit": "N s", "scale": 1},
+    6553762: {"name": "Concentric Impulse:Eccentric Deceleration Impulse Ratio", "unit": "", "scale": 1},
+    6553641: {"name": "Concentric Maximum RFD", "unit": "N/s", "scale": 1},
+    6553619: {"name": "Concentric Mean Force", "unit": "N", "scale": 1},
+    6553738: {"name": "Concentric Mean Instantaneous Power", "unit": "W", "scale": 1},
+    6553623: {"name": "Concentric Mean Power", "unit": "W", "scale": 1},
+    6553626: {"name": "Concentric Mean Velocity", "unit": "m/s", "scale": 1},
+    6553637: {"name": "Concentric RFD", "unit": "N/s", "scale": 1},
+    6553638: {"name": "Concentric RFD - 100ms", "unit": "N/s", "scale": 1},
+    6553639: {"name": "Concentric RFD - 200ms", "unit": "N/s", "scale": 1},
+    6553640: {"name": "Concentric RFD - 50ms", "unit": "N/s", "scale": 1},
+    6553692: {"name": "Concentric RPD", "unit": "W/s", "scale": 1},
+    6553696: {"name": "Concentric RPD - 100ms", "unit": "W/s", "scale": 1},
+    6553694: {"name": "Concentric RPD - 50ms", "unit": "W/s", "scale": 1},
+    6553658: {"name": "Contraction Time:Eccentric Duration", "unit": "%", "scale": 1},
+    6553667: {"name": "Eccentric Acceleration Phase Duration", "unit": "s", "scale": 1},
+    6553678: {"name": "Eccentric Braking RFD", "unit": "N/s", "scale": 1},
+    6553680: {"name": "Eccentric Braking RFD-100ms", "unit": "N/s", "scale": 1},
+    6553704: {"name": "Eccentric Deceleration Impulse", "unit": "N s", "scale": 1},
+    6553723: {"name": "Eccentric Deceleration Impulse:Concentric Impulse", "unit": "", "scale": 1},
+    6553672: {"name": "Eccentric Deceleration Mean Force", "unit": "N", "scale": 1},
+    6553770: {"name": "Eccentric Deceleration Mean Power", "unit": "W", "scale": 1},
+    6553771: {"name": "Eccentric Deceleration Mean Velocity", "unit": "m/s", "scale": 1},
+    6553760: {"name": "Eccentric Deceleration Peak Force", "unit": "N", "scale": 1},
+    6553644: {"name": "Eccentric Duration", "unit": "ms", "scale": 1000},
+    6553715: {"name": "Eccentric Impulse", "unit": "N s", "scale": 1},
+    6553671: {"name": "Eccentric Mean Braking Force", "unit": "N", "scale": 1},
+    6553620: {"name": "Eccentric Mean Force", "unit": "N", "scale": 1},
+    6553621: {"name": "Eccentric Mean Power", "unit": "W", "scale": 1},
+    6553687: {"name": "Eccentric Peak Force", "unit": "N", "scale": 1},
+    6553702: {"name": "Eccentric Peak Power", "unit": "W", "scale": 1},
+    6553724: {"name": "Eccentric Peak Power:Concentric Peak Power", "unit": "", "scale": 1},
+    6553716: {"name": "Eccentric Unloading Impulse", "unit": "N s", "scale": 1},
+    6553744: {"name": "Eccentric Unloading Phase Duration", "unit": "s", "scale": 1},
+    6553747: {"name": "Eccentric Unloading Phase Impulse", "unit": "N s", "scale": 1},
+    6553748: {"name": "Eccentric Unloading Phase Mean Force", "unit": "N", "scale": 1},
+    6553745: {"name": "Eccentric Unloading Phase RFD", "unit": "N/s", "scale": 1},
+    6553750: {"name": "Eccentric Yielding Phase Duration", "unit": "s", "scale": 1},
+    6553753: {"name": "Eccentric Yielding Phase Impulse", "unit": "N s", "scale": 1},
+    6553754: {"name": "Eccentric Yielding Phase Mean Force", "unit": "N", "scale": 1},
+    6553751: {"name": "Eccentric Yielding Phase RFD", "unit": "N/s", "scale": 1},
+    6553659: {"name": "Eccentric:Concentric Duration", "unit": "%", "scale": 1},
+    6553622: {"name": "Eccentric:Concentric Mean Force Ratio", "unit": "%", "scale": 1},
+    6553606: {"name": "Flight Time", "unit": "ms", "scale": 1000},
+    6553661: {"name": "FlightTime:Eccentric Duration", "unit": "", "scale": 1},
+    6553691: {"name": "Lower-Limb Stiffness", "unit": "N/m", "scale": 1},
+    6553690: {"name": "Mean Eccentric+Concentric Power:Time", "unit": "W/s", "scale": 1},
+    6553663: {"name": "Minimum Eccentric Force", "unit": "N", "scale": 1},
+    6553707: {"name": "Peak Drive-Off Force", "unit": "N", "scale": 1},
+    6553736: {"name": "Peak Instantaneous Power", "unit": "W", "scale": 1},
+    6553631: {"name": "Peak Takeoff Acceleration", "unit": "m/s\u00b2", "scale": 1},
+    13172744: {"name": "Peak Takeoff Force", "unit": "N", "scale": 1},
+    6553714: {"name": "Positive Impulse", "unit": "N s", "scale": 1},
+    6553717: {"name": "Positive Takeoff Impulse", "unit": "N s", "scale": 1},
+    6553666: {"name": "Time to Braking Phase", "unit": "s", "scale": 1},
+    6553699: {"name": "Total Work", "unit": "J", "scale": 1},
+    6553700: {"name": "Velocity at Peak Power", "unit": "m/s", "scale": 1}
+}
+
+
+def sweep_cmj():
+    from datetime import date as _date
+    import gzip
+    log("=" * 50)
+    log(f"CMJ sweep: {len(SWEEP_CMJ_IDS)} Takeoff-family metrics, trial limb only")
+    log("=" * 50)
+    token = authenticate()
+    profiles = fetch_profiles(token)
+    names = {(p.get("profileId") or p.get("id")): profile_name(p) for p in profiles}
+    all_tests = fetch_tests(token, "2020-01-01T00:00:00Z")
+    cmj = [t for t in all_tests if t.get("testType") == "CMJ"]
+    log(f"CMJ tests: {len(cmj)} of {len(all_tests)}")
+    if not cmj:
+        log("No CMJ tests returned; aborting.")
+        sys.exit(1)
+    trials_by_test = fetch_all_trials_parallel(token, cmj)
+    out = []
+    for t in cmj:
+        rows = []
+        for tr in trials_by_test.get(t["testId"]) or []:
+            vals = {}
+            for r in tr.get("results", []):
+                rid = r.get("resultId")
+                if rid is None:
+                    rid = r.get("definition", {}).get("id")
+                if rid in SWEEP_CMJ_IDS and r.get("limb", "Trial") in (None, "Trial") and r.get("value") is not None:
+                    vals[str(rid)] = round(r["value"] * SWEEP_CMJ_IDS[rid]["scale"], 3)
+            if vals:
+                rows.append(vals)
+        if rows:
+            out.append({"profileId": t.get("profileId"), "name": names.get(t.get("profileId")),
+                        "date": t.get("recordedDateUtc") or t.get("testDateUtc") or t.get("modifiedDateUtc"),
+                        "testId": t["testId"], "trials": rows})
+    os.makedirs("sweeps", exist_ok=True)
+    path = f"sweeps/cmj_takeoff_{_date.today():%Y-%m-%d}.json.gz"
+    with gzip.open(path, "wt", encoding="utf-8") as f:
+        json.dump({"meta": {"ranAt": datetime.now(timezone.utc).isoformat(),
+                            "metrics": {str(k): v for k, v in SWEEP_CMJ_IDS.items()}},
+                   "tests": out}, f, separators=(",", ":"), default=str)
+    log(f"SWEEP COMPLETE: {len(out)} CMJ tests with values -> {path} ({os.path.getsize(path)/1048576:.1f} MB)")
+
+
 def refresh_cmj():
     """Re-fetch + re-extract ONLY CMJ tests and merge them into the existing
     portal JSON, leaving Hop (HJ) / IMTP / everything else untouched. Used to
@@ -934,6 +1046,8 @@ def main():
         return reconcile(apply=True)
     if "--reconcile" in sys.argv:
         return reconcile(apply=False)
+    if "--sweep-cmj" in sys.argv:
+        return sweep_cmj()
     if "--refresh-cmj" in sys.argv:
         return refresh_cmj()
     if "--refresh-hop" in sys.argv:

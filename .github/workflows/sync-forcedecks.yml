@@ -73,6 +73,8 @@ jobs:
             echo "$MSG" | grep -q '\[full-sync\]' && ARGS="--full"
             echo "$MSG" | grep -q '\[refresh-cmj\]' && ARGS="--refresh-cmj"
             echo "$MSG" | grep -q '\[refresh-hop\]' && ARGS="--refresh-hop"
+            # [sweep-cmj] = one-off Takeoff-family pull to sweeps/ (2026-10-18)
+            echo "$MSG" | grep -q '\[sweep-cmj\]' && ARGS="--sweep-cmj"
             # [reconcile] = DRY RUN: diff the store against VALD's current test
             # list and commit reconcile_report.json, changing nothing else.
             # [reconcile-apply] actually drops tests deleted at source.
@@ -126,10 +128,12 @@ jobs:
           # JSONs, so regenerating after reset gives a conflict-free result.
           mkdir -p /tmp/synced
           cp forcedecks_portal.json.gz vald_sync_state.json reconcile_report.json /tmp/synced/
+          [ -d sweeps ] && cp -r sweeps /tmp/synced/ || true
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
             cp /tmp/synced/forcedecks_portal.json.gz /tmp/synced/vald_sync_state.json /tmp/synced/reconcile_report.json .
+            [ -d /tmp/synced/sweeps ] && cp -r /tmp/synced/sweeps . || true
             python generate_portal_data.py forcedecks_portal.json.gz src/App.jsx trackman_portal.json
             if [ -f App_updated.jsx ]; then mv App_updated.jsx src/App.jsx; fi
             git add -A
