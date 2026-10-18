@@ -613,6 +613,10 @@ def process_trial(trial, test_type=""):
         # (GitHub rejects blobs over 100 MB — bitten 2026-08-02).
         if meta.get("trialOnly") and limb != "Trial":
             continue
+        # Guard against any "Dominant" limb row from VALD: side labels are
+        # never stored (see the asymmetry block below, 2026-10-17).
+        if limb == "Dominant":
+            continue
         scale = meta.get("scale", 1)
         if is_ppu_metric:
             value = _ppu_norm(meta["key"], value)
@@ -679,9 +683,10 @@ def process_trial(trial, test_type=""):
         right = metrics.get(f"{base_key}Right")
         if left is not None and right is not None and (left + right) > 0:
             asym_pct = round(abs(right - left) / max(left, right) * 100, 1)
-            dominant = "R" if right > left else "L" if left > right else "="
             metrics[f"{base_key}Asym"] = asym_pct
-            metrics[f"{base_key}Dominant"] = dominant
+            # No f"{base_key}Dominant" side label (dropped 2026-10-17): it is
+            # derivable from Left/Right, generate_portal_data recomputes it,
+            # and 378k of them cost 10.5 MB against the 100 MiB blob limit.
 
     return metrics
 
