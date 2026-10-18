@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-17 evening pull, eval-day reports
+# sync-trigger: 2026-10-18 Hunter Zelznick evaluation
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
