@@ -91,13 +91,8 @@ def row(label, val, desc, pct):
     </div>"""
 
 
-def grip_rows(src, name, grp):
-    """Page-1 grip rows under the CMJ column (Frank, 2026-10-16): best-side peak
-    squeeze and squeeze RFD from DynaMo, same row format as the CMJ metrics.
-    Peak percentile uses the velo-model pool when the athlete has a _VM grip row,
-    so the number matches the summary callout and the velo page exactly;
-    otherwise (and for RFD always) it is rank-based against same-group athletes
-    in dynamo_portal.json."""
+def _load_dynamo():
+    """dynamo_portal.json athlete records as a list ([] when missing/bad)."""
     path = os.path.join(REPO, "dynamo_portal.json")
     if not os.path.exists(path):
         return []
@@ -106,18 +101,32 @@ def grip_rows(src, name, grp):
     except Exception:
         return []
     aths = data.get("athletes", data) if isinstance(data, dict) else data
-    items = list(aths.values()) if isinstance(aths, dict) else list(aths)
+    return list(aths.values()) if isinstance(aths, dict) else list(aths)
 
-    def squeeze(a):
-        peaks, rfds = [], []
-        for t in a.get("tests", []):
-            for mv in t.get("movements", []):
-                if mv.get("name") != "Grip Squeeze":
-                    continue
-                peaks += [v for v in (mv.get("peakN") or []) if v is not None]
-                rfds += [v for v in (mv.get("rfd") or []) if v is not None]
-        return (max(peaks) if peaks else None, max(rfds) if rfds else None)
 
+def _squeeze(a):
+    """Best-side (peakN, rfd) across an athlete's Grip Squeeze movements."""
+    peaks, rfds = [], []
+    for t in a.get("tests", []):
+        for mv in t.get("movements", []):
+            if mv.get("name") != "Grip Squeeze":
+                continue
+            peaks += [v for v in (mv.get("peakN") or []) if v is not None]
+            rfds += [v for v in (mv.get("rfd") or []) if v is not None]
+    return (max(peaks) if peaks else None, max(rfds) if rfds else None)
+
+
+def grip_rows(src, name, grp):
+    """Page-1 grip rows under the CMJ column (Frank, 2026-10-16): best-side peak
+    squeeze and squeeze RFD from DynaMo, same row format as the CMJ metrics.
+    Peak percentile uses the velo-model pool when the athlete has a _VM grip row,
+    so the number matches the summary callout and the velo page exactly;
+    otherwise (and for RFD always) it is rank-based against same-group athletes
+    in dynamo_portal.json."""
+    items = _load_dynamo()
+    if not items:
+        return []
+    squeeze = _squeeze
     want = " ".join(name.split()).casefold()
     me = next((a for a in items
                if " ".join((a.get("name") or "").split()).casefold() == want), None)
@@ -273,6 +282,119 @@ def velo_page(src, name, grp, female, logo, updated):
 <div><div class="rtitle">Velocity &amp; Bullpen</div><div class="rsub">TrackMan + VALD ForceDecks</div></div></div>
 {"".join(parts)}
 <div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: TrackMan &middot; VALD ForceDecks &middot; RPM velocity model</span></div>
+</div>"""
+
+
+def projection_page(src, name, grp, female, logo, updated):
+    """Opt-in page 2 for an arm with NO bullpen on file (--project-velo; Frank,
+    2026-10-18, Hunter Zelznick ramping back up): compute the velocity
+    projection from the coefficients _VM exports and show where it lands among
+    the level's pitchers. Inputs are the card's own displayed CMJ numbers plus
+    best-side grip — today's form, deliberately not a lifetime best, since the
+    point is where a ramping arm's engine is right now. Verified 2026-10-18:
+    for single-session athletes this reproduces gen_VM's stored predictions to
+    within 0.1 mph. The scatter keeps projected-vs-actual axes; with no actual
+    yet the athlete sits ON the identity line at his projection, and the shaded
+    band is where an on-model first pen should land."""
+    if female:
+        return ""
+    m = re.search(r"const _VM = (\{.*?\});\n", src, re.S)
+    vm = json.loads(m.group(1)) if m else None
+    if not vm:
+        return ""
+    A = arr(src, "_A")
+    want = " ".join(name.split()).casefold()
+    hit = next((r for r in A if " ".join(r[0].split()).casefold() == want), None)
+    if not hit:
+        return ""
+    rsi, ci, bw = hit[7], hit[8], hit[3]
+    if not ci or not rsi:
+        return ""
+    first = name.split()[0]
+    me = next((a for a in _load_dynamo()
+               if " ".join((a.get("name") or "").split()).casefold() == want), None)
+    grip_n = _squeeze(me)[0] if me else None
+    has_grip = bool(grip_n and bw)
+    if has_grip:
+        g0, g1, g2, g3 = vm["g"]
+        pred = g0 + g1 * ci + g2 * rsi + g3 * (grip_n / (bw / 2.20462))
+        band_ = vm["gband"]
+        pidx, model_name = 25, "force plate + grip"
+    else:
+        a0, a1, a2 = vm["a"]
+        pred = a0 + a1 * ci + a2 * rsi
+        band_ = vm["rmse"]
+        pidx, model_name = 8, "force plate"
+
+    pool = [r for r in vm["rows"] if r[1] == grp and r[5] is not None
+            and len(r) > pidx and r[pidx] is not None]
+    if len(pool) < 8:
+        return ""
+    lvl = GROUP_LABEL.get(grp, grp)
+    pct = lambda v, xs: max(1, min(99, round(100 * sum(1 for x in xs if x < v) / len(xs)))) if xs else None
+    p_pred = pct(pred, [r[5] for r in pool])
+    p_grip = None
+    if has_grip:
+        grips = [g for g in (_squeeze(a)[0] for a in _load_dynamo()
+                             if a.get("group") == grp) if g is not None]
+        p_grip = pct(grip_n, grips)
+
+    # Same scatter as the measured page; the athlete rides the diagonal.
+    W, H, P = 330, 300, 34
+    vals = [r[5] for r in pool] + [r[pidx] for r in pool] + [pred]
+    lo, hi = min(vals) - 2, max(vals) + 2
+    X = lambda v: P + (v - lo) / (hi - lo) * (W - 2 * P)
+    Y = lambda v: H - P - (v - lo) / (hi - lo) * (H - 2 * P)
+    g = []
+    g.append(f'<polygon points="{X(lo)},{Y(lo+band_)} {X(hi-band_)},{Y(hi)} {X(hi)},{Y(hi)} '
+             f'{X(hi)},{Y(hi-band_)} {X(lo+band_)},{Y(lo)} {X(lo)},{Y(lo)}" fill="#EEF2F7"/>')
+    g.append(f'<line x1="{X(lo)}" y1="{Y(lo)}" x2="{X(hi)}" y2="{Y(hi)}" stroke="#B9C2CE" stroke-dasharray="4 3"/>')
+    t = int(lo) + (5 - int(lo) % 5) % 5
+    while t <= hi:
+        g.append(f'<text x="{X(t)}" y="{H-P+13}" font-size="8" fill="#98A0AA" text-anchor="middle">{t}</text>')
+        g.append(f'<text x="{P-6}" y="{Y(t)+3}" font-size="8" fill="#98A0AA" text-anchor="end">{t}</text>')
+        t += 5
+    for r in pool:
+        g.append(f'<circle cx="{X(r[pidx]):.1f}" cy="{Y(r[5]):.1f}" r="3.2" fill="#C5CCD6"/>')
+    g.append(f'<line x1="{X(pred):.1f}" y1="{Y(lo)}" x2="{X(pred):.1f}" y2="{Y(pred):.1f}" '
+             f'stroke="#DD5228" stroke-dasharray="3 3" stroke-width="1.2"/>')
+    g.append(f'<circle cx="{X(pred):.1f}" cy="{Y(pred):.1f}" r="6.5" fill="#fff" stroke="#DD5228" stroke-width="2.5"/>')
+    lx = X(pred) + (10 if X(pred) < W - 110 else -10)
+    g.append(f'<text x="{lx:.1f}" y="{Y(pred)-9:.1f}" font-size="9.5" font-weight="800" fill="#DD5228" '
+             f'text-anchor="{"start" if X(pred) < W - 110 else "end"}">{first} (projected)</text>')
+    g.append(f'<text x="{W/2}" y="{H-4}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6">PROJECTED FROM {model_name.upper()} (mph)</text>')
+    g.append(f'<text x="9" y="{H/2}" font-size="8" fill="#5B6470" text-anchor="middle" letter-spacing="0.6" transform="rotate(-90 9 {H/2})">ACTUAL PEAK FASTBALL (mph)</text>')
+    svg = f'<svg viewBox="0 0 {W} {H}" style="width:100%;display:block">{"".join(g)}</svg>'
+
+    grip_sub = (f'Grip {grip_n:.0f} N ({grip_n/4.44822:.0f} lbs), {p_grip}{ordinal(p_grip)} pct'
+                if has_grip and p_grip else
+                'No grip test yet: force plate only' if not has_grip else
+                f'Grip {grip_n:.0f} N ({grip_n/4.44822:.0f} lbs)')
+    sumtx = (f"No bullpen yet: {first} is ramping back up, so this page shows the engine, not the arm. "
+             f"His testing today supports a peak fastball around {pred:.1f} mph, which would sit at the "
+             f"{p_pred}{ordinal(p_pred)} percentile of actual peaks thrown by RPM {lvl} pitchers. "
+             f"The model reads {'three numbers: concentric impulse and RSI-modified from the countermovement jump, plus grip strength relative to bodyweight' if has_grip else 'two numbers from the countermovement jump: concentric impulse and RSI-modified'}. "
+             f"When he throws his first pen, where it lands against the {pred - band_:.0f}-{pred + band_:.0f} mph band tells us whether "
+             "the delivery is ahead of the engine or has velocity still waiting in it.")
+
+    return f"""
+<div class="page" style="page-break-before:always">
+<div class="tophdr"><img src="{logo}" style="height:30px" alt="RPM Strength"><div class="gen">Generated {updated}<br>rpmstrength.coach</div></div>
+<div class="rule"></div>
+<div class="idrow"><div><div class="aname">{name}</div><div class="asub">{GROUP_LABEL.get(grp, grp)} &middot; Pitching Projection</div></div>
+<div><div class="rtitle">Projected Velocity</div><div class="rsub">RPM velocity model &middot; no bullpen on file</div></div></div>
+<div class="sect">Projected Peak Fastball</div>
+<div class="scap">RPM velocity model &middot; projected from today's jump{' and grip' if has_grip else ''} &middot; no TrackMan session yet</div>
+<div class="vrow">
+  <div class="vbox"><div class="vl">PROJECTED{' WITH GRIP' if has_grip else ' FROM FORCE PLATE'}</div><div class="vv">{pred:.1f}<span class="u"> &plusmn; {band_}</span></div><div class="vs">{grip_sub}</div></div>
+  <div class="vbox"><div class="vl">WHERE THAT SITS</div><div class="vv">{p_pred}<span class="u">{ordinal(p_pred)} pct</span></div><div class="vs">vs actual peaks of {len(pool)} RPM {lvl} pitchers</div></div>
+  <div class="vbox"><div class="vl">FIRST-PEN TARGET</div><div class="vv">{pred - band_:.0f}&ndash;{pred + band_:.0f}<span class="u"> mph</span></div><div class="vs">on-model range for his first bullpen</div></div>
+</div>
+<div class="cols" style="align-items:flex-start;margin-top:10px">
+  <div class="col">{svg}<div class="scap" style="text-align:center;margin-top:2px">{len(pool)} RPM {lvl} pitchers. {first}'s marker sits on the diagonal at his projection; the shaded band (&plusmn;{band_} mph) is where an on-model first pen lands.</div></div>
+  <div class="col"><div class="summary" style="margin-top:4px"><div class="sumhd">Engine first, arm next</div><div class="sumtx">{sumtx} It is a guide to where his ceiling sits right now, not a prediction of a single outing.</div></div></div>
+</div>
+<div class="foot"><span>RPM Strength &middot; Queens, NY</span><span>Data: VALD ForceDecks &middot; VALD DynaMo &middot; RPM velocity model</span></div>
 </div>"""
 
 
@@ -466,6 +588,9 @@ def main():
     ap.add_argument("--out", default=os.path.expanduser("~/Desktop"))
     ap.add_argument("--summary", default=None,
                     help="Coach paragraph for the callout. Omit for a data-driven default.")
+    ap.add_argument("--project-velo", action="store_true",
+                    help="For an arm with no bullpen on file: add a page showing the "
+                         "model's projected peak fastball on the level's scatter.")
     a = ap.parse_args()
 
     src = open(APP).read()
@@ -595,6 +720,8 @@ body{{font-family:'DM Sans','Helvetica Neue',sans-serif;color:#1B2A44;background
         summary = model_summary(src, name, grp, rows, first)
     html = html.replace("{SUMMARY}", summary)
     vp = velo_page(src, name, grp, female, logo, updated)
+    if not vp and a.project_velo:
+        vp = projection_page(src, name, grp, female, logo, updated)
     html = html.replace("{VELO_PAGE}", vp)
     # Pitch charts ride only on cards that already carry a pitching profile.
     html = html.replace("{CHARTS_PAGE}", charts_page(name, grp, logo, updated) if vp else "")
