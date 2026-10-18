@@ -35,7 +35,20 @@ CLIENT_ID = os.environ.get("VALD_CLIENT_ID", "jOvajkmerTNoNt1wV4xrtgEizdBCt8Va")
 CLIENT_SECRET = os.environ.get("VALD_CLIENT_SECRET", "")
 TESTS_PAGE_SIZE = 50
 STATE_FILE = "vald_sync_state.json"
-OUTPUT_FILE = "forcedecks_portal.json"
+OUTPUT_FILE = "forcedecks_portal.json.gz"
+# The store is gzip-compressed on disk (2026-10-18): the plain JSON hit
+# GitHub's 100 MiB blob limit. Same bytes inside, ~8x smaller in git. Every
+# reader goes through _open_store so the compression is invisible.
+LEGACY_OUTPUT_FILE = "forcedecks_portal.json"
+
+
+def _open_store(mode="r"):
+    """Open the ForceDecks store for text I/O, gzip-transparent. Reading falls
+    back to the legacy plain file if the .gz does not exist yet."""
+    import gzip
+    if mode.startswith("r") and not os.path.exists(OUTPUT_FILE) and os.path.exists(LEGACY_OUTPUT_FILE):
+        return open(LEGACY_OUTPUT_FILE, mode)
+    return gzip.open(OUTPUT_FILE, mode + "t", encoding="utf-8")
 RATE_LIMIT_PAUSE = 0.05
 
 # ─── Portal Metrics (only these get kept) ────────────────────────────────────
@@ -402,10 +415,10 @@ def refresh_cmj():
     log(f"Fetched trials for {len(trials_by_test)} CMJ tests.")
     new_data = build_portal_data(profiles, cmj, trials_by_test)  # CMJ-only athletes
 
-    with open(OUTPUT_FILE) as f:
+    with _open_store("r") as f:
         existing = json.load(f)
     existing, stats = merge_cmj(existing, new_data)
-    with open(OUTPUT_FILE, "w") as f:
+    with _open_store("w") as f:
         json.dump(existing, f, separators=(',', ':'), default=str)
     log("=" * 50)
     log(f"CMJ REFRESH COMPLETE — dropped {stats['dropped']} old CMJ tests, added "
@@ -498,7 +511,7 @@ def heal_legacy_ppu(token, profiles):
     them in. Runs on every sync; a no-op once the store has converged."""
     if not os.path.exists(OUTPUT_FILE):
         return
-    with open(OUTPUT_FILE) as f:
+    with _open_store("r") as f:
         existing = json.load(f)
     stale = count_legacy_ppu(existing)
     if not stale:
@@ -511,10 +524,10 @@ def heal_legacy_ppu(token, profiles):
         return
     trials_by_test = fetch_all_trials_parallel(token, ppu)
     new_data = build_portal_data(profiles, ppu, trials_by_test)
-    with open(OUTPUT_FILE) as f:
+    with _open_store("r") as f:
         existing = json.load(f)
     existing, stats = merge_ppu(existing, new_data)
-    with open(OUTPUT_FILE, "w") as f:
+    with _open_store("w") as f:
         json.dump(existing, f, separators=(',', ':'), default=str)
     log(f"PPU self-heal complete: replaced {stats['dropped']} legacy with "
         f"{stats['added']} fresh PPU tests.")
@@ -547,10 +560,10 @@ def refresh_hop():
     log(f"Fetched trials for {len(trials_by_test)} HJ tests.")
     new_data = build_portal_data(profiles, hj, trials_by_test)  # HJ-only athletes
 
-    with open(OUTPUT_FILE) as f:
+    with _open_store("r") as f:
         existing = json.load(f)
     existing, stats = merge_hop(existing, new_data)
-    with open(OUTPUT_FILE, "w") as f:
+    with _open_store("w") as f:
         json.dump(existing, f, separators=(',', ':'), default=str)
     log("=" * 50)
     log(f"HOP REFRESH COMPLETE — dropped {stats['dropped']} old HJ tests, added "
@@ -771,7 +784,7 @@ def refresh_groups_only(profiles):
     if not os.path.exists(OUTPUT_FILE):
         return
     try:
-        with open(OUTPUT_FILE) as f:
+        with _open_store("r") as f:
             data = json.load(f)
     except (json.JSONDecodeError, KeyError, OSError) as e:
         log(f"Group-only refresh skipped (could not read store: {e}).")
@@ -794,7 +807,7 @@ def refresh_groups_only(profiles):
         log("No new tests, no group/name changes. Done.")
         return
     data.setdefault("meta", {})["syncDate"] = datetime.now(timezone.utc).isoformat()
-    with open(OUTPUT_FILE, "w") as f:
+    with _open_store("w") as f:
         json.dump(data, f, separators=(',', ':'), default=str)
     log(f"No new tests, but {len(changed)} group/name change(s) written:")
     for c in changed:
@@ -847,7 +860,7 @@ def reconcile(apply=False):
         sys.exit(1)
     live = {_rkey(t.get("profileId"), t.get("recordedDateUtc"), t.get("testType")) for t in vald}
 
-    with open(OUTPUT_FILE) as f:
+    with _open_store("r") as f:
         data = json.load(f)
     athletes = data.get("athletes", {})
     total = sum(len(a.get("tests", [])) for a in athletes.values())
@@ -911,7 +924,7 @@ def reconcile(apply=False):
     meta = data.setdefault("meta", {})
     meta["totalTests"] = sum(len(a.get("tests", [])) for a in athletes.values())
     meta["syncDate"] = datetime.now(timezone.utc).isoformat()
-    with open(OUTPUT_FILE, "w") as f:
+    with _open_store("w") as f:
         json.dump(data, f, separators=(',', ':'), default=str)
     log(f"APPLIED: removed {len(stale)} tests; store now {meta['totalTests']}.")
 
@@ -953,7 +966,7 @@ def main():
     existing_test_ids = set()
     if os.path.exists(OUTPUT_FILE):
         try:
-            with open(OUTPUT_FILE) as f:
+            with _open_store("r") as f:
                 existing = json.load(f)
             for ath in existing.get("athletes", {}).values():
                 for t in ath.get("tests", []):
@@ -970,7 +983,7 @@ def main():
     # For existing tests, try to reuse trial data from portal JSON
     if os.path.exists(OUTPUT_FILE):
         try:
-            with open(OUTPUT_FILE) as f:
+            with _open_store("r") as f:
                 existing = json.load(f)
             for ath in existing.get("athletes", {}).values():
                 for t in ath.get("tests", []):
@@ -996,7 +1009,7 @@ def main():
     # Merge with existing data on incremental syncs
     if not full_sync and os.path.exists(OUTPUT_FILE):
         try:
-            with open(OUTPUT_FILE) as f:
+            with _open_store("r") as f:
                 existing = json.load(f)
             existing_athletes = existing.get("athletes", {})
             new_athletes = new_portal_data.get("athletes", {})
@@ -1038,7 +1051,7 @@ def main():
     else:
         portal_data = new_portal_data
 
-    with open(OUTPUT_FILE, "w") as f:
+    with _open_store("w") as f:
         json.dump(portal_data, f, separators=(',', ':'), default=str)
     file_size_mb = os.path.getsize(OUTPUT_FILE) / (1024 * 1024)
     log(f"Output: {OUTPUT_FILE} ({file_size_mb:.1f} MB)")

@@ -3,7 +3,7 @@
 Generate portal data arrays from forcedecks_portal.json
 Outputs a JS snippet to paste into App.jsx, replacing the hardcoded arrays.
 """
-import json, sys, os, re
+import json, sys, os, re, gzip
 from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 import statistics
@@ -20,7 +20,7 @@ def r1u(x):
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
-PORTAL_JSON = sys.argv[1] if len(sys.argv) > 1 else "forcedecks_portal.json"
+PORTAL_JSON = sys.argv[1] if len(sys.argv) > 1 else ("forcedecks_portal.json.gz" if os.path.exists("forcedecks_portal.json.gz") else "forcedecks_portal.json")
 CURRENT_JSX = sys.argv[2] if len(sys.argv) > 2 else "App.jsx"
 TRACKMAN_JSON = sys.argv[3] if len(sys.argv) > 3 else "trackman_portal.json"
 ACTIVE_CUTOFF = datetime.now() - timedelta(days=42)
@@ -191,7 +191,7 @@ VELO_BULLPEN_LABELS = {
 
 # ─── Load Data ───────────────────────────────────────────────────────────────
 
-with open(PORTAL_JSON) as f:
+with (gzip.open(PORTAL_JSON, "rt", encoding="utf-8") if PORTAL_JSON.endswith(".gz") else open(PORTAL_JSON)) as f:
     fd = json.load(f)
 
 # ─── Duplicate VALD profiles ────────────────────────────────────────────────

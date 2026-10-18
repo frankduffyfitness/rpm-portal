@@ -95,7 +95,7 @@ jobs:
             echo "ERROR: $APP_JSX not found"
             exit 1
           fi
-          python generate_portal_data.py forcedecks_portal.json "$APP_JSX" trackman_portal.json
+          python generate_portal_data.py forcedecks_portal.json.gz "$APP_JSX" trackman_portal.json
           if [ -f "App_updated.jsx" ]; then
             mv App_updated.jsx "$APP_JSX"
             echo "Replaced $APP_JSX with updated data"
@@ -115,8 +115,8 @@ jobs:
           git config user.name "RPM Auto-Sync"
           git config user.email "sync@rpmstrength.coach"
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          ATHLETES=$(python -c "import json; d=json.load(open('forcedecks_portal.json')); print(d['meta']['totalAthletes'])" 2>/dev/null || echo "?")
-          TESTS=$(python -c "import json; d=json.load(open('forcedecks_portal.json')); print(d['meta']['totalTests'])" 2>/dev/null || echo "?")
+          ATHLETES=$(python -c "import json; d=json.load(__import__('gzip').open('forcedecks_portal.json.gz','rt')); print(d['meta']['totalAthletes'])" 2>/dev/null || echo "?")
+          TESTS=$(python -c "import json; d=json.load(__import__('gzip').open('forcedecks_portal.json.gz','rt')); print(d['meta']['totalTests'])" 2>/dev/null || echo "?")
           # This used to be a bare `git commit && git push`, which is rejected if
           # main moved during the run — throwing the whole sync away. A --full
           # re-pull takes ~4h and the DynaMo/ForceDecks crons fire every 6h, so a
@@ -125,12 +125,12 @@ jobs:
           # ours, and App.jsx / portal_data_arrays.js are pure functions of the
           # JSONs, so regenerating after reset gives a conflict-free result.
           mkdir -p /tmp/synced
-          cp forcedecks_portal.json vald_sync_state.json reconcile_report.json /tmp/synced/
+          cp forcedecks_portal.json.gz vald_sync_state.json reconcile_report.json /tmp/synced/
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
-            cp /tmp/synced/forcedecks_portal.json /tmp/synced/vald_sync_state.json /tmp/synced/reconcile_report.json .
-            python generate_portal_data.py forcedecks_portal.json src/App.jsx trackman_portal.json
+            cp /tmp/synced/forcedecks_portal.json.gz /tmp/synced/vald_sync_state.json /tmp/synced/reconcile_report.json .
+            python generate_portal_data.py forcedecks_portal.json.gz src/App.jsx trackman_portal.json
             if [ -f App_updated.jsx ]; then mv App_updated.jsx src/App.jsx; fi
             git add -A
             if git diff --cached --quiet; then echo "no changes after rebuild"; exit 0; fi

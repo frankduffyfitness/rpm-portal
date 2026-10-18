@@ -39,7 +39,7 @@ from datetime import datetime, timedelta
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
 STORE_JSON = os.environ.get("RPM_FORCEDECKS_JSON") or os.path.join(
-    _HERE, "forcedecks_portal.json")
+    _HERE, "forcedecks_portal.json.gz")
 EXPERIMENTS_JSON = os.environ.get("RPM_WATCH_EXPERIMENTS") or os.path.join(
     _HERE, "experiments.json")
 STATE_JSON = os.environ.get("RPM_WATCH_STATE") or os.path.join(

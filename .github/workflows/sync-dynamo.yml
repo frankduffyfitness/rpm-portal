@@ -51,7 +51,7 @@ jobs:
 
       - name: Regenerate portal data
         run: |
-          python generate_portal_data.py forcedecks_portal.json src/App.jsx trackman_portal.json
+          python generate_portal_data.py forcedecks_portal.json.gz src/App.jsx trackman_portal.json
           if [ -f "App_updated.jsx" ]; then mv App_updated.jsx src/App.jsx; fi
 
       - name: Commit and push if changed
