@@ -699,7 +699,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
     <div className="vidsheet" role="dialog" aria-label={`${vid.name} demo`} onClick={(e) => { if (e.target === e.currentTarget) setVid(null); }}>
       <div className="vidin">
         <div className="vidtop"><span>{vid.name}</span><button className="tb" onClick={() => setVid(null)} aria-label="Close video">Close</button></div>
-        <div className="vidbox"><iframe src={`https://www.youtube-nocookie.com/embed/${vid.id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`} title={`${vid.name} demo`} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin" /></div>
+        <div className="vidbox"><iframe src={`https://www.youtube-nocookie.com/embed/${vid.id}?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1`} title={`${vid.name} demo`} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin" /></div>
       </div>
     </div>
   );
