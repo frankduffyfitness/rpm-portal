@@ -16,6 +16,8 @@ const other = (s) => (s === "sumo" ? "conventional" : s === "conventional" ? "su
 const skey = (day, week) => `d${day}w${week}`;
 // Calendar programs (e.g. Jared Welch's daily mobility): sessions are keyed by date, d<day>t<YYYYMMDD>.
 const calKey = (day, date) => `d${day}t${date.replace(/-/g, "")}`;
+// ex.video: a YouTube id or any YouTube/Shorts link; played in-portal via the privacy embed.
+const ytId = (v) => { const m = /(?:shorts\/|youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/.exec(v || ""); return m ? m[1] : /^[\w-]{11}$/.test(v || "") ? v : null; };
 const isCal = (p) => !!(p && p.calendar);
 const calDate = (key) => { const m = /^d\d+t(\d{4})(\d{2})(\d{2})$/.exec(key || ""); return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
 const todayIso = () => new Date().toLocaleDateString("en-CA");
@@ -244,6 +246,13 @@ const CSS = `
 .tl .sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.65);overflow-y:auto;padding:20px 10px 40px}
 .tl .sheetin{max-width:560px;margin:0 auto;background:#0E1116;border:1px solid var(--rule);border-radius:16px;overflow:hidden}
 .tl .sheetin .logger{margin-top:0}
+.tl .exvid{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:rgba(79,255,176,.45);text-underline-offset:3px}
+.tl .exvid .play{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--acc);color:#0A0C10;font-size:8px;padding-left:1px;flex:none}
+.tl .vidsheet{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:16px}
+.tl .vidin{width:min(380px,100%);background:#0E1116;border:1px solid var(--rule);border-radius:16px;overflow:hidden}
+.tl .vidtop{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;font-size:13px;font-weight:700;color:var(--ink)}
+.tl .vidbox{position:relative;width:100%;aspect-ratio:9/16;max-height:calc(100vh - 110px);background:#000}
+.tl .vidbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .tl .thread{display:grid;gap:6px;max-height:340px;overflow-y:auto;padding:2px 0}
 .tl .bub{max-width:85%;justify-self:start;background:rgba(255,255,255,.05);border:1px solid var(--rule);border-radius:12px 12px 12px 4px;padding:7px 10px;font-size:13px;line-height:1.4;color:var(--ink);white-space:pre-wrap;word-break:break-word}
 .tl .bub.me{justify-self:end;background:rgba(79,255,176,.10);border-color:rgba(79,255,176,.3);border-radius:12px 12px 4px 12px}
@@ -441,6 +450,8 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
   });
   const [drafts, setDrafts] = useState({});
   const [toast, setToast] = useState(null);
+  const [vid, setVid] = useState(null);
+  useEffect(() => { if (!vid) return; const k = (e) => { if (e.key === "Escape") setVid(null); }; window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k); }, [vid]);
   const timers = useRef({}), writing = useRef({}), again = useRef({}), latest = useRef({}), toastT = useRef(null);
   latest.current = drafts;
 
@@ -613,7 +624,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           return (
             <div key={ex.slot} className="ex">
               <div className="extop">
-                <span className="exname"><span className="slot">{ex.slot}</span>{name}
+                <span className="exname"><span className="slot">{ex.slot}</span>{ex.video && !swapped && ytId(ex.video) ? <button className="exvid" onClick={() => setVid({ id: ytId(ex.video), name })} aria-label={`Watch the ${name} demo`}><span className="play" aria-hidden="true">▶</span>{name}</button> : name}
                   {isDl(ex) && <span className="seg" role="group" aria-label="Stance this session">
                     {["conventional", "sumo"].map((st) => <button key={st} aria-pressed={stance === st} onClick={() => change((l) => { l.stance = { ...(l.stance || {}), [ex.slot]: st === planned ? null : st }; })}>{st === "sumo" ? <span className="dot" /> : <span className="sq" />}{STANCE[st]}</button>)}
                   </span>}
@@ -684,6 +695,15 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
         <Thread A={A} role={role} month={sel.month} sk={sessK} pw={pw} note={log.notes || ""} focus={!!(start && start.month === sel.month && start.key === sessK && start.msg)} onA={onA} onLocked={onLocked} />
       </div>
   );
+  const vidModal = vid && (
+    <div className="vidsheet" role="dialog" aria-label={`${vid.name} demo`} onClick={(e) => { if (e.target === e.currentTarget) setVid(null); }}>
+      <div className="vidin">
+        <div className="vidtop"><span>{vid.name}</span><button className="tb" onClick={() => setVid(null)} aria-label="Close video">Close</button></div>
+        <div className="vidbox"><iframe src={`https://www.youtube-nocookie.com/embed/${vid.id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`} title={`${vid.name} demo`} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin" /></div>
+      </div>
+    </div>
+  );
+
   if (calP) {
     const base = new Date(); base.setHours(0, 0, 0, 0);
     base.setDate(base.getDate() - ((base.getDay() + 6) % 7) + calWeek * 7);
@@ -722,6 +742,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           );
         })}
         {sel.date && <div className="sheet" onClick={(e) => { if (e.target === e.currentTarget) setSel((x) => ({ ...x, date: null })); }}><div className="sheetin">{panel}</div></div>}
+        {vidModal}
         {toast && <div className={`toast ${toast.bad ? "bad" : ""}`} role="status">{toast.text}</div>}
       </div>
     );
@@ -791,6 +812,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
       <div className="key"><span><i />Not logged</span><span><i className="p" />Partly</span><span><i className="d" />Logged</span><span><i className="n" />Up next</span></div>
 
       {panel}
+      {vidModal}
       {toast && <div className={`toast ${toast.bad ? "bad" : ""}`} role="status">{toast.text}</div>}
     </div>
   );
