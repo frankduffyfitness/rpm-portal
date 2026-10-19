@@ -2097,15 +2097,17 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
     # Grip = best THROWING-HAND reading (Frank, 2026-10-19; was best of either
     # hand, which fed Jay Delgadillo's stronger non-throwing left into the
     # model). peakN is [left, right]. Throwing hand comes from the sign of
-    # the pitch-weighted fastball/sinker horizontal break in _TMR (arm side
-    # is + for a RHP); checked 93/94 against the side DynaMo actually tests.
-    # No TrackMan hand, or no reading on the throwing side: best of either.
+    # the pitch-weighted release side in _TMR (+ = RHP); checked 94/94
+    # against the side DynaMo actually tests. Fastball horizontal break was
+    # tried first and misread Leo Caruso (LHP, ~0 in of FB run; Frank
+    # 2026-10-19). No TrackMan hand, or no reading on the throwing side:
+    # best of either.
     def _throw_hand(name):
         w = tot = 0
         for sess in _TMR.get(name, []):
             for t in sess.get("types", []):
-                if t[0] in ("Fastball", "Sinker") and t[5] is not None:
-                    w += t[5] * t[1]
+                if t[9] is not None:
+                    w += t[9] * t[1]
                     tot += t[1]
         return None if not tot else (1 if w > 0 else 0)
     gripN = {}
