@@ -2017,7 +2017,7 @@ VM_RMSE = 4.4
 VM_R2 = 0.56
 # A + grip (Frank adopted DISPLAY-BESIDE-A, 2026-08-19: "merit enough to show
 # guys"). Fit frozen from that day's grip-covered subset (n=67, LOO ±4.43);
-# grip = best-side max peakN across every DynaMo Grip Squeeze. Shown as a
+# grip = best THROWING-HAND peakN across every DynaMo Grip Squeeze (since 2026-10-19; was best of either hand). Shown as a
 # second read on the athlete card only — Model A stays the headline, flags,
 # and boards. The CI coefficient is much smaller than A's because grip
 # absorbs part of the size axis; do not compare coefficients across models.
@@ -2044,7 +2044,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
      velo6w|null, sess6w, ci6w|null, rsi6w|null, pred6w|null, resid6w|null,
      status, lastCmj|null, bestCiDate|null, bestRsiDate|null,
      gripN|null, predG|null, residG|null]
-    Indices 24-26 (2026-08-19): DynaMo grip peak (best-side max, N) and the
+    Indices 24-26 (2026-08-19): DynaMo grip peak (throwing-hand best, N) and the
     frozen A+grip prediction/residual (VM_G, display-beside-A only). Since
     2026-09-08 the grip term is grip/kg (needs bwLbs; predG null without it).
     Indices 22-23 are the session dates the LIFETIME-BEST ci and rsi were set
@@ -2094,14 +2094,31 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
                    "v6": _target(peaks6) if peaks6 else None, "n6": len(recent)}
 
     er = {}
+    # Grip = best THROWING-HAND reading (Frank, 2026-10-19; was best of either
+    # hand, which fed Jay Delgadillo's stronger non-throwing left into the
+    # model). peakN is [left, right]. Throwing hand comes from the sign of
+    # the pitch-weighted fastball/sinker horizontal break in _TMR (arm side
+    # is + for a RHP); checked 93/94 against the side DynaMo actually tests.
+    # No TrackMan hand, or no reading on the throwing side: best of either.
+    def _throw_hand(name):
+        w = tot = 0
+        for sess in _TMR.get(name, []):
+            for t in sess.get("types", []):
+                if t[0] in ("Fastball", "Sinker") and t[5] is not None:
+                    w += t[5] * t[1]
+                    tot += t[1]
+        return None if not tot else (1 if w > 0 else 0)
     gripN = {}
     for a in dynamo_list:
         k = _vm_norm(a.get("name"))
-        vals = [v for t in a.get("tests", []) for m in t.get("movements", [])
-                if m.get("name") == "Grip Squeeze"
-                for v in (m.get("peakN") or []) if v is not None]
-        if vals:
-            gripN[k] = max(vals)
+        pairs = [m.get("peakN") or [None, None] for t in a.get("tests", [])
+                 for m in t.get("movements", []) if m.get("name") == "Grip Squeeze"]
+        vals = [v for pr in pairs for v in pr if v is not None]
+        if not vals:
+            continue
+        side = _throw_hand(k)
+        thr = [pr[side] for pr in pairs if side is not None and len(pr) > side and pr[side] is not None]
+        gripN[k] = max(thr) if thr else max(vals)
     for a in dynamo_list:
         k = _vm_norm(a.get("name"))
         per_test = []
