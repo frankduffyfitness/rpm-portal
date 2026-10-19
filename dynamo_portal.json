@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-19T16:24:11.050016+00:00",
+    "syncDate": "2026-10-19T21:46:59.456165+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 124
+    "totalAthletes": 125
   },
   "athletes": {
     "Joey Muzio": {
@@ -7992,6 +7992,65 @@
       "group": "hs",
       "dob": "2011-08-24",
       "tests": [
+        {
+          "date": "2026-10-19",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                437.8,
+                null
+              ],
+              "peakLbs": [
+                98.4,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                2642,
+                null
+              ],
+              "ttp": [
+                0.88,
+                null
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                452.9,
+                null
+              ],
+              "peakLbs": [
+                101.8,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                2979,
+                null
+              ],
+              "ttp": [
+                0.96,
+                null
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-08-03",
           "type": "Shoulder Strength Baseline",
@@ -19369,6 +19428,118 @@
           "erIr": {
             "left": null,
             "right": 0.87
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "George Cancel Jr": {
+      "name": "George Cancel Jr",
+      "group": "hs",
+      "dob": "2010-03-26",
+      "tests": [
+        {
+          "date": "2026-10-19",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "External Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                142.7,
+                100.7
+              ],
+              "peakLbs": [
+                32.1,
+                22.6
+              ],
+              "asymPct": 29.4,
+              "asymNote": "left side stronger",
+              "rfd": [
+                342,
+                427
+              ],
+              "ttp": [
+                2.89,
+                2.24
+              ]
+            },
+            {
+              "name": "Internal Rotation",
+              "position": "Supine, 90/90",
+              "discomfort": false,
+              "peakN": [
+                151.3,
+                178.3
+              ],
+              "peakLbs": [
+                34.0,
+                40.1
+              ],
+              "asymPct": 15.1,
+              "asymNote": "right side stronger",
+              "rfd": [
+                374,
+                728
+              ],
+              "ttp": [
+                0.97,
+                2.06
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                423.8
+              ],
+              "peakLbs": [
+                null,
+                95.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2457
+              ],
+              "ttp": [
+                null,
+                1.23
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                418.4
+              ],
+              "peakLbs": [
+                null,
+                94.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2546
+              ],
+              "ttp": [
+                null,
+                1.69
+              ]
+            }
+          ],
+          "erIr": {
+            "left": 0.94,
+            "right": 0.56
           },
           "discomfortNote": "",
           "planNote": ""
