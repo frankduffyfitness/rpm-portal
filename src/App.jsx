@@ -3624,13 +3624,13 @@ function VmOverview({ rows, onPick }) {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
-        <VmTile v={rows.length} l="Pitchers, last 6 weeks" />
+        <VmTile v={rows.length} l="Grip-tested pitchers" />
         <VmTile v={`±${VM_BAND} mph`} l="Typical error" />
-        <VmTile v={`${rows.filter(r => r.model === "grip").length}/${rows.length}`} l="Scored with grip" />
+        <VmTile v={rows.filter(r => r.cur).length} l="In current form" />
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 8px 8px", marginBottom: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Current form vs the model, with grip</div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Peak fastball and CMJ testing from the last 6 weeks, actual vs predicted with grip (throwing-hand best). Pitchers without a grip test are scored on legs only. Shaded band: {"±"}{VM_BAND} mph, the model&rsquo;s noise floor. Tap a dot for the athlete card.</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Every grip-tested pitcher vs the model, with grip</div>
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Lifetime-best peak fastball vs the prediction from lifetime-best CMJ and throwing-hand grip. Grey dots are thin samples. Shaded band: {"±"}{VM_BAND} mph, the model&rsquo;s noise floor. The Flag list scores current form (last 6 weeks). Tap a dot for the athlete card.</div>
         <VmScatter rows={rows} onPick={onPick} />
         <div style={{ display: "flex", justifyContent: "center", gap: 12, padding: "8px 0 6px", flexWrap: "wrap" }}>
           {[["#FF6B6B", "Over the model"], ["#60A5FA", "Under the model"], ["#6B7280", `On model (within ±${VM_BAND})`]].map(([c, l]) => (
@@ -4333,24 +4333,24 @@ function VmGains({ onPick }) {
 function VmGripView({ rows, onPick }) {
   // 2026-10-19: grip is primary everywhere else, so this tab is the
   // legs-only (Model A) comparison. Same pitchers and same basis as the
-  // Overview (current form, last 6 weeks) so the ONLY difference between the
+  // Overview (grip-tested, lifetime bests) so the ONLY difference between the
   // two plots is grip (Frank: a lifetime-best population here read as the
   // tabs being swapped).
-  const gRows = rows.filter(r => r.cur && r.pred6Leg != null).map(r => ({ ...r, predA: r.pred6Leg, velo: r.velo6, residA: r.resid6Leg, thin: false, __orig: r }));
+  const gRows = rows.filter(r => r.model === "grip").map(r => ({ ...r, predA: r.predLeg, residA: r.residLeg, __orig: r }));
   const nog = 0;
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
-        <VmTile v={gRows.length} l="Pitchers, last 6 weeks" />
+        <VmTile v={gRows.length} l="Grip-tested pitchers" />
         <VmTile v={`±${VM_BAND_LEG} mph`} l="Typical error" />
         <VmTile v={_VM.r2.toFixed(2)} l="R², legs only" />
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 8px 8px", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "0 8px" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Current form vs the model, legs only</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Every grip-tested pitcher vs the model, legs only</div>
           <span style={{ fontSize: 9, fontWeight: 700, color: "#8A8F98", background: "#8A8F9818", borderRadius: 8, padding: "2px 7px" }}>MODEL A {"·"} COMPARISON</span>
         </div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Same pitchers and same 6-week window as the Overview, scored on CMJ alone (Model A), grip left out. Shaded band: {"±"}{VM_BAND_LEG} mph. Flip between the two tabs: a dot that sits closer to the line on the Overview is a pitcher whose hand explains part of his gap.</div>
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Same pitchers and same lifetime bests as the Overview, scored on CMJ alone (Model A), grip left out. Shaded band: {"±"}{VM_BAND_LEG} mph. Flip between the two tabs: a dot that sits closer to the line on the Overview is a pitcher whose hand explains part of his gap.</div>
         <VmScatter rows={gRows} onPick={onPick} band={VM_BAND_LEG} />
         <div style={{ display: "flex", justifyContent: "center", gap: 12, padding: "8px 0 6px", flexWrap: "wrap" }}>
           {[["#FF6B6B", "Over on legs only"], ["#60A5FA", "Under on legs only"], ["#6B7280", `Within ±${VM_BAND_LEG}`]].map(([c, l]) => (
@@ -4373,9 +4373,10 @@ function VeloModelSection() {
   const [openLists, setOpenLists] = useState({ model: false, thin: false, gone: false });
   const onToggleList = (k) => setOpenLists(s => ({ ...s, [k]: !s[k] }));
   const rows = VM_ROWS;
-  // Overview plots current form: windowed actual/predicted, current athletes
-  // only. __orig hands the untransformed row to the athlete card on tap.
-  const curRows = rows.filter(r => r.cur).map(r => ({ ...r, predA: r.pred6, velo: r.velo6, residA: r.resid6, thin: false, __orig: r }));
+  // Overview plots every grip-tested pitcher on lifetime bests, with grip
+  // (Frank, 2026-10-19: "all 105 that have tested"). The Flag list keeps the
+  // current-form basis. __orig hands the untransformed row to the card on tap.
+  const curRows = rows.filter(r => r.model === "grip").map(r => ({ ...r, __orig: r }));
   if (!rows.length) return <div style={{ fontSize: 12, color: "#6B7280", textAlign: "center", padding: 40 }}>No fitted pitchers yet. Regenerate the portal data to fill the model.</div>;
   if (pick) return <VmAthleteCard r={pick} onBack={() => setPick(null)} />;
   const open = (r) => { setPick(r.__orig || r); window.scrollTo(0, 0); };
