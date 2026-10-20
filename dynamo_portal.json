@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-20T19:07:39.316029+00:00",
+    "syncDate": "2026-10-20T23:46:12.401005+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 125
+    "totalAthletes": 127
   },
   "athletes": {
     "Joey Muzio": {
@@ -19540,6 +19540,161 @@
           "erIr": {
             "left": 0.94,
             "right": 0.56
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Jackson So": {
+      "name": "Jackson So",
+      "group": "hs",
+      "dob": "2011-01-05",
+      "tests": [
+        {
+          "date": "2026-10-20",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                485.9
+              ],
+              "peakLbs": [
+                null,
+                109.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3861
+              ],
+              "ttp": [
+                null,
+                0.47
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                470.2
+              ],
+              "peakLbs": [
+                null,
+                105.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3422
+              ],
+              "ttp": [
+                null,
+                0.66
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                510.1,
+                null
+              ],
+              "peakLbs": [
+                114.7,
+                null
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                3386,
+                null
+              ],
+              "ttp": [
+                1.15,
+                null
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Charlie Troia": {
+      "name": "Charlie Troia",
+      "group": "hs",
+      "dob": "2010-06-06",
+      "tests": [
+        {
+          "date": "2026-10-20",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                403.2,
+                470.7
+              ],
+              "peakLbs": [
+                90.6,
+                105.8
+              ],
+              "asymPct": 14.3,
+              "asymNote": "right side stronger",
+              "rfd": [
+                2536,
+                2937
+              ],
+              "ttp": [
+                1.52,
+                1.5
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                378.4,
+                466.4
+              ],
+              "peakLbs": [
+                85.1,
+                104.9
+              ],
+              "asymPct": 18.9,
+              "asymNote": "right side stronger",
+              "rfd": [
+                2398,
+                3006
+              ],
+              "ttp": [
+                1.28,
+                1.78
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
