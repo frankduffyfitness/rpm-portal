@@ -3441,19 +3441,38 @@ function DynamoTrending({ onSelect }) {
 
 // ─── Velo Model (staff dashboard section) ────────────────────────────────────
 // Cross-sectional velocity model: predicted vs actual peak FB, residual flags,
-// and a what-if card. Model A only — see the Model B note below.
-const VM_ROWS = _VM.rows.map(r => ({
-  name: r[0], group: r[1], ci: r[2], rsi: r[3], erRfd: r[4], velo: r[5],
-  sessions: r[6], lastVelo: r[7], predA: r[8], residA: r[9],
-  thin: !!r[12], bw: r[13],
-  // Current form (last 6 weeks): scoring inputs windowed, coefficients all-time.
-  velo6: r[14], sess6: r[15], ci6: r[16], rsi6: r[17],
-  pred6: r[18], resid6: r[19], cur: r[20] === "current", lastCmj: r[21],
-  // Session dates the lifetime-best CI/RSI were set (stale-engine badge).
-  bestCiD: r[22], bestRsiD: r[23],
-  // Grip (2026-08-19): DynaMo grip peak (N) + frozen A+grip second read.
-  grip: r[24], predG: r[25], residG: r[26],
-}));
+// and a what-if card.
+// PRIMARY MODEL (Frank, 2026-10-19): the A + grip-per-kg read is the headline
+// for every grip-tested pitcher; pitchers with no grip test fall back to
+// Model A. predA/residA/pred6/resid6 below carry the PRIMARY numbers so every
+// board reads them through the same keys; the legs-only Model A values ride
+// along as predLeg/residLeg/pred6Leg/resid6Leg. band is the matching error.
+const VM_ROWS = _VM.rows.map(r => {
+  const grip = r[24], bw = r[13];
+  const gOk = grip != null && bw != null && r[25] != null && !!_VM.g;
+  const pg = (ci, rsi) => _VM.g[0] + _VM.g[1] * ci + _VM.g[2] * rsi + _VM.g[3] * (grip / (bw / 2.20462));
+  const pred6G = gOk && r[16] != null && r[17] != null ? pg(r[16], r[17]) : null;
+  return {
+    name: r[0], group: r[1], ci: r[2], rsi: r[3], erRfd: r[4], velo: r[5],
+    sessions: r[6], lastVelo: r[7],
+    predA: gOk ? r[25] : r[8], residA: gOk ? r[26] : r[9],
+    predLeg: r[8], residLeg: r[9],
+    thin: !!r[12], bw,
+    // Current form (last 6 weeks): scoring inputs windowed, coefficients all-time.
+    // Grip has no 6-week window, so the current-form grip read pairs windowed
+    // CI/RSI with his throwing-hand best.
+    velo6: r[14], sess6: r[15], ci6: r[16], rsi6: r[17],
+    pred6: pred6G != null ? pred6G : r[18],
+    resid6: pred6G != null && r[14] != null ? r[14] - pred6G : r[19],
+    pred6Leg: r[18], resid6Leg: r[19],
+    cur: r[20] === "current", lastCmj: r[21],
+    // Session dates the lifetime-best CI/RSI were set (stale-engine badge).
+    bestCiD: r[22], bestRsiD: r[23],
+    // Grip: DynaMo throwing-hand peak (N) + frozen A+grip read.
+    grip, predG: r[25], residG: r[26],
+    model: gOk ? "grip" : "A", band: gOk ? _VM.gband : _VM.rmse,
+  };
+});
 
 // Grip percentile among grip-tested fitted pitchers (card context line).
 const VM_GRIPS = VM_ROWS.filter(r => r.grip != null).map(r => r.grip).sort((a, b) => a - b);
@@ -3512,7 +3531,10 @@ const vmStaleEngine = (r) => {
   if (ra != null && ra > 180) out.push(`RSI ${Math.round(ra / 30)} mo ago`);
   return out;
 };
-const VM_BAND = _VM.rmse;
+// Band for shared plots and flag cut-offs = the PRIMARY (with-grip) error;
+// cards show each pitcher's own band (r.band: 4.4 on Model A fallback).
+const VM_BAND = _VM.gband || _VM.rmse;
+const VM_BAND_LEG = _VM.rmse;
 // Bodyweight-to-CI coupling for the what-if projector: +1.1 N·s per lb is the
 // facility's measured within-athlete value (median +1.03 N·s per lb across 170
 // athletes; physics ceiling +1.21 if jump height holds). Bodyweight alone
@@ -3540,8 +3562,9 @@ const vmPredG = (ci, rsi, g, bwLbs) => (_VM.g && bwLbs) ? _VM.g[0] + _VM.g[1] * 
 // _VM.b and the generator still emits predB/residB, so this is a UI removal
 // and nothing else: restoring it is re-adding the helper. Model A only until
 // grip clears its pre-registered verdict.
-const vmBandColor = (r) => r > VM_BAND ? "#FF6B6B" : r < -VM_BAND ? "#60A5FA" : "#6B7280";
-const vmBandLabel = (r) => r > VM_BAND ? "Over the model" : r < -VM_BAND ? "Under the model" : "On model";
+const vmBandColor = (r, b = VM_BAND) => r > b ? "#FF6B6B" : r < -b ? "#60A5FA" : "#6B7280";
+const vmBandLabel = (r, b = VM_BAND) => r > b ? "Over the model" : r < -b ? "Under the model" : "On model";
+const VM_GRIP_N = VM_ROWS.filter(r => r.model === "grip").length;
 
 function VmTile({ v, l }) {
   return (
@@ -3552,15 +3575,15 @@ function VmTile({ v, l }) {
   );
 }
 
-function VmScatter({ rows, onPick }) {
+function VmScatter({ rows, onPick, band }) {
   const [hover, setHover] = useState(null);
   const S = 340, P = 34;
   const all = rows.flatMap(r => [r.predA, r.velo]);
   const lo = Math.floor(Math.min(...all)) - 2, hi = Math.ceil(Math.max(...all)) + 2;
   const X = (v) => P + ((v - lo) / (hi - lo)) * (S - 2 * P);
   const Y = (v) => S - P - ((v - lo) / (hi - lo)) * (S - 2 * P);
-  const e = VM_BAND;
-  const band = `${X(lo)},${Y(lo + e)} ${X(hi)},${Y(hi + e)} ${X(hi)},${Y(hi - e)} ${X(lo)},${Y(lo - e)}`;
+  const e = band || VM_BAND;
+  const bandPts = `${X(lo)},${Y(lo + e)} ${X(hi)},${Y(hi + e)} ${X(hi)},${Y(hi - e)} ${X(lo)},${Y(lo - e)}`;
   const ticks = [];
   for (let t = Math.ceil(lo / 5) * 5; t <= hi; t += 5) ticks.push(t);
   const h = hover != null ? rows[hover] : null;
@@ -3573,10 +3596,10 @@ function VmScatter({ rows, onPick }) {
           <text x={X(t)} y={S - P + 14} textAnchor="middle" style={{ fontSize: 8, fill: "#4A4F57", fontFamily: "DM Sans" }}>{t}</text>
           <text x={P - 6} y={Y(t) + 3} textAnchor="end" style={{ fontSize: 8, fill: "#4A4F57", fontFamily: "DM Sans" }}>{t}</text>
         </g>))}
-        <polygon points={band} fill="rgba(255,255,255,0.045)" />
+        <polygon points={bandPts} fill="rgba(255,255,255,0.045)" />
         <line x1={X(lo)} y1={Y(lo)} x2={X(hi)} y2={Y(hi)} stroke="rgba(255,255,255,0.22)" strokeWidth="1.2" />
         {rows.map((r, i) => {
-          const c = r.thin ? "#3A3F47" : vmBandColor(r.residA);
+          const c = r.thin ? "#3A3F47" : vmBandColor(r.residA, band || r.band || VM_BAND);
           return <circle key={i} cx={X(r.predA)} cy={Y(r.velo)} r={hover === i ? 6.5 : r.thin ? 3.5 : 4.5}
             fill={c} stroke="#0A0C10" strokeWidth="1.5" style={{ cursor: "pointer" }}
             onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
@@ -3589,7 +3612,7 @@ function VmScatter({ rows, onPick }) {
         <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 10px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{h.name}</span>
           <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {h.velo} actual, {h.predA.toFixed(1)} predicted</span>
-          {!h.thin && <span style={{ fontSize: 10, fontWeight: 700, color: vmBandColor(h.residA) }}> {"·"} {h.residA > 0 ? "+" : ""}{h.residA.toFixed(1)}</span>}
+          {!h.thin && <span style={{ fontSize: 10, fontWeight: 700, color: vmBandColor(h.residA, band || h.band || VM_BAND) }}> {"·"} {h.residA > 0 ? "+" : ""}{h.residA.toFixed(1)}</span>}
           {h.thin && <span style={{ fontSize: 10, color: "#FFB020" }}> {"·"} thin data</span>}
         </div>
       )}
@@ -3603,11 +3626,11 @@ function VmOverview({ rows, onPick }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
         <VmTile v={rows.length} l="Pitchers, last 6 weeks" />
         <VmTile v={`±${VM_BAND} mph`} l="Typical error" />
-        <VmTile v={_VM.r2.toFixed(2)} l="R²" />
+        <VmTile v={`${rows.filter(r => r.model === "grip").length}/${rows.length}`} l="Scored with grip" />
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 8px 8px", marginBottom: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", padding: "0 8px" }}>Current form vs the model</div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Peak fastball and CMJ testing from the last 6 weeks, actual vs predicted. Shaded band: {"±"}{VM_BAND} mph, the model&rsquo;s noise floor. Tap a dot for the athlete card.</div>
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Peak fastball and CMJ testing from the last 6 weeks, actual vs predicted with grip (throwing-hand best). Pitchers without a grip test are scored on legs only. Shaded band: {"±"}{VM_BAND} mph, the model&rsquo;s noise floor. Tap a dot for the athlete card.</div>
         <VmScatter rows={rows} onPick={onPick} />
         <div style={{ display: "flex", justifyContent: "center", gap: 12, padding: "8px 0 6px", flexWrap: "wrap" }}>
           {[["#FF6B6B", "Over the model"], ["#60A5FA", "Under the model"], ["#6B7280", `On model (within ±${VM_BAND})`]].map(([c, l]) => (
@@ -3667,23 +3690,24 @@ function VmGroupList({ title, caption, rows, right, open, onToggle, onPick, dim 
 function VmFlags({ rows, onPick, openLists, onToggleList }) {
   // Current form only: inputs from the last 6 weeks, 3+ sessions in the window.
   const current = rows.filter(r => r.cur);
-  const flagged = current.filter(r => Math.abs(r.resid6) > VM_BAND).sort((a, b) => b.resid6 - a.resid6);
-  const onModel = current.filter(r => Math.abs(r.resid6) <= VM_BAND);
+  const flagged = current.filter(r => Math.abs(r.resid6) > r.band).sort((a, b) => b.resid6 - a.resid6);
+  const onModel = current.filter(r => Math.abs(r.resid6) <= r.band);
   // Departed/away/injured athletes get their own list so the stale list stays
   // a genuine re-engagement tool (they are all stale today; a returner shows
   // up current with his status chip until the ledger clears him).
   const stale = rows.filter(r => !r.cur && !ROSTER_STATUS[r.name]);
   const gone = rows.filter(r => !r.cur && ROSTER_STATUS[r.name]);
   const maxAbs = Math.max(...flagged.map(r => Math.abs(r.resid6)), VM_BAND + 1);
-  // Grip second-read flags (2026-08-19): all-time basis like the card's grip
-  // block (grip has no 6-week windowing), 5+ sessions, departed excluded.
-  const gFlagged = rows.filter(r => r.grip != null && r.residG != null && !ROSTER_STATUS[r.name] && r.sessions >= 5 && Math.abs(r.residG) > _VM.gband)
-    .sort((a, b) => b.residG - a.residG);
-  const gMax = Math.max(...gFlagged.map(r => Math.abs(r.residG)), _VM.gband + 1);
+  // Legs-only comparison (2026-10-19, grip became primary): grip-tested
+  // current pitchers whose Model A residual is beyond its band. On this list
+  // but not above = his grip explains the gap; on both = off even with grip.
+  const gFlagged = current.filter(r => r.model === "grip" && r.resid6Leg != null && Math.abs(r.resid6Leg) > VM_BAND_LEG)
+    .map(r => ({ ...r, residG: r.resid6Leg })).sort((a, b) => b.residG - a.residG);
+  const gMax = Math.max(...gFlagged.map(r => Math.abs(r.residG)), VM_BAND_LEG + 1);
   return (
     <div>
       <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, marginBottom: 12 }}>
-        Current form: actual minus predicted peak FB, both from the last 6 weeks, Model A. Shown for pitchers with 3+ recent Trackman sessions and a residual beyond {"±"}{VM_BAND} mph.
+        Current form: actual minus predicted peak FB, both from the last 6 weeks, scored with grip (pitchers without a grip test on legs only). Shown for pitchers with 3+ recent Trackman sessions and a residual beyond {"±"}{VM_BAND} mph ({"±"}{VM_BAND_LEG} on legs only).
       </div>
       <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
         {flagged.map((r) => {
@@ -3718,12 +3742,11 @@ function VmFlags({ rows, onPick, openLists, onToggleList }) {
         {!flagged.length && <div style={{ padding: 20, fontSize: 11, color: "#6B7280", textAlign: "center" }}>No pitcher is currently outside the noise band.</div>}
       </div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, margin: "4px 0 6px" }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Still flagged with grip accounted for</span>
-        <span style={{ fontSize: 9, fontWeight: 700, color: "#FFB020", background: "#FFB02018", borderRadius: 8, padding: "2px 7px" }}>PROVISIONAL</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Flagged on legs alone</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: "#8A8F98", background: "#8A8F9818", borderRadius: 8, padding: "2px 7px" }}>MODEL A {"·"} COMPARISON</span>
       </div>
       <div style={{ fontSize: 10, color: "#6B7280", lineHeight: 1.5, marginBottom: 10 }}>
-        The A + grip-per-kg second read, lifetime bests, grip-tested pitchers with 5+ sessions, beyond {"±"}{_VM.gband} mph. A pitcher flagged above but absent here has a residual his grip explains; a pitcher on both lists is off the model even after his hand is counted.
-      </div>
+        Grip-tested pitchers scored on CMJ alone (Model A, current form), beyond {"±"}{VM_BAND_LEG} mph. A pitcher here but not above has a gap his grip explains; a pitcher on both lists is off the model even after his hand is counted.</div>
       <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
         {gFlagged.map((r) => {
           const w = Math.abs(r.residG) / gMax * 50;
@@ -3741,7 +3764,7 @@ function VmFlags({ rows, onPick, openLists, onToggleList }) {
               <div style={{ position: "relative", height: 10, background: "rgba(255,255,255,0.04)", borderRadius: 5 }}>
                 <div style={{ position: "absolute", left: "50%", top: 0, width: 1, height: "100%", background: "rgba(255,255,255,0.18)" }} />
                 {[1, -1].map(sgn => (
-                  <div key={sgn} style={{ position: "absolute", left: `${50 + sgn * (_VM.gband / gMax * 50)}%`, top: 0, width: 1, height: "100%", background: "rgba(255,255,255,0.09)" }} />
+                  <div key={sgn} style={{ position: "absolute", left: `${50 + sgn * (VM_BAND_LEG / gMax * 50)}%`, top: 0, width: 1, height: "100%", background: "rgba(255,255,255,0.09)" }} />
                 ))}
                 <div style={{ position: "absolute", top: 1, height: 8, borderRadius: 4, background: over ? "#FF6B6B" : "#60A5FA",
                   left: over ? "50%" : `${50 - w}%`, width: `${w}%` }} />
@@ -3865,7 +3888,7 @@ function VmWhatIfChart({ livePred, basePred, livePredG, name, actual }) {
         <span><span style={{ color: "#4FFFB0" }}>{"●"}</span> projection</span>
         {moved && <span><span style={{ color: "#fff" }}>{"○"}</span> {name ? "his current prediction" : "pinned baseline"}</span>}
         {name && <span><span style={{ color: "#fff" }}>{"●"}</span> his actual</span>}
-        {livePredG != null && <span><span style={{ color: "#B8BDC4" }}>{"◇"}</span> with grip</span>}
+        {livePredG != null && <span><span style={{ color: "#B8BDC4" }}>{"◇"}</span> legs only</span>}
         <span><span style={{ color: "rgba(255,255,255,0.35)" }}>{"●"}</span> roster</span>
       </div>
     </div>
@@ -3907,10 +3930,15 @@ function VmAthleteCard({ r, onBack }) {
 
   const gi = GROUPS[r.group] || {};
 
-  const curPred = vmPredA(ci0, rsi0);
-  const livePred = vmPredA(ci, rsi);
+  // Primary = with grip where he has a grip test; legs-only Model A is the
+  // comparison line beneath it (2026-10-19).
+  const curLeg = vmPredA(ci0, rsi0);
+  const liveLeg = vmPredA(ci, rsi);
   const curPredG = hasGrip ? vmPredG(ci0, rsi0, r.grip, r.bw) : null;
   const livePredG = hasGrip ? vmPredG(ci, rsi, grip, bw) : null;
+  const curPred = hasGrip ? curPredG : curLeg;
+  const livePred = hasGrip ? livePredG : liveLeg;
+  const legDelta = Math.round(liveLeg * 10) / 10 - Math.round(curLeg * 10) / 10;
   // Delta from the ROUNDED pair so the visible arithmetic closes (2026-08-10
   // lesson: coaches subtract what they see).
   const deltaG = hasGrip ? Math.round(livePredG * 10) / 10 - Math.round(curPredG * 10) / 10 : 0;
@@ -3930,7 +3958,7 @@ function VmAthleteCard({ r, onBack }) {
   const deltaLine = changed.length === 0 ? null :
     `At ${changed.length === 1 ? changed[0] : "these inputs"} the model predicts ${delta > 0 ? "+" : ""}${delta.toFixed(1)} mph vs his current prediction.`;
 
-  const status = !cur ? { l: "Stale", c: "#FFB020" } : { l: vmBandLabel(resid0), c: vmBandColor(resid0) };
+  const status = !cur ? { l: "Stale", c: "#FFB020" } : { l: vmBandLabel(resid0, r.band), c: vmBandColor(resid0, r.band) };
   const card = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 16px", marginBottom: 12 };
 
   return (
@@ -3950,16 +3978,19 @@ function VmAthleteCard({ r, onBack }) {
             <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>{cur ? "6-WEEK PEAK FB" : "ALL-TIME PEAK FB"}</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{pred0.toFixed(1)} <span style={{ fontSize: 12, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
-            <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>{cur ? "PREDICTED, CURRENT TESTS" : "MODEL A PREDICTED"}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{pred0.toFixed(1)} <span style={{ fontSize: 12, color: "#8A8F98" }}>{"±"} {r.band}</span></div>
+            <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>{r.model === "grip" ? (cur ? "PREDICTED WITH GRIP, CURRENT" : "PREDICTED WITH GRIP") : (cur ? "PREDICTED, LEGS ONLY" : "MODEL A, LEGS ONLY")}</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: cur ? vmBandColor(resid0) : "#6B7280" }}>{resid0 > 0 ? "+" : ""}{resid0.toFixed(1)}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: cur ? vmBandColor(resid0, r.band) : "#6B7280" }}>{resid0 > 0 ? "+" : ""}{resid0.toFixed(1)}</div>
             <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>{cur ? "RESIDUAL" : "RESIDUAL (STALE)"}</div>
           </div>
         </div>
         {cur && (
           <div style={{ fontSize: 10, color: "#6B7280", marginTop: 8, textAlign: "center" }}>All-time peak {r.velo.toFixed(1)} mph, last session {r.lastVelo}.</div>
+        )}
+        {r.model !== "grip" && (
+          <div style={{ fontSize: 10, color: "#8A8F98", marginTop: 8, textAlign: "center" }}>No grip test yet: scored on legs only (Model A).</div>
         )}
         {!cur && (
           <div style={{ fontSize: 10.5, color: "#FFB020", marginTop: 10, lineHeight: 1.5 }}>
@@ -3971,7 +4002,7 @@ function VmAthleteCard({ r, onBack }) {
             Only {r.sess6} session{r.sess6 === 1 ? "" : "s"} in the window; treat as provisional.
           </div>
         )}
-        {vmSelectedArm(r) && resid0 > VM_BAND && (
+        {vmSelectedArm(r) && resid0 > r.band && (
           <div style={{ fontSize: 10.5, color: "#8A8F98", marginTop: 10, lineHeight: 1.5 }}>
             Selected-arm note: across the roster the residual rises with velocity (r = +0.60). Elite arms are selected for exactly the component leg testing cannot see, so read the + here as profile, not untapped legs.
           </div>
@@ -3987,7 +4018,7 @@ function VmAthleteCard({ r, onBack }) {
         <div style={card}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Grip</div>
-            <span style={{ fontSize: 9, fontWeight: 700, color: "#FFB020", background: "#FFB02018", borderRadius: 8, padding: "2px 7px" }}>SECOND READ {"·"} PROVISIONAL</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: "#8A8F98", background: "#8A8F9818", borderRadius: 8, padding: "2px 7px" }}>VS LEGS ONLY</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, textAlign: "center" }}>
             <div>
@@ -3995,24 +4026,24 @@ function VmAthleteCard({ r, onBack }) {
               <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>GRIP PEAK {"·"} {Math.round(r.grip / 4.448)} LBS {"·"} P{vmGripPct(r.grip)} {"·"} {(r.grip / (r.bw / VM_LB_PER_KG)).toFixed(1)} N/KG</div>
             </div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{r.predG.toFixed(1)} <span style={{ fontSize: 11, color: "#8A8F98" }}>{"±"} {_VM.gband}</span></div>
-              <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>PREDICTED, WITH GRIP</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{(cur && r.pred6Leg != null ? r.pred6Leg : r.predLeg).toFixed(1)} <span style={{ fontSize: 11, color: "#8A8F98" }}>{"±"} {VM_BAND_LEG}</span></div>
+              <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>LEGS ONLY (MODEL A)</div>
             </div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: vmBandColor(r.residG) }}>{r.residG > 0 ? "+" : ""}{r.residG.toFixed(1)}</div>
-              <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>RESIDUAL, WITH GRIP</div>
+              {(() => { const rl = cur && r.resid6Leg != null ? r.resid6Leg : r.residLeg; return (<>
+              <div style={{ fontSize: 22, fontWeight: 800, color: vmBandColor(rl, VM_BAND_LEG) }}>{rl > 0 ? "+" : ""}{rl.toFixed(1)}</div>
+              <div style={{ fontSize: 8.5, color: "#6B7280", marginTop: 2 }}>RESIDUAL, LEGS ONLY</div></>); })()}
             </div>
           </div>
           <div style={{ fontSize: 9.5, color: "#4A4F57", lineHeight: 1.55, marginTop: 10 }}>
-            Stronger hand for his size, harder throw at equal engine: grip enters per kg of bodyweight. On the {VM_GRIPS.length} grip-tested arms this cut the model's error from {"±"}4.8 to {"±"}4.2 mph out of sample (2026-09-08 fit, frozen). Uses lifetime bests. Model A above stays the headline; this read is a second look, not the ranking.
-          </div>
+            Stronger hand for his size, harder throw at equal engine: grip enters per kg of bodyweight, throwing hand only. On the grip-tested arms adding grip cut the model&rsquo;s error from {"±"}4.8 to {"±"}4.2 mph out of sample (2026-09-08 fit, frozen), so it is the headline above. The legs-only read is here for comparison: the gap between the two is what his hand adds.</div>
         </div>
       )}
 
       <div style={card}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>What if</div>
-        <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14 }}>Slide the testing inputs and watch the Model A prediction{hasGrip ? ", with the provisional grip read beneath it" : ""}. {cur ? "Sliders start from his current 6-week testing." : "Sliders start from his all-time bests."}{hasGrip ? " Grip starts from his lifetime best and enters per kg, so bodyweight moves the with-grip line too." : ""}</div>
-        <VmWhatIfChart name={r.name} actual={velo0} livePred={livePred} basePred={curPred} livePredG={hasGrip ? livePredG : null} />
+        <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14 }}>Slide the testing inputs and watch the prediction{hasGrip ? " (with grip), with the legs-only read beneath it" : " (legs only: no grip test yet)"}. {cur ? "Sliders start from his current 6-week testing." : "Sliders start from his all-time bests."}{hasGrip ? " Grip starts from his lifetime best and enters per kg, so bodyweight moves the with-grip line too." : ""}</div>
+        <VmWhatIfChart name={r.name} actual={velo0} livePred={livePred} basePred={curPred} livePredG={hasGrip ? liveLeg : null} />
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => setCi(v)} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => setRsi(v)} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
         {hasGrip && (
@@ -4027,12 +4058,12 @@ function VmAthleteCard({ r, onBack }) {
           </div>
         )}
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 4, textAlign: "center" }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
-          <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph)</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: (extrap || extrapG) ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {r.band}</span></div>
+          <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph){hasGrip ? ", with grip" : ", legs only"}</div>
           {hasGrip && (
             <div style={{ fontSize: 13, color: "#B8BDC4", marginTop: 8, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-              with grip: <span style={{ fontWeight: 800, color: extrapG ? "#FFB020" : "#fff" }}>{livePredG.toFixed(1)}</span> <span style={{ fontSize: 10, color: "#8A8F98" }}>{"±"} {_VM.gband}</span>
-              {Math.abs(deltaG) >= 0.05 && <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {deltaG > 0 ? "+" : ""}{deltaG.toFixed(1)} vs his numbers</span>}
+              legs only: <span style={{ fontWeight: 800, color: extrap ? "#FFB020" : "#fff" }}>{liveLeg.toFixed(1)}</span> <span style={{ fontSize: 10, color: "#8A8F98" }}>{"±"} {VM_BAND_LEG}</span>
+              {Math.abs(legDelta) >= 0.05 && <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {legDelta > 0 ? "+" : ""}{legDelta.toFixed(1)} vs his numbers</span>}
             </div>
           )}
           {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
@@ -4078,13 +4109,14 @@ function VmSandboxCard() {
   const [er, setEr] = useState(d0.er);
   const [grip, setGrip] = useState(d0.grip);
 
-  const livePred = vmPredA(ci, rsi);
-  const pinPred = vmPredA(pin.ci, pin.rsi);
-  const delta = livePred - pinPred;
-  // Grip second read (2026-08-19): rounded pairs so visible arithmetic closes.
-  const livePredG = vmPredG(ci, rsi, grip, bw);
-  const pinPredG = vmPredG(pin.ci, pin.rsi, pin.grip != null ? pin.grip : d0.grip, pin.bw);
-  const deltaG = Math.round(livePredG * 10) / 10 - Math.round(pinPredG * 10) / 10;
+  // Primary = with grip (2026-10-19); legs-only Model A is the comparison.
+  // Rounded pairs so the visible arithmetic closes.
+  const livePred = vmPredG(ci, rsi, grip, bw);
+  const pinPred = vmPredG(pin.ci, pin.rsi, pin.grip != null ? pin.grip : d0.grip, pin.bw);
+  const delta = Math.round(livePred * 10) / 10 - Math.round(pinPred * 10) / 10;
+  const liveLeg = vmPredA(ci, rsi);
+  const pinLeg = vmPredA(pin.ci, pin.rsi);
+  const legDelta = Math.round(liveLeg * 10) / 10 - Math.round(pinLeg * 10) / 10;
   const extrapG = grip < VM_RANGE.grip[0] || grip > VM_RANGE.grip[1];
   const extrap = ci < VM_RANGE.ci[0] || ci > VM_RANGE.ci[1] || rsi < VM_RANGE.rsi[0] || rsi > VM_RANGE.rsi[1] ||
     false;
@@ -4099,7 +4131,7 @@ function VmSandboxCard() {
         <div style={{ fontSize: 10, color: "#6B7280", marginBottom: 14, lineHeight: 1.5 }}>
           For evals: set a pitcher&rsquo;s tested numbers, tap Pin as baseline, then slide to project. Linked to nobody, saved nowhere.
         </div>
-        <VmWhatIfChart name={null} livePred={livePred} basePred={pinPred} livePredG={livePredG} />
+        <VmWhatIfChart name={null} livePred={livePred} basePred={pinPred} livePredG={liveLeg} />
         <VmSlider label="Concentric Impulse" unit="N·s" value={ci} onChange={(v) => setCi(v)} min={ciB[0]} max={ciB[1]} fit={VM_RANGE.ci} step={1} dec={0} />
         <VmSlider label="RSI-modified" unit="" value={rsi} onChange={(v) => setRsi(v)} min={rsiB[0]} max={rsiB[1]} fit={VM_RANGE.rsi} step={0.01} dec={2} />
         <VmSlider label="Grip Peak" unit="lbs" value={grip / VM_N_PER_LB} onChange={(v) => setGrip(v * VM_N_PER_LB)} min={gB[0] / VM_N_PER_LB} max={gB[1] / VM_N_PER_LB} fit={[VM_RANGE.grip[0] / VM_N_PER_LB, VM_RANGE.grip[1] / VM_N_PER_LB]} step={1} dec={0} />
@@ -4110,11 +4142,11 @@ function VmSandboxCard() {
           <div style={{ fontSize: 9.5, color: "#6B7280", lineHeight: 1.55, marginTop: -6 }}>Holds only if you keep your jump. Gaining weight while jump height drops more than about 0.4 cm per pound nets zero.</div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 12, textAlign: "center" }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: extrap ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
-          <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph)</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: (extrap || extrapG) ? "#FFB020" : "#4FFFB0" }}>{livePred.toFixed(1)} <span style={{ fontSize: 14, color: "#8A8F98" }}>{"±"} {VM_BAND}</span></div>
+          <div style={{ fontSize: 9, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginTop: 2 }}>Predicted peak FB (mph), with grip</div>
           <div style={{ fontSize: 13, color: "#B8BDC4", marginTop: 8, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            with grip: <span style={{ fontWeight: 800, color: extrapG ? "#FFB020" : "#fff" }}>{livePredG.toFixed(1)}</span> <span style={{ fontSize: 10, color: "#8A8F98" }}>{"±"} {_VM.gband} {"·"} provisional</span>
-            {!pinned && Math.abs(deltaG) >= 0.05 && <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {deltaG > 0 ? "+" : ""}{deltaG.toFixed(1)} vs baseline ({pinPredG.toFixed(1)})</span>}
+            legs only: <span style={{ fontWeight: 800, color: extrap ? "#FFB020" : "#fff" }}>{liveLeg.toFixed(1)}</span> <span style={{ fontSize: 10, color: "#8A8F98" }}>{"±"} {VM_BAND_LEG}</span>
+            {!pinned && Math.abs(legDelta) >= 0.05 && <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {legDelta > 0 ? "+" : ""}{legDelta.toFixed(1)} vs baseline ({pinLeg.toFixed(1)})</span>}
           </div>
           {extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Extrapolating: outside the tested range, treat with extra caution.</div>}
           {extrapG && !extrap && <div style={{ fontSize: 10, fontWeight: 700, color: "#FFB020", marginTop: 6 }}>Grip outside the tested range: extrapolating.</div>}
@@ -4299,30 +4331,32 @@ function VmGains({ onPick }) {
 // the with-grip numbers through their usual keys; __orig hands the untouched
 // row to the athlete card on tap.
 function VmGripView({ rows, onPick }) {
-  const gRows = rows.filter(r => r.predG != null).map(r => ({ ...r, predA: r.predG, residA: r.residG, thin: r.thin, __orig: r }));
+  // 2026-10-19: grip is primary everywhere else, so this tab is now the
+  // legs-only (Model A) comparison for the grip-tested pitchers.
+  const gRows = rows.filter(r => r.model === "grip").map(r => ({ ...r, predA: r.predLeg, residA: r.residLeg, thin: r.thin, __orig: r }));
   const nog = rows.length - gRows.length;
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
         <VmTile v={gRows.length} l="Grip-tested pitchers" />
-        <VmTile v={`±${_VM.gband} mph`} l="Typical error" />
-        <VmTile v="2nd read" l="Model A stays headline" />
+        <VmTile v={`±${VM_BAND_LEG} mph`} l="Typical error" />
+        <VmTile v={_VM.r2.toFixed(2)} l="R², legs only" />
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 8px 8px", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "0 8px" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>With grip accounted for</div>
-          <span style={{ fontSize: 9, fontWeight: 700, color: "#FFB020", background: "#FFB02018", borderRadius: 8, padding: "2px 7px" }}>PROVISIONAL</span>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Legs only, grip left out</div>
+          <span style={{ fontSize: 9, fontWeight: 700, color: "#8A8F98", background: "#8A8F9818", borderRadius: 8, padding: "2px 7px" }}>MODEL A {"·"} COMPARISON</span>
         </div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Actual peak FB vs the A + grip-per-kg prediction, lifetime bests. Shaded band: {"±"}{_VM.gband} mph. A dot that moved toward the line vs the Overview plot is a pitcher whose residual grip explains. Tap a dot for the athlete card.</div>
-        <VmScatter rows={gRows} onPick={onPick} />
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Actual peak FB vs the CMJ-only prediction (Model A), lifetime bests, for the grip-tested pitchers. Shaded band: {"±"}{VM_BAND_LEG} mph. Compare with the Overview: a dot that sits closer to the line there is a pitcher whose hand explains part of his gap.</div>
+        <VmScatter rows={gRows} onPick={onPick} band={VM_BAND_LEG} />
         <div style={{ display: "flex", justifyContent: "center", gap: 12, padding: "8px 0 6px", flexWrap: "wrap" }}>
-          {[["#FF6B6B", "Over, even with grip"], ["#60A5FA", "Under, even with grip"], ["#6B7280", `Within ±${_VM.gband}`]].map(([c, l]) => (
+          {[["#FF6B6B", "Over on legs only"], ["#60A5FA", "Under on legs only"], ["#6B7280", `Within ±${VM_BAND_LEG}`]].map(([c, l]) => (
             <span key={l} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, color: "#6B7280" }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: c }} />{l}</span>
           ))}
         </div>
       </div>
       <div style={{ fontSize: 10, color: "#4A4F57", lineHeight: 1.5, padding: "0 4px" }}>
-        Second read, frozen 2026-09-08: grip per kg of bodyweight added to the leg inputs cut the model&rsquo;s error from {"±"}4.8 to {"±"}4.2 mph out of sample on this group. Flags and rankings everywhere else still use Model A. {nog > 0 ? `${nog} fitted pitchers have no grip test yet and are not plotted.` : ""}
+        Model A is the legs-only baseline (CMJ concentric impulse + RSI-mod). The headline everywhere else adds throwing-hand grip per kg of bodyweight (frozen 2026-09-08), which cut the error from {"±"}4.8 to {"±"}4.2 mph out of sample on this group.
       </div>
     </div>
   );
@@ -4345,7 +4379,7 @@ function VeloModelSection() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
-        {[["overview", "Overview"], ["grip", "Grip"], ["flags", "Flag list"], ["gains", "Impulse"], ["sandbox", "Evaluation"]].map(([k, l]) => (
+        {[["overview", "Overview"], ["grip", "Legs only"], ["flags", "Flag list"], ["gains", "Impulse"], ["sandbox", "Evaluation"]].map(([k, l]) => (
           <button key={k} onClick={() => setView(k)} style={{ padding: "7px 12px", border: "1px solid " + (view === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: view === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: view === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
         ))}
       </div>
