@@ -3577,6 +3577,11 @@ function VmTile({ v, l }) {
 
 function VmScatter({ rows, onPick, band }) {
   const [hover, setHover] = useState(null);
+  // Name search (Frank, 2026-10-21): rings the matching dot(s) without
+  // hiding anything, so the full cloud still shows for athletes/parents.
+  const [q, setQ] = useState("");
+  const qn = q.trim().toLowerCase();
+  const hits = qn.length >= 2 ? rows.map((r, i) => i).filter(i => rows[i].name.toLowerCase().includes(qn)) : [];
   const S = 340, P = 34;
   const all = rows.flatMap(r => [r.predA, r.velo]);
   const lo = Math.floor(Math.min(...all)) - 2, hi = Math.ceil(Math.max(...all)) + 2;
@@ -3586,9 +3591,23 @@ function VmScatter({ rows, onPick, band }) {
   const bandPts = `${X(lo)},${Y(lo + e)} ${X(hi)},${Y(hi + e)} ${X(hi)},${Y(hi - e)} ${X(lo)},${Y(lo - e)}`;
   const ticks = [];
   for (let t = Math.ceil(lo / 5) * 5; t <= hi; t += 5) ticks.push(t);
-  const h = hover != null ? rows[hover] : null;
+  const h = hover != null ? rows[hover] : hits.length === 1 ? rows[hits[0]] : null;
   return (
     <div style={{ position: "relative" }}>
+      <div style={{ padding: "0 8px 8px" }}>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find a pitcher"
+          onKeyDown={(e) => { if (e.key === "Enter" && hits.length === 1) onPick(rows[hits[0]]); if (e.key === "Escape") setQ(""); }}
+          style={{ width: "100%", boxSizing: "border-box", padding: "8px 12px", borderRadius: 10, border: `1px solid ${hits.length ? "rgba(79,255,176,0.45)" : "rgba(255,255,255,0.08)"}`, background: "rgba(255,255,255,0.03)", color: "#fff", fontSize: 16, outline: "none" }} />
+        {qn.length >= 2 && hits.length !== 1 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+            {hits.length === 0 && <span style={{ fontSize: 10, color: "#6B7280" }}>No pitcher on this chart matches.</span>}
+            {hits.slice(0, 8).map(k => (
+              <button key={k} onClick={() => setQ(rows[k].name)} style={{ padding: "3px 9px", borderRadius: 8, border: "1px solid rgba(79,255,176,0.3)", background: "rgba(79,255,176,0.06)", color: "#4FFFB0", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>{rows[k].name}</button>
+            ))}
+            {hits.length > 8 && <span style={{ fontSize: 10, color: "#6B7280", alignSelf: "center" }}>+{hits.length - 8} more</span>}
+          </div>
+        )}
+      </div>
       <svg viewBox={`0 0 ${S} ${S}`} style={{ display: "block", width: "100%" }}>
         {ticks.map(t => (<g key={t}>
           <line x1={X(t)} y1={P} x2={X(t)} y2={S - P} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
@@ -3605,11 +3624,20 @@ function VmScatter({ rows, onPick, band }) {
             onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
             onClick={() => onPick(r)} />;
         })}
+        {hits.map(k => {
+          const r = rows[k], cx = X(r.predA), cy = Y(r.velo);
+          return (<g key={"hit" + k} style={{ cursor: "pointer" }} onClick={() => onPick(r)}>
+            <circle cx={cx} cy={cy} r="9" fill="none" stroke="#4FFFB0" strokeWidth="2" />
+            <circle cx={cx} cy={cy} r="5" fill="#4FFFB0" stroke="#0A0C10" strokeWidth="1.5" />
+            <text x={cx > S - 90 ? cx - 13 : cx + 13} y={cy + 3} textAnchor={cx > S - 90 ? "end" : "start"}
+              style={{ fontSize: 9, fontWeight: 700, fill: "#fff", fontFamily: "DM Sans", paintOrder: "stroke", stroke: "#0A0C10", strokeWidth: 3 }}>{r.name}</text>
+          </g>);
+        })}
         <text x={S / 2} y={S - 6} textAnchor="middle" style={{ fontSize: 8.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>PREDICTED PEAK FB (MPH)</text>
         <text x={10} y={S / 2} textAnchor="middle" transform={`rotate(-90 10 ${S / 2})`} style={{ fontSize: 8.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>ACTUAL PEAK FB (MPH)</text>
       </svg>
       {h && (
-        <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 10px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
+        <div style={{ position: "absolute", top: 52, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 10px", pointerEvents: "none", whiteSpace: "nowrap", zIndex: 5 }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{h.name}</span>
           <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} {h.velo} actual, {h.predA.toFixed(1)} predicted</span>
           {!h.thin && <span style={{ fontSize: 10, fontWeight: 700, color: vmBandColor(h.residA, band || h.band || VM_BAND) }}> {"·"} {h.residA > 0 ? "+" : ""}{h.residA.toFixed(1)}</span>}
