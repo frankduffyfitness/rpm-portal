@@ -121,6 +121,7 @@ VELO_BULLPEN_LABELS = {
     ("John Turner", "2026-09-28"): "Rehab",            # short slope session (Frank, 2026-09-29)
     ("Will McDuffy", "2026-10-01"): "Rehab",           # short slope, first throws back (Frank, 2026-10-01)
     ("Lucas Baker", "2026-10-10"): "Rehab",            # short slope (Frank, 2026-10-10)
+    ("Thomas Corkery", "2026-10-21"): "Low Effort",   # low-intent pen (Frank, 2026-10-21)
     ("Thomas LoBello", "2026-10-06"): "Low Effort",    # pitch design session (Frank, 2026-10-06)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
