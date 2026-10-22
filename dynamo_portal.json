@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-22T14:28:05.095812+00:00",
+    "syncDate": "2026-10-22T19:07:41.367712+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 127
+    "totalAthletes": 128
   },
   "athletes": {
     "Joey Muzio": {
@@ -19971,6 +19971,72 @@
               "ttp": [
                 1.28,
                 1.78
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Anthony Plascoff": {
+      "name": "Anthony Plascoff",
+      "group": "hs",
+      "dob": "2009-06-22",
+      "tests": [
+        {
+          "date": "2026-10-22",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                449.7
+              ],
+              "peakLbs": [
+                null,
+                101.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2466
+              ],
+              "ttp": [
+                null,
+                2.28
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                410.8
+              ],
+              "peakLbs": [
+                null,
+                92.4
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2419
+              ],
+              "ttp": [
+                null,
+                1.51
               ]
             }
           ],
