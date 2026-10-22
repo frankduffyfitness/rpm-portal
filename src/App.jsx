@@ -5007,6 +5007,9 @@ function CmjQuadrants() {
   const [grp, setGrp] = useState("hs");
   const [pick, setPick] = useState(null);
   const [hover, setHover] = useState(null);
+  // Name search (Frank, 2026-10-22), same as the velo charts: rings the
+  // matching dot(s), hides nothing.
+  const [q, setQ] = useState("");
   const cut = useMemo(() => new Date(Date.now() - QUAD_WIN_DAYS * 864e5).toISOString().slice(0, 10), []);
   // FEM selects on the fem FLAG (r[7]), not the group code: GROUP_PRIORITY resolves
   // fem|hs into hs, so r[1]==="fem" would show 1 of 9 female athletes. Female athletes
@@ -5017,6 +5020,11 @@ function CmjQuadrants() {
     const mid = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
     return { ci: mid(pool.map(r => r[2])), rsi: mid(pool.map(r => r[3])) };
   }, [pool]);
+  const qn = q.trim().toLowerCase();
+  const hits = qn.length >= 2 ? pool.map((r, i) => i).filter(i => pool[i][0].toLowerCase().includes(qn)) : [];
+  // Matches outside the selected group, so a miss can point to the right chip.
+  const elsewhere = qn.length >= 2 && !hits.length ? _QUAD.filter(r => r[5] >= cut && r[0].toLowerCase().includes(qn)) : [];
+  const tip = hover != null ? hover : hits.length === 1 ? hits[0] : null;
   if (!pool.length) return <div style={{ fontSize: 12, color: "#6B7280", textAlign: "center", padding: 40 }}>No recent CMJ data in this group.</div>;
   const S = 340, P = 34;
   const lox = Math.min(...pool.map(r => r[2])) * 0.94, hix = Math.max(...pool.map(r => r[2])) * 1.05;
@@ -5034,13 +5042,30 @@ function CmjQuadrants() {
           <button key={k} onClick={() => { setGrp(k); setPick(null); }} style={{ padding: "6px 11px", border: "1px solid " + (grp === k ? gi.color : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: grp === k ? gi.color + "18" : "rgba(255,255,255,0.02)", color: grp === k ? gi.color : "#6B7280" }}>{gi.shortLabel || k}</button>); })}
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "14px 8px 6px", position: "relative" }}>
-        {hover != null && pool[hover] && (() => { const r = pool[hover];
+        <div style={{ padding: "0 8px 8px" }}>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find an athlete"
+            onKeyDown={(e) => { if (e.key === "Enter" && hits.length === 1) setPick(hits[0]); if (e.key === "Escape") setQ(""); }}
+            style={{ width: "100%", boxSizing: "border-box", padding: "8px 12px", borderRadius: 10, border: `1px solid ${hits.length ? "rgba(79,255,176,0.45)" : "rgba(255,255,255,0.08)"}`, background: "rgba(255,255,255,0.03)", color: "#fff", fontSize: 16, outline: "none" }} />
+          {qn.length >= 2 && hits.length !== 1 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+              {hits.length === 0 && elsewhere.length === 0 && <span style={{ fontSize: 10, color: "#6B7280" }}>No athlete with a CMJ in the last {QUAD_WIN_DAYS} days matches.</span>}
+              {hits.length === 0 && elsewhere.length > 0 && (
+                <button onClick={() => { setGrp("all"); setPick(null); }} style={{ padding: "3px 9px", borderRadius: 8, border: "1px solid rgba(255,176,32,0.35)", background: "rgba(255,176,32,0.06)", color: "#FFB020", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Not in this group: show in ALL</button>
+              )}
+              {hits.slice(0, 8).map(k => (
+                <button key={k} onClick={() => setQ(pool[k][0])} style={{ padding: "3px 9px", borderRadius: 8, border: "1px solid rgba(79,255,176,0.3)", background: "rgba(79,255,176,0.06)", color: "#4FFFB0", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>{pool[k][0]}</button>
+              ))}
+              {hits.length > 8 && <span style={{ fontSize: 10, color: "#6B7280", alignSelf: "center" }}>+{hits.length - 8} more</span>}
+            </div>
+          )}
+        </div>
+        {tip != null && pool[tip] && (() => { const r = pool[tip];
           const pc = (k) => Math.round(100 * pool.filter(o => o[k] < r[k]).length / pool.length);
           const proj = vmPredA(r[2], r[3]);
           const extrap = r[2] < VM_RANGE.ci[0] || r[2] > VM_RANGE.ci[1] || r[3] < VM_RANGE.rsi[0] || r[3] > VM_RANGE.rsi[1];
           const showProj = !r[7];  // model fit on male pitchers: no projection for female athletes
           return (
-            <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "6px 11px", pointerEvents: "none", whiteSpace: "normal", maxWidth: "94%", textAlign: "center", zIndex: 5 }}>
+            <div style={{ position: "absolute", top: 60, left: "50%", transform: "translateX(-50%)", background: "#1A1D24", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "6px 11px", pointerEvents: "none", whiteSpace: "normal", maxWidth: "94%", textAlign: "center", zIndex: 5 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{r[0]}</span>
               <span style={{ fontSize: 10, color: "#8A8F98" }}> {"·"} CI {r[2].toFixed(0)} ({pc(2)}th) {"·"} RSI {r[3].toFixed(2)} ({pc(3)}th){r[6] != null ? ` · ${Math.round(r[6])} lbs` : ""}</span>
               {showProj && <span style={{ fontSize: 10, fontWeight: 700, color: extrap ? "#FFB020" : "#60A5FA" }}> {"·"} engine ~{proj.toFixed(1)} mph{extrap ? "*" : ""}</span>}
@@ -5068,6 +5093,15 @@ function CmjQuadrants() {
               onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
               onClick={() => setPick(pick === i ? null : i)} />
           ))}
+          {hits.map(k => {
+            const r = pool[k], cx = X(r[2]), cy = Y(r[3]);
+            return (<g key={"hit" + r[0]} style={{ cursor: "pointer" }} onClick={() => setPick(pick === k ? null : k)}>
+              <circle cx={cx} cy={cy} r="9" fill="none" stroke="#4FFFB0" strokeWidth="2" />
+              <circle cx={cx} cy={cy} r="5" fill="#4FFFB0" stroke="#0A0C10" strokeWidth="1.5" />
+              <text x={cx > S - 90 ? cx - 13 : cx + 13} y={cy + 3} textAnchor={cx > S - 90 ? "end" : "start"}
+                style={{ fontSize: 9, fontWeight: 700, fill: "#fff", fontFamily: "DM Sans", paintOrder: "stroke", stroke: "#0A0C10", strokeWidth: 3 }}>{r[0]}</text>
+            </g>);
+          })}
           <text x={S / 2} y={S - 4} textAnchor="middle" style={{ fontSize: 7.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>CONCENTRIC IMPULSE (N·s) · FORCE</text>
           <text x={9} y={S / 2} textAnchor="middle" transform={`rotate(-90 9 ${S / 2})`} style={{ fontSize: 7.5, fill: "#6B7280", letterSpacing: 0.8, fontFamily: "DM Sans" }}>RSI-MOD · ELASTICITY</text>
         </svg>
