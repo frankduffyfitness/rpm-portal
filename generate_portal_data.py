@@ -2016,10 +2016,12 @@ _DYNAMO = gen_DYNAMO()
 # product: actual minus predicted, read against the ±RMSE noise floor.
 # All aggregation rules mirror SKILL.md; do not change without re-validating
 # against athlete_table_<date>.csv.
-VM_A = (49.7784, 0.099611, 9.433266)              # velo = a0 + a1*CI + a2*RSI
+# Refit 2026-10-24 on the 270-day input basis, 3+ tracked sessions (n=98, LOO ±4.33).
+# Previous: 49.7784/0.099611/9.433266 on lifetime bests, July n=81.
+VM_A = (53.6458, 0.075846, 13.073728)              # velo = a0 + a1*CI + a2*RSI
 VM_B = (41.8141, 0.068449, 11.978324, 3.185650)   # ... + b3*ln(ER_RFD lbs/s)
-VM_RMSE = 4.4
-VM_R2 = 0.56
+VM_RMSE = 4.3
+VM_R2 = 0.48
 # A + grip (Frank adopted DISPLAY-BESIDE-A, 2026-08-19: "merit enough to show
 # guys"). Fit frozen from that day's grip-covered subset (n=67, LOO ±4.43);
 # grip = best THROWING-HAND peakN across every DynaMo Grip Squeeze (since 2026-10-19; was best of either hand). Shown as a
@@ -2033,8 +2035,9 @@ VM_R2 = 0.56
 # grip/kg no longer competes with CI on the size axis). Units: N per kg, bw =
 # the row's bwLbs / LB_PER_KG. Refit on the production store, never pasted
 # from the coach's export-based fit (different target, aggregation, units).
-VM_G = (41.491587, 0.079335, 6.580987, 2.593587)  # velo = g0 + g1*CI + g2*RSI + g3*(gripN / bw_kg)
-VM_G_BAND = 4.2
+# Refit 2026-10-24 on the 270-day input basis, 3+ sessions (n=77, LOO ±4.49). Previous: 41.491587/0.079335/6.580987/2.593587 (Sep 8).
+VM_G = (43.94498, 0.087388, 10.493879, 1.492574)  # velo = g0 + g1*CI + g2*RSI + g3*(gripN / bw_kg)
+VM_G_BAND = 4.5
 # Velo target: max Peak FB across sessions. The top-3-median target ("t3")
 # validated slightly better in the refit; flip only with coach sign-off.
 VM_TARGET = "max"
@@ -2052,7 +2055,10 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
     Indices 24-26 (2026-08-19): DynaMo grip peak (throwing-hand best, N) and the
     frozen A+grip prediction/residual (VM_G, display-beside-A only). Since
     2026-09-08 the grip term is grip/kg (needs bwLbs; predG null without it).
-    Indices 22-23 are the session dates the LIFETIME-BEST ci and rsi were set
+    ci / rsi (indices 2-3) are the best values inside the last 270 days
+    (VM_INPUT_WINDOW_DAYS, 2026-10-24), falling back to lifetime bests for an
+    athlete with no CMJ in the window; the 42-day current-form fields are
+    unchanged. Indices 22-23 are the session dates those bests were set
     (stale-engine badge, 2026-08-02: an all-time prediction leaning on an old
     best can flag an athlete who has since declined; Cellilli and Persichilli's
     under-flags were traced to >180d-old bests. UI computes the age).
@@ -2078,6 +2084,14 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
     # history (n=81); refitting on the window alone was tested and is worse.
     VM_WINDOW_DAYS = 42
     cutoff = (datetime.now() - timedelta(days=VM_WINDOW_DAYS)).strftime("%Y-%m-%d")
+    # All-time INPUT basis = best CI / RSI within the last VM_INPUT_WINDOW_DAYS
+    # (Frank, 2026-10-24). Lifetime bests were quietly stale: a third of RSI
+    # bests were >6 months old and tilted those residuals ~1 mph negative;
+    # a 180-270 day window fit 0.12-0.14 mph tighter under LOO and k-fold,
+    # shorter windows got noisy. An athlete with no CMJ inside the window
+    # falls back to his lifetime best (the stale-engine badge covers him).
+    VM_INPUT_WINDOW_DAYS = 270
+    basis_cutoff = (datetime.now() - timedelta(days=VM_INPUT_WINDOW_DAYS)).strftime("%Y-%m-%d")
 
     def _target(peaks):
         if VM_TARGET == "max":
@@ -2152,6 +2166,8 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
         ci_meas = ci_est = rsi = 0.0
         ci6_meas = ci6_est = rsi6 = 0.0
         ci_meas_d = ci_est_d = rsi_d = None  # session date of each lifetime best
+        bci_meas = bci_est = brsi = 0.0      # bests inside the input window
+        bci_meas_d = bci_est_d = brsi_d = None
         last_cmj = None
         cmj_weights = []  # (date, kg) per CMJ test, for current bodyweight
         for t in ath.get("tests", []):
@@ -2159,6 +2175,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
                 continue
             t_date = (t.get("date") or "")[:10]
             in_window = t_date >= cutoff
+            in_basis = t_date >= basis_cutoff
             if t_date:
                 last_cmj = max(last_cmj, t_date) if last_cmj else t_date
             if t.get("weight"):
@@ -2168,6 +2185,8 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
                 if m.get("concentricImpulse"):
                     if m["concentricImpulse"] > ci_meas:
                         ci_meas, ci_meas_d = m["concentricImpulse"], t_date or None
+                    if in_basis and m["concentricImpulse"] > bci_meas:
+                        bci_meas, bci_meas_d = m["concentricImpulse"], t_date or None
                     if in_window:
                         ci6_meas = max(ci6_meas, m["concentricImpulse"])
                 jh, bw = m.get("jumpHeight"), m.get("bodyweightLbs")
@@ -2175,14 +2194,23 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
                     est = (bw * 0.45359237) * math.sqrt(2 * 9.81 * jh * 0.0254) * 1.006
                     if est > ci_est:
                         ci_est, ci_est_d = est, t_date or None
+                    if in_basis and est > bci_est:
+                        bci_est, bci_est_d = est, t_date or None
                     if in_window:
                         ci6_est = max(ci6_est, est)
                 r = m.get("rsiModified")
                 if r:
                     if r > rsi:
                         rsi, rsi_d = r, t_date or None
+                    if in_basis and r > brsi:
+                        brsi, brsi_d = r, t_date or None
                     if in_window:
                         rsi6 = max(rsi6, r)
+        # Input basis: windowed best when the athlete has one, else lifetime.
+        if bci_meas or bci_est:
+            ci_meas, ci_est, ci_meas_d, ci_est_d = bci_meas, bci_est, bci_meas_d, bci_est_d
+        if brsi:
+            rsi, rsi_d = brsi, brsi_d
         ci = ci_meas or ci_est  # per-athlete fallback, mirroring fit_model.py
         ci_date = ci_meas_d if ci_meas else ci_est_d  # date follows the source used
         ci6 = ci6_meas or ci6_est
