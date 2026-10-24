@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-24T16:14:58.988289+00:00",
+    "syncDate": "2026-10-24T16:38:51.933885+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 130
+    "totalAthletes": 132
   },
   "athletes": {
     "Joey Muzio": {
@@ -20618,6 +20618,138 @@
               "ttp": [
                 5.67,
                 9.42
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Micah Liu": {
+      "name": "Micah Liu",
+      "group": "col",
+      "dob": "2007-01-26",
+      "tests": [
+        {
+          "date": "2026-10-24",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                470.7,
+                465.9
+              ],
+              "peakLbs": [
+                105.8,
+                104.7
+              ],
+              "asymPct": 1,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2155,
+                2320
+              ],
+              "ttp": [
+                2.46,
+                1.99
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                451.3,
+                485.3
+              ],
+              "peakLbs": [
+                101.5,
+                109.1
+              ],
+              "asymPct": 7,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2488,
+                3190
+              ],
+              "ttp": [
+                1.92,
+                1.41
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Caleb Liu": {
+      "name": "Caleb Liu",
+      "group": "hs",
+      "dob": "2010-07-17",
+      "tests": [
+        {
+          "date": "2026-10-24",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                339,
+                261.3
+              ],
+              "peakLbs": [
+                76.2,
+                58.7
+              ],
+              "asymPct": 22.9,
+              "asymNote": "left side stronger",
+              "rfd": [
+                1838,
+                1210
+              ],
+              "ttp": [
+                5.11,
+                1.72
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                313.6,
+                332
+              ],
+              "peakLbs": [
+                70.5,
+                74.6
+              ],
+              "asymPct": 5.5,
+              "asymNote": "Symmetric",
+              "rfd": [
+                1754,
+                1669
+              ],
+              "ttp": [
+                1.07,
+                0.6
               ]
             }
           ],
