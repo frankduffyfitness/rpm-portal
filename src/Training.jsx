@@ -14,6 +14,8 @@ const monShort = (m) => MON[+m.slice(5) - 1];
 const round5 = (x) => Math.round(x / 5) * 5;
 const other = (s) => (s === "sumo" ? "conventional" : s === "conventional" ? "sumo" : null);
 const skey = (day, week) => `d${day}w${week}`;
+// Weeks in a program = the highest week its exercises carry (the Dec 21 to Jan 1 peak phase is 2 weeks, not 4).
+const weeksOf = (p) => { const ws = (p.days || []).flatMap((d) => (d.exercises || []).flatMap((x) => (x.weeks || []).map((w) => w.w))); return ws.length ? Math.max(...ws) : 4; };
 // Calendar programs (e.g. Jared Welch's daily mobility): sessions are keyed by date, d<day>t<YYYYMMDD>.
 const calKey = (day, date) => `d${day}t${date.replace(/-/g, "")}`;
 // ex.video: a YouTube id or any YouTube/Shorts link; played in-portal via the privacy embed.
@@ -112,7 +114,7 @@ function model(A) {
     return { rx, done };
   };
   const sessions = [];
-  months.forEach((p, mi) => { for (let w = 1; w <= 4; w++) for (const d of p.days) sessions.push({ month: p.month, day: d.day, week: w, order: mi * 100 + w * 10 + d.day }); });
+  months.forEach((p, mi) => { for (let w = 1; w <= weeksOf(p); w++) for (const d of p.days) sessions.push({ month: p.month, day: d.day, week: w, order: mi * 100 + w * 10 + d.day }); });
   const orderOf = (month, day, week) => (sessions.find((s) => s.month === month && s.day === day && s.week === week) || {}).order ?? -1;
   const nextSession = () => sessions.find((s) => sessionStats(A.programs[s.month], s.day, s.week).done === 0) || null;
   const lastTime = (ex, cur) => {
@@ -348,7 +350,7 @@ function Progress({ A, M, ctx }) {
         <Tile label="RSI-mod" value={rsi.length ? rsi[rsi.length - 1].toFixed(2) : "–"} sub={rsiD ? rsiD.text : rsi.length ? "1 CMJ in this block" : "No CMJ in this block"} subColor={rsiD && rsiD.color} spark={rsi.length > 1 ? rsi : null} sparkColor="#60A5FA" />
         {M.months.some((p) => (p.movement || []).length) && (() => {
           let n = 0, done = 0;
-          M.months.forEach((p) => (p.movement || []).forEach((mv, mi) => { for (let w = 1; w <= 4; w++) { n++; const l = (A.logs[p.month] || {})[`m${mi + 1}w${w}`]; if (l && Object.values(l.entries || {}).some((a) => (a || []).some((c) => c && c.done))) done++; } }));
+          M.months.forEach((p) => (p.movement || []).forEach((mv, mi) => { for (let w = 1; w <= weeksOf(p); w++) { n++; const l = (A.logs[p.month] || {})[`m${mi + 1}w${w}`]; if (l && Object.values(l.entries || {}).some((a) => (a || []).some((c) => c && c.done))) done++; } }));
           return <Tile label="Movement days" value={done} unit={`/ ${n}`} sub="weeks with the Movement Day logged" />;
         })()}
         {velo && <Tile label="Peak velo" value={veloWin.length ? Math.max(...veloWin.map((v) => v[1])).toFixed(1) : "–"} unit={veloWin.length ? "mph" : ""} sub={veloWin.length ? `${veloWin.length} TrackMan session${veloWin.length === 1 ? "" : "s"} in this block` : "No TrackMan in this block"} spark={veloWin.length > 1 ? veloWin.map((v) => v[1]) : null} sparkColor="#FFB020" />}
@@ -759,7 +761,8 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           let dn = 0;
           const cells = [];
           const labeled = p.days.some((x) => x.short);
-          for (let w = 1; w <= 4; w++) {
+          const nw = weeksOf(p);
+          for (let w = 1; w <= nw; w++) {
             cells.push(<span key={"l" + w} className="lab">W{w}</span>);
             for (const dd of p.days) {
               const st = M.sessionStats(p, dd.day, w);
@@ -772,7 +775,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           }
           return (
             <div key={p.month} style={labeled ? { gridColumn: "1 / -1" } : null}>
-              <div className="mh">{p.label.split(" ")[0]}<span>{dn}/{p.days.length * 4}</span></div>
+              <div className="mh">{p.label.split(" ")[0]}<span>{dn}/{p.days.length * nw}</span></div>
               <div className="mgrid" style={{ gridTemplateColumns: `20px repeat(${p.days.length}, 1fr)` }}>{cells}</div>
             </div>
           );
