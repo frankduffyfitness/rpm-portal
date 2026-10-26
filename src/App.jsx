@@ -166,6 +166,18 @@ const ASYMMETRY = Object.fromEntries(_ASY.map(a => [a[0], {
 const BW_DATA = Object.fromEntries(_BW.map(b => [b[0], {
   history: b[1], current: b[2], change: b[3], dates: b[4],
 }]));
+// Report-card and athlete-page bodyweight sparklines show the last 6 months of weigh-ins
+// (Frank, 10/25/26), anchored at the athlete's latest weigh-in so a departed athlete
+// still shows a line. The date-range tool keeps the full history.
+const bwRecent = (b, months = 6) => {
+  if (!b || !b.dates || !b.history || b.dates.length !== b.history.length) return b;
+  const ts = b.dates.map((t) => { const q = String(t).split("/").map(Number); return new Date(q[2] < 100 ? 2000 + q[2] : q[2], q[0] - 1, q[1]).getTime(); });
+  const cut = new Date(Math.max(...ts)); cut.setMonth(cut.getMonth() - months);
+  const keep = ts.map((t) => t >= cut.getTime());
+  const history = b.history.filter((_, i) => keep[i]), dates = b.dates.filter((_, i) => keep[i]);
+  const change = history.length > 1 ? Math.round((history[history.length - 1] - history[0]) * 10) / 10 : 0;
+  return { ...b, history, dates, change };
+};
 
 const SESSION_DATES = Object.fromEntries(_SD.map(d => [d[0], d[1]]));
 const HOP_SESSION_DATES = Object.fromEntries(_HD.map(d => [d[0], d[1]]));
@@ -1898,7 +1910,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
   const tmr = veloAthlete ? (_TMR[veloAthlete.name] || []) : [];
   const bp = tmr[0] || null;
   const isFemale = id.group === "fem" || FEM_SET.has(id.name);
-  const bw = athlete && !isFemale ? BW_DATA[athlete.name] : null;
+  const bw = athlete && !isFemale ? bwRecent(BW_DATA[athlete.name]) : null;
 
   // DynaMo (VALD shoulder strength) — the ER/IR rotator screen, on page 1.
   const dynTest = dynamo && dynamo.tests ? dynPrimaryTest(dynamo.tests) : undefined;
@@ -2016,7 +2028,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
                 return (
                   <div className="rc-card">
                     <div className="rc-ctitle">Bodyweight</div>
-                    <div className="rc-csub">Tracked across every testing session</div>
+                    <div className="rc-csub">Last 6 months of testing sessions</div>
                     <div className="rc-bw-top">
                       <div className="rc-bw-big">{h[0]} {"→"} {bw.current} lbs</div>
                       <div className="rc-bw-chg" style={{ color: ch > 0 ? "#16A34A" : ch < 0 ? "#DC2626" : "#5B6470" }}>{ch > 0 ? "+" : ""}{ch} lbs</div>
@@ -2148,7 +2160,7 @@ function ReportView({ athlete, norms, hopAthlete, hopNorms, veloAthlete, offseas
 
 function BodyweightChart({ athleteName, group }) {
   if (group === "fem" || FEM_SET.has(athleteName)) return null;
-  const data = BW_DATA[athleteName];
+  const data = bwRecent(BW_DATA[athleteName]);
   if (!data || data.history.length < 3) return null;
 
   const changeColor = data.change > 0 ? "#4FFFB0" : data.change < 0 ? "#FF6B6B" : "#6B7280";
@@ -5619,7 +5631,7 @@ export default function App() {
           <PhysCard name={sel.name} gc={gi.color} giLabel={gi.label} norms={norms} />
           {!FEM_SET.has(sel.name) && BW_DATA[sel.name] && sel.bw ? (
             <MC metricKey="bodyweight" value={sel.bw} unit="lbs" norms={norms.bodyweight} sparkColor="#E0E0E0"
-              sparkData={BW_DATA[sel.name].history} sparkDates={BW_DATA[sel.name].dates} sparkUnit=" lbs" />
+              sparkData={bwRecent(BW_DATA[sel.name]).history} sparkDates={bwRecent(BW_DATA[sel.name]).dates} sparkUnit=" lbs" />
           ) : null}
           <MC metricKey="cmjHeight" value={cmj.jumpHeight} unit='"' norms={norms.cmjHeight} sparkData={sel.jhHistory} sparkColor="#4FFFB0" bestValue={sel.best.jumpHeight} sparkDates={sel.jhHistoryDates} sparkUnit='"' rank={jhRank} rankTotal={groupCount} rankLabel={groupLabel} />
           <MC metricKey="rsiMod" value={cmj.rsi} unit="" norms={norms.rsiMod} sparkData={sel.rsiHistory} sparkColor="#FF6B6B" bestValue={sel.best.rsi} sparkDates={sel.rsiHistoryDates} rank={rsiRank} rankTotal={groupCount} rankLabel={groupLabel} />
