@@ -617,7 +617,11 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           const pctTxt = wk.pct ? ` @ ${wk.pct.map((p) => +(p * 100).toFixed(1)).join("-")}%` : "";
           let callout = null;
           if (isDl(ex) && wk.target && wk.target.length > 1) callout = <><b>Test single.</b> Work up to one single at 92-95%. Your best single this month sets next month's loads.</>;
-          if (isDl(ex) && sel.month.endsWith("-12") && sel.week === 4) {
+          // Jan 1 attempts box: the last week of a program labeled "Peak" (the 2-week
+          // peak phase, Dec 21 - Jan 1), or December week 4 when no peak program exists.
+          const peakLast = /peak/i.test(prog.label || "") && sel.week === Math.max(...d.exercises.flatMap((x) => x.weeks.map((w) => w.w)));
+          const hasPeak = Object.values(A.programs).some((p) => /peak/i.test(p.label || ""));
+          if (isDl(ex) && (peakLast || (!hasPeak && sel.month.endsWith("-12") && sel.week === 4))) {
             const best = M.months.map((p) => M.bestSingle(p.month, "deadlift")).filter(Boolean).reduce((m, s) => (!m || s.load > m.load ? s : m), null);
             callout = best ? <><b>Jan 1 attempts.</b> Best training single so far: {best.load}. Opener about {round5(best.load * 0.95)}, second a small PR over {best.load}, third is the day's call.</> : <><b>Jan 1 attempts.</b> Opener is about 95% of your best training single.</>;
           }
