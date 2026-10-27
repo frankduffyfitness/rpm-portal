@@ -4377,35 +4377,38 @@ function VmGains({ onPick }) {
 // the with-grip numbers through their usual keys; __orig hands the untouched
 // row to the athlete card on tap.
 function VmGripView({ rows, onPick }) {
-  // 2026-10-19: grip is primary everywhere else, so this tab is the
-  // legs-only (Model A) comparison. Same pitchers and same basis as the
-  // Overview (grip-tested, lifetime bests) so the ONLY difference between the
-  // two plots is grip (Frank: a lifetime-best population here read as the
-  // tabs being swapped).
-  const gRows = rows.filter(r => r.model === "grip").map(r => ({ ...r, predA: r.predLeg, residA: r.residLeg, __orig: r }));
-  const nog = 0;
+  // 2026-10-27 (Frank): this tab shows the pitchers with a FULL testing
+  // history (3+ tracked pens, grip, hop test on file) against the headline
+  // model. Same frozen constants as the Overview; the band is the model's
+  // cross-validated error on this group (_VM.gbandFull), which is tighter
+  // than the roster-wide band because these are the regulars with the
+  // cleanest peaks. Replaced the legs-only comparison view.
+  const band = _VM.gbandFull || VM_BAND;
+  const fRows = rows.filter(r => r.model === "grip" && r.hasHop && r.sessions >= 3)
+    .map(r => ({ ...r, band, __orig: r }));
+  const n8 = fRows.filter(r => r.sessions >= 8).length;
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
-        <VmTile v={gRows.length} l="Grip-tested pitchers" />
-        <VmTile v={`±${VM_BAND_LEG} mph`} l="Typical error" />
-        <VmTile v={_VM.r2.toFixed(2)} l="R², legs only" />
+        <VmTile v={fRows.length} l="Full-battery pitchers" />
+        <VmTile v={`±${band} mph`} l="Typical error, this group" />
+        <VmTile v={`±${_VM.gbandFull8 || band} mph`} l={`With 8+ pens (${n8})`} />
       </div>
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 8px 8px", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "0 8px" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Every grip-tested pitcher vs the model, legs only</div>
-          <span style={{ fontSize: 9, fontWeight: 700, color: "#8A8F98", background: "#8A8F9818", borderRadius: 8, padding: "2px 7px" }}>MODEL A {"·"} COMPARISON</span>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Full testing history vs the model</div>
+          <span style={{ fontSize: 9, fontWeight: 700, color: "#4FFFB0", background: "#4FFFB018", borderRadius: 8, padding: "2px 7px" }}>FULL BATTERY</span>
         </div>
-        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Same pitchers and same lifetime bests as the Overview, scored on CMJ alone (Model A), grip left out. Shaded band: {"±"}{VM_BAND_LEG} mph. Flip between the two tabs: a dot that sits closer to the line on the Overview is a pitcher whose hand explains part of his gap.</div>
-        <VmScatter rows={gRows} onPick={onPick} band={VM_BAND_LEG} />
+        <div style={{ fontSize: 10, color: "#6B7280", padding: "2px 8px 8px" }}>Pitchers with 3+ tracked pens, a grip test, and a hop test on file, actual vs predicted on the headline model. Shaded band: {"±"}{band} mph, the model&rsquo;s error on exactly this group. Same constants as the Overview; the band is tighter because a complete testing history means cleaner peaks, not a different model. Tap a dot for the athlete card.</div>
+        <VmScatter rows={fRows} onPick={onPick} band={band} />
         <div style={{ display: "flex", justifyContent: "center", gap: 12, padding: "8px 0 6px", flexWrap: "wrap" }}>
-          {[["#FF6B6B", "Over on legs only"], ["#60A5FA", "Under on legs only"], ["#6B7280", `Within ±${VM_BAND_LEG}`]].map(([c, l]) => (
+          {[["#FF6B6B", "Over the model"], ["#60A5FA", "Under the model"], ["#6B7280", `Within ±${band}`]].map(([c, l]) => (
             <span key={l} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, color: "#6B7280" }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: c }} />{l}</span>
           ))}
         </div>
       </div>
       <div style={{ fontSize: 10, color: "#4A4F57", lineHeight: 1.5, padding: "0 4px" }}>
-        Model A is the legs-only baseline (CMJ concentric impulse + RSI-mod). The headline everywhere else adds throwing-hand grip per kg of bodyweight (frozen 2026-10-24), which cut the error from {"±"}4.6 to {"±"}4.5 mph out of sample on this group.
+        Roster-wide the headline model reads {"±"}{VM_BAND} mph across every established arm; on this group it reads {"±"}{band}, and {"±"}{_VM.gbandFull8 || band} for the {n8} with 8+ pens. The quickest way onto this chart is a hop test; the quickest way to tighten a pitcher&rsquo;s own band is more tracked pens.
       </div>
     </div>
   );
@@ -4429,7 +4432,7 @@ function VeloModelSection() {
   return (
     <div>
       <div style={{ display: "flex", gap: 5, marginBottom: 14 }}>
-        {[["overview", "Overview"], ["grip", "Legs only"], ["flags", "Flag list"], ["gains", "Impulse"], ["sandbox", "Evaluation"]].map(([k, l]) => (
+        {[["overview", "Overview"], ["grip", "Full battery"], ["flags", "Flag list"], ["gains", "Impulse"], ["sandbox", "Evaluation"]].map(([k, l]) => (
           <button key={k} onClick={() => setView(k)} style={{ padding: "7px 12px", border: "1px solid " + (view === k ? "#4FFFB0" : "rgba(255,255,255,0.06)"), borderRadius: 8, cursor: "pointer", fontSize: 10, fontWeight: 600, background: view === k ? "rgba(79,255,176,0.12)" : "rgba(255,255,255,0.02)", color: view === k ? "#4FFFB0" : "#6B7280" }}>{l}</button>
         ))}
       </div>
