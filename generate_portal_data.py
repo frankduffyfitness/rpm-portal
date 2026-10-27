@@ -2038,6 +2038,14 @@ VM_R2 = 0.48
 # Refit 2026-10-24 on the 270-day input basis, 3+ sessions (n=77, LOO ±4.49). Previous: 41.491587/0.079335/6.580987/2.593587 (Sep 8).
 VM_G = (43.94498, 0.087388, 10.493879, 1.492574)  # velo = g0 + g1*CI + g2*RSI + g3*(gripN / bw_kg)
 VM_G_BAND = 4.5
+# Full-battery bands (Frank, 2026-10-27): the same frozen constants read
+# tighter on athletes with a complete testing history. Cross-validated on
+# the 2026-10-24 basis: 3+ pens + grip + a hop test on file = +-3.8 (n=65);
+# of those, 8+ pens = +-3.3 (n=46). Display context only; refreshed at refits.
+VM_G_BAND_FULL = 3.8
+VM_G_BAND_FULL_N = 65
+VM_G_BAND_FULL8 = 3.3
+VM_G_BAND_FULL8_N = 46
 # Velo target: max Peak FB across sessions. The top-3-median target ("t3")
 # validated slightly better in the refit; flip only with coach sign-off.
 VM_TARGET = "max"
@@ -2051,7 +2059,8 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
      predB|null, residB|null, thin, bwLbs|null,
      velo6w|null, sess6w, ci6w|null, rsi6w|null, pred6w|null, resid6w|null,
      status, lastCmj|null, bestCiDate|null, bestRsiDate|null,
-     gripN|null, predG|null, residG|null]
+     gripN|null, predG|null, residG|null, hasHop]
+    Index 27 (2026-10-27): 1 if a hop test is on file (full-battery band context).
     Indices 24-26 (2026-08-19): DynaMo grip peak (throwing-hand best, N) and the
     frozen A+grip prediction/residual (VM_G, display-beside-A only). Since
     2026-09-08 the grip term is grip/kg (needs bwLbs; predG null without it).
@@ -2161,6 +2170,7 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             continue
         k = _vm_norm(name)
         tv = velo.get(k)
+        has_hop = 1 if any(t.get("testType") == "HJ" and t.get("trials") for t in ath.get("tests", [])) else 0
         if not tv:
             continue
         ci_meas = ci_est = rsi = 0.0
@@ -2255,9 +2265,12 @@ def gen_VM(fd_data, trackman_data, dynamo_list):
             round(pred6, 1) if pred6 is not None else None, resid6,
             status, last_cmj, ci_date, rsi_d,
             round(g, 1) if g else None, pred_g, resid_g,
+            has_hop,
         ])
     rows.sort(key=lambda r: -r[9])
     return {"a": list(VM_A), "b": list(VM_B), "g": list(VM_G), "gband": VM_G_BAND,
+            "gbandFull": VM_G_BAND_FULL, "gbandFullN": VM_G_BAND_FULL_N,
+            "gbandFull8": VM_G_BAND_FULL8, "gbandFull8N": VM_G_BAND_FULL8_N,
             "rmse": VM_RMSE, "r2": VM_R2, "target": VM_TARGET, "rows": rows}
 
 
