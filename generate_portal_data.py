@@ -281,7 +281,6 @@ GROUP_OVERRIDES = {
     # VALD has him in Staff, which gen_VM skips outright; Frank wants him
     # graded and modelled as Men's League (2026-09-18).
     "Ricky Falcon": "ml",
-    "Emrie McLaughlin": "col",  # no VALD group; velo row defaulted to hs (2026-10-27)
     "Nick Padilla": "pro",
     "Cade Winquest": "pro",
     "Pete Hansen": "pro",
@@ -1480,7 +1479,7 @@ def _vm_norm(s):
     return VM_ALIASES.get(s, s)
 
 
-def _velo_extract_groups_from_jsx(jsx_text):
+def _velo_extract_groups_from_jsx(jsx_text, vald_groups=None):
     """Pull name → group from the existing _A/_HA/_VELO arrays.
 
     _A/_HA win because they are rebuilt from VALD every run, so a group change
@@ -1492,7 +1491,15 @@ def _velo_extract_groups_from_jsx(jsx_text):
     these."""
     import re
     out = {}
-    for var, idx in (("_A", 2), ("_HA", 2), ("_VELO", 2)):
+    for var, idx in (("_A", 2), ("_HA", 2), ("__VALD__", None), ("_VELO", 2)):
+        # VALD profile groups sit between the live plate rows and _VELO
+        # (2026-10-27): an athlete who stopped testing drops out of _A/_HA, and
+        # without this his velo row fell back to the "hs" default even though
+        # his VALD profile says College (Emrie McLaughlin).
+        if var == "__VALD__":
+            for k, g in (vald_groups or {}).items():
+                out.setdefault(k, g)
+            continue
         m = re.search(rf"const {var}\s*=\s*(\[[\s\S]*?\]);", jsx_text)
         if not m:
             continue
@@ -1789,7 +1796,10 @@ def _merge_bullpen_velo(trackman_data, reports_path="trackman_reports.json"):
 # Velo (Trackman) array — pulls existing pitcher classifications from _VELO/_A/_HA in the
 # current App.jsx so groups don't reset on every sync.
 trackman = _merge_bullpen_velo(trackman)
-_velo_groups = _velo_extract_groups_from_jsx(jsx)
+_velo_vald = {_vm_norm(_a["name"]): get_group(_a["name"], _a.get("groups"))
+              for _a in (fd.get("athletes") or {}).values()
+              if _a.get("name") and _a.get("groups")}
+_velo_groups = _velo_extract_groups_from_jsx(jsx, _velo_vald)
 _VELO = gen_VELO(trackman, _velo_groups, VELO_MANUAL_EXCLUSIONS)
 
 
