@@ -1400,13 +1400,19 @@ function LandingPage({ onEnter, onSelectAthlete }) {
       
 
 
-      <button onClick={() => { window.location.href = "/coachportal"; }} style={{
-        display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 18px",
-        border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, cursor: "pointer",
-        fontSize: 12, fontWeight: 600, background: "rgba(255,255,255,0.03)", color: "#8A8F98",
-      }}>
-        {"🔒"} Coach Log-In
-      </button>
+      {/* Two staff doors (Frank, 2026-10-30): Model Portal (CMJ, DynaMo, Velo
+          Model, Arsenal) and Coach Portal (training logs, programs, intakes). */}
+      <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+        {[["Model Log-In", "/modelportal"], ["Coach Log-In", "/coachportal"]].map(([l, path]) => (
+          <button key={path} onClick={() => { window.location.href = path; }} style={{
+            display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 18px",
+            border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, cursor: "pointer",
+            fontSize: 12, fontWeight: 600, background: "rgba(255,255,255,0.03)", color: "#8A8F98",
+          }}>
+            {"🔒"} {l}
+          </button>
+        ))}
+      </div>
 
       <div style={{ marginTop: 20, fontSize: 9, color: "#4a4f57", letterSpacing: 0.5 }}>
         Updated {LAST_UPDATED}
