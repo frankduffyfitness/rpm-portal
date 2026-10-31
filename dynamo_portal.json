@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-31T09:29:55.697042+00:00",
+    "syncDate": "2026-10-31T14:46:23.189013+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 132
+    "totalAthletes": 134
   },
   "athletes": {
     "Joey Muzio": {
@@ -9885,6 +9885,65 @@
       "dob": "2009-09-28",
       "tests": [
         {
+          "date": "2026-10-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                703.4,
+                581.4
+              ],
+              "peakLbs": [
+                158.1,
+                130.7
+              ],
+              "asymPct": 17.3,
+              "asymNote": "left side stronger",
+              "rfd": [
+                4136,
+                3703
+              ],
+              "ttp": [
+                1.05,
+                0.8
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                681.3,
+                608.9
+              ],
+              "peakLbs": [
+                153.2,
+                136.9
+              ],
+              "asymPct": 10.6,
+              "asymNote": "left side stronger",
+              "rfd": [
+                4152,
+                3279
+              ],
+              "ttp": [
+                3.71,
+                1.71
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-08-03",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -16082,6 +16141,42 @@
       "dob": "2011-04-27",
       "tests": [
         {
+          "date": "2026-10-31",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                463.2,
+                510.1
+              ],
+              "peakLbs": [
+                104.1,
+                114.7
+              ],
+              "asymPct": 9.2,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2853,
+                3011
+              ],
+              "ttp": [
+                1.62,
+                1.21
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-10-24",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -19102,6 +19197,42 @@
       "dob": "2010-09-20",
       "tests": [
         {
+          "date": "2026-10-31",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                512.8,
+                479.9
+              ],
+              "peakLbs": [
+                115.3,
+                107.9
+              ],
+              "asymPct": 6.4,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2213,
+                1939
+              ],
+              "ttp": [
+                2.53,
+                1.57
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-10-17",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -20868,6 +20999,92 @@
               "ttp": [
                 1.07,
                 0.6
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Nate Shin": {
+      "name": "Nate Shin",
+      "group": "hs",
+      "dob": "2011-08-26",
+      "tests": [
+        {
+          "date": "2026-10-31",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                343.3,
+                384.4
+              ],
+              "peakLbs": [
+                77.2,
+                86.4
+              ],
+              "asymPct": 10.7,
+              "asymNote": "right side stronger",
+              "rfd": [
+                1854,
+                1997
+              ],
+              "ttp": [
+                5.25,
+                3.14
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Sammy Bolotin": {
+      "name": "Sammy Bolotin",
+      "group": "hs",
+      "dob": "2010-11-16",
+      "tests": [
+        {
+          "date": "2026-10-31",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                438.3,
+                486.4
+              ],
+              "peakLbs": [
+                98.5,
+                109.3
+              ],
+              "asymPct": 9.9,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2926,
+                3037
+              ],
+              "ttp": [
+                1.88,
+                1.56
               ]
             }
           ],
