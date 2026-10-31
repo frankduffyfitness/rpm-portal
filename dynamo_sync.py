@@ -537,3 +537,5 @@ if __name__ == "__main__":
 # sync trigger 2026-10-24 — pull Micah Liu grip (synced to Hub by Frank)
 
 # sync trigger 2026-10-31 — pull Oct 31 grips (Mena, Desjardins, Bolotin, Daniels-Weeks, Cintron; synced to Hub by Frank)
+
+# sync trigger 2026-10-31 — pull Jackson Cintron grip (uploaded by Frank)
