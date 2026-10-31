@@ -126,6 +126,7 @@ VELO_BULLPEN_LABELS = {
     ("CJ Burke", "2026-10-22"): "Low Effort",         # lower intent, command work (Frank, 2026-10-22)
     ("Jamin Rose", "2026-10-24"): "Low Effort",       # beat up, kept short; 3rd session of the week (Frank, 2026-10-24)
     ("Franklin Angeles", "2026-10-24"): "Low Effort", # beat up (Frank, 2026-10-24)
+    ("Goose Plummer", "2026-10-30"): "Low Effort", # low-intent (Frank, 2026-10-31)
     ("Thomas LoBello", "2026-10-06"): "Low Effort",    # pitch design session (Frank, 2026-10-06)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
