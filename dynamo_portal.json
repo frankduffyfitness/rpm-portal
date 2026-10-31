@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-31T14:46:23.189013+00:00",
+    "syncDate": "2026-10-31T15:07:39.485482+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 134
+    "totalAthletes": 135
   },
   "athletes": {
     "Joey Muzio": {
@@ -21085,6 +21085,49 @@
               "ttp": [
                 1.88,
                 1.56
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Jackson Cintron": {
+      "name": "Jackson Cintron",
+      "group": "hs",
+      "dob": "2009-10-20",
+      "tests": [
+        {
+          "date": "2026-10-31",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                525.8,
+                534.4
+              ],
+              "peakLbs": [
+                118.2,
+                120.1
+              ],
+              "asymPct": 1.6,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2081,
+                2367
+              ],
+              "ttp": [
+                3.72,
+                2.06
               ]
             }
           ],
