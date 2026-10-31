@@ -1842,6 +1842,7 @@ def gen_TMR(velo_rows):
     velo_names = {r[0] for r in velo_rows}
     out = {}
     for name, ath in (rep.get("athletes") or {}).items():
+        name = _vm_norm(name)  # folder spellings -> portal spellings (VM_ALIASES)
         if is_excluded(name):
             continue
         if name not in velo_names:
