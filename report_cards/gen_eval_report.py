@@ -403,6 +403,25 @@ PITCH_COLORS = {"Fastball": "#C0392B", "Sinker": "#E67E22", "Cutter": "#8D6E4B",
                 "Changeup": "#1B7F4B", "Splitter": "#16A085"}
 P_OTHER = "#5B6470"
 
+_VM_ALIASES_CACHE = None
+
+
+def _vm_aliases():
+    """VM_ALIASES from generate_portal_data.py (TrackMan name -> portal name),
+    parsed from source so the alias list lives in exactly one place."""
+    global _VM_ALIASES_CACHE
+    if _VM_ALIASES_CACHE is None:
+        _VM_ALIASES_CACHE = {}
+        try:
+            import ast
+            gsrc = open(os.path.join(REPO, "generate_portal_data.py")).read()
+            m = re.search(r"VM_ALIASES = (\{.*?\})\n\n", gsrc, re.S)
+            if m:
+                _VM_ALIASES_CACHE = ast.literal_eval(m.group(1))
+        except Exception:
+            pass
+    return _VM_ALIASES_CACHE
+
 
 def _scatter_panel(pts, xr, yr, ticks_x, ticks_y, unit, zero_axes=False, zone=False):
     """One square SVG scatter: light grid, optional zero cross / strike zone,
@@ -456,8 +475,15 @@ def charts_page(name, grp, logo, updated):
     except Exception:
         return ""
     want = " ".join(name.split()).casefold()
+
+    def portal_name(n):
+        """TrackMan spelling -> portal spelling, from generate_portal_data's
+        VM_ALIASES (the one alias source of truth; e.g. Lucas->Luca Ferrara)."""
+        n = " ".join((n or "").split())
+        return _vm_aliases().get(n, n)
+
     ath = next((a for a in data.get("athletes", {}).values()
-                if " ".join(a.get("name", "").split()).casefold() == want), None)
+                if portal_name(a.get("name")).casefold() == want), None)
     if not ath or not ath.get("sessions"):
         return ""
     s = ath["sessions"][0]  # newest first

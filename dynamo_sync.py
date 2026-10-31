@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-18 Hunter Zelznick evaluation
+# sync-trigger: 2026-10-31 Luca Ferrara evaluation
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
