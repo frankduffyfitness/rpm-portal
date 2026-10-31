@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-10-31T15:07:39.485482+00:00",
+    "syncDate": "2026-10-31T17:15:53.679347+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 135
+    "totalAthletes": 136
   },
   "athletes": {
     "Joey Muzio": {
@@ -21128,6 +21128,72 @@
               "ttp": [
                 3.72,
                 2.06
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Luca Ferrara": {
+      "name": "Luca Ferrara",
+      "group": "hs",
+      "dob": "2010-12-19",
+      "tests": [
+        {
+          "date": "2026-10-31",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                396.2
+              ],
+              "peakLbs": [
+                null,
+                89.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2240
+              ],
+              "ttp": [
+                null,
+                3.52
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                369.8
+              ],
+              "peakLbs": [
+                null,
+                83.1
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1975
+              ],
+              "ttp": [
+                null,
+                4.0
               ]
             }
           ],
