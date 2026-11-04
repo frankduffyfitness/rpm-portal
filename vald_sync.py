@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-18 Hunter Zelznick evaluation
+# sync-trigger: 2026-11-03 St. Francis Prep testing day
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings

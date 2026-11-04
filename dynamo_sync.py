@@ -1,4 +1,4 @@
-# sync-trigger: 2026-10-31 Luca Ferrara evaluation
+# sync-trigger: 2026-11-03 St. Francis Prep testing day
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
