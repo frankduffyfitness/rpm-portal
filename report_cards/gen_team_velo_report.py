@@ -32,7 +32,9 @@ FONT = os.path.join(HERE, "dmsans_embed.css")
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 NAVY, INK, MUT, FAINT = "#16233C", "#1B2A44", "#5B6470", "#98A0AA"
 LINE, PANEL = "#E3E6EA", "#F7F8FA"
-RED, GREEN, AMBER = "#C8102E", "#1E8A4C", "#B7791F"
+# Model-read palette from the RPM Velocity Model flyer's sample card (2026-11-03):
+# blue = below the model, tan = on it, red = above it.
+BELOW, ONM, ABOVE = "#2F6BD0", "#D2C8B4", "#C8102E"
 LVL = {"hs": "High school", "col": "College", "pro": "Pro"}
 
 
@@ -127,11 +129,11 @@ def main():
         pred, band, model = primary(r, vm)
         diff = r[5] - pred
         if abs(diff) <= band:
-            read, col = "In range", NAVY
+            read, col = "On the model", NAVY
         elif diff > 0:
-            read, col = "Above model", GREEN
+            read, col = "Above the model", ABOVE
         else:
-            read, col = "Below model", AMBER
+            read, col = "Below the model", BELOW
         norms = N.get(lvl) or N["all"]
         pc = cP(r[2], norms["conImpulse"])
         pr = cP(r[3], norms["rsiMod"])
@@ -141,14 +143,20 @@ def main():
         else:
             grip = f'<span style="color:{FAINT}">not tested</span>'
         mtag = "" if model == "grip" else ' <span class="dt">plate only</span>'
+        # Flyer-style gauge: three equal zones, the middle one is the +/- band,
+        # so the scale runs -3 to +3 bands and the marker clamps at the ends.
+        x = max(0.0, min(1.0, (diff / band + 3) / 6))
+        gauge = (f'<div class="gl" style="color:{col}">{read}</div>'
+                 f'<div class="gb"><i style="background:{BELOW}"></i><i style="background:{ONM}"></i>'
+                 f'<i style="background:{ABOVE}"></i><b style="left:{x*100:.1f}%"></b></div>')
         trs += (f'<tr><td><span class="num">{i}</span></td><td class="nm">{r[0]}</td>'
                 f'<td>{r[2]:.0f} <span class="dt">{pc}{ordinal(pc)}</span></td>'
                 f'<td>{r[3]:.2f} <span class="dt">{pr}{ordinal(pr)}</span></td>'
                 f'<td>{grip}</td>'
                 f'<td>{pred:.1f} <span class="dt">&plusmn;{band}</span>{mtag}</td>'
                 f'<td><b>{r[5]:.1f}</b></td>'
-                f'<td style="color:{col};font-weight:700">{diff:+.1f}</td>'
-                f'<td><span class="chip" style="color:{col};border-color:{col}">{read}</span></td></tr>')
+                f'<td class="gc">{gauge}</td>'
+                f'<td style="color:{col};font-weight:700">{diff:+.1f}</td></tr>')
 
     lvl_txt = " / ".join(LVL.get(l, l) for l in lvls).lower()
     font = open(FONT).read() if os.path.exists(FONT) else ""
@@ -172,7 +180,13 @@ tr:nth-child(even) td{{background:{PANEL}}}
 .nm{{font-weight:700}}
 .dt{{color:{FAINT};font-size:8.5px}}
 .num{{display:inline-block;width:18px;height:18px;border-radius:50%;background:{NAVY};color:#fff;font-size:9.5px;font-weight:800;text-align:center;line-height:18px}}
-.chip{{display:inline-block;border:1px solid;border-radius:999px;padding:1px 8px;font-size:9px;font-weight:700}}
+th,td{{text-align:center}}
+td.nm,th.nm{{text-align:left}}
+.gc{{width:128px}}
+.gl{{font-size:7.5px;font-weight:800;letter-spacing:0.7px;text-transform:uppercase;margin-bottom:3px}}
+.gb{{position:relative;display:flex;gap:2px;height:7px;width:120px;margin:0 auto}}
+.gb i{{flex:1;display:block;height:7px}}
+.gb b{{position:absolute;top:-3px;width:3px;height:13px;margin-left:-1.5px;background:{INK};border-radius:1px}}
 .note{{background:{PANEL};border:1px solid {LINE};border-radius:10px;padding:9px 14px;font-size:8.8px;color:{MUT};line-height:1.55;margin-top:12px}}
 .foot{{position:absolute;bottom:24px;left:40px;right:40px;display:flex;justify-content:space-between;font-size:9px;color:{FAINT}}}
 </style></head><body>
@@ -191,7 +205,7 @@ tr:nth-child(even) td{{background:{PANEL}}}
   {chart(rows, team, vm)}
   <div class="stitle">THE NUMBERS</div>
   <table>
-    <tr><th>#</th><th>PITCHER</th><th>CON. IMPULSE (N&middot;s)</th><th>RSI-MOD</th><th>GRIP (throwing hand)</th><th>PREDICTED FB</th><th>ACTUAL PEAK FB</th><th>DIFF</th><th>READ</th></tr>
+    <tr><th>#</th><th class="nm">PITCHER</th><th>CON. IMPULSE (N&middot;s)</th><th>RSI-MOD</th><th>GRIP (throwing hand)</th><th>PREDICTED FB</th><th>ACTUAL PEAK FB</th><th>VS. THE MODEL</th><th>DIFF</th></tr>
     {trs}
   </table>
   <div class="note"><b>How to read this.</b> The model predicts peak fastball velocity from three numbers. <b>Concentric impulse</b> (countermovement jump) is the total push-off force put into the ground, in Newton-seconds; it grows with strength and body mass. <b>RSI-modified</b> is jump height divided by the time it takes to jump, a measure of how quickly that force is produced. <b>Grip</b> is the strongest squeeze on the handheld dynamometer with the throwing hand, and the model reads it relative to bodyweight. Small grey numbers are percentiles among RPM {lvl_txt} athletes, the same comparison as each pitcher&rsquo;s own report. Force plate numbers are each pitcher&rsquo;s best jump on file, the values the model uses. <b>Actual peak FB</b> is the hardest fastball from today's TrackMan bullpen. Dots above the line are throwing harder than their strength profile predicts (efficient movers; strength is the next lever), dots below are leaving velocity on the table relative to the engine they already have (mechanics, intent or arm conditioning). Inside the shaded band the arm and the engine agree, within the model's typical error of &plusmn;{vm['gband']} mph.</div>
