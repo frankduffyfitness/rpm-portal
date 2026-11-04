@@ -1470,6 +1470,8 @@ VM_ALIASES = {
     "George Cancel": "George Cancel Jr",
     # TrackMan entry is "Jaymin"; VALD and Frank use "Jamin" (2026-10-17).
     "Jaymin Rose": "Jamin Rose",
+    # TrackMan entry is "Meos"; Frank uses "Neos" (2026-11-03).
+    "Joey Meos": "Joey Neos",
     # TrackMan folder/PDF say "Lucas"; VALD and Frank use "Luca" (2026-10-31).
     "Lucas Ferrara": "Luca Ferrara",
 }
