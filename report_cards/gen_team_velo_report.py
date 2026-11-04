@@ -56,8 +56,8 @@ def primary(r, vm):
     return r[8], vm["rmse"], "A"
 
 
-def chart(rows, team, vm):
-    W, H = 736, 300
+def chart(rows, team, vm, flagged=()):
+    W, H = 736, 270
     L, R, T, B = 52, 18, 16, 44
     pts = [(primary(r, vm)[0], r[5]) for r in rows]
     lo = min(min(p) for p in pts) - 2
@@ -88,8 +88,12 @@ def chart(rows, team, vm):
         o.append(f'<circle cx="{sx(p):.1f}" cy="{sy(r[5]):.1f}" r="4" fill="#B8BFC9" fill-opacity="0.45"/>')
     for r, i in team:
         p = primary(r, vm)[0]
-        o.append(f'<circle cx="{sx(p):.1f}" cy="{sy(r[5]):.1f}" r="10" fill="{NAVY}" stroke="#fff" stroke-width="2"/>')
-        o.append(f'<text x="{sx(p):.1f}" y="{sy(r[5])+3.6:.1f}" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">{i}</text>')
+        # Flagged arms (model not valid for them) draw as an outlined ring.
+        f = r[0] in flagged
+        o.append(f'<circle cx="{sx(p):.1f}" cy="{sy(r[5]):.1f}" r="10" fill="{"#fff" if f else NAVY}" '
+                 f'stroke="{NAVY if f else "#fff"}" stroke-width="2"/>')
+        o.append(f'<text x="{sx(p):.1f}" y="{sy(r[5])+3.6:.1f}" font-size="10" font-weight="800" '
+                 f'fill="{NAVY if f else "#fff"}" text-anchor="middle">{i}</text>')
     o.append(f'<text x="{(L+W-R)/2:.1f}" y="{H-6}" font-size="10.5" font-weight="700" fill="{INK}" text-anchor="middle">'
              f'PREDICTED PEAK FASTBALL (mph), from force plate + grip</text>')
     o.append(f'<text transform="translate(13 {(T+H-B)/2:.1f}) rotate(-90)" font-size="10.5" font-weight="700" fill="{INK}" '
@@ -104,6 +108,8 @@ def main():
     ap.add_argument("--names", required=True, help="comma-separated, in display order")
     ap.add_argument("--date", default=date.today().strftime("%B %-d, %Y"))
     ap.add_argument("--out", default=os.path.expanduser("~/Desktop"))
+    ap.add_argument("--flag", action="append", default=[], metavar="NAME=NOTE",
+                    help="asterisk an arm the model can't read, with a footnote (repeatable)")
     a = ap.parse_args()
 
     src = open(os.path.join(REPO, "src", "App.jsx")).read()
@@ -116,6 +122,10 @@ def main():
     if missing:
         raise SystemExit(f"not in the velo model (need a CMJ + a bullpen): {missing}")
     team = [(by[n], i + 1) for i, n in enumerate(want)]
+    flags = dict(f.split("=", 1) for f in a.flag)
+    bad = [n for n in flags if n not in want]
+    if bad:
+        raise SystemExit(f"--flag names not in --names: {bad}")
     # Faded dots = the team's own level(s), the same pool the individual eval
     # cards plot and the percentiles below use.
     lvls = sorted({r[1] for r, _ in team})
@@ -149,7 +159,7 @@ def main():
         gauge = (f'<div class="gl" style="color:{col}">{read}</div>'
                  f'<div class="gb"><i style="background:{BELOW}"></i><i style="background:{ONM}"></i>'
                  f'<i style="background:{ABOVE}"></i><b style="left:{x*100:.1f}%"></b></div>')
-        trs += (f'<tr><td><span class="num">{i}</span></td><td class="nm">{r[0]}</td>'
+        trs += (f'<tr><td><span class="num">{i}</span></td><td class="nm">{r[0]}{'*' if r[0] in flags else ''}</td>'
                 f'<td>{r[2]:.0f} <span class="dt">{pc}{ordinal(pc)}</span></td>'
                 f'<td>{r[3]:.2f} <span class="dt">{pr}{ordinal(pr)}</span></td>'
                 f'<td>{grip}</td>'
@@ -183,6 +193,7 @@ tr:nth-child(even) td{{background:{PANEL}}}
 th,td{{text-align:center}}
 td.nm,th.nm{{text-align:left}}
 .gc{{width:128px}}
+.fn{{font-size:9px;color:{MUT};margin-top:6px}}
 .gl{{font-size:7.5px;font-weight:800;letter-spacing:0.7px;text-transform:uppercase;margin-bottom:3px}}
 .gb{{position:relative;display:flex;gap:2px;height:7px;width:120px;margin:0 auto}}
 .gb i{{flex:1;display:block;height:7px}}
@@ -202,12 +213,13 @@ td.nm,th.nm{{text-align:left}}
   <div class="stitle">WHERE YOUR PITCHERS SIT IN THE RPM VELOCITY MODEL</div>
   <div class="ssub">Each grey dot is one of the {len(rows)} {lvl_txt} pitchers in the RPM model. Numbered dots are your staff, matching the table below.</div>
   <div class="leg"><span><i style="width:12px;height:12px;border-radius:50%;background:{NAVY}"></i>{a.team}</span><span><i style="width:8px;height:8px;border-radius:50%;background:#B8BFC9"></i>Other RPM pitchers</span><span><i style="width:16px;height:0;border-top:1.5px dashed {NAVY}"></i>Prediction line (shaded &plusmn;{vm['gband']} mph)</span></div>
-  {chart(rows, team, vm)}
+  {chart(rows, team, vm, flags)}
   <div class="stitle">THE NUMBERS</div>
   <table>
     <tr><th>#</th><th class="nm">PITCHER</th><th>CON. IMPULSE (N&middot;s)</th><th>RSI-MOD</th><th>GRIP (throwing hand)</th><th>PREDICTED FB</th><th>ACTUAL PEAK FB</th><th>VS. THE MODEL</th><th>DIFF</th></tr>
     {trs}
   </table>
+  {''.join(f'<div class="fn">* <b>{n}:</b> {t}</div>' for n, t in flags.items())}
   <div class="note"><b>How to read this.</b> The model predicts peak fastball velocity from three numbers. <b>Concentric impulse</b> (countermovement jump) is the total push-off force put into the ground, in Newton-seconds; it grows with strength and body mass. <b>RSI-modified</b> is jump height divided by the time it takes to jump, a measure of how quickly that force is produced. <b>Grip</b> is the strongest squeeze on the handheld dynamometer with the throwing hand, and the model reads it relative to bodyweight. Small grey numbers are percentiles among RPM {lvl_txt} athletes, the same comparison as each pitcher&rsquo;s own report. Force plate numbers are each pitcher&rsquo;s best jump on file, the values the model uses. <b>Actual peak FB</b> is the hardest fastball from today's TrackMan bullpen. Dots above the line are throwing harder than their strength profile predicts (efficient movers; strength is the next lever), dots below are leaving velocity on the table relative to the engine they already have (mechanics, intent or arm conditioning). Inside the shaded band the arm and the engine agree, within the model's typical error of &plusmn;{vm['gband']} mph.</div>
   <div class="foot"><div>RPM Strength &middot; Queens, NY</div><div>Prepared for the {a.team} coaching staff &middot; {a.date}</div></div>
 </div>
