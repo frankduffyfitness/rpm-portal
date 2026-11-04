@@ -370,7 +370,7 @@ def projection_page(src, name, grp, female, logo, updated):
                 if has_grip and p_grip else
                 'No grip test yet: force plate only' if not has_grip else
                 f'Grip {grip_n:.0f} N ({grip_n/4.44822:.0f} lbs)')
-    sumtx = (f"No bullpen yet: {first} is ramping back up, so this page shows the engine, not the arm. "
+    sumtx = (f"No bullpen on file yet, so this page shows the engine, not the arm. "
              f"His testing today supports a peak fastball around {pred:.1f} mph, which would sit at the "
              f"{p_pred}{ordinal(p_pred)} percentile of actual peaks thrown by RPM {lvl} pitchers. "
              f"The model reads {'three numbers: concentric impulse and RSI-modified from the countermovement jump, plus grip strength relative to bodyweight' if has_grip else 'two numbers from the countermovement jump: concentric impulse and RSI-modified'}. "
