@@ -1472,6 +1472,10 @@ VM_ALIASES = {
     "Jaymin Rose": "Jamin Rose",
     # TrackMan entry is "Meos"; Frank uses "Neos" (2026-11-03).
     "Joey Meos": "Joey Neos",
+    # St. Francis Prep testing day: TrackMan entries -> VALD names (2026-11-03).
+    "Joseph Fressle": "Joe Fressle",
+    "Bradley Zamen": "Bradley Zaman",
+    "Joey Irizarry Jr.": "Joey Irizarry",
     # TrackMan folder/PDF say "Lucas"; VALD and Frank use "Luca" (2026-10-31).
     "Lucas Ferrara": "Luca Ferrara",
 }
