@@ -77,12 +77,17 @@ def strip_tags(t):
 
 def row(label, val, desc, pct):
     w = max(2, min(99, pct))
+    # Bodyweight is context, not a quality: show where it sits, no tier word
+    # or good/bad colour (a 304 lb kid read "99th, Elite"; Frank, 2026-11-04).
+    neutral = label == "Bodyweight"
+    color = "#6B7280" if neutral else band(pct)
+    tier_txt = "" if neutral else tier(pct)
     return f"""
     <div class="mrow">
       <div class="mtop">
         <div class="mlab"><div class="mname">{label}</div><div class="mdesc">{desc}</div></div>
         <div class="mval">{val}</div>
-        <div class="mpct" style="color:{band(pct)}"><span class="pnum">{pct}<span class="pord">{ordinal(pct)}</span></span><br><span class="ptier">{tier(pct)}</span></div>
+        <div class="mpct" style="color:{color}"><span class="pnum">{pct}<span class="pord">{ordinal(pct)}</span></span><br><span class="ptier">{tier_txt}</span></div>
       </div>
       <div class="bar"><div class="tick" style="left:25%"></div><div class="tick" style="left:50%"></div><div class="tick" style="left:75%"></div>
         <div class="fill" style="width:{w}%"><div class="grad" style="width:{10000 / w:.1f}%"></div></div>
