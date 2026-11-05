@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-03 St. Francis Prep testing day
+# sync-trigger: 2026-11-05 Manase Paulino testing
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
