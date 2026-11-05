@@ -4190,7 +4190,7 @@ function VmSandboxCard() {
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 12, marginBottom: 4 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Bodyweight projector</div>
           <div style={{ fontSize: 10, color: "#6B7280", margin: "2px 0 12px", lineHeight: 1.5 }}>Weight drives impulse: this slider drags Concentric Impulse with it at +{VM_CI_PER_LB} N·s per lb, the facility&rsquo;s measured rate. It never moves RSI. The with-grip line also reads grip per kg, so added weight at the same grip lowers it.</div>
-          <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={(v) => setBw(v)} min={120} max={280} step={1} dec={0} sub={`baseline ${Math.round(pin.bw)}`} />
+          <VmSlider label="Bodyweight" unit="lbs" value={bw} onChange={(v) => setBw(v)} min={120} max={315} step={1} dec={0} sub={`baseline ${Math.round(pin.bw)}`} />
           <div style={{ fontSize: 9.5, color: "#6B7280", lineHeight: 1.55, marginTop: -6 }}>Holds only if you keep your jump. Gaining weight while jump height drops more than about 0.4 cm per pound nets zero.</div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "12px 14px", marginTop: 12, textAlign: "center" }}>
