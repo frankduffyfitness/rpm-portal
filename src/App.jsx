@@ -4688,6 +4688,79 @@ function StratEvidence({ rows, dim }) {
   );
 }
 
+// Phase bar (Frank 2026-11-05, PHASE_BAR_SPEC.md in cmj_strategy/): where the
+// athlete's contraction time goes, start of the dip to takeoff, as Unload / Yield
+// / Brake / Push shares, total at right, the roster's typical split as a thin bar
+// beneath. Descriptive only: no bands, no flags, nothing here feeds a bucket.
+// Shares, total and the roster split arrive finished from generate_portal_data.py;
+// this lays them out and rounds a label, nothing more.
+const STRAT_PHASES = [["Unload", "#8FB0D6"], ["Yield", "#3D6FA8"], ["Brake", "#C2884A"], ["Push", "#4F8A5B"]];
+
+function StratPhaseBar({ phases, phasePct, phaseRef }) {
+  const barRef = useRef(null);
+  const [barW, setBarW] = useState(0);
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver((entries) => setBarW(entries[0].contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  // Label rule from the spec: "Unload 27%" at ~11% of the bar and up, "27%" alone
+  // from ~6%, nothing below. On a narrow phone a label that would not fit its
+  // segment steps down the same ladder instead of clipping (10px bold DM Sans
+  // measures ~5.0-5.7px/char in the browser; 5.8 leaves room for the fallback font).
+  // Grow factors are scaled x1000 below: CSS fills only that fraction of the bar
+  // when they sum under 1, and the four shares sum to 1 only within rounding.
+  const fits = (text, share) => !barW || share * barW >= text.length * 5.8 + 6;
+  // Label text comes finished upstream (largest remainder, the four sum to 100).
+  const label = (name, share, p) => {
+    const pct = `${p}%`;
+    if (share >= 0.11 && fits(`${name} ${pct}`, share)) return `${name} ${pct}`;
+    if (share >= 0.06 && fits(pct, share)) return pct;
+    return "";
+  };
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: "flex", alignItems: "baseline", fontSize: 10, color: "#8A8F98", marginBottom: 4 }}>
+        <span>where the contraction time goes</span>
+        <span style={{ marginLeft: "auto", flexShrink: 0 }}>{phases[4]} ms</span>
+      </div>
+      <div ref={barRef} style={{ display: "flex", gap: 1, height: 16, borderRadius: 3, overflow: "hidden" }}>
+        {STRAT_PHASES.map(([name, color], i) => (
+          <div key={name} style={{ flex: `${phases[i] * 1000} 1 0`, minWidth: 0, background: color, display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 10, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden" }}>{label(name, phases[i], phasePct[i])}</div>
+        ))}
+      </div>
+      {phaseRef && (
+        <>
+          <div style={{ display: "flex", gap: 1, height: 4, marginTop: 3, borderRadius: 2, overflow: "hidden", opacity: 0.55 }}>
+            {STRAT_PHASES.map(([name, color], i) => (
+              <div key={name} style={{ flex: `${phaseRef[i] * 1000} 1 0`, minWidth: 0, background: color }} />
+            ))}
+          </div>
+          <div style={{ fontSize: 9, color: "#5B6470", marginTop: 3 }}>roster typical</div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// The old evidence rows, one tap away under the bar, so the card still answers
+// "why this bucket" (blueprint Phase 2). Closed by default; StratCard renders it
+// only when there are rows to reveal.
+function StratWhy({ rows, dim }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: 6 }}>
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} style={{ fontSize: 9, color: "#6B7280", background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "inherit" }}>
+        why {open ? "\u25BE" : "\u25B8"}
+      </button>
+      {open && <StratEvidence rows={rows} dim={dim} />}
+    </div>
+  );
+}
+
 function StratCard({ r }) {
   const gi = GROUPS[r.group] || {};
   // Retest banners and stale gray-out removed at Frank's request (2026-08-06):
@@ -4708,7 +4781,17 @@ function StratCard({ r }) {
         {r.label}
         {r.secondaryLabel && <span style={{ fontWeight: 400, color: dim ? "#4A4F57" : "#6B7280" }}>, then {r.secondaryLabel}</span>}
       </div>
-      <StratEvidence rows={r.ind} dim={dim} />
+      {/* Phase bar replaces the evidence rows once the split exists (Frank
+          2026-11-05); before the unload/yield backfill, or for an athlete
+          missing a phase, the card keeps the rows so it is never empty. */}
+      {r.phases && r.phasePct ? (
+        <>
+          <StratPhaseBar phases={r.phases} phasePct={r.phasePct} phaseRef={r.phaseRef} />
+          {r.ind.length > 0 && <StratWhy rows={r.ind} dim={dim} />}
+        </>
+      ) : (
+        <StratEvidence rows={r.ind} dim={dim} />
+      )}
       {r.tags.length > 0 && (
         <div style={{ marginTop: 8 }}>
           {r.tags.map(([tag, ev], i) => (

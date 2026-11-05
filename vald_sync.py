@@ -86,6 +86,14 @@ PORTAL_METRICS = {
     6553657: {"key": "concDuration",      "label": "Concentric Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
     6553664: {"key": "brakingPhaseDur",   "label": "Braking Phase Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
     6553668: {"key": "eccDecelPhaseDur",  "label": "Ecc Deceleration Phase Duration", "unit": "s", "scale": 1, "trialOnly": True},
+    # 2026-11-05 phase bar (Frank's call; ~/Desktop/Pitch Model/cmj_strategy/
+    # PHASE_BAR_SPEC.md): with 6553668 above, contractionTime and concDuration,
+    # these split contraction time into unload / yield / brake / push on the
+    # strategy cards. Display only, never a bucket input. Backfill via [refresh-cmj].
+    # Pinned in ms like contractionTime/concDuration (0.01 ms after the 2-dp store
+    # rounding), NOT seconds like 6553668 above, which keeps only 10 ms.
+    6553744: {"key": "eccUnloadPhaseDur", "label": "Ecc Unloading Phase Duration", "unit": "ms", "scale": 1000, "trialOnly": True},
+    6553750: {"key": "eccYieldPhaseDur",  "label": "Ecc Yielding Phase Duration",  "unit": "ms", "scale": 1000, "trialOnly": True},
     # 6553642 concTimeToPF DROPPED 2026-08-09 (Frank's call, DECISIONS_2026-08-09.md).
     # VALD emits a literal 0 on 42.9% of reps instead of omitting the value — an
     # upstream event-detection failure, not a real "peak force at concentric onset".

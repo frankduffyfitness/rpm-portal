@@ -2458,6 +2458,41 @@ STRAT_COL_LABELS = {
 # test older than this many days and the row leads with the retest line.
 STRAT_STALE_DAYS = 90
 
+# Phase bar (PHASE_BAR_SPEC.md, 2026-11-05): where the contraction time goes, as
+# four shares finished by bucket_engine. Display only; this order is the bar's
+# left-to-right order and the order of the row's `phases` / `phaseRef` arrays.
+STRAT_PHASE_KEYS = ("unload", "yield", "brake", "push")
+
+
+def _strat_phases(ph):
+    """bucket_engine `phases` dict -> [unload, yield, brake, push, ct_ms], or None
+    when the athlete has no complete split (pre-backfill, or a phase missing).
+    The card falls back to the evidence rows on None."""
+    keys = STRAT_PHASE_KEYS + ("ct_ms",)
+    if not isinstance(ph, dict) or any(ph.get(k) is None for k in keys):
+        return None
+    return [ph[k] for k in keys]
+
+
+def _strat_phase_pct(ph):
+    """Whole-percent labels for the four shares, by largest remainder so the printed
+    percentages always sum to 100 (rounding each share alone prints 99 or 101 on
+    about a third of athletes). None when the athlete has no complete split."""
+    if _strat_phases(ph) is None:
+        return None
+    exact = [ph[k] * 100.0 / sum(ph[j] for j in STRAT_PHASE_KEYS) for k in STRAT_PHASE_KEYS]
+    pct = [int(x) for x in exact]                  # shares are >= 0, so int() floors
+    for i in sorted(range(4), key=lambda i: (-(exact[i] - pct[i]), i))[:100 - sum(pct)]:
+        pct[i] += 1
+    return pct
+
+
+def _strat_phase_ref(ref):
+    """Top-level `phase_reference` -> [unload, yield, brake, push] or None."""
+    if not isinstance(ref, dict) or any(ref.get(k) is None for k in STRAT_PHASE_KEYS):
+        return None
+    return [ref[k] for k in STRAT_PHASE_KEYS]
+
 
 def _strat_label(col):
     """`ci100_share` -> "first 100 ms share of the push"; unknown columns
@@ -2546,7 +2581,10 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
     [{name, group, bucket, label, secondary, secondaryLabel, conf, confBasis,
       score, pool, note, days, lastTest, stale, extended,
       ind: [[label, value, pct, depth, required]], ind2: [...],
-      tags: [[tag, [[label, value, pct, depth], ...]]]}]
+      tags: [[tag, [[label, value, pct, depth], ...]]],
+      phases: [unload, yield, brake, push, ct_ms] | null,
+      phasePct: [unload, yield, brake, push] whole-percent labels summing to 100 | null,
+      phaseRef: [unload, yield, brake, push] | null}]
 
     Buckets are hypotheses about the most likely limiter, so nothing here is
     scored, ranked or colour-coded by severity — the board shows the evidence and
@@ -2574,6 +2612,9 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
         return []
 
     names = data.get("bucket_names") or {}
+    # Roster-typical split, repeated on every row so StratPhaseBar reads it from
+    # the row and computes nothing. None until the unload/yield backfill lands.
+    phase_ref = _strat_phase_ref(data.get("phase_reference"))
     # Group chips resolve exactly like every other board's: the ForceDecks store
     # via get_group (which honours GROUP_OVERRIDES) as the base, then the live
     # _A/_VELO rows on top. The store is the base because a third of this file's
@@ -2633,6 +2674,9 @@ def gen_STRAT(fd_data, velo_rows, athlete_rows):
                         _strat_pct(e.get("pct")), str(e.get("depth") or "")]
                        for e in (t.get("evidence") or [])]]
                      for t in (a.get("tags") or [])],
+            "phases": _strat_phases(a.get("phases")),
+            "phasePct": _strat_phase_pct(a.get("phases")),
+            "phaseRef": phase_ref,
         }
         out.append(row)
     out.sort(key=lambda x: (x["name"].split()[-1] if x["name"] else "", x["name"]))
