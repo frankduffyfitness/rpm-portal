@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-11-06T02:46:59Z",
+ "lastSyncedAt": "2026-11-06T02:59:41Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -230850,24 +230850,24 @@
     {
      "date": "2026-11-06",
      "sessionType": "Pitching practice",
-     "total": 16,
+     "total": 15,
      "types": [
       {
        "name": "Fastball",
-       "count": 12,
+       "count": 11,
        "veloMin": 66.4,
-       "veloMax": 72.5,
-       "veloAvg": 69.2,
-       "spinMin": 1545.5,
-       "spinMax": 1724.6,
+       "veloMax": 70.6,
+       "veloAvg": 68.9,
+       "spinMin": 1545.0,
+       "spinMax": 1725.0,
        "spinAvg": 1610.2,
        "ivb": 19.4,
        "hb": 12.8,
        "hbMaxAbs": 15.6,
        "vertMovMaxAbs": 46.2,
-       "relH": 4.9,
+       "relH": 4.7,
        "relSide": 1.6,
-       "ext": 5.5,
+       "ext": 5.6,
        "effAvg": 88
       },
       {
@@ -231011,19 +231011,6 @@
        "relSide": 1.17,
        "eff": 49,
        "type": "Curveball"
-      },
-      {
-       "no": 9,
-       "velo": 72.5,
-       "spin": null,
-       "tilt": null,
-       "ivb": null,
-       "hb": null,
-       "ext": null,
-       "relH": 6.17,
-       "relSide": 2.25,
-       "eff": null,
-       "type": "Fastball"
       },
       {
        "no": 10,
