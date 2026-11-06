@@ -130,6 +130,8 @@ VELO_BULLPEN_LABELS = {
     ("Franklin Angeles", "2026-11-04"): "Low Effort", # lower-effort pitch design (Frank, 2026-11-05)
     ("Jamin Rose", "2026-11-04"): "Low Effort",       # lower-effort pitch design (Frank, 2026-11-05)
     ("Bruno Cergol", "2026-11-04"): "Low Effort",     # mound blend, first time on the mound, sub-max (Frank, 2026-11-05)
+    ("Dylan Leitner", "2026-11-05"): "Low Effort",    # pitch design (Frank, 2026-11-05)
+    ("Jose Pino", "2026-11-06"): "Low Effort",        # low effort; TrackMan UTC stamp, thrown 11/5 (Frank, 2026-11-05)
     ("Thomas LoBello", "2026-10-06"): "Low Effort",    # pitch design session (Frank, 2026-10-06)
     ("Eric Grgas", "2026-08-07"): "Live AB",          # Frank, 2026-08-07
     ("Frankie Muzio", "2026-08-07"): "Live AB",       # Frank, 2026-08-07
