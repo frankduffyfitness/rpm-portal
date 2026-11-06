@@ -405,12 +405,71 @@ def parse_report(path, athlete_name):
             "types": types, "pitches": pitches, "locations": locations}
 
 
+# ─── Manual pitches ──────────────────────────────────────────────────────────
+# Pitches TrackMan tracked but the session PDF left out (the iPad dropped the
+# unit mid-pen), recovered from a screenshot. They live in manual_pitches.json
+# at the TrackMan Files root, keyed by folder name then the PDF's header date.
+# stuff_plus_model/extract_arsenal.py merges the same file into its shape rows.
+MANUAL_PITCHES_FILE = "manual_pitches.json"
+
+
+def load_manual_pitches(root):
+    path = os.path.join(root, MANUAL_PITCHES_FILE)
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        return {k: v for k, v in json.load(f).items() if not k.startswith("_")}
+
+
+def apply_manual_pitches(session, extra):
+    """Fold screenshot pitches into a parsed session: per-pitch rows, the
+    total, and the per-type summary (count, min/max/avg). Averages are
+    re-weighted by how many pitches of that type actually reported the field."""
+    for mp in extra:
+        t = next((t for t in session["types"] if t["name"] == mp["type"]), None)
+        if t is None:
+            print(f"  WARN manual pitch type {mp['type']} not in session "
+                  f"{session['date']}; skipped", file=sys.stderr)
+            continue
+        same = [p for p in session["pitches"] if p.get("type") == mp["type"]]
+        for k, pk in (("veloAvg", "velo"), ("spinAvg", "spin"), ("ivb", "ivb"),
+                      ("hb", "hb"), ("relH", "relH"), ("relSide", "relSide"),
+                      ("ext", "ext")):
+            v = mp.get(pk)
+            if v is None or t.get(k) is None:
+                continue
+            n = sum(1 for p in same if p.get(pk) is not None) or t["count"]
+            t[k] = round((t[k] * n + v) / (n + 1), 1)
+        t["veloMin"] = min(t["veloMin"], mp["velo"])
+        t["veloMax"] = max(t["veloMax"], mp["velo"])
+        if mp.get("spin") is not None:
+            t["spinMin"] = min(t["spinMin"], mp["spin"])
+            t["spinMax"] = max(t["spinMax"], mp["spin"])
+        if mp.get("hb") is not None and t.get("hbMaxAbs") is not None:
+            t["hbMaxAbs"] = max(t["hbMaxAbs"], abs(mp["hb"]))
+        t["count"] += 1
+        session["total"] += 1
+        session["pitches"].append({
+            "no": max([p["no"] for p in session["pitches"]] or [0]) + 1,
+            "velo": mp["velo"], "spin": mp.get("spin"), "tilt": mp.get("tilt"),
+            "ivb": mp.get("ivb"), "hb": mp.get("hb"), "ext": mp.get("ext"),
+            "relH": mp.get("relH"), "relSide": mp.get("relSide"),
+            "eff": mp.get("eff"), "type": mp["type"], "manual": True})
+        effs = [p["eff"] for p in session["pitches"]
+                if p.get("type") == mp["type"] and p.get("eff") is not None]
+        if effs:
+            t["effAvg"] = round(sum(effs) / len(effs))
+        print(f"  manual pitch added: {session['date']} {mp['type']} "
+              f"{mp['velo']}", file=sys.stderr)
+
+
 def main():
     if len(sys.argv) < 2:
         print('Usage: trackman_reports_sync.py "/path/to/TrackMan Files"', file=sys.stderr)
         sys.exit(2)
     root = sys.argv[1]
 
+    manual = load_manual_pitches(root)
     athletes = {}
     for folder in sorted(os.listdir(root)):
         fpath = os.path.join(root, folder)
@@ -422,6 +481,9 @@ def main():
                 continue
             s = parse_report(os.path.join(fpath, f), folder)
             if s:
+                extra = manual.get(folder, {}).get(s["date"])
+                if extra:
+                    apply_manual_pitches(s, extra)
                 sessions.append(s)
         if sessions:
             sessions.sort(key=lambda s: s["date"], reverse=True)
