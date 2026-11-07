@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-07 Matteo LaMassa + Ryan Delaney evaluations
+# sync-trigger: 2026-11-07 Matteo LaMassa + Ryan Delaney profiles
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
