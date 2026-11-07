@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-05 Manase Paulino testing
+# sync-trigger: 2026-11-07 Matteo LaMassa + Ryan Delaney evaluations
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
