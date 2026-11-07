@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-11-07T09:53:14.782855+00:00",
+    "syncDate": "2026-11-07T15:16:40.436190+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 149
+    "totalAthletes": 151
   },
   "athletes": {
     "Joey Muzio": {
@@ -578,6 +578,65 @@
       "group": "stf",
       "dob": "1993-11-20",
       "tests": [
+        {
+          "date": "2026-11-07",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                682.9,
+                610
+              ],
+              "peakLbs": [
+                153.5,
+                137.1
+              ],
+              "asymPct": 10.7,
+              "asymNote": "left side stronger",
+              "rfd": [
+                3565,
+                2947
+              ],
+              "ttp": [
+                2.48,
+                2.72
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                674.8,
+                559.8
+              ],
+              "peakLbs": [
+                151.7,
+                125.8
+              ],
+              "asymPct": 17,
+              "asymNote": "left side stronger",
+              "rfd": [
+                3043,
+                2984
+              ],
+              "ttp": [
+                1.55,
+                2.34
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-11-04",
           "type": "Shoulder Strength Baseline",
@@ -1960,6 +2019,65 @@
       "group": "stf",
       "dob": "1994-06-28",
       "tests": [
+        {
+          "date": "2026-11-07",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                643.5,
+                619.7
+              ],
+              "peakLbs": [
+                144.7,
+                139.3
+              ],
+              "asymPct": 3.7,
+              "asymNote": "Symmetric",
+              "rfd": [
+                3243,
+                2984
+              ],
+              "ttp": [
+                1.78,
+                2.21
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                623.5,
+                652.7
+              ],
+              "peakLbs": [
+                140.2,
+                146.7
+              ],
+              "asymPct": 4.5,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2942,
+                3312
+              ],
+              "ttp": [
+                2.69,
+                1.87
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-10-21",
           "type": "Shoulder Strength Baseline",
@@ -10048,6 +10166,65 @@
       "group": "hs",
       "dob": "2009-09-28",
       "tests": [
+        {
+          "date": "2026-11-07",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                673.2,
+                610
+              ],
+              "peakLbs": [
+                151.3,
+                137.1
+              ],
+              "asymPct": 9.4,
+              "asymNote": "Symmetric",
+              "rfd": [
+                3861,
+                3714
+              ],
+              "ttp": [
+                2.54,
+                1.72
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                723.9,
+                607.3
+              ],
+              "peakLbs": [
+                162.7,
+                136.5
+              ],
+              "asymPct": 16.1,
+              "asymNote": "left side stronger",
+              "rfd": [
+                4484,
+                3475
+              ],
+              "ttp": [
+                1.38,
+                1.64
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-10-27",
           "type": "Shoulder Strength Baseline",
@@ -22662,6 +22839,138 @@
               "ttp": [
                 null,
                 3.27
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Matteo LaMassa": {
+      "name": "Matteo LaMassa",
+      "group": "col",
+      "dob": "2008-01-07",
+      "tests": [
+        {
+          "date": "2026-11-07",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                585.7
+              ],
+              "peakLbs": [
+                null,
+                131.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                1928
+              ],
+              "ttp": [
+                null,
+                1.85
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                607.9
+              ],
+              "peakLbs": [
+                null,
+                136.7
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2483
+              ],
+              "ttp": [
+                null,
+                1.93
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Ryan Delaney": {
+      "name": "Ryan Delaney",
+      "group": "hs",
+      "dob": "2010-12-11",
+      "tests": [
+        {
+          "date": "2026-11-07",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                472.9
+              ],
+              "peakLbs": [
+                null,
+                106.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2472
+              ],
+              "ttp": [
+                null,
+                1.5
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                441.6
+              ],
+              "peakLbs": [
+                null,
+                99.3
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                2325
+              ],
+              "ttp": [
+                null,
+                0.67
               ]
             }
           ],
