@@ -3520,6 +3520,9 @@ const ROSTER_STATUS = {
   // per the UCL ledger, matching the 8/3 note.
   "Cade Winquest": "away", "Mario Corso-Winks": "injured",
   "Pete Hansen": "departed",
+  // Frank 2026-11-07: Alex Rodriguez is no longer at RPM; Christian Sanchez
+  // is away at school, expected back December 2026 (flags parked, not history).
+  "Alex Rodriguez": "departed", "Christian Sanchez": "away",
 };
 const VM_STATUS_CHIP = {
   departed: { label: "DEPARTED", color: "#FF8C42" },
