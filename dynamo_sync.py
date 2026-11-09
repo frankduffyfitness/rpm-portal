@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-07 Matteo LaMassa + Ryan Delaney profiles
+# sync-trigger: 2026-11-09 DynaMo testing day
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
