@@ -1442,6 +1442,7 @@ export default function TrainingSection({ ctx }) {
   const [err, setErr] = useState(null);
   const [sel, setSel] = useState(null);
   const [start, setStart] = useState(null);
+  const [q, setQ] = useState("");
   const [tab, setTabState] = useState(() => { try { return localStorage.getItem("rpm_coach_tab") || "schedule"; } catch (e) { return "schedule"; } });
   const setTab = (t) => { setTabState(t); try { localStorage.setItem("rpm_coach_tab", t); } catch (e) {} };
   const lock = (msg) => { setPw(""); setPwState(""); setIndex(null); setSel(null); setErr(msg || null); };
@@ -1452,6 +1453,9 @@ export default function TrainingSection({ ctx }) {
       .catch((e) => { if (e.status === 401) lock("That password didn't work."); else if (live) setErr(e.message); });
     return () => { live = false; };
   }, [pw]);
+  const fold = (x) => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const words = fold(q).split(/\s+/).filter(Boolean);
+  const logMatches = [...(index || [])].sort((a, b) => a.name.localeCompare(b.name)).filter((a) => words.every((w) => fold(a.name).includes(w)));
   const body = !pw
     ? <Unlock error={err} onUnlock={(v) => { setPw(v); setPwState(v); setErr(null); }} />
     : sel
@@ -1476,7 +1480,15 @@ export default function TrainingSection({ ctx }) {
             {tab === "log" && <>
             <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Training log</div>
             {index.length === 0 && <div style={{ fontSize: 13, color: "#6B7280", padding: "24px 0", textAlign: "center" }}>No programs loaded yet.</div>}
-            {[...index].sort((a, b) => a.name.localeCompare(b.name)).map((a) => {
+            {index.length > 0 && (
+              <div style={{ position: "relative", marginBottom: 10 }}>
+                <input type="text" inputMode="search" enterKeyHint="search" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && logMatches.length === 1) { setSel(logMatches[0].id); window.scrollTo(0, 0); } if (e.key === "Escape") setQ(""); }} placeholder="Search athletes" aria-label="Search athletes" autoComplete="off" spellCheck={false}
+                  style={{ width: "100%", boxSizing: "border-box", padding: "11px 38px 11px 12px", fontSize: 16, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, outline: "none", WebkitAppearance: "none" }} />
+                {q && <button onClick={() => setQ("")} aria-label="Clear search" style={{ position: "absolute", right: 4, top: 4, bottom: 4, width: 34, border: "none", background: "none", color: "#9CA3AF", fontSize: 18, cursor: "pointer" }}>{"×"}</button>}
+              </div>
+            )}
+            {q.trim() && <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 8 }}>{logMatches.length === 0 ? `No athlete matches "${q.trim()}".` : `${logMatches.length} of ${index.length} athletes`}</div>}
+            {logMatches.map((a) => {
               const ms = a.months || [];
               const range = ms.length ? (ms.length > 1 ? `${monShort(ms[0])} to ${monShort(ms[ms.length - 1])} ${ms[ms.length - 1].slice(0, 4)}` : `${monShort(ms[0])} ${ms[0].slice(0, 4)}`) : "No program";
               return (
