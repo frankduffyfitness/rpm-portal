@@ -6,6 +6,7 @@
 // generator, which only splices const markers in App.jsx).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IntakesPanel } from "./Intake.jsx";
+import BOARD_DATA from "./board_data.json";
 
 const PW_KEY = "rpm_staff_pw";
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -157,6 +158,45 @@ function liftRows(A, M) {
     sets.forEach((s) => { const r = repsOf(s, wk); if (r && r <= 10) row.e1rm = Math.max(row.e1rm || 0, s.load * (1 + r / 30)); });
   }))));
   return [...rows.values()].filter((r) => r.pts.some((v) => v != null));
+}
+
+// Strength-line lifts (Frank, 2026-11-09): the only lifts that get an estimated
+// 1RM, and the ones that get a line running across programs. "I don't need a
+// predicted 1RM on my curls."
+const KPI_FAMILIES = [
+  ["Deadlift", /^deadlift, /i],
+  ["Trap Bar Deadlift", /trap bar deadlift/i],
+  ["SSB split squat and lunge", /ssb.*(split squat|lunge)/i],
+  ["SSB Squat", /ssb.*squat/i],
+  ["DB split squat and lunge", /split squat|reverse lunge/i],
+  ["Chin-Up", /chin-up/i],
+  ["DB Bench Press", /\bdb\b.*bench press/i],
+];
+const kpiFamily = (name) => { if (/iso hold/i.test(name || "")) return null; const f = KPI_FAMILIES.find(([, re]) => re.test(name || "")); return f ? f[0] : null; };
+
+// One value per program for each strength-line family: the best estimated 1RM
+// (Epley, sets of 10 or fewer) logged in that program. Chin-Up uses the heaviest
+// added load, since bodyweight isn't in the log.
+function strengthLines(A, M) {
+  const fams = new Map();
+  M.months.forEach((p, mi) => p.days.forEach((d) => d.exercises.forEach((ex) => ex.weeks.forEach((wk) => {
+    const log = M.logOf(p.month, d.day, wk.w) || {};
+    const name = ex.key === "deadlift" ? "Deadlift, heavy day" : ((log.swaps || {})[ex.slot] || ex.name);
+    const fam = kpiFamily(name);
+    if (!fam || (ex.key === "deadlift" && ex.role !== "heavy")) return;
+    ((log.entries || {})[ex.slot] || []).filter((x) => setDone(x) && x.load > 0).forEach((x) => {
+      const r = repsOf(x, wk);
+      const v = fam === "Chin-Up" ? x.load : (r && r <= 10 ? x.load * (1 + r / 30) : null);
+      if (v == null) return;
+      if (!fams.has(fam)) fams.set(fam, { name: fam, pts: Array(M.months.length).fill(null) });
+      const row = fams.get(fam);
+      if (row.pts[mi] == null || v > row.pts[mi]) row.pts[mi] = v;
+    });
+  }))));
+  return KPI_FAMILIES.map(([n]) => fams.get(n)).filter(Boolean).map((r) => {
+    const v = r.pts.filter((x) => x != null);
+    return { ...r, first: v[0], last: v[v.length - 1], n: v.length };
+  });
 }
 
 // ─── Styles (portal look: #0A0C10, DM Sans, mint #4FFFB0) ───────────────────
@@ -341,6 +381,7 @@ function Progress({ A, M, ctx }) {
   logged.forEach((s) => { const st = M.sessionStats(A.programs[s.month], s.day, s.week); done += st.done; rx += st.rx; });
   const pct = rx ? Math.round((done / rx) * 100) : null;
   const lifts = liftRows(A, M);
+  const lines = strengthLines(A, M);
   const jhD = delta(jh, 1, '"'), rsiD = delta(rsi, 2, "");
   return (
     <div>
@@ -355,14 +396,24 @@ function Progress({ A, M, ctx }) {
         })()}
         {velo && <Tile label="Peak velo" value={veloWin.length ? Math.max(...veloWin.map((v) => v[1])).toFixed(1) : "–"} unit={veloWin.length ? "mph" : ""} sub={veloWin.length ? `${veloWin.length} TrackMan session${veloWin.length === 1 ? "" : "s"} in this block` : "No TrackMan in this block"} spark={veloWin.length > 1 ? veloWin.map((v) => v[1]) : null} sparkColor="#FFB020" />}
       </div>
-      <Section title="Lift trends" subtitle="Heaviest set each week. Estimated 1RM uses the Epley formula on sets of 10 reps or fewer.">
+      {lines.length > 0 && <Section title="Strength lines" subtitle="Best estimated 1RM in each program, across every program logged. Chin-Up shows the heaviest added load.">
+        {lines.map((r) => (
+          <div key={r.name} style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 84px 110px 52px", gap: 10, alignItems: "center", padding: "8px 0", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ fontSize: 12, color: "#E0E0E0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</div>
+            <Spark pts={r.pts} w={84} h={22} />
+            <div style={{ fontSize: 12, color: "#fff", fontWeight: 600, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{r.n > 1 ? <>{Math.round(r.first)}<span style={{ color: "#6B7280", fontWeight: 500 }}>{" → "}</span>{Math.round(r.last)}</> : Math.round(r.last)}</div>
+            <div style={{ fontSize: 11, textAlign: "right", color: r.n > 1 && r.last > r.first ? "#4FFFB0" : "#8A8F98" }}>{r.n > 1 && r.first > 0 ? `${r.last >= r.first ? "+" : ""}${Math.round(100 * (r.last - r.first) / r.first)}%` : `${r.n} program`}</div>
+          </div>
+        ))}
+      </Section>}
+      <Section title="Lift trends" subtitle="Heaviest set each week. Estimated 1RM shows only for the strength-line lifts (Epley formula, sets of 10 reps or fewer).">
         {lifts.length === 0 && <div style={{ fontSize: 12, color: "#6B7280", padding: "8px 0" }}>No loads logged yet.</div>}
         {lifts.map((r) => (
           <div key={r.name} style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 84px 64px 44px", gap: 10, alignItems: "center", padding: "8px 0", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
             <div style={{ fontSize: 12, color: "#E0E0E0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.name}>{r.name}</div>
             <Spark pts={r.pts.slice(0, Math.max(4, r.pts.reduce((m, v, i) => (v != null ? i + 1 : m), 0)))} w={84} h={22} />
             <div style={{ fontSize: 12, color: "#fff", fontWeight: 600, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{r.last[0]}{r.last[1] != null && <span style={{ color: "#6B7280", fontWeight: 500 }}>{" × " + r.last[1]}</span>}</div>
-            <div style={{ fontSize: 11, color: "#8A8F98", textAlign: "right" }} title="Estimated 1RM">{r.e1rm ? Math.round(r.e1rm) : ""}</div>
+            <div style={{ fontSize: 11, color: "#8A8F98", textAlign: "right" }} title="Estimated 1RM">{r.e1rm && kpiFamily(r.name) && kpiFamily(r.name) !== "Chin-Up" ? Math.round(r.e1rm) : ""}</div>
           </div>
         ))}
       </Section>
@@ -1127,6 +1178,44 @@ function BoardForm({ row, athletes, defCoach, onSave, onDelete, onCancel }) {
     </form>
   );
 }
+// ─── Board facts: visits per week and the automatic target (Frank, 2026-11-10) ──
+// board_data.json is rebuilt by board_data.py on every ForceDecks sync. A visit is
+// any day with a ForceDecks or DynaMo test, because some athletes don't jump
+// (Abe Florman tests plyo push-ups). The target is the key metric where the
+// athlete sits lowest in his age group: concentric impulse +2.5% or RSI-mod +2%
+// per program, read off the median of his last three jump sessions.
+const _bkey = (s) => (s || "").toLowerCase().replace(/[^a-z]/g, "");
+const _median = (a) => { const v = [...a].sort((x, y) => x - y), n = v.length; return n ? (n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2) : null; };
+const TARGET_BAR = { ci: 0.025, rsi: 0.02 };
+function boardFacts(r, rows, today) {
+  const rec = (BOARD_DATA.athletes || {})[_bkey(r.athleteName || r.name)];
+  if (!rec) return null;
+  const from = new Date(new Date(today).getTime() - 56 * 864e5).toISOString().slice(0, 10);
+  const visits = rec.days.filter((d) => d > from && d <= today).length / 8;
+  const m = /(\d)\s*x\s*(\d)/.exec(r.format || "");
+  const rx = m ? +m[2] : null;
+  const out = { visits, rx, low: rx ? visits < 0.75 * rx : false };
+  if (rec.ciPct == null || rec.rsiPct == null) return out;
+  const key = rec.ciPct <= rec.rsiPct ? "ci" : "rsi", col = key === "ci" ? 1 : 2;
+  const asOf = (day) => {
+    const lo = new Date(new Date(day).getTime() - 60 * 864e5).toISOString().slice(0, 10);
+    const v = rec.s.filter((x) => x[0] <= day && x[0] >= lo).slice(-3).map((x) => x[col]);
+    return v.length >= 2 ? _median(v) : null;
+  };
+  const start = asOf(r.due && r.due <= today ? r.due : today);
+  if (start == null) return out;
+  const mine = rows.filter((x) => x.due && x.due <= today && _bkey(x.athleteName || x.name) === _bkey(r.athleteName || r.name))
+    .map((x) => x.due).filter((d, i, a) => a.indexOf(d) === i).sort();
+  const misses = [];
+  for (let i = 1; i < mine.length; i++) {
+    const a = asOf(mine[i - 1]), b = asOf(mine[i]);
+    if (a != null && b != null) misses.push(b < a * (1 + TARGET_BAR[key]));
+  }
+  return { ...out, target: { key, label: key === "ci" ? "Concentric impulse" : "RSI-mod", start, bar: start * (1 + TARGET_BAR[key]),
+    now: r.due && r.due < today ? asOf(today) : null, checkIn: misses.length >= 2 && misses.slice(-2).every(Boolean) } };
+}
+const _fmtT = (k, v) => (k === "ci" ? Math.round(v) : v.toFixed(2));
+
 function Board({ pw, athletes, onOpen, onLocked }) {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
@@ -1154,6 +1243,7 @@ function Board({ pw, athletes, onOpen, onLocked }) {
     const [due, dueColor] = r.done ? [`Written ${shortDate((r.doneAt || "").slice(0, 10))}`, "#6B7280"] : dueLabel(r.due);
     const i = r.info;
     const ready = i && i.total && i.logged >= i.total;
+    const bf = boardFacts(r, rows, new Date().toISOString().slice(0, 10));
     return (
       <div key={r.id} style={{ display: "grid", gridTemplateColumns: "4px minmax(0,1fr) auto auto", gap: 10, alignItems: "center", padding: "10px 10px 10px 0", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 6, overflow: "hidden", opacity: r.done ? 0.6 : 1 }}>
         <div style={{ alignSelf: "stretch", margin: "-10px 0", background: COACH_COLOR[r.coach] || "rgba(255,255,255,0.08)" }} />
@@ -1163,6 +1253,11 @@ function Board({ pw, athletes, onOpen, onLocked }) {
             {fmtFormat(r.format)}
             {i && <span style={{ color: ready ? "#4FFFB0" : "#8A8F98" }}>{" · "}{monShort(i.month)} {i.logged}/{i.total} logged{i.next.length ? ` · ${i.next.map(monShort).join(", ")} loaded` : ""}</span>}
           </div>
+          {bf && !r.done && <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 3 }}>
+            <span style={{ color: bf.low ? "#F2C94C" : "#8A8F98", fontWeight: bf.low ? 700 : 400 }} title="Days with a ForceDecks or DynaMo test, last 8 weeks">{bf.low ? "⚑ " : ""}{bf.visits.toFixed(1)} visits/wk{bf.rx ? ` of ${bf.rx}` : ""}</span>
+            {bf.target && <span>{" · Target: "}{bf.target.label} {_fmtT(bf.target.key, bf.target.start)} {"→"} {_fmtT(bf.target.key, bf.target.bar)}{bf.target.now != null ? ` (now ${_fmtT(bf.target.key, bf.target.now)})` : ""}</span>}
+            {bf.target && bf.target.checkIn && <span style={{ color: "#F97362", fontWeight: 700 }}>{" · Check in: missed twice"}</span>}
+          </div>}
           {(r.recap || r.focus) && !r.done && <div style={{ fontSize: 11, color: "#8A8F98", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{"Notes: "}{r.focus || r.recap}</div>}
           {r.draft && !r.done && <div style={{ fontSize: 11, color: "#4FFFB0", marginTop: 3, fontWeight: 600 }}>{r.draft}</div>}
         </button>

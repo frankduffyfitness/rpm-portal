@@ -106,6 +106,12 @@ jobs:
             exit 1
           fi
 
+      - name: Board data (visits per week + targets for the Training tab)
+        run: |
+          # Never fail the sync over this file: keep the committed one on error.
+          python board_data.py forcedecks_portal.json.gz dynamo_portal.json > board_data.tmp \
+            && mv board_data.tmp src/board_data.json || { rm -f board_data.tmp; echo "board_data.py failed, kept the old file"; }
+
       - name: Check for changes
         id: changes
         run: |
