@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-11-10T22:28:37Z",
+ "lastSyncedAt": "2026-11-10T23:38:49Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -23154,6 +23154,409 @@
   "Axel Campos": {
    "name": "Axel Campos",
    "sessions": [
+    {
+     "date": "2026-11-10",
+     "sessionType": "Pitching practice",
+     "total": 20,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 13,
+       "veloMin": 78.6,
+       "veloMax": 80.7,
+       "veloAvg": 79.9,
+       "spinMin": 1902.7,
+       "spinMax": 2177.7,
+       "spinAvg": 2034.4,
+       "ivb": 19.6,
+       "hb": 8.8,
+       "hbMaxAbs": 14.1,
+       "vertMovMaxAbs": 28.1,
+       "relH": 4.6,
+       "relSide": 1.2,
+       "ext": 5.0,
+       "effAvg": 69
+      },
+      {
+       "name": "Cutter",
+       "count": 1,
+       "veloMin": 75.7,
+       "veloMax": 75.7,
+       "veloAvg": 75.7,
+       "spinMin": 1990.0,
+       "spinMax": 1990.0,
+       "spinAvg": 1990.0,
+       "ivb": 14.8,
+       "hb": 2.6,
+       "hbMaxAbs": 2.6,
+       "vertMovMaxAbs": 35.7,
+       "relH": 4.6,
+       "relSide": 1.3,
+       "ext": 5.1,
+       "effAvg": 50
+      },
+      {
+       "name": "Changeup",
+       "count": 3,
+       "veloMin": 73.9,
+       "veloMax": 74.9,
+       "veloAvg": 74.5,
+       "spinMin": 1006.8,
+       "spinMax": 1110.9,
+       "spinAvg": 1063.3,
+       "ivb": 4.6,
+       "hb": 13.6,
+       "hbMaxAbs": 16.6,
+       "vertMovMaxAbs": 48.8,
+       "relH": 4.6,
+       "relSide": 1.3,
+       "ext": 4.9,
+       "effAvg": 72
+      },
+      {
+       "name": "Curveball",
+       "count": 3,
+       "veloMin": 69.3,
+       "veloMax": 70.2,
+       "veloAvg": 69.8,
+       "spinMin": null,
+       "spinMax": null,
+       "spinAvg": null,
+       "ivb": 2.0,
+       "hb": -3.2,
+       "hbMaxAbs": 3.2,
+       "vertMovMaxAbs": 40.7,
+       "relH": 4.5,
+       "relSide": 1.4,
+       "ext": 4.3,
+       "effAvg": null
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 80.2,
+       "spin": 1903.0,
+       "tilt": "1:15",
+       "ivb": 18.3,
+       "hb": 14.1,
+       "ext": 5.08,
+       "relH": 4.58,
+       "relSide": 1.33,
+       "eff": 68,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 80.0,
+       "spin": 1970.0,
+       "tilt": "1:00",
+       "ivb": 17.7,
+       "hb": 9.8,
+       "ext": 4.75,
+       "relH": 4.58,
+       "relSide": 1.5,
+       "eff": 64,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 79.6,
+       "spin": 2031.0,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 5.08,
+       "relH": 4.75,
+       "relSide": 1.33,
+       "eff": 62,
+       "type": "Fastball"
+      },
+      {
+       "no": 4,
+       "velo": 80.3,
+       "spin": 2034.0,
+       "tilt": "12:30",
+       "ivb": 21.6,
+       "hb": 5.0,
+       "ext": 5.0,
+       "relH": 4.58,
+       "relSide": 1.17,
+       "eff": 72,
+       "type": "Fastball"
+      },
+      {
+       "no": 5,
+       "velo": 80.2,
+       "spin": 1984.0,
+       "tilt": "1:00",
+       "ivb": 18.8,
+       "hb": 11.0,
+       "ext": 5.08,
+       "relH": 4.67,
+       "relSide": 1.25,
+       "eff": 73,
+       "type": "Fastball"
+      },
+      {
+       "no": 6,
+       "velo": 78.6,
+       "spin": 2008.0,
+       "tilt": "12:30",
+       "ivb": 19.5,
+       "hb": 4.3,
+       "ext": 5.25,
+       "relH": 4.75,
+       "relSide": 1.25,
+       "eff": 63,
+       "type": "Fastball"
+      },
+      {
+       "no": 7,
+       "velo": 80.6,
+       "spin": 2107.0,
+       "tilt": "12:45",
+       "ivb": 19.3,
+       "hb": 7.3,
+       "ext": 4.58,
+       "relH": 4.67,
+       "relSide": 1.5,
+       "eff": 70,
+       "type": "Fastball"
+      },
+      {
+       "no": 8,
+       "velo": 80.7,
+       "spin": 1965.0,
+       "tilt": "12:45",
+       "ivb": 22.5,
+       "hb": 10.5,
+       "ext": 5.08,
+       "relH": 4.67,
+       "relSide": 1.08,
+       "eff": 86,
+       "type": "Fastball"
+      },
+      {
+       "no": 9,
+       "velo": 79.2,
+       "spin": 2059.0,
+       "tilt": "1:00",
+       "ivb": 17.6,
+       "hb": 9.2,
+       "ext": 5.25,
+       "relH": 4.58,
+       "relSide": 0.92,
+       "eff": 77,
+       "type": "Fastball"
+      },
+      {
+       "no": 10,
+       "velo": 74.7,
+       "spin": 1111.0,
+       "tilt": "2:15",
+       "ivb": null,
+       "hb": null,
+       "ext": null,
+       "relH": 4.5,
+       "relSide": 1.42,
+       "eff": 70,
+       "type": "Changeup"
+      },
+      {
+       "no": 11,
+       "velo": 74.9,
+       "spin": 1007.0,
+       "tilt": "2:30",
+       "ivb": 4.4,
+       "hb": 16.6,
+       "ext": 4.92,
+       "relH": 4.58,
+       "relSide": 1.17,
+       "eff": 84,
+       "type": "Changeup"
+      },
+      {
+       "no": 12,
+       "velo": 73.9,
+       "spin": 1072.0,
+       "tilt": "2:15",
+       "ivb": 4.8,
+       "hb": 10.5,
+       "ext": 4.83,
+       "relH": 4.67,
+       "relSide": 1.33,
+       "eff": 61,
+       "type": "Changeup"
+      },
+      {
+       "no": 13,
+       "velo": 69.7,
+       "spin": null,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 4.25,
+       "relH": 4.58,
+       "relSide": 1.58,
+       "eff": null,
+       "type": "Curveball"
+      },
+      {
+       "no": 14,
+       "velo": 70.2,
+       "spin": null,
+       "tilt": null,
+       "ivb": 2.0,
+       "hb": -3.2,
+       "ext": null,
+       "relH": 4.5,
+       "relSide": 1.25,
+       "eff": null,
+       "type": "Curveball"
+      },
+      {
+       "no": 15,
+       "velo": 69.3,
+       "spin": null,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 4.42,
+       "relH": 4.58,
+       "relSide": 1.42,
+       "eff": null,
+       "type": "Curveball"
+      },
+      {
+       "no": 16,
+       "velo": 75.7,
+       "spin": 1990.0,
+       "tilt": "12:15",
+       "ivb": 14.8,
+       "hb": 2.6,
+       "ext": 5.17,
+       "relH": 4.58,
+       "relSide": 1.33,
+       "eff": 50,
+       "type": "Cutter"
+      },
+      {
+       "no": 17,
+       "velo": 80.0,
+       "spin": 2083.0,
+       "tilt": "12:45",
+       "ivb": 20.0,
+       "hb": 7.3,
+       "ext": 5.0,
+       "relH": 4.58,
+       "relSide": 1.17,
+       "eff": 70,
+       "type": "Fastball"
+      },
+      {
+       "no": 18,
+       "velo": 79.3,
+       "spin": 2011.0,
+       "tilt": "12:45",
+       "ivb": 19.5,
+       "hb": 6.8,
+       "ext": 4.83,
+       "relH": 4.5,
+       "relSide": 1.17,
+       "eff": 58,
+       "type": "Fastball"
+      },
+      {
+       "no": 19,
+       "velo": 80.4,
+       "spin": 2115.0,
+       "tilt": "1:00",
+       "ivb": null,
+       "hb": null,
+       "ext": 4.92,
+       "relH": 4.5,
+       "relSide": 1.08,
+       "eff": null,
+       "type": "Fastball"
+      },
+      {
+       "no": 20,
+       "velo": 80.2,
+       "spin": 2178.0,
+       "tilt": "1:00",
+       "ivb": 21.2,
+       "hb": 11.5,
+       "ext": 5.0,
+       "relH": 4.58,
+       "relSide": 1.25,
+       "eff": 65,
+       "type": "Fastball"
+      }
+     ],
+     "locations": [
+      {
+       "x": -3.3,
+       "z": 1.97,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.42,
+       "z": 2.29,
+       "type": "Fastball"
+      },
+      {
+       "x": -0.36,
+       "z": 2.15,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.0,
+       "z": 3.25,
+       "type": "Fastball"
+      },
+      {
+       "x": -0.22,
+       "z": 1.91,
+       "type": "Fastball"
+      },
+      {
+       "x": 0.73,
+       "z": 0.73,
+       "type": "Fastball"
+      },
+      {
+       "x": 0.0,
+       "z": 1.33,
+       "type": "Fastball"
+      },
+      {
+       "x": 0.13,
+       "z": 1.37,
+       "type": "Changeup"
+      },
+      {
+       "x": 0.97,
+       "z": 2.57,
+       "type": "Changeup"
+      },
+      {
+       "x": 0.01,
+       "z": 2.85,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.12,
+       "z": 1.08,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.27,
+       "z": 1.79,
+       "type": "Fastball"
+      }
+     ]
+    },
     {
      "date": "2026-11-06",
      "sessionType": "Pitching practice",
@@ -294697,6 +295100,447 @@
   "Sam Rubinstein": {
    "name": "Sam Rubinstein",
    "sessions": [
+    {
+     "date": "2026-11-10",
+     "sessionType": "Pitching practice",
+     "total": 21,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 10,
+       "veloMin": 75.6,
+       "veloMax": 77.2,
+       "veloAvg": 76.3,
+       "spinMin": 1891.7,
+       "spinMax": 1995.6,
+       "spinAvg": 1946.8,
+       "ivb": 17.9,
+       "hb": 21.2,
+       "hbMaxAbs": 23.1,
+       "vertMovMaxAbs": 35.9,
+       "relH": 4.2,
+       "relSide": 2.0,
+       "ext": 4.6,
+       "effAvg": 91
+      },
+      {
+       "name": "Sinker",
+       "count": 3,
+       "veloMin": 74.6,
+       "veloMax": 76.1,
+       "veloAvg": 75.3,
+       "spinMin": 1529.7,
+       "spinMax": 1856.3,
+       "spinAvg": 1678.1,
+       "ivb": 10.3,
+       "hb": 19.0,
+       "hbMaxAbs": 19.9,
+       "vertMovMaxAbs": 45.5,
+       "relH": 4.1,
+       "relSide": 2.0,
+       "ext": 4.7,
+       "effAvg": 91
+      },
+      {
+       "name": "Changeup",
+       "count": 6,
+       "veloMin": 70.4,
+       "veloMax": 72.0,
+       "veloAvg": 71.4,
+       "spinMin": 1160.8,
+       "spinMax": 1373.2,
+       "spinAvg": 1259.7,
+       "ivb": 10.0,
+       "hb": 18.3,
+       "hbMaxAbs": 22.6,
+       "vertMovMaxAbs": 52.6,
+       "relH": 4.1,
+       "relSide": 1.9,
+       "ext": 4.4,
+       "effAvg": 92
+      },
+      {
+       "name": "Curveball",
+       "count": 2,
+       "veloMin": 65.9,
+       "veloMax": 66.6,
+       "veloAvg": 66.2,
+       "spinMin": 1496.1,
+       "spinMax": 1995.5,
+       "spinAvg": 1745.8,
+       "ivb": 4.9,
+       "hb": -8.2,
+       "hbMaxAbs": 9.0,
+       "vertMovMaxAbs": 73.2,
+       "relH": 4.1,
+       "relSide": 1.9,
+       "ext": 4.7,
+       "effAvg": 50
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 76.3,
+       "spin": 1948.0,
+       "tilt": "1:45",
+       "ivb": 15.9,
+       "hb": 20.3,
+       "ext": 4.58,
+       "relH": 4.17,
+       "relSide": 1.92,
+       "eff": 84,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 75.6,
+       "spin": 1932.0,
+       "tilt": "1:45",
+       "ivb": 16.8,
+       "hb": 23.1,
+       "ext": 4.5,
+       "relH": 4.17,
+       "relSide": 1.92,
+       "eff": 90,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 75.8,
+       "spin": 1926.0,
+       "tilt": "1:45",
+       "ivb": 16.8,
+       "hb": 21.4,
+       "ext": 4.42,
+       "relH": 4.25,
+       "relSide": 2.0,
+       "eff": 88,
+       "type": "Fastball"
+      },
+      {
+       "no": 4,
+       "velo": 75.8,
+       "spin": 1947.0,
+       "tilt": "1:30",
+       "ivb": null,
+       "hb": null,
+       "ext": 5.58,
+       "relH": 4.25,
+       "relSide": 1.75,
+       "eff": 86,
+       "type": "Fastball"
+      },
+      {
+       "no": 5,
+       "velo": 77.2,
+       "spin": 1959.0,
+       "tilt": "1:30",
+       "ivb": 18.4,
+       "hb": 21.2,
+       "ext": 4.92,
+       "relH": 4.25,
+       "relSide": 2.17,
+       "eff": 95,
+       "type": "Fastball"
+      },
+      {
+       "no": 6,
+       "velo": 76.6,
+       "spin": 1955.0,
+       "tilt": "1:45",
+       "ivb": 18.5,
+       "hb": 22.7,
+       "ext": 4.08,
+       "relH": 4.33,
+       "relSide": 2.08,
+       "eff": 93,
+       "type": "Fastball"
+      },
+      {
+       "no": 7,
+       "velo": 76.0,
+       "spin": 1963.0,
+       "tilt": "1:45",
+       "ivb": 17.5,
+       "hb": 22.2,
+       "ext": 4.5,
+       "relH": 4.25,
+       "relSide": 2.17,
+       "eff": 95,
+       "type": "Fastball"
+      },
+      {
+       "no": 8,
+       "velo": 76.6,
+       "spin": 1996.0,
+       "tilt": "1:30",
+       "ivb": 21.2,
+       "hb": 19.2,
+       "ext": 4.5,
+       "relH": 4.42,
+       "relSide": 2.17,
+       "eff": 96,
+       "type": "Fastball"
+      },
+      {
+       "no": 9,
+       "velo": 66.6,
+       "spin": 1995.0,
+       "tilt": "8:00",
+       "ivb": -3.8,
+       "hb": -7.3,
+       "ext": 4.42,
+       "relH": 4.0,
+       "relSide": 2.08,
+       "eff": 43,
+       "type": "Curveball"
+      },
+      {
+       "no": 10,
+       "velo": 65.9,
+       "spin": 1496.0,
+       "tilt": "8:00",
+       "ivb": -6.0,
+       "hb": -9.0,
+       "ext": 5.0,
+       "relH": 4.17,
+       "relSide": 1.75,
+       "eff": 57,
+       "type": "Curveball"
+      },
+      {
+       "no": 11,
+       "velo": 71.7,
+       "spin": 1264.0,
+       "tilt": "2:15",
+       "ivb": 10.7,
+       "hb": 22.6,
+       "ext": 4.5,
+       "relH": 3.92,
+       "relSide": 2.08,
+       "eff": 92,
+       "type": "Changeup"
+      },
+      {
+       "no": 12,
+       "velo": 71.9,
+       "spin": 1292.0,
+       "tilt": "2:00",
+       "ivb": 11.3,
+       "hb": 19.2,
+       "ext": 4.5,
+       "relH": 4.08,
+       "relSide": 2.08,
+       "eff": 92,
+       "type": "Changeup"
+      },
+      {
+       "no": 13,
+       "velo": 72.0,
+       "spin": 1170.0,
+       "tilt": "1:45",
+       "ivb": 10.6,
+       "hb": 16.0,
+       "ext": 4.58,
+       "relH": 3.92,
+       "relSide": 2.08,
+       "eff": 89,
+       "type": "Changeup"
+      },
+      {
+       "no": 14,
+       "velo": 70.9,
+       "spin": 1161.0,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 4.33,
+       "relH": 4.5,
+       "relSide": 1.33,
+       "eff": 96,
+       "type": "Changeup"
+      },
+      {
+       "no": 15,
+       "velo": 71.7,
+       "spin": 1299.0,
+       "tilt": "2:00",
+       "ivb": 9.2,
+       "hb": 14.7,
+       "ext": null,
+       "relH": 4.0,
+       "relSide": 1.92,
+       "eff": 95,
+       "type": "Changeup"
+      },
+      {
+       "no": 16,
+       "velo": 76.5,
+       "spin": 1951.0,
+       "tilt": "1:45",
+       "ivb": 17.0,
+       "hb": 20.9,
+       "ext": 4.42,
+       "relH": 4.25,
+       "relSide": 2.0,
+       "eff": 92,
+       "type": "Fastball"
+      },
+      {
+       "no": 17,
+       "velo": 76.1,
+       "spin": 1530.0,
+       "tilt": "2:15",
+       "ivb": 8.2,
+       "hb": 19.8,
+       "ext": 4.75,
+       "relH": 4.17,
+       "relSide": 1.92,
+       "eff": 91,
+       "type": "Sinker"
+      },
+      {
+       "no": 18,
+       "velo": 75.3,
+       "spin": 1648.0,
+       "tilt": "1:30",
+       "ivb": 15.4,
+       "hb": 17.5,
+       "ext": 4.67,
+       "relH": 4.08,
+       "relSide": 2.08,
+       "eff": 91,
+       "type": "Sinker"
+      },
+      {
+       "no": 19,
+       "velo": 74.6,
+       "spin": 1856.0,
+       "tilt": "2:15",
+       "ivb": 7.4,
+       "hb": 19.9,
+       "ext": 4.75,
+       "relH": 4.17,
+       "relSide": 1.92,
+       "eff": 91,
+       "type": "Sinker"
+      },
+      {
+       "no": 20,
+       "velo": 70.4,
+       "spin": 1373.0,
+       "tilt": "2:15",
+       "ivb": 8.1,
+       "hb": 18.9,
+       "ext": 4.25,
+       "relH": 4.08,
+       "relSide": 1.92,
+       "eff": 86,
+       "type": "Changeup"
+      },
+      {
+       "no": 21,
+       "velo": 76.7,
+       "spin": 1892.0,
+       "tilt": "1:30",
+       "ivb": 18.7,
+       "hb": 20.4,
+       "ext": 4.5,
+       "relH": 4.17,
+       "relSide": 2.0,
+       "eff": 93,
+       "type": "Fastball"
+      }
+     ],
+     "locations": [
+      {
+       "x": -3.23,
+       "z": 2.11,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.18,
+       "z": 0.9,
+       "type": "Fastball"
+      },
+      {
+       "x": -2.12,
+       "z": 1.86,
+       "type": "Fastball"
+      },
+      {
+       "x": -2.21,
+       "z": 2.17,
+       "type": "Fastball"
+      },
+      {
+       "x": 0.22,
+       "z": 2.05,
+       "type": "Fastball"
+      },
+      {
+       "x": -0.33,
+       "z": 3.75,
+       "type": "Fastball"
+      },
+      {
+       "x": 0.06,
+       "z": 3.89,
+       "type": "Fastball"
+      },
+      {
+       "x": -0.59,
+       "z": 2.71,
+       "type": "Curveball"
+      },
+      {
+       "x": -2.96,
+       "z": 0.8,
+       "type": "Curveball"
+      },
+      {
+       "x": 2.92,
+       "z": 4.2,
+       "type": "Changeup"
+      },
+      {
+       "x": -1.25,
+       "z": 1.64,
+       "type": "Changeup"
+      },
+      {
+       "x": -1.14,
+       "z": 3.52,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.0,
+       "z": 1.74,
+       "type": "Sinker"
+      },
+      {
+       "x": 1.63,
+       "z": 3.07,
+       "type": "Sinker"
+      },
+      {
+       "x": 0.04,
+       "z": 1.32,
+       "type": "Sinker"
+      },
+      {
+       "x": 0.66,
+       "z": 1.88,
+       "type": "Changeup"
+      },
+      {
+       "x": 0.77,
+       "z": 2.91,
+       "type": "Fastball"
+      }
+     ]
+    },
     {
      "date": "2026-11-05",
      "sessionType": "Pitching practice",
