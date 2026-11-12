@@ -826,22 +826,27 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           const mvs = p.movement || [];
           for (let w = 1; w <= nw; w++) {
             cells.push(<span key={"l" + w} className="lab">W{w}</span>);
-            for (const dd of p.days) {
+            // Movement day(s): their own square per week, so they are not buried in a collapsed row.
+            const mvCell = (mi) => {
+              const mv = mvs[mi];
+              const ml = drafts[`${p.month}|m${mi + 1}w${w}`] || (A.logs[p.month] || {})[`m${mi + 1}w${w}`] || {};
+              const tk = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
+              const mcur = sel.mv === mi && sel.month === p.month && sel.week === w;
+              cells.push(<button key={w + "-m" + mi} className={`cell mv ${tk === 0 ? "" : tk >= mv.exercises.length ? "done" : "partial"} ${labeled ? "lbl" : ""}`} aria-current={mcur} aria-label={`${p.label}, week ${w}, ${mv.label}: ${tk} of ${mv.exercises.length} done`} title={mv.label}
+                onClick={() => setSel((x) => ({ month: p.month, day: p.days.some((dd) => dd.day === x.day) ? x.day : p.days[0].day, week: w, mv: mi }))}>{mvs.length > 1 ? `MD${mi + 1}` : "MD"}</button>);
+            };
+            // Movement days sit after every second lifting day (D1, D2, MD1, D3, D4, MD2); extras go at the end.
+            let placed = 0;
+            p.days.forEach((dd, di) => {
               const st = M.sessionStats(p, dd.day, w);
               if (st.done > 0) dn++;
               const cls = st.done === 0 ? "" : st.done >= st.rx ? "done" : "partial";
               const isNext = nx && nx.month === p.month && nx.day === dd.day && nx.week === w;
               const cur = sel.mv == null && sel.month === p.month && sel.day === dd.day && sel.week === w;
               cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""} ${unreadFor(A, role, `${p.month}|${skey(dd.day, w)}`) ? "msg" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
-            }
-            // Movement day(s): their own square per week, so they are not buried in a collapsed row.
-            mvs.forEach((mv, mi) => {
-              const ml = drafts[`${p.month}|m${mi + 1}w${w}`] || (A.logs[p.month] || {})[`m${mi + 1}w${w}`] || {};
-              const tk = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
-              const mcur = sel.mv === mi && sel.month === p.month && sel.week === w;
-              cells.push(<button key={w + "-m" + mi} className={`cell mv ${tk === 0 ? "" : tk >= mv.exercises.length ? "done" : "partial"} ${labeled ? "lbl" : ""}`} aria-current={mcur} aria-label={`${p.label}, week ${w}, ${mv.label}: ${tk} of ${mv.exercises.length} done`} title={mv.label}
-                onClick={() => setSel((x) => ({ month: p.month, day: p.days.some((dd) => dd.day === x.day) ? x.day : p.days[0].day, week: w, mv: mi }))}>{mvs.length > 1 ? `MD${mi + 1}` : "MD"}</button>);
+              if (di % 2 === 1 && placed < mvs.length) mvCell(placed++);
             });
+            while (placed < mvs.length) mvCell(placed++);
           }
           return (
             <div key={p.month} style={labeled ? { gridColumn: "1 / -1" } : null}>
