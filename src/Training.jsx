@@ -215,6 +215,8 @@ const CSS = `
 .tl .mgrid{display:grid;gap:3px;align-items:center}
 .tl .lab{font-size:9px;color:var(--faint);font-weight:600}
 .tl .cell{height:28px;border:1px solid var(--rule);background:rgba(255,255,255,.03);border-radius:6px;font-size:10px;font-weight:600;color:var(--mut);padding:0;position:relative}
+.tl .cell.mv{border-style:dashed;letter-spacing:.02em}
+.tl .cell.mv.done,.tl .cell.mv.partial{border-style:solid}
 .tl .cell.lbl{font-size:9px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
 .tl .cell.partial{background:rgba(79,255,176,.22);border-color:transparent;color:var(--ink)}
 .tl .cell.done{background:var(--acc);border-color:var(--acc);color:#0A0C10}
@@ -544,6 +546,14 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
   }, [fdName]);
   const fdBw = (date) => (date ? bwMap[date] ?? null : null);
 
+  const mvRefs = useRef([]);
+  useEffect(() => {
+    if (!sel || sel.mv == null) return;
+    const el = mvRefs.current[sel.mv];
+    if (!el) return;
+    el.open = true;
+    try { el.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {}
+  }, [sel && sel.mv, sel && sel.week, sel && sel.month]);
   if (!sel) return <div style={{ fontSize: 13, color: "#6B7280" }}>No program loaded for this athlete yet.</div>;
   const sessK = sel.date ? calKey(sel.day, sel.date) : skey(sel.day, sel.week);
   const k = `${sel.month}|${sessK}`;
@@ -813,6 +823,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
           const cells = [];
           const labeled = p.days.some((x) => x.short);
           const nw = weeksOf(p);
+          const mvs = p.movement || [];
           for (let w = 1; w <= nw; w++) {
             cells.push(<span key={"l" + w} className="lab">W{w}</span>);
             for (const dd of p.days) {
@@ -820,14 +831,22 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
               if (st.done > 0) dn++;
               const cls = st.done === 0 ? "" : st.done >= st.rx ? "done" : "partial";
               const isNext = nx && nx.month === p.month && nx.day === dd.day && nx.week === w;
-              const cur = sel.month === p.month && sel.day === dd.day && sel.week === w;
+              const cur = sel.mv == null && sel.month === p.month && sel.day === dd.day && sel.week === w;
               cells.push(<button key={w + "-" + dd.day} className={`cell ${cls} ${isNext ? "next" : ""} ${labeled ? "lbl" : ""} ${unreadFor(A, role, `${p.month}|${skey(dd.day, w)}`) ? "msg" : ""}`} aria-current={cur} aria-label={`${p.label}, week ${w}, ${dd.label || `day ${dd.day}`}: ${st.done} of ${st.rx} sets`} onClick={() => setSel({ month: p.month, day: dd.day, week: w })}>{dd.short || `D${dd.day}`}</button>);
             }
+            // Movement day(s): their own square per week, so they are not buried in a collapsed row.
+            mvs.forEach((mv, mi) => {
+              const ml = drafts[`${p.month}|m${mi + 1}w${w}`] || (A.logs[p.month] || {})[`m${mi + 1}w${w}`] || {};
+              const tk = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
+              const mcur = sel.mv === mi && sel.month === p.month && sel.week === w;
+              cells.push(<button key={w + "-m" + mi} className={`cell mv ${tk === 0 ? "" : tk >= mv.exercises.length ? "done" : "partial"} ${labeled ? "lbl" : ""}`} aria-current={mcur} aria-label={`${p.label}, week ${w}, ${mv.label}: ${tk} of ${mv.exercises.length} done`} title={mv.label}
+                onClick={() => setSel((x) => ({ month: p.month, day: p.days.some((dd) => dd.day === x.day) ? x.day : p.days[0].day, week: w, mv: mi }))}>{mvs.length > 1 ? `MD${mi + 1}` : "MD"}</button>);
+            });
           }
           return (
             <div key={p.month} style={labeled ? { gridColumn: "1 / -1" } : null}>
               <div className="mh">{p.label.split(" ")[0]}<span>{dn}/{p.days.length * nw}</span></div>
-              <div className="mgrid" style={{ gridTemplateColumns: `20px repeat(${p.days.length}, 1fr)` }}>{cells}</div>
+              <div className="mgrid" style={{ gridTemplateColumns: `20px repeat(${p.days.length + mvs.length}, 1fr)` }}>{cells}</div>
             </div>
           );
         })}
@@ -836,7 +855,7 @@ function Logger({ A, M, ctx, pw, onSaved, onLocked, start, role = "coach", onA =
         const ml = mvLog(mi);
         const ticked = mv.exercises.filter((x, i) => ((ml.entries || {})[mvSlot(x, i)] || [])[0]?.done).length;
         return (
-          <details key={mi} style={{ marginTop: 14, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)" }}>
+          <details key={mi} ref={(el) => { mvRefs.current[mi] = el; }} style={{ marginTop: 14, border: sel.mv === mi ? "1px solid rgba(79,255,176,0.45)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 12, background: "rgba(255,255,255,0.02)", scrollMarginTop: 12 }}>
             <summary>{mv.label} · Week {sel.week}{" "}
               <span style={{ fontSize: 11, fontWeight: 700, color: ticked ? "#4FFFB0" : "#6B7280", marginLeft: 6 }}>{ticked === mv.exercises.length ? "✓ logged" : ticked ? `${ticked}/${mv.exercises.length} done` : "not logged"}</span>
             </summary>
