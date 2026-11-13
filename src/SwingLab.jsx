@@ -12,7 +12,7 @@
 // speed loss from release to plate, the same factor the exit velo card uses.
 import { useEffect, useMemo, useRef, useState } from "react";
 import SWING_DATA from "./swing_data.json";
-import { swingModel, TAU_END, BAT_LEN, UP, rad, vadd, vsub, vmul, vdot, vcross, vnorm } from "./swingModel.js";
+import { swingModel, TAU_END, FOLLOW, BAT_LEN, UP, rad, vadd, vsub, vmul, vdot, vcross, vnorm } from "./swingModel.js";
 
 const T = { bg: "#0A0C10", card: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", line: "rgba(255,255,255,0.06)",
   text: "#E0E0E0", white: "#fff", muted: "#8A8F98", dim: "#6B7280", faint: "#4a4f57",
@@ -111,97 +111,13 @@ function MetricCard({ m, t }) {
   );
 }
 
-// ─── Time to decide ──────────────────────────────────────────────────────────
+// ─── Generic pitch (used by Time to Decide) ─────────────────────────────────
 const FLIGHT_FT = 54.5, PLATE_FACTOR = 0.91, MPH_TO_FTS = 1.46667;
 function pitch(mph) {
   const v0 = mph * MPH_TO_FTS, vf = PLATE_FACTOR * v0, a = (vf * vf - v0 * v0) / (2 * FLIGHT_FT);
   return { T: (2 * FLIGHT_FT) / (v0 + vf), dist: (t) => Math.min(FLIGHT_FT, v0 * t + 0.5 * a * t * t) };
 }
 const ms = (t) => Math.round(t * 1000) + " ms";
-const REL = [92, 128], END = [588, 140], HANDS = [628, 139];
-const at = (f) => [REL[0] + (END[0] - REL[0]) * f, REL[1] + (END[1] - REL[1]) * f];
-
-function TimeToDecide({ t }) {
-  const ttcPool = TESTERS.filter((x) => x.sum.ttc != null);
-  const avgTtc = mean(ttcPool.map((x) => x.sum.ttc));
-  const ttc = t.sum.ttc;
-  const [mph, setMph] = useState(90);
-  const [speed, setSpeed] = useState(0.2);
-  const [clock, setClock] = useState(0);
-  const raf = useRef(null);
-  const P = useMemo(() => pitch(mph), [mph]);
-  useEffect(() => { cancelAnimationFrame(raf.current); setClock(0); }, [t, mph]);
-  useEffect(() => () => cancelAnimationFrame(raf.current), []);
-  if (ttc == null) return null;
-
-  const tStart = P.T - ttc, decide = tStart;
-  const [cx, cy] = at(P.dist(tStart) / FLIGHT_FT);
-  const feels = FLIGHT_FT / (((1 + PLATE_FACTOR) / 2) * MPH_TO_FTS * (decide + avgTtc));
-  const play = (s = speed) => {
-    cancelAnimationFrame(raf.current);
-    let t0 = null;
-    const step = (now) => { if (t0 == null) t0 = now; const tt = ((now - t0) / 1000) * s; setClock(tt); if (tt < P.T + 0.9 * s) raf.current = requestAnimationFrame(step); };
-    raf.current = requestAnimationFrame(step);
-  };
-  const [bx, by] = at(P.dist(Math.max(0, clock)) / FLIGHT_FT);
-  const p = clock > tStart ? Math.min(1, (clock - tStart) / ttc) : 0;
-  const status = clock <= 0 ? "Press pitch" : clock < tStart ? "Seeing and deciding" : clock < P.T ? "Swinging" : "Contact";
-  const pill = (on) => ({ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8, cursor: "pointer", border: "1px solid " + (on ? "rgba(79,255,176,0.35)" : "rgba(255,255,255,0.1)"), background: on ? "rgba(79,255,176,0.1)" : "transparent", color: on ? T.green : T.muted, fontFamily: FONT });
-  const stat = (l, v, s) => (
-    <div style={{ flex: "1 1 120px", background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "10px 12px" }}>
-      <div style={{ fontSize: 10, color: T.dim, textTransform: "uppercase", letterSpacing: 0.6 }}>{l}</div>
-      <div style={{ fontSize: 20, fontWeight: 700, color: T.white }}>{v}</div>
-      <div style={{ fontSize: 10, color: T.faint }}>{s}</div>
-    </div>
-  );
-  return (
-    <Card>
-      <div style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 4 }}>Time to Decide</div>
-      <div style={{ fontSize: 11, color: T.dim, marginBottom: 14 }}>How much of the pitch you get to see before you have to start your swing.</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <span style={{ fontSize: 11, color: T.muted }}>Fastball</span>
-        <input type="range" min="60" max="100" step="1" value={mph} onChange={(e) => setMph(+e.target.value)} style={{ flex: 1, accentColor: T.green }} />
-        <span style={{ fontSize: 16, fontWeight: 700, color: T.white, minWidth: 62, textAlign: "right" }}>{mph} mph</span>
-      </div>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
-        <button onClick={() => play()} style={{ ...pill(false), background: T.green, color: T.bg, border: "none", fontWeight: 700 }}>Pitch</button>
-        {[[1, "Real time"], [0.2, "5x slower"], [0.07, "15x slower"]].map(([s, l]) => <button key={s} style={pill(speed === s)} onClick={() => { setSpeed(s); play(s); }}>{l}</button>)}
-      </div>
-      <svg viewBox="0 0 680 230" width="100%" role="img" aria-label="Fastball path from pitcher to hitter, split where the hitter must start his swing" style={{ display: "block", color: T.muted }}>
-        <path d="M20 205 Q70 188 120 205 L660 205" fill="none" stroke="currentColor" strokeWidth="1" opacity=".35" />
-        <rect x="600" y="203" width="22" height="4" fill="currentColor" opacity=".5" />
-        <g stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none">
-          <circle cx="70" cy="122" r="8" strokeWidth="2.5" /><line x1="70" y1="130" x2="73" y2="165" /><line x1="73" y1="165" x2="58" y2="196" /><line x1="73" y1="165" x2="92" y2="192" />
-          <line x1="71" y1="138" x2="92" y2="129" /><line x1="71" y1="138" x2="55" y2="150" />
-        </g>
-        <line x1={REL[0]} y1={REL[1]} x2={cx} y2={cy} stroke={T.green} strokeWidth="4" strokeLinecap="round" />
-        <line x1={cx} y1={cy} x2={END[0]} y2={END[1]} stroke={T.orange} strokeWidth="4" strokeLinecap="round" />
-        <line x1={cx} y1="112" x2={cx} y2="152" stroke={T.orange} strokeWidth="1.5" strokeDasharray="3 3" />
-        <text x={Math.max(60, Math.min(560, cx))} y="104" textAnchor="middle" fontSize="12" fill={T.text}>must start: {Math.round(FLIGHT_FT - P.dist(tStart))} ft out</text>
-        <g stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none">
-          <circle cx="641" cy="116" r="8" strokeWidth="2.5" /><line x1="641" y1="124" x2="637" y2="164" /><line x1="637" y1="164" x2="620" y2="200" /><line x1="637" y1="164" x2="654" y2="200" />
-          <line x1="639" y1="132" x2="628" y2="139" />
-        </g>
-        <g transform={`rotate(${-70 - 110 * p * p} ${HANDS[0]} ${HANDS[1]})`}>
-          <line x1={HANDS[0]} y1={HANDS[1]} x2={HANDS[0] + 56} y2={HANDS[1]} stroke={T.text} strokeWidth="5" strokeLinecap="round" />
-        </g>
-        <circle cx={bx} cy={by} r="5" fill={T.white} />
-        <text x="340" y="40" textAnchor="middle" fontSize="16" fontWeight="700" fill={T.white}>{status}</text>
-        <text x="340" y="60" textAnchor="middle" fontSize="12" fill={T.dim}>{clock > 0 ? ms(Math.min(clock, P.T)) + " after release" : ""}</text>
-      </svg>
-      <div style={{ display: "flex", gap: 14, fontSize: 11, color: T.muted, margin: "4px 0 12px" }}>
-        <span><span style={{ display: "inline-block", width: 14, height: 4, borderRadius: 2, background: T.green, verticalAlign: "middle", marginRight: 6 }} />See and decide</span>
-        <span><span style={{ display: "inline-block", width: 14, height: 4, borderRadius: 2, background: T.orange, verticalAlign: "middle", marginRight: 6 }} />Swing</span>
-      </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {stat("Pitch flight", ms(P.T), "release to plate")}
-        {stat("Your swing", ms(ttc), "time to contact")}
-        {stat("Time to decide", ms(decide), "before you start")}
-        {stat("Feels like", Math.round(feels) + " mph", "for an average swing")}
-      </div>
-    </Card>
-  );
-}
 
 // ─── Swing path: a full 3D swing from attack angle + vertical bat angle + time to contact ─
 // The swing itself comes from swingModel.js (exact at contact, generic shape elsewhere).
@@ -211,11 +127,11 @@ const VIEWS = { Angle: { az: 40, el: 16 }, Side: { az: 0, el: 4 }, Catcher: { az
 const SCENE = { w: 360, h: 280, f: 400, dist: 13.5 };
 const BAT_PROFILE = [[0, 0.085], [0.07, 0.085], [0.12, 0.045], [1.0, 0.05], [1.9, 0.105], [2.66, 0.108], [BAT_LEN, 0.06]]; // ft from the knob, radius
 
-function makeCamera(az, el, target) {
-  const pos = vadd(target, vmul([Math.cos(rad(el)) * Math.sin(rad(az)), Math.sin(rad(el)), Math.cos(rad(el)) * Math.cos(rad(az))], SCENE.dist));
+function makeCamera(az, el, target, scene = SCENE) {
+  const pos = vadd(target, vmul([Math.cos(rad(el)) * Math.sin(rad(az)), Math.sin(rad(el)), Math.cos(rad(el)) * Math.cos(rad(az))], scene.dist));
   const fw = vnorm(vsub(target, pos)), rt = vnorm(vcross(fw, UP)), up = vcross(rt, fw);
   const cam = (p) => { const d = vsub(p, pos); return [vdot(d, rt), vdot(d, up), vdot(d, fw)]; };
-  const flat = (c) => [SCENE.w / 2 + (SCENE.f * c[0]) / c[2], SCENE.h * 0.56 - (SCENE.f * c[1]) / c[2], c[2]];
+  const flat = (c) => [scene.w / 2 + (scene.f * c[0]) / c[2], scene.h * 0.56 - (scene.f * c[1]) / c[2], c[2]];
   const proj = (p) => { const c = cam(p); return flat([c[0], c[1], Math.max(c[2], 0.5)]); };
   // Line clipped to what is in front of the camera (the floor grid runs past it).
   const seg = (a, b) => {
@@ -225,7 +141,7 @@ function makeCamera(az, el, target) {
     if (ca[2] < 1) ca = cut(ca, cb); else if (cb[2] < 1) cb = cut(cb, ca);
     return [...flat(ca).slice(0, 2), ...flat(cb).slice(0, 2)];
   };
-  return { proj, seg };
+  return { proj, seg, f: scene.f };
 }
 const pts = (list) => list.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
 
@@ -234,7 +150,7 @@ function BatShape({ cam, frame, opacity = 1 }) {
   const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, n = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
   const left = [], right = [];
   BAT_PROFILE.forEach(([d, r]) => {
-    const c = cam.proj(vadd(frame.hands, vmul(frame.dir, d))), px = (r * SCENE.f) / c[2];
+    const c = cam.proj(vadd(frame.hands, vmul(frame.dir, d))), px = (r * cam.f) / c[2];
     left.push([c[0] + n[0] * px, c[1] + n[1] * px]); right.unshift([c[0] - n[0] * px, c[1] - n[1] * px]);
   });
   return <polygon points={pts([...left, ...right])} fill="#E3C79B" stroke="#8C6F45" strokeWidth="0.6" strokeLinejoin="round" opacity={opacity} />;
@@ -373,6 +289,186 @@ function SwingPath({ t }) {
         ))}
       </div>
       <div style={{ fontSize: 10, color: T.faint, marginTop: 10, lineHeight: 1.5 }}>The bat's angle and the barrel's direction at contact are your Blast numbers. The rest of the swing is a model, not motion capture. Thin white lines are each of your counted swings.</div>
+    </Card>
+  );
+}
+
+// ─── Time to decide: the whole pitch in 3D, with the hitter's modeled swing ──
+// Same generic pitch as before (54.5 ft of flight, ~9% speed loss, arriving about
+// 6° downhill) and the same swing model as Swing Path. The bat waits at launch until
+// the ball reaches the last moment he can start, then swings over his time to contact.
+const PITCH_VIEWS = { // az as seen for a lefty, mirrored for righties; target z is toward the hitter's side
+  Angle: { az: 72, el: 14, dist: 25, f: 430, target: [-5, 2.4, 1.6] },
+  Side: { az: 10, el: 9, dist: 70, f: 385, target: [-24.5, 3.6, 0] },
+  Catcher: { az: 90, el: 20, dist: 25, f: 400, target: [-9, 1.6, 0.8] },
+};
+const PSCENE = { w: 360, h: 250 };
+const RELEASE_HT = 5.8;
+
+function TimeToDecide({ t }) {
+  const groupMean = (k) => mean(TESTERS.map((x) => x.sum[k]).filter((x) => x != null));
+  const ttc = t.sum.ttc, avgTtc = groupMean("ttc");
+  const aa = t.sum.aa, vba = t.sum.vba ?? groupMean("vba"), lefty = t.bats === "L";
+  const home = (name) => { const v = PITCH_VIEWS[name]; return { ...v, az: lefty ? v.az : 180 - v.az, target: [v.target[0], v.target[1], v.target[2] * (lefty ? -1 : 1)] }; };
+  const [mph, setMph] = useState(90);
+  const [speed, setSpeed] = useState(0.2);
+  const [clock, setClock] = useState(null); // null = finished
+  const [view, setView] = useState(() => home("Angle"));
+  const [viewName, setViewName] = useState("Angle");
+  const raf = useRef(null), camRaf = useRef(null), drag = useRef(null), bar = useRef(null), scrubbing = useRef(false);
+  const P = useMemo(() => pitch(mph), [mph]);
+  const swing = useMemo(() => { const m = swingModel(aa, vba, lefty), N = 56; return { m, frames: [...Array(N + 1)].map((_, i) => m.at((TAU_END * i) / N)), contact: m.at(1) }; }, [aa, vba, lefty]);
+  useEffect(() => { cancelAnimationFrame(raf.current); setClock(null); }, [t, mph]);
+  useEffect(() => { cancelAnimationFrame(camRaf.current); setView(home(viewName || "Angle")); }, [t]);
+  useEffect(() => () => { cancelAnimationFrame(raf.current); cancelAnimationFrame(camRaf.current); }, []);
+  if (ttc == null) return null;
+
+  const tStart = P.T - ttc, total = P.T + FOLLOW * ttc, now = clock == null ? total : clock;
+  const tau = now <= tStart ? 0 : Math.min(TAU_END, (now - tStart) / ttc);
+  const feels = FLIGHT_FT / (((1 + PLATE_FACTOR) / 2) * MPH_TO_FTS * (tStart + avgTtc));
+
+  const play = (s = speed) => {
+    cancelAnimationFrame(raf.current);
+    let t0 = null;
+    const step = (ts) => { if (t0 == null) t0 = ts; const x = ((ts - t0) / 1000) * s; if (x >= total) { setClock(null); return; } setClock(x); raf.current = requestAnimationFrame(step); };
+    raf.current = requestAnimationFrame(step);
+  };
+  const goView = (name) => {
+    cancelAnimationFrame(camRaf.current); setViewName(name);
+    const from = view, to = home(name), turn = ((((to.az - from.az) % 360) + 540) % 360) - 180;
+    let t0 = null;
+    const step = (ts) => {
+      if (t0 == null) t0 = ts;
+      const k = Math.min(1, (ts - t0) / 500), e = k * k * (3 - 2 * k), mix = (a, b) => a + (b - a) * e;
+      setView({ az: from.az + turn * e, el: mix(from.el, to.el), dist: mix(from.dist, to.dist), f: mix(from.f, to.f), target: from.target.map((x, i) => mix(x, to.target[i])) });
+      if (k < 1) camRaf.current = requestAnimationFrame(step);
+    };
+    camRaf.current = requestAnimationFrame(step);
+  };
+  const onDown = (e) => { cancelAnimationFrame(camRaf.current); drag.current = { x: e.clientX, y: e.clientY, az: view.az, el: view.el }; e.currentTarget.setPointerCapture?.(e.pointerId); };
+  const onMove = (e) => { const d = drag.current; if (!d) return; setViewName(null); setView((v) => ({ ...v, az: d.az - (e.clientX - d.x) * 0.5, el: Math.min(85, Math.max(2, d.el + (e.clientY - d.y) * 0.3)) })); };
+  const onUp = () => { drag.current = null; };
+  const scrub = (e) => { const r = bar.current.getBoundingClientRect(); cancelAnimationFrame(raf.current); setClock(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * total); };
+
+  const cam = makeCamera(view.az, view.el, view.target, { ...PSCENE, dist: view.dist, f: view.f });
+  const m = swing.m, C = m.contact, side = lefty ? -1 : 1;
+  // Ball flight: straight at the plate, dropping on a curve that arrives ~6° downhill at the contact point.
+  const rel = [C[0] - FLIGHT_FT, RELEASE_HT, 0], drop = C[1] - RELEASE_HT;
+  const curve = (-Math.tan(rad(6)) * FLIGHT_FT - drop) / (FLIGHT_FT * FLIGHT_FT), slope = drop / FLIGHT_FT - curve * FLIGHT_FT;
+  const ballAt = (time) => { const s = P.dist(Math.max(0, Math.min(time, P.T))); return [rel[0] + s, RELEASE_HT + slope * s + curve * s * s, 0]; };
+  const K = 48, times = [...Array(K + 1)].map((_, i) => (P.T * i) / K);
+  const flown = (from, to) => { const end = Math.min(to, now); if (end <= from) return []; return [from, ...times.filter((x) => x > from && x < end), end].map(ballAt); };
+  const gate = ballAt(tStart), ftOut = Math.round(FLIGHT_FT - P.dist(tStart));
+  const ghosts = []; for (let g = 0.05; g < Math.min(now, P.T) - 0.01; g += 0.05) ghosts.push(g);
+
+  const hit = tau >= 1, live = m.at(tau), bat = hit ? swing.contact : live;
+  const shown = swing.frames.filter((f) => f.tau < tau);
+  const before = tau > 0 ? [...shown.filter((f) => f.tau <= 1), bat] : [];
+  const after = hit ? [swing.contact, ...shown.filter((f) => f.tau > 1), live] : [];
+  const quad = (a, b) => pts([cam.proj(a.hands), cam.proj(a.tip), cam.proj(b.tip), cam.proj(b.hands)]);
+
+  const ballNow = now < P.T ? ballAt(now) : C, ballP = cam.proj(ballNow), ballR = Math.max(1.8, (0.12 * view.f) / ballP[2]);
+  const ballInFront = ballP[2] < cam.proj(bat.sweet)[2];
+  const ball = <circle cx={ballP[0]} cy={ballP[1]} r={ballR} fill={T.white} />;
+  const gateP = cam.proj(gate), gateFoot = cam.seg([gate[0], 0, 0], gate), relPost = cam.seg([rel[0], 0, 0], rel), relP = cam.proj(rel);
+  const lane = cam.seg([rel[0], 0, 0], [C[0], 0, 0]);
+  const grid = [];
+  for (let x = -66; x <= 8; x += 2) grid.push(cam.seg([x, 0, -8], [x, 0, 8]));
+  for (let z = -8; z <= 8; z += 2) grid.push(cam.seg([-66, 0, z], [8, 0, z]));
+  const marks = [10, 20, 30, 40, 50].map((d) => ({ d, p: cam.proj([C[0] - d, 0, 0]), tick: cam.seg([C[0] - d, 0, -0.8], [C[0] - d, 0, 0.8]) }));
+  const plate = [[-0.71, 0, -0.71], [-0.71, 0, 0.71], [0, 0, 0.71], [0.71, 0, 0], [0, 0, -0.71]].map(cam.proj);
+  const box = [[-3, 0, 1.2 * side], [3, 0, 1.2 * side], [3, 0, 5.2 * side], [-3, 0, 5.2 * side]].map(cam.proj);
+  const mound = [...Array(24)].map((_, i) => cam.proj([rel[0] - 4 + 9 * Math.cos((i * Math.PI) / 12), 0, 9 * Math.sin((i * Math.PI) / 12)]));
+  const rubber = [[rel[0] - 6.2, 0, -1], [rel[0] - 5.7, 0, -1], [rel[0] - 5.7, 0, 1], [rel[0] - 6.2, 0, 1]].map(cam.proj);
+
+  const phase = now <= 0 ? "Ready" : now < tStart ? "Seeing and deciding" : now < P.T ? "Swinging" : "Contact";
+  const phaseColor = now < tStart ? T.green : now < P.T ? T.orange : T.white;
+  const pill = (on) => ({ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8, cursor: "pointer", border: "1px solid " + (on ? "rgba(79,255,176,0.35)" : "rgba(255,255,255,0.1)"), background: on ? "rgba(79,255,176,0.1)" : "transparent", color: on ? T.green : T.muted, fontFamily: FONT });
+  const stat = (l, v, s, c = T.white) => (
+    <div style={{ flex: "1 1 120px", background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "10px 12px" }}>
+      <div style={{ fontSize: 10, color: T.dim, textTransform: "uppercase", letterSpacing: 0.6 }}>{l}</div>
+      <div style={{ fontSize: 20, fontWeight: 700, color: c }}>{v}</div>
+      <div style={{ fontSize: 10, color: T.faint }}>{s}</div>
+    </div>
+  );
+  const pct = (x) => `${((x / total) * 100).toFixed(1)}%`;
+  const labelLeft = gateP[0] > PSCENE.w - 90, labelX = gateP[0] + (labelLeft ? -9 : 9), labelY = Math.max(24, gateP[1] - 4);
+  let lastMark = null;
+  const shownMarks = marks.filter(({ p, tick }) => { if (!tick || p[2] <= 1 || (lastMark && Math.hypot(p[0] - lastMark[0], p[1] - lastMark[1]) < 17)) return false; lastMark = p; return true; });
+
+  return (
+    <Card>
+      <div style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 4 }}>Time to Decide</div>
+      <div style={{ fontSize: 11, color: T.dim, marginBottom: 14, lineHeight: 1.45 }}>How much of the pitch you get to see before you have to start your swing. Green is time to see and decide. Orange is your swing. Drag the picture to turn it.</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+        <span style={{ fontSize: 11, color: T.muted }}>Fastball</span>
+        <input type="range" min="60" max="100" step="1" value={mph} aria-label="Fastball speed" onChange={(e) => setMph(+e.target.value)} style={{ flex: 1, accentColor: T.green }} />
+        <span style={{ fontSize: 16, fontWeight: 700, color: T.white, minWidth: 62, textAlign: "right" }}>{mph} mph</span>
+      </div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+        <button onClick={() => play()} style={{ ...pill(false), background: T.green, color: T.bg, border: "none", fontWeight: 700 }}>Pitch</button>
+        {[[1, "Real time"], [0.2, "5x slower"], [0.07, "15x slower"]].map(([s, l]) => <button key={s} style={pill(speed === s)} onClick={() => { setSpeed(s); play(s); }}>{l}</button>)}
+      </div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8, alignItems: "center" }}>
+        <span style={{ fontSize: 10, color: T.dim, textTransform: "uppercase", letterSpacing: 0.6, marginRight: 2 }}>View</span>
+        {Object.keys(PITCH_VIEWS).map((n) => <button key={n} style={pill(viewName === n)} onClick={() => goView(n)}>{n}</button>)}
+      </div>
+      <svg viewBox={`0 0 ${PSCENE.w} ${PSCENE.h}`} width="100%" role="img" aria-label={`A ${mph} mph fastball from release to contact. ${t.name} must start his swing with the ball ${ftOut} feet away.`}
+        onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
+        style={{ display: "block", background: "rgba(96,165,250,0.04)", borderRadius: 12, touchAction: "pan-y", cursor: "grab", userSelect: "none" }}>
+        {grid.map((g, i) => g && <line key={i} x1={g[0]} y1={g[1]} x2={g[2]} y2={g[3]} stroke="rgba(255,255,255,0.05)" />)}
+        <polygon points={pts(mound)} fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" />
+        <polygon points={pts(rubber)} fill="rgba(255,255,255,0.35)" />
+        {lane && <line x1={lane[0]} y1={lane[1]} x2={lane[2]} y2={lane[3]} stroke="rgba(255,255,255,0.12)" />}
+        <g fontFamily={FONT} style={{ pointerEvents: "none" }}>
+          {shownMarks.map(({ d, p, tick }) => <g key={d}><line x1={tick[0]} y1={tick[1]} x2={tick[2]} y2={tick[3]} stroke="rgba(255,255,255,0.3)" /><text x={p[0]} y={p[1] + 11} textAnchor="middle" fontSize="8" fill={T.faint}>{d} ft</text></g>)}
+        </g>
+        <polygon points={pts(box)} fill="none" stroke="rgba(255,255,255,0.14)" />
+        <polygon points={pts(plate)} fill="rgba(255,255,255,0.16)" stroke="rgba(255,255,255,0.3)" />
+        {relPost && <line x1={relPost[0]} y1={relPost[1]} x2={relPost[2]} y2={relPost[3]} stroke="rgba(255,255,255,0.25)" />}
+        <circle cx={relP[0]} cy={relP[1]} r="2.5" fill="none" stroke={T.muted} />
+        <polyline points={pts(times.map(ballAt).map(cam.proj))} fill="none" stroke="rgba(255,255,255,0.14)" strokeDasharray="2 4" />
+        <polyline points={pts(flown(0, tStart).map(cam.proj))} fill="none" stroke={T.green} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points={pts(flown(tStart, P.T).map(cam.proj))} fill="none" stroke={T.orange} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        {ghosts.map((g) => { const p = cam.proj(ballAt(g)); return <circle key={g} cx={p[0]} cy={p[1]} r={Math.max(1.4, (0.1 * view.f) / p[2])} fill={T.white} opacity="0.5" />; })}
+        {gateFoot && <line x1={gateFoot[0]} y1={gateFoot[1]} x2={gateFoot[2]} y2={gateFoot[3]} stroke={T.orange} strokeWidth="1.5" strokeDasharray="3 3" />}
+        <circle cx={gateP[0]} cy={gateP[1]} r="4" fill={T.bg} stroke={T.orange} strokeWidth="2" />
+        {before.slice(1).map((f, i) => { const k = (i + 1) / before.length; return <polygon key={i} points={quad(before[i], f)} fill={T.orange} fillOpacity={0.05 + 0.3 * k * k} />; })}
+        {after.slice(1).map((f, i) => <polygon key={"a" + i} points={quad(after[i], f)} fill={T.white} fillOpacity={0.07} />)}
+        {before.length > 1 && <polyline points={pts(before.map((f) => cam.proj(f.sweet)))} fill="none" stroke={T.orange} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />}
+        {hit && tau > 1.02 && <BatShape cam={cam} frame={live} opacity={0.4} />}
+        {!ballInFront && ball}
+        <BatShape cam={cam} frame={bat} />
+        <circle cx={cam.proj(bat.hands)[0]} cy={cam.proj(bat.hands)[1]} r="2.5" fill={T.text} />
+        {ballInFront && ball}
+        <g fontFamily={FONT} style={{ pointerEvents: "none" }}>
+          <text x={labelX} y={labelY} textAnchor={labelLeft ? "end" : "start"} fontSize="10" fontWeight="700" fill={T.orange}>MUST START</text>
+          <text x={labelX} y={labelY + 11} textAnchor={labelLeft ? "end" : "start"} fontSize="9" fill={T.text}>{ftOut} ft out</text>
+          <text x={relP[0]} y={relP[1] - 7} textAnchor="middle" fontSize="8" fill={T.faint}>release</text>
+          <text x="12" y="20" fontSize="12" fontWeight="700" fill={phaseColor}>{phase}</text>
+          <text x={PSCENE.w - 12} y="20" textAnchor="end" fontSize="10" fill={T.muted}>{ms(Math.min(now, P.T))} after release</text>
+        </g>
+      </svg>
+      <div ref={bar} role="slider" aria-label="Step through the pitch" aria-valuemin={0} aria-valuemax={Math.round(total * 1000)} aria-valuenow={Math.round(now * 1000)}
+        onPointerDown={(e) => { scrubbing.current = true; e.currentTarget.setPointerCapture?.(e.pointerId); scrub(e); }} onPointerMove={(e) => scrubbing.current && scrub(e)}
+        onPointerUp={() => { scrubbing.current = false; }} onPointerCancel={() => { scrubbing.current = false; }}
+        style={{ position: "relative", display: "flex", height: 16, borderRadius: 8, overflow: "hidden", marginTop: 10, cursor: "ew-resize", touchAction: "none" }}>
+        <div style={{ width: pct(tStart), background: "rgba(79,255,176,0.4)" }} />
+        <div style={{ width: pct(ttc), background: "rgba(255,140,66,0.55)" }} />
+        <div style={{ flex: 1, background: "rgba(255,255,255,0.08)" }} />
+        <div style={{ position: "absolute", left: pct(now), top: 0, bottom: 0, width: 3, background: T.white, transform: "translateX(-50%)" }} />
+      </div>
+      <div style={{ position: "relative", height: 26, fontSize: 9, color: T.faint, marginTop: 4 }}>
+        <span style={{ position: "absolute", left: 0 }}>release</span>
+        <span style={{ position: "absolute", left: pct(tStart), transform: "translateX(-50%)", textAlign: "center", color: T.orange, whiteSpace: "nowrap" }}>must start<br />{ms(tStart)}</span>
+        <span style={{ position: "absolute", left: pct(P.T), transform: "translateX(-50%)", textAlign: "center", color: T.text, whiteSpace: "nowrap" }}>contact<br />{ms(P.T)}</span>
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+        {stat("Time to decide", ms(tStart), "before you start", T.green)}
+        {stat("Your swing", ms(ttc), "time to contact", T.orange)}
+        {stat("Pitch flight", ms(P.T), "release to plate")}
+        {stat("Feels like", Math.round(feels) + " mph", "for an average swing")}
+      </div>
     </Card>
   );
 }
