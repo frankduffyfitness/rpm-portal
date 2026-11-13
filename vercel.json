@@ -19,6 +19,10 @@
     {
       "source": "/swinglab",
       "destination": "/index.html"
+    },
+    {
+      "source": "/pitchlab",
+      "destination": "/index.html"
     }
   ]
 }
