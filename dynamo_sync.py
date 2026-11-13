@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-09 DynaMo testing day
+# sync-trigger: 2026-11-13 Lucas Chu evaluation
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
