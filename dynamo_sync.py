@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-13 Lucas Chu evaluation
+# sync-trigger: 2026-11-13 Lucas Chu grip re-pull (uploaded after first trigger)
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
