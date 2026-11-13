@@ -7,6 +7,8 @@
 // (avg of counted swings off the tee, facility Baum 33/30).
 // Generic pitch: 6 ft of extension (54.5 ft of flight) and ~9% speed loss from
 // release to plate, the same release-to-plate factor the exit velo card uses.
+// Behind the Model Portal's staff password (same soft gate: unlocking either page
+// unlocks both for the browser session; the data still ships in the bundle).
 import { useEffect, useMemo, useRef, useState } from "react";
 
 // Avg Blast time to contact (s) over counted swings, first session per hitter.
@@ -133,7 +135,36 @@ function PitchScene({ hitter, mph }) {
   );
 }
 
-export function SwingLabPage({ logo }) {
+function StaffGate({ logo, password, onOk }) {
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState(false);
+  const submit = (e) => {
+    e.preventDefault();
+    if (pw === password) { try { sessionStorage.setItem("dyn_ok", "1"); } catch (e) {} onOk(); }
+    else setErr(true);
+  };
+  return (
+    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: C.navy }}>
+      <form onSubmit={submit} style={{ maxWidth: 320, margin: "0 auto", padding: "80px 16px", textAlign: "center" }}>
+        {logo && <img src={logo} alt="RPM" style={{ width: 48, height: 48, marginBottom: 12 }} />}
+        <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>Staff access</div>
+        <div style={{ fontSize: 12, color: C.gray, marginBottom: 16 }}>Enter the staff password to open the Swing Lab.</div>
+        <input type="password" value={pw} autoFocus placeholder="Password" onChange={(e) => { setPw(e.target.value); setErr(false); }}
+          style={{ width: "100%", padding: "11px 12px", border: "1px solid " + (err ? C.orange : C.line), borderRadius: 8, fontSize: 14, textAlign: "center", boxSizing: "border-box" }} />
+        <button type="submit" style={{ marginTop: 12, padding: "10px 28px", border: "none", borderRadius: 8, background: C.navy, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Unlock</button>
+        {err && <div style={{ fontSize: 12, color: C.orange, marginTop: 10 }}>Incorrect password.</div>}
+      </form>
+    </div>
+  );
+}
+
+export function SwingLabPage({ logo, password }) {
+  const [ok, setOk] = useState(() => { try { return sessionStorage.getItem("dyn_ok") === "1"; } catch (e) { return false; } });
+  if (!ok) return <StaffGate logo={logo} password={password} onOk={() => setOk(true)} />;
+  return <SwingLab logo={logo} />;
+}
+
+function SwingLab({ logo }) {
   const [name, setName] = useState("Luke Desjardins");
   const [mph, setMph] = useState(90);
   const hitter = HITTERS.find((h) => h.name === name);

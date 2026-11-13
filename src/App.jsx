@@ -5589,7 +5589,7 @@ export default function App() {
   const [isSwingLab] = useState(() => { try { return /^\/swinglab\/?$/i.test(window.location.pathname); } catch (e) { return false; } });
   if (isAthleteLog) return <AthleteLogPage ctx={{ _FH, CMJ_BY_CANON, VELO_BY_CANON, BW_DATA, canonName }} logo={RPM_LOGO} />;
   if (isIntake) return <IntakePage logo={RPM_LOGO} />;
-  if (isSwingLab) return <SwingLabPage logo={RPM_LOGO} />;
+  if (isSwingLab) return <SwingLabPage logo={RPM_LOGO} password={DYNAMO_PASSWORD} />;
   if (staffPortal) return <DynamoPage portal={staffPortal} />;
 
   // Shared print: every .rpt-page prints as exactly one letter sheet, measured
