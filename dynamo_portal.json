@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-11-13T23:22:38.636929+00:00",
+    "syncDate": "2026-11-13T23:54:42.273767+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 153
+    "totalAthletes": 154
   },
   "athletes": {
     "Joey Muzio": {
@@ -24113,6 +24113,72 @@
           "erIr": {
             "left": null,
             "right": 0.91
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Lucas Chu": {
+      "name": "Lucas Chu",
+      "group": "ms",
+      "dob": "2013-03-15",
+      "tests": [
+        {
+          "date": "2026-11-13",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                381.1,
+                408.1
+              ],
+              "peakLbs": [
+                85.7,
+                91.7
+              ],
+              "asymPct": 6.6,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2092,
+                2129
+              ],
+              "ttp": [
+                4.28,
+                3.46
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                382.7,
+                414.6
+              ],
+              "peakLbs": [
+                86.0,
+                93.2
+              ],
+              "asymPct": 7.7,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2361,
+                2758
+              ],
+              "ttp": [
+                1.27,
+                1.33
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
