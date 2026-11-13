@@ -221,6 +221,17 @@ def velo_page(src, name, grp, female, logo, updated):
                      "Velocity gains from here should track gains in strength and power.")
         pool = [r for r in vm["rows"] if r[1] == grp and r[5] is not None and len(r) > pidx and r[pidx] is not None]
         lvl = GROUP_LABEL.get(grp, grp)
+        # A thin level pool (e.g. 3 Middle School arms) makes percentile claims
+        # junk ("1st pct of 3") and an empty-looking scatter. Below 8 arms, rank
+        # and plot against ALL RPM pitchers and say so (Frank, 2026-11-13,
+        # Lucas Chu's card).
+        if len(pool) < 8:
+            pool = [r for r in vm["rows"] if r[5] is not None and len(r) > pidx and r[pidx] is not None]
+            cohort_lbl = f"RPM pitchers, all levels (too few {lvl} arms to rank)"
+            cohort_short = "RPM pitchers (all levels)"
+        else:
+            cohort_lbl = f"RPM {lvl} pitchers"
+            cohort_short = f"RPM {lvl} pitchers"
         pct = lambda v, xs: max(1, min(99, round(100 * sum(1 for x in xs if x < v) / len(xs)))) if xs else None
         p_act = pct(actual, [r[5] for r in pool])
         p_pred = pct(pred, [r[pidx] for r in pool])
@@ -258,12 +269,12 @@ def velo_page(src, name, grp, female, logo, updated):
 <div class="sect">Projected vs Actual Velocity</div>
 <div class="scap">RPM velocity model &middot; peak fastball predicted from {'concentric impulse, RSI-modified and grip strength' if has_grip else 'concentric impulse and RSI-modified'}</div>
 <div class="vrow">
-  <div class="vbox"><div class="vl">ACTUAL PEAK FB</div><div class="vv">{actual:.1f}<span class="u"> mph</span></div><div class="vs">{p_act}{ordinal(p_act)} pct of RPM {lvl} pitchers</div></div>
+  <div class="vbox"><div class="vl">ACTUAL PEAK FB</div><div class="vv">{actual:.1f}<span class="u"> mph</span></div><div class="vs">{p_act}{ordinal(p_act)} pct of {cohort_short}</div></div>
   <div class="vbox"><div class="vl">PROJECTED{' WITH GRIP' if has_grip else ' FROM FORCE PLATE'}</div><div class="vv">{pred:.1f}<span class="u"> &plusmn; {band_}</span></div><div class="vs">{(f'Grip {grip_n:.0f} N ({grip_n/4.44822:.0f} lbs), {p_grip}{ordinal(p_grip)} pct. Force plate alone: {predA:.1f}') if has_grip else 'No grip test yet: force plate only'}</div></div>
   <div class="vbox"><div class="vl">DIFFERENCE</div><div class="vv" style="color:{vcol}">{'+' if resid >= 0 else ''}{resid:.1f}<span class="u"> mph</span></div><div class="vs" style="color:{vcol};font-weight:700">{verdict}</div></div>
 </div>
 <div class="cols" style="align-items:flex-start;margin-top:10px">
-  <div class="col">{svg}<div class="scap" style="text-align:center;margin-top:2px">{len(pool)} RPM {lvl} pitchers. Shaded band = model's typical error (&plusmn;{band_} mph). Above the band = arm ahead of engine.</div></div>
+  <div class="col">{svg}<div class="scap" style="text-align:center;margin-top:2px">{len(pool)} {cohort_lbl}. Shaded band = model's typical error (&plusmn;{band_} mph). Above the band = arm ahead of engine.</div></div>
   <div class="col"><div class="summary" style="margin-top:4px"><div class="sumhd">{verdict}</div><div class="sumtx">{vtext}<br><br>{('The model reads three numbers: concentric impulse and RSI-modified from the countermovement jump (how much force he puts into the ground, and how quickly), plus grip strength relative to bodyweight. Adding grip tightens the model&rsquo;s typical error to &plusmn;' + str(vm['gband']) + ' mph.') if has_grip else ('The model reads two numbers from the countermovement jump: concentric impulse (how much force he puts into the ground) and RSI-modified (how quickly). A grip test would add a third input and tighten the projection.')} It is a guide to where his ceiling sits right now, not a prediction of a single outing.</div></div></div>
 </div>""")
 
@@ -273,7 +284,8 @@ def velo_page(src, name, grp, female, logo, updated):
             f"<tr><td><b>{t[0]}</b></td><td>{t[1]}</td><td>{t[2]}</td><td>{t[3]}</td>"
             f"<td>{t[6] if t[6] is not None else '&ndash;'}</td>"
             f"<td>{t[4] if t[4] is not None else '&ndash;'}</td><td>{t[5] if t[5] is not None else '&ndash;'}</td>"
-            f"<td>{t[7]}</td><td>{t[8]}</td></tr>" for t in s0["types"])
+            f"<td>{t[7] if t[7] is not None else '&ndash;'}</td>"
+            f"<td>{t[8] if t[8] is not None else '&ndash;'}</td></tr>" for t in s0["types"])
         parts.append(f"""
 <div class="sect">Bullpen &middot; {s0['df']}</div>
 <div class="scap">TrackMan &middot; {s0['tot']} pitches &middot; velocity in mph, movement in inches, release in feet</div>
