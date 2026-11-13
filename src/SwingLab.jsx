@@ -202,89 +202,64 @@ function TimeToDecide({ t }) {
   );
 }
 
-// ─── Bat at contact: attack angle (side view) + vertical bat angle (catcher's view) ─
-// Played like the pitch: the swing runs over the hitter's own time to contact
-// (group average if he has none), sped up or slowed down, and the angle is drawn
-// once the barrel reaches the ball. Each view is built from one Blast number at
-// contact; the path before contact is an illustration. Faint lines = every counted
-// swing, dashed = group average, shown once the swing finishes.
+// ─── Bat at contact: one 3D scene for attack angle + vertical bat angle ─────
+// A simple perspective scene (feet; x toward the catcher, y up, z toward first
+// base). The sweet spot swings around the hitter on a plane tilted so that at
+// contact it is moving at his attack angle; the bat tilts from up by the shoulder
+// down to his vertical bat angle. It plays over his own time to contact. Only the
+// two angles at contact come from Blast; the rest of the swing is an illustration.
 const deg = (a) => (a * Math.PI) / 180;
-const easeIn = (q) => q * q; // the barrel keeps speeding up into contact
+const easeIn = (q) => q * q;
+const add = (a, b) => a.map((v, i) => v + b[i]), sub = (a, b) => a.map((v, i) => v - b[i]), mul = (a, k) => a.map((v) => v * k);
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = (a) => mul(a, 1 / Math.hypot(...a));
+const UP = [0, 1, 0];
 
-function AngleArc({ cx, cy, r, from, to, color }) {
-  // Angles in SVG degrees (0 = right, clockwise positive).
-  const p = (a) => [cx + r * Math.cos(deg(a)), cy + r * Math.sin(deg(a))];
-  const [x0, y0] = p(from), [x1, y1] = p(to);
-  return <path d={`M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 0 ${to > from ? 1 : 0} ${x1.toFixed(1)} ${y1.toFixed(1)}`} fill="none" stroke={color} strokeWidth="1.5" />;
+function camera(pos, target, f, cx, cy) {
+  const fw = norm(sub(target, pos)), rt = norm(cross(fw, UP)), up = cross(rt, fw);
+  return (p) => { const d = sub(p, pos), z = dot(d, fw); return [cx + (f * dot(d, rt)) / z, cy - (f * dot(d, up)) / z, z]; };
+}
+const CAM = camera([6.5, 4.6, 8.5], [-1.2, 2.2, -0.5], 400, 180, 112);
+const P2 = (p) => CAM(p).slice(0, 2).map((v) => v.toFixed(1)).join(",");
+
+const SWING_START = -115; // degrees of turn before contact
+const R_SWING = 2.3, L_SWEET = 2.0, L_BAT = 2.75; // ft
+const CONTACT = [-1.2, 2.5, -0.1]; // a little in front of the plate, belt high
+
+function swingModel(aa, vba, lefty) {
+  const s = lefty ? -1 : 1;
+  const u = [0, 0, s];                                   // from the hitter out across the plate
+  const v = [-Math.cos(deg(aa)), Math.sin(deg(aa)), 0];  // sweet-spot direction at contact: toward the pitcher, up/down by attack angle
+  const C = lefty ? [CONTACT[0], CONTACT[1], -CONTACT[2]] : CONTACT;
+  const pivot = sub(C, mul(u, R_SWING));
+  return (q) => { // q 0..1 -> bat at that moment
+    const th = deg(SWING_START * (1 - easeIn(q)));
+    const radial = add(mul(u, Math.cos(th)), mul(v, Math.sin(th)));
+    const sweet = add(pivot, mul(radial, R_SWING));
+    const tilt = deg(45 + (vba - 45) * easeIn(q));
+    const dir = norm(add(mul(radial, Math.cos(tilt)), mul(UP, Math.sin(tilt))));
+    const hands = sub(sweet, mul(dir, L_SWEET));
+    return { hands, sweet, tip: add(hands, mul(dir, L_BAT)), mid: add(hands, mul(dir, 1.2)), dir, C, u, v };
+  };
 }
 
-function AttackAngleScene({ t, a, q, done, avgGroup }) {
-  const C = [196, 112], back = 130, fwd = 46;
-  const d = (ang) => [-Math.cos(deg(ang)), -Math.sin(deg(ang))]; // barrel travels toward the pitcher (left)
-  const at = (ang, s) => [C[0] + d(ang)[0] * s, C[1] + d(ang)[1] * s];
-  const s = -back + easeIn(q) * back; // rests at contact
-  const [bx, by] = at(a, s), [sx, sy] = at(a, -back), [fx, fy] = at(a, fwd);
-  const pitchStart = [C[0] - 190 * Math.cos(deg(6)), C[1] - 190 * Math.sin(deg(6))];
-  const ball = done ? C : [pitchStart[0] + (C[0] - pitchStart[0]) * q, pitchStart[1] + (C[1] - pitchStart[1]) * q];
-  const sign = a > 0 ? "+" : "";
+function Bat({ b, opacity = 1, color = "#E3C79B" }) {
+  const z = CAM(b.sweet)[2], w = 300 / z; // thicker when closer
   return (
-    <svg viewBox="0 0 320 200" width="100%" style={{ display: "block" }} role="img" aria-label={`Side view: the barrel comes through contact at ${sign}${Math.round(a)} degrees`}>
-      <line x1="0" y1="176" x2="320" y2="176" stroke={T.line} />
-      <rect x={C[0] - 16} y="174" width="32" height="4" fill="rgba(255,255,255,0.18)" />
-      <text x="6" y="192" fontSize="9" fill={T.faint}>{"←"} toward the pitcher</text>
-      <text x="314" y="192" textAnchor="end" fontSize="9" fill={T.faint}>side view</text>
-      <line x1={pitchStart[0]} y1={pitchStart[1]} x2={C[0]} y2={C[1]} stroke={T.muted} strokeWidth="1.2" strokeDasharray="4 4" />
-      <text x="6" y={pitchStart[1] - 8} fontSize="9" fill={T.dim}>pitch</text>
-      {done && t.swings.map((sw, i) => sw.aa != null && (() => { const [x0, y0] = at(sw.aa, -70), [x1, y1] = at(sw.aa, fwd); return <line key={i} x1={x0} y1={y0} x2={x1} y2={y1} stroke={T.blue} strokeOpacity="0.3" strokeWidth="1.2" />; })())}
-      {done && (() => { const [x0, y0] = at(avgGroup, -70), [x1, y1] = at(avgGroup, fwd); return <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="rgba(255,255,255,0.5)" strokeWidth="1.3" strokeDasharray="3 3" />; })()}
-      <line x1={sx} y1={sy} x2={bx} y2={by} stroke={T.blue} strokeWidth="4" strokeLinecap="round" />
-      {done && <line x1={C[0]} y1={C[1]} x2={fx} y2={fy} stroke={T.blue} strokeWidth="4" strokeLinecap="round" strokeDasharray="1 7" />}
-      {done && <line x1={C[0] - 70} y1={C[1]} x2={C[0] + 50} y2={C[1]} stroke="rgba(255,255,255,0.35)" strokeWidth="1" />}
-      {done && <text x={C[0] + 54} y={C[1] + 3} fontSize="9" fill={T.dim}>level</text>}
-      {done && Math.abs(a) >= 1 && <AngleArc cx={C[0]} cy={C[1]} r={62} from={180} to={180 + a} color={T.white} />}
-      <circle cx={ball[0]} cy={ball[1]} r="5" fill={T.white} />
-      <circle cx={bx} cy={by} r="8" fill={T.blue} stroke={T.bg} strokeWidth="2" />
-      {!done && <text x={bx + 12} y={by + 4} fontSize="9" fill={T.dim}>barrel</text>}
-      {done && <text x="314" y="26" textAnchor="end" fontSize="22" fontWeight="700" fill={T.white}>{sign}{Math.round(a)}°</text>}
-      {done && <text x="314" y="40" textAnchor="end" fontSize="9" fill={T.muted}>{a >= 1 ? "swinging up" : a <= -1 ? "swinging down" : "level"} through contact</text>}
-    </svg>
+    <g opacity={opacity} strokeLinecap="round">
+      <line x1={CAM(b.hands)[0]} y1={CAM(b.hands)[1]} x2={CAM(b.mid)[0]} y2={CAM(b.mid)[1]} stroke={color} strokeWidth={Math.max(1.5, w * 0.09)} />
+      <line x1={CAM(b.mid)[0]} y1={CAM(b.mid)[1]} x2={CAM(b.tip)[0]} y2={CAM(b.tip)[1]} stroke={color} strokeWidth={Math.max(3, w * 0.2)} />
+    </g>
   );
 }
 
-function BatAngleScene({ t, v, q, done, avgGroup }) {
-  const L = t.bats === "L", X = (x) => (L ? 320 - x : x), sx = L ? -1 : 1; // catcher's view: righties stand on the left
-  const H = [X(122), 92], len = 128;
-  const ang = done ? v : 42 + (v - 42) * easeIn(q); // from up by the shoulder down to the contact angle
-  const end = (g, f = 1) => [H[0] + sx * len * f * Math.cos(deg(g)), H[1] - len * f * Math.sin(deg(g))];
-  const [ex, ey] = end(ang), [cx, cy] = end(v, 0.82);
-  return (
-    <svg viewBox="0 0 320 200" width="100%" style={{ display: "block" }} role="img" aria-label={`Catcher's view: the barrel is ${Math.round(Math.abs(v))} degrees below the hands at contact`}>
-      <line x1="0" y1="176" x2="320" y2="176" stroke={T.line} />
-      <path d="M140 176 L180 176 L180 171 L160 166 L140 171 Z" fill="rgba(255,255,255,0.18)" />
-      <text x="6" y="192" fontSize="9" fill={T.faint}>catcher's view</text>
-      <g stroke={T.muted} strokeWidth="3" strokeLinecap="round" fill="none">
-        <circle cx={X(98)} cy="40" r="8" strokeWidth="2.5" />
-        <line x1={X(98)} y1="48" x2={X(101)} y2="112" /><line x1={X(101)} y1="112" x2={X(84)} y2="174" /><line x1={X(101)} y1="112" x2={X(118)} y2="174" />
-        <line x1={X(99)} y1="60" x2={H[0]} y2={H[1]} />
-      </g>
-      {done && t.swings.map((sw, i) => sw.vba != null && (() => { const [x, y] = end(sw.vba); return <line key={i} x1={H[0]} y1={H[1]} x2={x} y2={y} stroke={T.purple} strokeOpacity="0.32" strokeWidth="1.5" />; })())}
-      {done && (() => { const [x, y] = end(avgGroup); return <line x1={H[0]} y1={H[1]} x2={x} y2={y} stroke="rgba(255,255,255,0.5)" strokeWidth="1.3" strokeDasharray="3 3" />; })()}
-      {done && <line x1={H[0]} y1={H[1]} x2={H[0] + sx * 112} y2={H[1]} stroke="rgba(255,255,255,0.35)" strokeWidth="1" />}
-      {done && <text x={H[0] + sx * 116} y={H[1] + 3} textAnchor={L ? "end" : "start"} fontSize="9" fill={T.dim}>level</text>}
-      <line x1={H[0]} y1={H[1]} x2={ex} y2={ey} stroke={T.purple} strokeWidth="7" strokeLinecap="round" />
-      {done && <AngleArc cx={H[0]} cy={H[1]} r={46} from={L ? 180 : 0} to={L ? 180 + v : -v} color={T.white} />}
-      <circle cx={cx} cy={cy} r={done ? 5 : 1 + 4 * q} fill={T.white} opacity={done ? 1 : 0.4 + 0.6 * q} />
-      <circle cx={H[0]} cy={H[1]} r="5" fill={T.text} />
-      {done && <text x={L ? 6 : 314} y="26" textAnchor={L ? "start" : "end"} fontSize="22" fontWeight="700" fill={T.white}>{Math.round(v)}°</text>}
-      {done && <text x={L ? 6 : 314} y="40" textAnchor={L ? "start" : "end"} fontSize="9" fill={T.muted}>barrel below the hands</text>}
-    </svg>
-  );
-}
-
-function BatAtContact({ t }) {
+function BatAtContact3D({ t }) {
   const groupMean = (k) => mean(TESTERS.map((x) => x.sum[k]).filter((x) => x != null));
-  const aa = t.sum.aa, vba = t.sum.vba;
-  const dur = t.sum.ttc ?? groupMean("ttc"); // the swing plays over his own time to contact
+  const aa = t.sum.aa, vba = t.sum.vba ?? groupMean("vba"), hasVba = t.sum.vba != null;
+  const lefty = t.bats === "L";
+  const dur = t.sum.ttc ?? groupMean("ttc");
+  const model = useMemo(() => swingModel(aa, vba, lefty), [aa, vba, lefty]);
   const [speed, setSpeed] = useState(0.07);
   const [clock, setClock] = useState(null); // null = resting at contact
   const raf = useRef(null);
@@ -293,31 +268,73 @@ function BatAtContact({ t }) {
   const play = (s = speed) => {
     cancelAnimationFrame(raf.current);
     let t0 = null;
-    const step = (now) => {
-      if (t0 == null) t0 = now;
-      const tt = ((now - t0) / 1000) * s;
-      if (tt >= dur) { setClock(null); return; }
-      setClock(tt); raf.current = requestAnimationFrame(step);
-    };
+    const step = (now) => { if (t0 == null) t0 = now; const tt = ((now - t0) / 1000) * s; if (tt >= dur) { setClock(null); return; } setClock(tt); raf.current = requestAnimationFrame(step); };
     raf.current = requestAnimationFrame(step);
   };
   const done = clock == null, q = done ? 1 : clock / dur;
+  const now = model(q), at0 = model(1), C = at0.C;
+
+  // Pitch: comes in from the pitcher (-x) about 6° downhill and reaches the contact point when the swing does.
+  const ballFt = 126 * dur; // ~86 mph at the plate, distance covered during the swing
+  const pitchAt = (sft) => [C[0] - sft * Math.cos(deg(6)), C[1] + sft * Math.sin(deg(6)), C[2]];
+  const ball = pitchAt(ballFt * (1 - q));
+  const ghosts = [...Array(9)].map((_, i) => 1.4 * (i + 1)).filter((sft) => done || sft > ballFt * (1 - q));
+  // Motion fan: earlier positions of the bat, fading out.
+  const fan = [...Array(14)].map((_, i) => Math.sqrt(q * q * (0.25 + 0.75 * (i / 14)))).filter((x) => x < q - 0.01); // even spacing in turn angle
+
+  // Reference lines at contact.
+  const level = add(at0.hands, mul(at0.u, L_BAT));
+  const arrowEnd = add(C, mul(at0.v, 2.2));
+  const [ax, ay] = CAM(arrowEnd), [cx0, cy0] = CAM(C);
+  const ang = Math.atan2(ay - cy0, ax - cx0);
+  const head = (k) => `${(ax - 9 * Math.cos(ang + k)).toFixed(1)},${(ay - 9 * Math.sin(ang + k)).toFixed(1)}`;
+
+  const grid = [];
+  for (let x = -12; x <= 4; x++) grid.push([[x, 0, -6], [x, 0, 5]]);
+  for (let z = -6; z <= 5; z++) grid.push([[-12, 0, z], [4, 0, z]]);
+  const plate = [[-0.71, 0, -0.71], [-0.71, 0, 0.71], [0, 0, 0.71], [0.71, 0, 0], [0, 0, -0.71]];
+  const sgn = (x) => (x > 0 ? "+" : "") + Math.round(x);
   const pill = (on) => ({ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8, cursor: "pointer", border: "1px solid " + (on ? "rgba(79,255,176,0.35)" : "rgba(255,255,255,0.1)"), background: on ? "rgba(79,255,176,0.1)" : "transparent", color: on ? T.green : T.muted, fontFamily: FONT });
-  const head = (title, sub) => (<><div style={{ fontSize: 12, fontWeight: 600, color: T.text, marginTop: 6 }}>{title}</div><div style={{ fontSize: 10, color: T.dim, marginBottom: 4 }}>{sub}</div></>);
+  const range = (k) => { const v = t.swings.map((s) => s[k]).filter((x) => x != null); return v.length ? `${sgn(Math.min(...v))}° to ${sgn(Math.max(...v))}°` : null; };
+
   return (
     <Card>
       <div style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 4 }}>Bat at Contact</div>
-      <div style={{ fontSize: 11, color: T.dim, marginBottom: 12, lineHeight: 1.45 }}>Press swing to watch the barrel come into the ball. The angle shows at contact. Faint lines are each of your swings; dashed is the group average.</div>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 4 }}>
+      <div style={{ fontSize: 11, color: T.dim, marginBottom: 12, lineHeight: 1.45 }}>Press swing to watch the bat come through the zone. Attack angle is the direction the barrel is moving at contact. Vertical bat angle is how far the barrel sits below the hands.</div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
         <button onClick={() => play()} style={{ ...pill(false), background: T.green, color: T.bg, border: "none", fontWeight: 700 }}>Swing</button>
         {[[1, "Real time"], [0.2, "5x slower"], [0.07, "15x slower"]].map(([s, l]) => <button key={s} style={pill(speed === s)} onClick={() => { setSpeed(s); play(s); }}>{l}</button>)}
       </div>
-      {head("Attack Angle", "Is the barrel moving up or down when it meets the ball?")}
-      <AttackAngleScene t={t} a={aa} q={q} done={done} avgGroup={groupMean("aa")} />
-      {head("Vertical Bat Angle", "How far the barrel tilts below the hands at contact")}
-      {vba == null
-        ? <div style={{ fontSize: 12, color: T.dim, padding: "24px 0 12px" }}>Not captured: this session was before the six-tile Blast layout.</div>
-        : <BatAngleScene t={t} v={vba} q={q} done={done} avgGroup={groupMean("vba")} />}
+      <svg viewBox="0 0 360 240" width="100%" role="img" aria-label={`3D view of the swing: attack angle ${sgn(aa)} degrees, vertical bat angle ${Math.round(vba)} degrees`} style={{ display: "block", background: "rgba(96,165,250,0.04)", borderRadius: 12 }}>
+        {grid.map(([a, b], i) => <line key={i} x1={CAM(a)[0]} y1={CAM(a)[1]} x2={CAM(b)[0]} y2={CAM(b)[1]} stroke="rgba(255,255,255,0.07)" />)}
+        <polygon points={plate.map(P2).join(" ")} fill="rgba(255,255,255,0.16)" stroke="rgba(255,255,255,0.3)" />
+        <line x1={CAM(pitchAt(30))[0]} y1={CAM(pitchAt(30))[1]} x2={cx0} y2={cy0} stroke={T.amber} strokeOpacity="0.45" strokeWidth="1.2" />
+        {ghosts.map((sft, i) => { const [x, y, z] = CAM(pitchAt(sft)); return <circle key={i} cx={x} cy={y} r={Math.max(1.5, 22 / z)} fill={T.white} opacity={0.12 + 0.04 * (9 - i)} />; })}
+        {fan.map((fq, i) => <Bat key={i} b={model(fq)} opacity={0.06 + 0.32 * (i / 14)} />)}
+        {done && <line x1={CAM(at0.hands)[0]} y1={CAM(at0.hands)[1]} x2={CAM(level)[0]} y2={CAM(level)[1]} stroke="rgba(255,255,255,0.45)" strokeDasharray="3 3" />}
+        <Bat b={now} />
+        <circle cx={CAM(now.hands)[0]} cy={CAM(now.hands)[1]} r="4" fill={T.text} />
+        {(() => { const [x, y, z] = CAM(done ? C : ball); return <circle cx={x} cy={y} r={Math.max(3, 30 / z)} fill={T.white} />; })()}
+        {done && <g>
+          <line x1={cx0} y1={cy0} x2={ax} y2={ay} stroke={T.red} strokeWidth="3" strokeLinecap="round" />
+          <polygon points={`${ax.toFixed(1)},${ay.toFixed(1)} ${head(0.45)} ${head(-0.45)}`} fill={T.red} />
+        </g>}
+        {done && <g fontFamily={FONT}>
+          <text x="12" y="210" fontSize="13" fontWeight="800" fill={T.red}>ATTACK ANGLE {sgn(aa)}°</text>
+          <text x="12" y="224" fontSize="9" fill={T.muted}>the bat's path, {aa >= 1 ? "swinging up" : aa <= -1 ? "swinging down" : "level"}</text>
+          <text x="348" y="24" textAnchor="end" fontSize="13" fontWeight="800" fill={hasVba ? T.purple : T.faint}>{hasVba ? `VERTICAL BAT ANGLE ${Math.round(vba)}°` : "VERTICAL BAT ANGLE"}</text>
+          <text x="348" y="38" textAnchor="end" fontSize="9" fill={T.muted}>{hasVba ? "barrel below the hands (dashed = level)" : "not captured; drawn at the group average"}</text>
+        </g>}
+      </svg>
+      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+        {[["Attack angle", `${sgn(aa)}°`, range("aa"), `group avg ${sgn(groupMean("aa"))}°`, T.red], ["Vertical bat angle", hasVba ? `${Math.round(vba)}°` : "–", range("vba"), `group avg ${Math.round(groupMean("vba"))}°`, T.purple]].map(([l, v, r, g, c]) => (
+          <div key={l} style={{ flex: 1, background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "10px 12px" }}>
+            <div style={{ fontSize: 10, color: T.dim, textTransform: "uppercase", letterSpacing: 0.6 }}>{l}</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: c }}>{v}</div>
+            <div style={{ fontSize: 10, color: T.faint }}>{r ? `your swings ${r} · ` : ""}{g}</div>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }
@@ -438,7 +455,7 @@ function SwingLab({ logo }) {
       </Card>
 
       <TimeToDecide t={t} />
-      <BatAtContact t={t} />
+      <BatAtContact3D t={t} />
       {METRICS.map((m) => <MetricCard key={m.k} m={m} t={t} />)}
       <Routes t={t} onPick={pick} />
 
