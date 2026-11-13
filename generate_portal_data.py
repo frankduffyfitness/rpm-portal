@@ -1881,8 +1881,12 @@ def gen_TMR(velo_rows):
                                   ivb_v, hb_v,
                                   round(t["spinAvg"]) if t["spinAvg"] is not None else None,
                                   t["ext"], t["relH"], t["relSide"], t["effAvg"], mv_n])
+            # Fields 5-6 (velo, ext) added 2026-11-13 for the Pitch Lab, which flies
+            # single pitches. Appended at the end: the movement / release plots and
+            # the arsenal pooling read indices 0-4 only.
             dots = [[tnames.index(p["type"]) if p.get("type") in tnames else -1,
-                     p["ivb"], p["hb"], p["relH"], p["relSide"]]
+                     p["ivb"], p["hb"], p["relH"], p["relSide"],
+                     p.get("velo"), p.get("ext")]
                     for p in s["pitches"]]
             entry = {"d": f"{mon} {d.day}", "df": f"{mon} {d.day}, {d.year}",
                      "st": VELO_BULLPEN_LABELS.get((name, s["date"]), s["sessionType"]),
