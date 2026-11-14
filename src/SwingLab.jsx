@@ -42,7 +42,16 @@ function summarize(t) {
   out.sdBs = sd(t.swings.map((s) => s.bs));
   return out;
 }
-const TESTERS = SWING_DATA.testers.map((t) => ({ ...t, sum: summarize(t) }));
+// One entry per test day. A tester's default view, and his row in every group
+// comparison, is his latest session; the page can switch him to an earlier one.
+function withSessions(t) {
+  const dates = [...new Set(t.swings.map((s) => s.date))].sort();
+  const sessions = dates.map((date) => { const swings = t.swings.filter((s) => s.date === date); return { date, swings, sum: summarize({ swings }) }; });
+  return { ...t, sessions, ...sessions[sessions.length - 1] };
+}
+const TESTERS = SWING_DATA.testers.map(withSessions);
+const poolWith = (t) => TESTERS.map((x) => (x.name === t.name ? t : x)); // the group, with this hitter as currently shown
+const shortDate = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
 const fmt = (v, dp) => (v == null ? "–" : v.toFixed(dp));
 const ord = (n) => n + (["th", "st", "nd", "rd"][(n % 100 - 20) % 10] || ["th", "st", "nd", "rd"][n % 100] || "th");
 
@@ -65,7 +74,7 @@ function Spark({ values, color, width = 280, height = 40 }) {
 
 function MetricCard({ m, t }) {
   const val = t.sum[m.k];
-  const pool = TESTERS.filter((x) => x.sum[m.k] != null);
+  const pool = poolWith(t).filter((x) => x.sum[m.k] != null);
   if (val == null) {
     return (
       <Card>
@@ -475,7 +484,7 @@ function TimeToDecide({ t }) {
 
 // ─── Two routes: bat speed vs time to contact ───────────────────────────────
 function Routes({ t, onPick }) {
-  const pts = TESTERS.filter((x) => x.sum.ttc != null);
+  const pts = poolWith(t).filter((x) => x.sum.ttc != null);
   if (t.sum.ttc == null) return null;
   const W = 520, H = 260, L = 44, B = 34, R = 14, TOP = 12;
   const xs = pts.map((x) => x.sum.ttc), ys = pts.map((x) => x.sum.bs);
@@ -554,13 +563,18 @@ export function SwingLabPage({ logo, password }) {
 
 function SwingLab({ logo }) {
   const [name, setName] = useState("Luke Desjardins");
-  const t = TESTERS.find((x) => x.name === name) || TESTERS[0];
-  const pick = (n) => { setName(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const [day, setDay] = useState(null); // null = latest session
+  const base = TESTERS.find((x) => x.name === name) || TESTERS[0];
+  const session = base.sessions.find((s) => s.date === day) || base.sessions[base.sessions.length - 1];
+  const t = useMemo(() => ({ ...base, ...session }), [base, session]);
+  const prev = base.sessions[base.sessions.indexOf(session) - 1];
+  const delta = prev ? t.sum.bs - prev.sum.bs : null;
+  const pick = (n) => { setName(n); setDay(null); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const gc = GROUP_COLOR[t.group];
   const d = new Date(t.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   return (
     <Shell logo={logo}>
-      <select value={name} onChange={(e) => setName(e.target.value)}
+      <select value={name} onChange={(e) => { setName(e.target.value); setDay(null); }}
         style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: T.white, fontSize: 14, fontFamily: FONT, marginBottom: 16, outline: "none" }}>
         {["Hitter", "2W", "PO", "Staff"].map((g) => (
           <optgroup key={g} label={GROUP_LABEL[g]} style={{ background: "#14161B" }}>
@@ -586,6 +600,16 @@ function SwingLab({ logo }) {
             </div>
           ))}
         </div>
+        {base.sessions.length > 1 && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginTop: 12 }}>
+            <span style={{ fontSize: 10, color: T.dim, textTransform: "uppercase", letterSpacing: 0.6, marginRight: 2 }}>Session</span>
+            {base.sessions.map((s, i) => { const on = s === session; return (
+              <button key={s.date} onClick={() => setDay(s.date)} style={{ fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8, cursor: "pointer", fontFamily: FONT,
+                border: "1px solid " + (on ? "rgba(79,255,176,0.35)" : "rgba(255,255,255,0.1)"), background: on ? "rgba(79,255,176,0.1)" : "transparent", color: on ? T.green : T.muted }}>{i + 1}: {shortDate(s.date)}</button>
+            ); })}
+            {delta != null && <span style={{ fontSize: 11, color: T.muted, marginLeft: 4 }}>{delta >= 0 ? "+" : ""}{delta.toFixed(1)} mph vs {shortDate(prev.date)}</span>}
+          </div>
+        )}
       </Card>
 
       <TimeToDecide t={t} />
