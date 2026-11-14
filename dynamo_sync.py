@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-13 Lucas Chu grip re-pull (uploaded after first trigger)
+# sync-trigger: 2026-11-14 Jesus Diaz + Kendrick Peguero assessments
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
