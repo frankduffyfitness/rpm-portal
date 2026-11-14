@@ -465,14 +465,19 @@ for pid, ath in fd['athletes'].items():
         
         jh = compute_session_best(test['trials'], 'jumpHeight')
         rsi = compute_session_best(test['trials'], 'rsiModified')
-        # 'pp' slot carries NET CONCENTRIC IMPULSE (N·s) — matching VALD Hub's
-        # headline "Concentric Impulse" number (Frank verified 239 for Christian
-        # Sanchez; L+R limb fields are GROSS impulse incl. bodyweight support,
-        # nearly 2x higher, and the base trial field stores the asym value).
-        # Net impulse = mass x takeoff velocity = m * sqrt(2*g*h), which
-        # reproduces VALD Hub's value exactly from jump height + bodyweight.
+        # 'pp' slot carries NET CONCENTRIC IMPULSE (N·s) — VALD Hub's headline
+        # "Concentric Impulse" number. Use the MEASURED per-trial value
+        # (metrics.concentricImpulse, populated on 99.99% of trials) so the
+        # standings match VALD Hub and the velo model exactly (Frank, 2026-11-14:
+        # Franklin Angeles 323.2 measured showed as 321.3). Only a trial with no
+        # measured value falls back to the physics estimate
+        # m * sqrt(2*g*h), which tracks measured within about +/-0.8%.
         ci_vals = []
         for tr in test['trials']:
+            ci_m = tr['metrics'].get('concentricImpulse')
+            if ci_m:
+                ci_vals.append(ci_m)
+                continue
             jh_t, bw_t = tr['metrics'].get('jumpHeight'), tr['metrics'].get('bodyweightLbs')
             if jh_t and bw_t:
                 ci_vals.append((bw_t * 0.45359) * (2 * 9.81 * jh_t * 0.0254) ** 0.5)
