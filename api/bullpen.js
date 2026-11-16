@@ -22,6 +22,11 @@
  *   bp:w:<date>:<HH:MM>  list   pids in that hour; RPUSH length is the capacity gate
  *   bp:closed            hash   date -> ["HH:MM", ...] hours Hack closed
  *   bp:req               hash   "<date>|<pid>" -> {pid, name, date, note, at}  "move my pen" requests
+ *   bp:ov                hash   "<date>|<pid>" -> {pid, name, date, kind: add|skip, at}
+ *                               a coach's change to ONE day's list, on top of the planner:
+ *                               add = throwing a pen the planner doesn't show (also how someone
+ *                               who isn't on the planner at all gets a link), skip = not throwing
+ *                               one it does. The planner is still never written to.
  *
  * Auth: `Authorization: Bearer <secret>`.
  *   - STAFF_PASSWORD: the coach, everything.
@@ -39,6 +44,8 @@
  * POST {op:"bpBook", pid, date, win} / {op:"bpCancel", pid, date}                       coach
  * POST {op:"bpWindow", date, win, open}    close or reopen an hour                      coach
  * POST {op:"bpReqDone", date, pid}         clear a move request                         coach
+ * POST {op:"bpAdd", date, pid | name}      put a pitcher on that day's list (or undo a skip)  coach
+ * POST {op:"bpRemove", date, pid}          take him off that day's list, cancels his hour     coach
  * POST {op:"bpNewLink", pid}               -> {token}                                   coach
  * POST {op:"bpConfig", sheet}              planner link or id -> {posted}               coach
  */
@@ -185,10 +192,26 @@ async function planner(cfg, monday, fresh) {
 // ─── Bookings ────────────────────────────────────────────────────────────────
 const claim = (v) => { const [win, at] = String(v || "").split("|"); return WIN.test(win || "") ? { win, at: at || "" } : null; };
 
+// One pitcher's mound days after the coach's day-list changes.
+function withOv(pens, ov, pid) {
+  const out = { ...pens };
+  for (const o of ov) {
+    if (o.pid !== pid) continue;
+    if (o.kind === "skip") delete out[o.date];
+    else if (!out[o.date]) out[o.date] = { label: o.label || "Bullpen", maybe: false, added: true };
+  }
+  return out;
+}
+async function loadOv() {
+  const [raw] = await redis([["HGETALL", "bp:ov"]]);
+  return Object.values(flat(raw)).map(parse).filter((o) => o && DAY.test(o.date || "") && PID.test(o.pid || ""));
+}
+
 // {date: {closed: [...], byWin: {win: [{pid, at}] in booking order}, mine: {pid: win}}}
 async function loadDays(dates) {
-  const res = await redis([...dates.map((d) => ["HGETALL", `bp:b:${d}`]), ["HGETALL", "bp:closed"], ["HGETALL", "bp:req"]]);
+  const res = await redis([...dates.map((d) => ["HGETALL", `bp:b:${d}`]), ["HGETALL", "bp:closed"], ["HGETALL", "bp:req"], ["HGETALL", "bp:ov"]]);
   const closed = flat(res[dates.length]), reqRaw = flat(res[dates.length + 1]);
+  const ov = Object.values(flat(res[dates.length + 2])).map(parse).filter((o) => o && DAY.test(o.date || "") && PID.test(o.pid || ""));
   const days = {};
   dates.forEach((d, i) => {
     const byWin = {}, mine = {};
@@ -202,7 +225,7 @@ async function loadDays(dates) {
     days[d] = { closed: parse(closed[d]) || [], byWin, mine };
   });
   const requests = Object.values(reqRaw).map(parse).filter(Boolean);
-  return { days, requests };
+  return { days, requests, ov };
 }
 
 // Book or move. The RPUSH is the gate: it is atomic, so of several pitchers going
@@ -241,20 +264,20 @@ async function cancel(pid, date) {
 }
 
 // ─── Pitcher view ────────────────────────────────────────────────────────────
-async function myPens(who, cfg, now) {
+async function myPens(who, cfg, now, ov) {
   const mon = mondayOf(now.date);
   const plans = await Promise.all([planner(cfg, mon), planner(cfg, addDays(mon, 7))]);
   const pens = {};
   for (const p of plans) for (const x of p.pitchers) if (x.pid === who.pid) Object.assign(pens, x.pens);
-  return { pens, plans };
+  return { pens: withOv(pens, ov || (await loadOv()), who.pid), plans };
 }
 
 async function me(who) {
   const cfg = await config(), now = nowNY();
-  const { pens, plans } = await myPens(who, cfg, now);
   const mon = mondayOf(now.date);
   const dates = Array.from({ length: 14 }, (_, i) => addDays(mon, i)).filter((d) => d >= now.date);
-  const { days, requests } = await loadDays(dates);
+  const { days, requests, ov } = await loadDays(dates);
+  const { pens, plans } = await myPens(who, cfg, now, ov);
   const out = [];
   for (const d of dates) {
     const st = days[d], myWin = st.mine[who.pid] || null;
@@ -284,7 +307,7 @@ async function week(monday, fresh) {
   const cfg = await config(), now = nowNY();
   const plan = await planner(cfg, monday, fresh);
   const dates = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
-  const [{ days, requests }, [regRaw]] = await Promise.all([loadDays(dates), redis([["HGETALL", "bp:pitchers"]])]);
+  const [{ days, requests, ov }, [regRaw]] = await Promise.all([loadDays(dates), redis([["HGETALL", "bp:pitchers"]])]);
   const reg = Object.fromEntries(Object.entries(flat(regRaw)).map(([k, v]) => [k, parse(v)]).filter(([, v]) => v));
   // First time a pitcher has mound work on the planner, make his link.
   const fresh_ = plan.pitchers.filter((p) => Object.keys(p.pens).length && !reg[p.pid]);
@@ -297,20 +320,32 @@ async function week(monday, fresh) {
     }
     await redis(cmds);
   }
-  const nameOf = (pid) => (plan.pitchers.find((p) => p.pid === pid) || reg[pid] || {}).name || pid;
+  const nameOf = (pid) => (plan.pitchers.find((p) => p.pid === pid) || reg[pid] || ov.find((o) => o.pid === pid) || {}).name || pid;
+  // Day-list changes older than three weeks are of no use to anyone.
+  const old = ov.filter((o) => o.date < addDays(now.date, -21));
+  if (old.length) await redis([["HDEL", "bp:ov", ...old.map((o) => `${o.date}|${o.pid}`)]]);
   const outDays = dates.map((d) => {
     const st = days[d];
-    const planned = plan.pitchers.filter((p) => p.pens[d]).map((p) => ({ pid: p.pid, name: p.name, group: p.group, label: p.pens[d].label, maybe: p.pens[d].maybe, win: st.mine[p.pid] || null }));
+    const dayOv = ov.filter((o) => o.date === d);
+    const skip = new Set(dayOv.filter((o) => o.kind === "skip").map((o) => o.pid));
+    const onPlanner = plan.pitchers.filter((p) => p.pens[d]);
+    const planned = [
+      ...onPlanner.filter((p) => !skip.has(p.pid)).map((p) => ({ pid: p.pid, name: p.name, group: p.group, label: p.pens[d].label, maybe: p.pens[d].maybe, win: st.mine[p.pid] || null })),
+      ...dayOv.filter((o) => o.kind === "add" && !onPlanner.some((p) => p.pid === o.pid)).map((o) => ({ pid: o.pid, name: nameOf(o.pid), group: "", label: o.label || "Bullpen", maybe: false, win: st.mine[o.pid] || null, added: true })),
+    ];
+    const skipped = onPlanner.filter((p) => skip.has(p.pid)).map((p) => ({ pid: p.pid, name: p.name }));
     const onPlan = new Set(planned.map((p) => p.pid));
     const windows = windowsFor(d, st.closed).map((w) => ({
       ...w, past: !stillOpen(d, w, now),
       booked: (st.byWin[w.win] || []).map((b, i) => ({ pid: b.pid, name: nameOf(b.pid), readyAt: hhmm(toMin(w.win) + i * PEN_MIN), offPlan: !onPlan.has(b.pid) })),
     }));
     const cap = windows.filter((w) => !w.closed).reduce((n, w) => n + w.cap, 0);
-    return { date: d, windows, planned, cap, requests: requests.filter((r) => r.date === d).map((r) => ({ ...r, name: nameOf(r.pid) })) };
+    return { date: d, windows, planned, skipped, cap, requests: requests.filter((r) => r.date === d).map((r) => ({ ...r, name: nameOf(r.pid) })) };
   });
-  const links = Object.fromEntries(plan.pitchers.filter((p) => reg[p.pid]).map((p) => [p.pid, reg[p.pid].token]));
-  return { monday, today: now.date, configured: !!cfg.sheetId, posted: plan.posted, stale: !!plan.stale, fetchedAt: plan.fetchedAt || null, days: outDays, links };
+  const shown = new Set([...plan.pitchers.map((p) => p.pid), ...outDays.flatMap((d) => d.planned.map((p) => p.pid))]);
+  const links = Object.fromEntries([...shown].filter((pid) => reg[pid]).map((pid) => [pid, reg[pid].token]));
+  const roster = plan.pitchers.map((p) => ({ pid: p.pid, name: p.name })).sort((a, b) => a.name.localeCompare(b.name));
+  return { monday, today: now.date, configured: !!cfg.sheetId, posted: plan.posted, stale: !!plan.stale, fetchedAt: plan.fetchedAt || null, days: outDays, links, roster };
 }
 
 // ─── Writes ──────────────────────────────────────────────────────────────────
@@ -368,6 +403,35 @@ async function write(body, who) {
     const set = new Set(parse(cur) || []);
     body.open ? set.delete(body.win) : set.add(body.win);
     await redis([set.size ? ["HSET", "bp:closed", date, JSON.stringify([...set].sort())] : ["HDEL", "bp:closed", date]]);
+    return { ok: true };
+  }
+  if (op === "bpAdd" || op === "bpRemove") {
+    let pid = PID.test(body.pid || "") ? body.pid : null;
+    const typed = op === "bpAdd" && !pid ? str(body.name, 60) : "";
+    if (typed) pid = slug(typed);
+    if (!pid || !PID.test(pid)) throw fail(400, op === "bpAdd" ? "Pick a pitcher or type his name." : "Bad pitcher");
+    const plan = await planner(await config(), mondayOf(date));
+    const onPlan = plan.pitchers.find((p) => p.pid === pid);
+    const hasPen = !!(onPlan && onPlan.pens[date]);
+    const key = `${date}|${pid}`;
+    const [curRaw, regRaw] = await redis([["HGET", "bp:ov", key], ["HGET", "bp:pitchers", pid]]);
+    const cur = parse(curRaw), rec = parse(regRaw);
+    const name = (onPlan && onPlan.name) || (rec && rec.name) || typed;
+    if (!name) throw fail(404, "No such pitcher");
+    const at = new Date().toISOString();
+    if (op === "bpAdd") {
+      const cmds = [];
+      if (cur && cur.kind === "skip") cmds.push(["HDEL", "bp:ov", key]);
+      else if (!hasPen) cmds.push(["HSET", "bp:ov", key, JSON.stringify({ pid, name, date, kind: "add", label: "Bullpen", at })]);
+      if (!rec) {
+        const token = "p_" + crypto.randomBytes(24).toString("base64url");
+        cmds.push(["HSET", "bp:pitchers", pid, JSON.stringify({ name, token, created: at })], ["HSET", "bp:tokens", sha(token), pid]);
+      }
+      if (cmds.length) await redis(cmds);
+      return { ok: true, pid, name };
+    }
+    await cancel(pid, date);
+    await redis([hasPen ? ["HSET", "bp:ov", key, JSON.stringify({ pid, name, date, kind: "skip", at })] : ["HDEL", "bp:ov", key], ["HDEL", "bp:req", key]]);
     return { ok: true };
   }
   if (!PID.test(body.pid || "")) throw fail(400, "Bad pitcher");

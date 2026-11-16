@@ -78,6 +78,7 @@ const CSS = `
 .bp .who{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--rule);font-size:14px;color:var(--ink)}
 .bp .who small{color:var(--mut);font-size:12px;margin-left:8px}
 .bp .tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hold);margin-left:8px}
+.bp .tag.here{color:var(--acc)}
 .bp .note{font-size:13px;line-height:1.45;border-radius:10px;padding:10px 12px}
 .bp .note.warn{background:var(--warnd);color:#FFB4B4}
 .bp .note.plain{background:rgba(255,255,255,.04);color:var(--ink2)}
@@ -298,7 +299,7 @@ export function BullpenBoard({ pw, onLocked }) {
           </div>
           <div style={{ fontSize: 11, color: "var(--dim)", margin: "7px 0 20px" }}>Pens planned / spots Hack has that day.</div>
 
-          <BoardDay d={cur} links={W.links} busy={busy} call={call} />
+          <BoardDay d={cur} links={W.links} roster={W.roster || []} busy={busy} call={call} />
 
           <div style={{ marginTop: 26 }}>
             <button className="mini" onClick={() => setAllLinks(!allLinks)}>{allLinks ? "Hide" : "Show"} all pitcher links ({everyone.length})</button>
@@ -318,9 +319,37 @@ export function BullpenBoard({ pw, onLocked }) {
   );
 }
 
-function BoardDay({ d, links, busy, call }) {
+// Put someone on this day's list who the planner doesn't have throwing: anyone on the
+// planner, or a typed name for someone who isn't on it at all.
+function AddPitcher({ d, roster, busy, call }) {
+  const [pick, setPick] = useState("");
+  const [name, setName] = useState("");
+  const here = new Set(d.planned.map((p) => p.pid));
+  const options = roster.filter((r) => !here.has(r.pid));
+  const ready = pick === "other" ? name.trim().length > 1 : !!pick;
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!ready || busy) return;
+    await call(pick === "other" ? { op: "bpAdd", date: d.date, name: name.trim() } : { op: "bpAdd", date: d.date, pid: pick });
+    setPick(""); setName("");
+  };
+  return (
+    <form onSubmit={submit} style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginTop: 12 }}>
+      <select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Add a pitcher to this day" style={{ maxWidth: 220, padding: "7px 9px", fontSize: 13 }}>
+        <option value="">+ Add a pitcher to this day</option>
+        <option value="other">Someone not on the planner…</option>
+        {options.map((r) => <option key={r.pid} value={r.pid}>{r.name}</option>)}
+      </select>
+      {pick === "other" && <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="First and last name" autoFocus style={{ flex: "1 1 160px", background: "rgba(255,255,255,.04)", border: "1px solid var(--rule2)", borderRadius: 8, padding: "7px 10px", fontSize: 14, outline: "none" }} />}
+      {pick && <button className="ghost" disabled={busy || !ready} style={{ padding: "6px 12px", borderColor: "var(--acc)", color: "var(--acc)" }}>Add</button>}
+    </form>
+  );
+}
+
+function BoardDay({ d, links, roster, busy, call }) {
   const booked = d.windows.reduce((n, w) => n + w.booked.length, 0);
   const waiting = d.planned.filter((p) => !p.win);
+  const skipped = d.skipped || [];
   const over = d.planned.length - d.cap;
   return (
     <div>
@@ -359,13 +388,28 @@ function BoardDay({ d, links, busy, call }) {
         </div>
       ))}
 
-      {waiting.length > 0 && (
-        <div style={{ marginTop: 22 }}>
-          <div className="eb" style={{ marginBottom: 6 }}>Not booked yet ({waiting.length})</div>
-          {waiting.map((p) => (
-            <div key={p.pid} className="who">
-              <span>{p.name}<small>{p.label}</small>{p.maybe && <span className="tag">maybe</span>}</span>
+      <div style={{ marginTop: 22 }}>
+        <div className="eb" style={{ marginBottom: 6 }}>Not booked yet ({waiting.length})</div>
+        {waiting.length === 0 && <div style={{ fontSize: 13, color: "var(--dim)", padding: "6px 0 2px" }}>{d.planned.length ? "Everyone on this day has an hour." : "No pens on this day."}</div>}
+        {waiting.map((p) => (
+          <div key={p.pid} className="who">
+            <span>{p.name}<small>{p.label}</small>{p.maybe && <span className="tag">maybe</span>}{p.added && <span className="tag here">added here</span>}</span>
+            <span style={{ display: "flex", gap: 14 }}>
               <LinkBtn pid={p.pid} links={links} />
+              <button className="mini" disabled={busy} aria-label={`Remove ${p.name} from this day`} title={p.added ? "Take him back off this day" : "Not throwing this day. Hack's planner is not changed."} onClick={() => call({ op: "bpRemove", date: d.date, pid: p.pid })}>Remove</button>
+            </span>
+          </div>
+        ))}
+        <AddPitcher d={d} roster={roster} busy={busy} call={call} />
+      </div>
+
+      {skipped.length > 0 && (
+        <div style={{ marginTop: 22 }}>
+          <div className="eb" style={{ marginBottom: 6 }}>Removed for this day ({skipped.length})</div>
+          {skipped.map((p) => (
+            <div key={p.pid} className="who" style={{ color: "var(--mut)" }}>
+              <span>{p.name}<small>on Hack's planner, not throwing</small></span>
+              <button className="mini" disabled={busy} onClick={() => call({ op: "bpAdd", date: d.date, pid: p.pid })}>Put back</button>
             </div>
           ))}
         </div>
