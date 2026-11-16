@@ -5,6 +5,7 @@
 // data, passed in as `ctx` by App.jsx (this file is never touched by the 6-hour
 // generator, which only splices const markers in App.jsx).
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BullpenBoard } from "./Bullpen.jsx";
 import { IntakesPanel } from "./Intake.jsx";
 import BOARD_DATA from "./board_data.json";
 
@@ -1494,11 +1495,12 @@ export default function TrainingSection({ ctx }) {
             </div>
             <Updates pw={pw} onOpen={(id, s) => { setStart(s || null); setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />
             <div className="tabs" style={{ marginTop: 0 }}>
-              {[["schedule", "📅 Schedule"], ["programs", "📋 Programs"], ["intakes", "📝 Intakes"], ["log", "🏋️ Log"]].map(([k, l]) => (
+              {[["schedule", "📅 Schedule"], ["bullpens", "⚾ Bullpens"], ["programs", "📋 Programs"], ["intakes", "📝 Intakes"], ["log", "🏋️ Log"]].map(([k, l]) => (
                 <button key={k} aria-pressed={tab === k} onClick={() => setTab(k)} style={{ flex: 1, padding: "8px 4px" }}>{l}</button>
               ))}
             </div>
             {tab === "schedule" && <Schedule pw={pw} athletes={index} onOpenPrograms={() => setTab("programs")} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
+            {tab === "bullpens" && <BullpenBoard pw={pw} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
             {tab === "programs" && <Board pw={pw} athletes={index} onOpen={(id) => { setSel(id); window.scrollTo(0, 0); }} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
             {tab === "intakes" && <IntakesPanel pw={pw} onLocked={() => lock("Your staff password changed. Enter it again.")} />}
             {tab === "log" && <>

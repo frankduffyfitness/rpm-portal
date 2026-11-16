@@ -6,6 +6,7 @@ import {
 useRef, useEffect, useMemo } from "react";
 import TrainingSection, { AthleteLogPage } from "./Training.jsx";
 import { IntakePage } from "./Intake.jsx";
+import { PenPage } from "./Bullpen.jsx";
 import { SwingLabPage } from "./SwingLab.jsx";
 import { PitchLabPage } from "./PitchLab.jsx";
 
@@ -5592,6 +5593,8 @@ export default function App() {
   const [isPitchLab] = useState(() => { try { return /^\/pitchlab\/?$/i.test(window.location.pathname); } catch (e) { return false; } });
   if (isAthleteLog) return <AthleteLogPage ctx={{ _FH, CMJ_BY_CANON, VELO_BY_CANON, BW_DATA, canonName }} logo={RPM_LOGO} />;
   if (isIntake) return <IntakePage logo={RPM_LOGO} />;
+  // Pitchers book their bullpen hour at /pen#t=<link key> (rewrite in vercel.json).
+  if (/^\/pen\/?$/i.test(window.location.pathname)) return <PenPage logo={RPM_LOGO} />;
   if (isSwingLab) return <SwingLabPage logo={RPM_LOGO} password={DYNAMO_PASSWORD} />;
   if (isPitchLab) return <PitchLabPage logo={RPM_LOGO} password={DYNAMO_PASSWORD} ars={_ARS} tmr={_TMR} colors={PITCH_COLORS} />;
   if (staffPortal) return <DynamoPage portal={staffPortal} />;

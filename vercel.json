@@ -23,6 +23,10 @@
     {
       "source": "/pitchlab",
       "destination": "/index.html"
+    },
+    {
+      "source": "/pen",
+      "destination": "/index.html"
     }
   ]
 }
