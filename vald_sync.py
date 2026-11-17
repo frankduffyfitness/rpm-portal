@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-14 Jesus Diaz + Kendrick Peguero assessments
+# sync-trigger: 2026-11-17 Jack Welz CMJ review
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
