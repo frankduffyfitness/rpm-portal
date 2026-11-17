@@ -24,13 +24,27 @@ const GROUP_COLOR = { Hitter: T.green, "2W": T.blue, PO: T.purple, Staff: T.mute
 const GROUP_LABEL = { Hitter: "Hitter", "2W": "Two-way", PO: "Pitcher only", Staff: "Staff" };
 
 // dir: +1 higher is better, -1 lower is better, 0 = shape (no better/worse here; that's a hitting coach's read).
+// `mlb` = the big-league reference line under each card (Frank, 11/17/26). Sources:
+//  - bat speed, attack angle, swing path tilt: Baseball Savant swing path leaderboard,
+//    2026 regular season, 209 qualified hitters' season averages, pulled 11/17/26.
+//  - time to contact: Frank's Swing Clock 2026 artifact (208 qualified hitters), an
+//    ESTIMATE from swing length and bat speed, not a measured time.
+//  - rotational acceleration, on-plane efficiency, HS varsity bat speed: Blast's own
+//    published averages (blastmotion.com metrics page and Blast figures on PBR reports).
+// MLB numbers are game swings against live pitching; ours are off a tee.
 const METRICS = [
-  { k: "bs", title: "Bat Speed", unit: " mph", dp: 1, dir: 1, agg: "top5", desc: "Speed of the sweet spot at contact. Average of your top 5 swings." },
-  { k: "ttc", title: "Time to Contact", unit: " s", dp: 3, dir: -1, desc: "Start of the downswing to contact. Lower means a quicker swing." },
-  { k: "ra", title: "Rotational Acceleration", unit: " g", dp: 1, dir: 1, desc: "How fast the bat speeds up at the start of the swing. Higher gets to speed sooner." },
-  { k: "aa", title: "Attack Angle", unit: "°", dp: 0, dir: 0, desc: "Up or down path of the bat at contact. Positive means swinging up." },
-  { k: "vba", title: "Vertical Bat Angle", unit: "°", dp: 0, dir: 0, desc: "Tilt of the barrel below the hands at contact. More negative means steeper." },
-  { k: "ope", title: "On-Plane Efficiency", unit: "%", dp: 0, dir: 0, desc: "Share of the swing the bat stays on the plane of the pitch." },
+  { k: "bs", title: "Bat Speed", unit: " mph", dp: 1, dir: 1, agg: "top5", desc: "Speed of the sweet spot at contact. Average of your top 5 swings.",
+    mlb: "MLB hitters average 62 to 79 mph in games (middle of the league: 72). Blast puts high school varsity at 60 to 70." },
+  { k: "ttc", title: "Time to Contact", unit: " s", dp: 3, dir: -1, desc: "Start of the downswing to contact. Lower means a quicker swing.",
+    mlb: "MLB hitters are estimated at 0.123 to 0.161 s (middle of the league: 0.138). That is worked out from swing length and bat speed, not measured like yours." },
+  { k: "ra", title: "Rotational Acceleration", unit: " g", dp: 1, dir: 1, desc: "How fast the bat speeds up at the start of the swing. Higher gets to speed sooner.",
+    mlb: "Blast's MLB average is 16.8 g. College is 12.9 and high school varsity is 9.9." },
+  { k: "aa", title: "Attack Angle", unit: "°", dp: 0, dir: 0, desc: "Up or down path of the bat at contact. Positive means swinging up.",
+    mlb: "MLB hitters average +1° to +20° in games (middle of the league: +10°). No qualified hitter swings down on average." },
+  { k: "vba", title: "Vertical Bat Angle", unit: "°", dp: 0, dir: 0, desc: "Tilt of the barrel below the hands at contact. More negative means steeper.",
+    mlb: "MLB does not publish this exact number. The closest is swing path tilt, 23° to 45° (middle of the league: 33°), which lines up with about -23° to -45° here." },
+  { k: "ope", title: "On-Plane Efficiency", unit: "%", dp: 0, dir: 0, desc: "Share of the swing the bat stays on the plane of the pitch.",
+    mlb: "Blast's MLB average is 69%. Blast calls 70% or higher the target." },
 ];
 
 const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
@@ -111,6 +125,12 @@ function MetricCard({ m, t }) {
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: T.faint, marginBottom: 12 }}>
         <span>{fmt(lo, m.dp)}</span><span>group avg {fmt(avg, m.dp)}</span><span>{fmt(hi, m.dp)}</span>
       </div>
+      {m.mlb && (
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 12 }}>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: T.blue, background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: 6, padding: "2px 6px", flexShrink: 0 }}>MLB</span>
+          <span style={{ fontSize: 11, color: T.muted, lineHeight: 1.45 }}>{m.mlb}</span>
+        </div>
+      )}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", paddingTop: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
           <Label>Swing by swing</Label>
@@ -625,7 +645,7 @@ function SwingLab({ logo }) {
       <div style={{ fontSize: 10, color: T.faint, lineHeight: 1.6, marginTop: 8 }}>
         Blast Motion, facility Baum 33/30, off a tee, cue "swing as hard as you can and hit it hard up the middle." Counted swings only; the first max swing is a settle swing.
         Rankings are among the {TESTERS.length} people tested so far, including pitchers-only and staff. Time to decide uses a generic pitch (6 ft extension, ~9% speed loss to the plate)
-        and time to contact measured from the start of the downswing, so real decision time is a little shorter. One session per hitter; none of these numbers have passed the reliability check yet.
+        and time to contact measured from the start of the downswing, so real decision time is a little shorter. None of these numbers have passed the reliability check yet. MLB lines are 2026 season averages from games against live pitching (Statcast, 209 qualified hitters) or Blast's published averages. Yours are off a tee, so read them as a reference, not a target.
       </div>
     </Shell>
   );
