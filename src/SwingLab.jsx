@@ -2,7 +2,9 @@
 // rpmstrength.coach/swinglab (rewrite in vercel.json). Nothing links here yet:
 // it's where the bat speed model's hitter-facing visuals get built before they
 // go on athlete pages (Frank, 11/13/26). Same look as the Model Portal, behind
-// its staff password (shared session unlock; the data still ships in the bundle).
+// its own staff password (Frank, 11/17/26) and its own session unlock, so opening the
+// Model Portal or Pitch Lab does not open this page. Soft gate: the data still ships
+// in the bundle.
 //
 // Data: swing_data.json, built from Bat Speed Model/blast_swings_manual.csv by
 // build_swinglab_data.py (counted swings only, facility Baum 33/30). Re-run the
@@ -533,12 +535,15 @@ function Shell({ logo, children }) {
   );
 }
 
-function StaffGate({ logo, password, onOk }) {
+const SWING_LAB_PASSWORD = "Blast";
+const UNLOCK_KEY = "swing_ok";
+
+function StaffGate({ logo, onOk }) {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState(false);
   const submit = (e) => {
     e.preventDefault();
-    if (pw === password) { try { sessionStorage.setItem("dyn_ok", "1"); } catch (e) {} onOk(); }
+    if (pw.trim() === SWING_LAB_PASSWORD) { try { sessionStorage.setItem(UNLOCK_KEY, "1"); } catch (e) {} onOk(); }
     else setErr(true);
   };
   return (
@@ -555,9 +560,9 @@ function StaffGate({ logo, password, onOk }) {
   );
 }
 
-export function SwingLabPage({ logo, password }) {
-  const [ok, setOk] = useState(() => { try { return sessionStorage.getItem("dyn_ok") === "1"; } catch (e) { return false; } });
-  if (!ok) return <StaffGate logo={logo} password={password} onOk={() => setOk(true)} />;
+export function SwingLabPage({ logo }) {
+  const [ok, setOk] = useState(() => { try { return sessionStorage.getItem(UNLOCK_KEY) === "1"; } catch (e) { return false; } });
+  if (!ok) return <StaffGate logo={logo} onOk={() => setOk(true)} />;
   return <SwingLab logo={logo} />;
 }
 

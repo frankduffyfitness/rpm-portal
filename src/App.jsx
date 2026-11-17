@@ -5595,7 +5595,7 @@ export default function App() {
   if (isIntake) return <IntakePage logo={RPM_LOGO} />;
   // Pitchers book their bullpen hour at /pen#t=<link key> (rewrite in vercel.json).
   if (/^\/pen\/?$/i.test(window.location.pathname)) return <PenPage logo={RPM_LOGO} />;
-  if (isSwingLab) return <SwingLabPage logo={RPM_LOGO} password={DYNAMO_PASSWORD} />;
+  if (isSwingLab) return <SwingLabPage logo={RPM_LOGO} />;
   if (isPitchLab) return <PitchLabPage logo={RPM_LOGO} password={DYNAMO_PASSWORD} ars={_ARS} tmr={_TMR} colors={PITCH_COLORS} />;
   if (staffPortal) return <DynamoPage portal={staffPortal} />;
 
