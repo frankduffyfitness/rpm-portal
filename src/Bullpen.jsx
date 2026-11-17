@@ -338,7 +338,7 @@ function AddPitcher({ d, roster, busy, call }) {
       <select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Add a pitcher to this day" style={{ maxWidth: 220, padding: "7px 9px", fontSize: 13 }}>
         <option value="">+ Add a pitcher to this day</option>
         <option value="other">Someone not on the planner…</option>
-        {options.map((r) => <option key={r.pid} value={r.pid}>{r.name}</option>)}
+        {options.map((r) => <option key={r.pid} value={r.pid}>{r.name}{r.extra ? " (not on planner)" : ""}</option>)}
       </select>
       {pick === "other" && <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="First and last name" autoFocus style={{ flex: "1 1 160px", background: "rgba(255,255,255,.04)", border: "1px solid var(--rule2)", borderRadius: 8, padding: "7px 10px", fontSize: 14, outline: "none" }} />}
       {pick && <button className="ghost" disabled={busy || !ready} style={{ padding: "6px 12px", borderColor: "var(--acc)", color: "var(--acc)" }}>Add</button>}

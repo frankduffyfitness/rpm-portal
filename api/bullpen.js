@@ -344,7 +344,13 @@ async function week(monday, fresh) {
   });
   const shown = new Set([...plan.pitchers.map((p) => p.pid), ...outDays.flatMap((d) => d.planned.map((p) => p.pid))]);
   const links = Object.fromEntries([...shown].filter((pid) => reg[pid]).map((pid) => [pid, reg[pid].token]));
-  const roster = plan.pitchers.map((p) => ({ pid: p.pid, name: p.name })).sort((a, b) => a.name.localeCompare(b.name));
+  // Who a coach can put on a day: everyone on the planner, plus anyone who was ever typed in
+  // by name (they have a link on file), so a walk-in only has to be typed once.
+  const onRoster = new Set(plan.pitchers.map((p) => p.pid));
+  const roster = [
+    ...plan.pitchers.map((p) => ({ pid: p.pid, name: p.name })),
+    ...Object.entries(reg).filter(([pid, r]) => !onRoster.has(pid) && r.name).map(([pid, r]) => ({ pid, name: r.name, extra: true })),
+  ].sort((a, b) => a.name.localeCompare(b.name));
   return { monday, today: now.date, configured: !!cfg.sheetId, posted: plan.posted, stale: !!plan.stale, fetchedAt: plan.fetchedAt || null, days: outDays, links, roster };
 }
 
