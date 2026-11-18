@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-17 Jack Welz CMJ review
+# sync-trigger: 2026-11-18 Charlie Delman assessment
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings

@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-14 Jesus Diaz + Kendrick Peguero assessments
+# sync-trigger: 2026-11-18 Charlie Delman assessment
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
