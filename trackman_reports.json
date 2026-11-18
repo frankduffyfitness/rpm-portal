@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-11-18T02:45:20Z",
+ "lastSyncedAt": "2026-11-18T21:42:36Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -60300,6 +60300,316 @@
        "x": -0.19,
        "z": 2.24,
        "type": "Sinker"
+      }
+     ]
+    }
+   ]
+  },
+  "Charlie Delman": {
+   "name": "Charlie Delman",
+   "sessions": [
+    {
+     "date": "2026-11-18",
+     "sessionType": "Pitching practice",
+     "total": 14,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 4,
+       "veloMin": 69.1,
+       "veloMax": 72.9,
+       "veloAvg": 71.4,
+       "spinMin": 1684.5,
+       "spinMax": 1763.0,
+       "spinAvg": 1721.3,
+       "ivb": 19.1,
+       "hb": 13.1,
+       "hbMaxAbs": 16.2,
+       "vertMovMaxAbs": 39.2,
+       "relH": 5.1,
+       "relSide": 1.4,
+       "ext": 5.3,
+       "effAvg": 76
+      },
+      {
+       "name": "Slider",
+       "count": 2,
+       "veloMin": 58.5,
+       "veloMax": 61.6,
+       "veloAvg": 60.1,
+       "spinMin": 2289.9,
+       "spinMax": 2289.9,
+       "spinAvg": 2289.9,
+       "ivb": 12.0,
+       "hb": -18.7,
+       "hbMaxAbs": 18.7,
+       "vertMovMaxAbs": 93.6,
+       "relH": 5.2,
+       "relSide": 1.7,
+       "ext": 4.6,
+       "effAvg": 73
+      },
+      {
+       "name": "Changeup",
+       "count": 3,
+       "veloMin": 63.3,
+       "veloMax": 64.9,
+       "veloAvg": 63.9,
+       "spinMin": 1184.6,
+       "spinMax": 1770.7,
+       "spinAvg": 1484.8,
+       "ivb": 17.5,
+       "hb": 12.8,
+       "hbMaxAbs": 14.1,
+       "vertMovMaxAbs": 58.3,
+       "relH": 5.1,
+       "relSide": 1.7,
+       "ext": 5.5,
+       "effAvg": 88
+      },
+      {
+       "name": "Curveball",
+       "count": 5,
+       "veloMin": 51.5,
+       "veloMax": 57.8,
+       "veloAvg": 54.5,
+       "spinMin": 1931.9,
+       "spinMax": 2226.4,
+       "spinAvg": 2070.8,
+       "ivb": 12.6,
+       "hb": -14.6,
+       "hbMaxAbs": 19.3,
+       "vertMovMaxAbs": 130.5,
+       "relH": 5.2,
+       "relSide": 1.5,
+       "ext": 5.3,
+       "effAvg": 91
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 72.9,
+       "spin": 1685.0,
+       "tilt": "1:30",
+       "ivb": 15.6,
+       "hb": 16.2,
+       "ext": 5.33,
+       "relH": 5.08,
+       "relSide": 1.67,
+       "eff": 82,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 69.1,
+       "spin": 1715.0,
+       "tilt": "1:00",
+       "ivb": 22.8,
+       "hb": 14.2,
+       "ext": 5.5,
+       "relH": 5.08,
+       "relSide": 1.33,
+       "eff": 71,
+       "type": "Fastball"
+      },
+      {
+       "no": 3,
+       "velo": 71.8,
+       "spin": 1763.0,
+       "tilt": "12:45",
+       "ivb": 18.8,
+       "hb": 9.1,
+       "ext": 5.33,
+       "relH": 5.17,
+       "relSide": 1.42,
+       "eff": null,
+       "type": "Fastball"
+      },
+      {
+       "no": 4,
+       "velo": 72.0,
+       "spin": 1722.0,
+       "tilt": "1:00",
+       "ivb": null,
+       "hb": null,
+       "ext": 5.0,
+       "relH": 5.17,
+       "relSide": 1.33,
+       "eff": null,
+       "type": "Fastball"
+      },
+      {
+       "no": 5,
+       "velo": 55.6,
+       "spin": null,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": null,
+       "relH": 4.92,
+       "relSide": 0.75,
+       "eff": null,
+       "type": "Curveball"
+      },
+      {
+       "no": 6,
+       "velo": 57.8,
+       "spin": 2226.0,
+       "tilt": "8:15",
+       "ivb": -8.4,
+       "hb": -19.3,
+       "ext": 5.33,
+       "relH": 5.08,
+       "relSide": 1.67,
+       "eff": 87,
+       "type": "Curveball"
+      },
+      {
+       "no": 7,
+       "velo": 61.6,
+       "spin": 2290.0,
+       "tilt": "8:00",
+       "ivb": -12.0,
+       "hb": -18.7,
+       "ext": 4.58,
+       "relH": 5.08,
+       "relSide": 1.67,
+       "eff": 73,
+       "type": "Slider"
+      },
+      {
+       "no": 8,
+       "velo": 58.5,
+       "spin": null,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": null,
+       "relH": 5.33,
+       "relSide": 1.83,
+       "eff": null,
+       "type": "Slider"
+      },
+      {
+       "no": 9,
+       "velo": 51.5,
+       "spin": 1932.0,
+       "tilt": "7:00",
+       "ivb": -16.3,
+       "hb": -9.0,
+       "ext": 5.17,
+       "relH": 5.08,
+       "relSide": 1.75,
+       "eff": 98,
+       "type": "Curveball"
+      },
+      {
+       "no": 10,
+       "velo": 52.4,
+       "spin": null,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": null,
+       "relH": 5.75,
+       "relSide": 1.67,
+       "eff": null,
+       "type": "Curveball"
+      },
+      {
+       "no": 11,
+       "velo": 64.9,
+       "spin": 1185.0,
+       "tilt": "1:00",
+       "ivb": 19.2,
+       "hb": 10.8,
+       "ext": null,
+       "relH": 5.08,
+       "relSide": 1.58,
+       "eff": 92,
+       "type": "Changeup"
+      },
+      {
+       "no": 12,
+       "velo": 63.3,
+       "spin": 1771.0,
+       "tilt": "1:00",
+       "ivb": 21.1,
+       "hb": 13.6,
+       "ext": 5.5,
+       "relH": 5.08,
+       "relSide": 1.58,
+       "eff": 85,
+       "type": "Changeup"
+      },
+      {
+       "no": 13,
+       "velo": 63.4,
+       "spin": 1499.0,
+       "tilt": "1:30",
+       "ivb": 12.3,
+       "hb": 14.1,
+       "ext": 5.58,
+       "relH": 5.08,
+       "relSide": 1.92,
+       "eff": 88,
+       "type": "Changeup"
+      },
+      {
+       "no": 14,
+       "velo": 55.0,
+       "spin": 2054.0,
+       "tilt": "7:45",
+       "ivb": -13.2,
+       "hb": -15.5,
+       "ext": null,
+       "relH": 5.08,
+       "relSide": 1.58,
+       "eff": 88,
+       "type": "Curveball"
+      }
+     ],
+     "locations": [
+      {
+       "x": -1.09,
+       "z": 1.03,
+       "type": "Fastball"
+      },
+      {
+       "x": -1.92,
+       "z": 0.66,
+       "type": "Fastball"
+      },
+      {
+       "x": -2.0,
+       "z": 2.12,
+       "type": "Curveball"
+      },
+      {
+       "x": -1.39,
+       "z": 2.18,
+       "type": "Slider"
+      },
+      {
+       "x": -0.71,
+       "z": 1.39,
+       "type": "Changeup"
+      },
+      {
+       "x": -1.69,
+       "z": 1.87,
+       "type": "Changeup"
+      },
+      {
+       "x": -1.96,
+       "z": 0.79,
+       "type": "Changeup"
+      },
+      {
+       "x": -0.94,
+       "z": 4.16,
+       "type": "Curveball"
       }
      ]
     }
