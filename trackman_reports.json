@@ -1,5 +1,5 @@
 {
- "lastSyncedAt": "2026-11-18T23:58:26Z",
+ "lastSyncedAt": "2026-11-19T00:09:12Z",
  "athletes": {
   "Aaron Yorker": {
    "name": "Aaron Yorker",
@@ -176045,6 +176045,195 @@
   "Jesus Diaz": {
    "name": "Jesus Diaz",
    "sessions": [
+    {
+     "date": "2026-11-18",
+     "sessionType": "Pitching practice",
+     "total": 6,
+     "types": [
+      {
+       "name": "Fastball",
+       "count": 1,
+       "veloMin": 77.4,
+       "veloMax": 77.4,
+       "veloAvg": 77.4,
+       "spinMin": 2210.1,
+       "spinMax": 2210.1,
+       "spinAvg": 2210.1,
+       "ivb": 16.1,
+       "hb": -0.7,
+       "hbMaxAbs": 0.7,
+       "vertMovMaxAbs": 31.9,
+       "relH": 4.8,
+       "relSide": 1.9,
+       "ext": 5.1,
+       "effAvg": null
+      },
+      {
+       "name": "Sinker",
+       "count": 1,
+       "veloMin": 77.1,
+       "veloMax": 77.1,
+       "veloAvg": 77.1,
+       "spinMin": 2103.7,
+       "spinMax": 2103.7,
+       "spinAvg": 2103.7,
+       "ivb": 16.2,
+       "hb": 14.0,
+       "hbMaxAbs": 14.0,
+       "vertMovMaxAbs": 32.6,
+       "relH": 4.9,
+       "relSide": 2.2,
+       "ext": 5.3,
+       "effAvg": null
+      },
+      {
+       "name": "Slider",
+       "count": 2,
+       "veloMin": 64.1,
+       "veloMax": 66.4,
+       "veloAvg": 65.2,
+       "spinMin": 2694.4,
+       "spinMax": 2714.0,
+       "spinAvg": 2704.2,
+       "ivb": 8.2,
+       "hb": -22.8,
+       "hbMaxAbs": 22.8,
+       "vertMovMaxAbs": 81.2,
+       "relH": 4.7,
+       "relSide": 2.3,
+       "ext": 4.9,
+       "effAvg": null
+      },
+      {
+       "name": "Changeup",
+       "count": 1,
+       "veloMin": 69.4,
+       "veloMax": 69.4,
+       "veloAvg": 69.4,
+       "spinMin": 1818.0,
+       "spinMax": 1818.0,
+       "spinAvg": 1818.0,
+       "ivb": null,
+       "hb": null,
+       "hbMaxAbs": null,
+       "vertMovMaxAbs": null,
+       "relH": 5.3,
+       "relSide": 1.4,
+       "ext": 5.3,
+       "effAvg": null
+      },
+      {
+       "name": "Other",
+       "count": 1,
+       "veloMin": 49.0,
+       "veloMax": 49.0,
+       "veloAvg": 49.0,
+       "spinMin": 1255.4,
+       "spinMax": 1255.4,
+       "spinAvg": 1255.4,
+       "ivb": null,
+       "hb": null,
+       "hbMaxAbs": null,
+       "vertMovMaxAbs": null,
+       "relH": 2.7,
+       "relSide": -1.1,
+       "ext": 8.4,
+       "effAvg": null
+      }
+     ],
+     "pitches": [
+      {
+       "no": 1,
+       "velo": 77.4,
+       "spin": 2210.0,
+       "tilt": "12:00",
+       "ivb": 16.1,
+       "hb": -0.7,
+       "ext": 5.08,
+       "relH": 4.83,
+       "relSide": 1.92,
+       "eff": null,
+       "type": "Fastball"
+      },
+      {
+       "no": 2,
+       "velo": 77.1,
+       "spin": 2104.0,
+       "tilt": "1:15",
+       "ivb": 16.2,
+       "hb": 14.0,
+       "ext": 5.25,
+       "relH": 4.83,
+       "relSide": 2.17,
+       "eff": null,
+       "type": "Sinker"
+      },
+      {
+       "no": 3,
+       "velo": 49.0,
+       "spin": 1255.0,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 8.33,
+       "relH": 2.75,
+       "relSide": -1.08,
+       "eff": null,
+       "type": "Other"
+      },
+      {
+       "no": 4,
+       "velo": 69.4,
+       "spin": 1818.0,
+       "tilt": null,
+       "ivb": null,
+       "hb": null,
+       "ext": 5.25,
+       "relH": 5.25,
+       "relSide": 1.42,
+       "eff": null,
+       "type": "Changeup"
+      },
+      {
+       "no": 5,
+       "velo": 66.4,
+       "spin": 2714.0,
+       "tilt": "8:30",
+       "ivb": null,
+       "hb": null,
+       "ext": 4.92,
+       "relH": 4.67,
+       "relSide": 2.17,
+       "eff": null,
+       "type": "Slider"
+      },
+      {
+       "no": 6,
+       "velo": 64.1,
+       "spin": 2694.0,
+       "tilt": "8:15",
+       "ivb": -8.2,
+       "hb": -22.8,
+       "ext": 4.83,
+       "relH": 4.67,
+       "relSide": 2.42,
+       "eff": null,
+       "type": "Slider"
+      }
+     ],
+     "locations": [
+      {
+       "x": 2.94,
+       "z": 1.56,
+       "type": "Sinker"
+      },
+      {
+       "x": 0.37,
+       "z": 3.32,
+       "type": "Slider"
+      }
+     ]
+    },
     {
      "date": "2026-11-14",
      "sessionType": "Pitching practice",
