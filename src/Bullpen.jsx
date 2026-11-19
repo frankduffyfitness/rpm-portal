@@ -312,6 +312,17 @@ export function BullpenBoard({ pw, onLocked }) {
                 </span>
               </div>
             ))}
+            {allLinks && (W.roster || []).some((r) => r.extra) && (
+              <div style={{ marginTop: 18 }}>
+                <div className="eb" style={{ marginBottom: 6 }}>Typed in, not on the planner</div>
+                {W.roster.filter((r) => r.extra).map((r) => (
+                  <div key={r.pid} className="who">
+                    <span>{r.name}</span>
+                    <button className="mini" disabled={busy} onClick={() => { if (window.confirm(`Delete ${r.name}? He leaves the add list and his link stops working.`)) call({ op: "bpForget", pid: r.pid }); }}>Delete</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}

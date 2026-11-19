@@ -47,6 +47,9 @@
  * POST {op:"bpAdd", date, pid | name}      put a pitcher on that day's list (or undo a skip)  coach
  * POST {op:"bpRemove", date, pid}          take him off that day's list, cancels his hour     coach
  * POST {op:"bpNewLink", pid}               -> {token}                                   coach
+ * POST {op:"bpForget", pid}                delete a typed-in pitcher (a typo, a one-off):     coach
+ *                                          his link dies and he leaves the add picker. Refused
+ *                                          for anyone on the planner.
  * POST {op:"bpConfig", sheet}              planner link or id -> {posted}               coach
  */
 import crypto from "crypto";
@@ -401,6 +404,20 @@ async function write(body, who) {
     const token = "p_" + crypto.randomBytes(24).toString("base64url");
     await redis([["HDEL", "bp:tokens", sha(rec.token || "")], ["HSET", "bp:tokens", sha(token), body.pid], ["HSET", "bp:pitchers", body.pid, JSON.stringify({ ...rec, token })]]);
     return { token };
+  }
+  if (op === "bpForget") {
+    if (!PID.test(body.pid || "")) throw fail(400, "Bad pitcher");
+    const now = nowNY(), mon = mondayOf(now.date), cfg = await config();
+    const plans = await Promise.all([planner(cfg, mon), planner(cfg, addDays(mon, 7))]);
+    if (plans.some((p) => p.pitchers.some((x) => x.pid === body.pid))) throw fail(409, "He's on Hack's planner, so he stays in the list.");
+    const [cur] = await redis([["HGET", "bp:pitchers", body.pid]]);
+    const rec = parse(cur);
+    if (!rec) throw fail(404, "No such pitcher");
+    // Days already gone keep their record; from today on he comes off every list.
+    const ahead = (await loadOv()).filter((o) => o.pid === body.pid && o.date >= now.date);
+    for (const o of ahead) await cancel(body.pid, o.date);
+    await redis([["HDEL", "bp:pitchers", body.pid], ["HDEL", "bp:tokens", sha(rec.token || "")], ...(ahead.length ? [["HDEL", "bp:ov", ...ahead.map((o) => `${o.date}|${o.pid}`)]] : [])]);
+    return { ok: true };
   }
   if (!date) throw fail(400, "Bad day");
   if (op === "bpWindow") {
