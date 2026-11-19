@@ -34,7 +34,7 @@ export function Spark({ values, color, width = 280, height = 40 }) {
   );
 }
 
-export function MetricCard({ m, t, pool: everyone, perLabel = "Swing by swing", missing = "Not captured in this session." }) {
+export function MetricCard({ m, t, pool: everyone, perLabel = "Swing by swing", missing = "Not captured in this session.", rankNote = null }) {
   const val = t.sum[m.k];
   const pool = everyone.filter((x) => x.sum[m.k] != null);
   if (val == null) {
@@ -47,18 +47,19 @@ export function MetricCard({ m, t, pool: everyone, perLabel = "Swing by swing", 
   }
   const vals = pool.map((x) => x.sum[m.k]);
   const lo = Math.min(...vals), hi = Math.max(...vals), avg = mean(vals);
-  const pos = hi > lo ? ((val - lo) / (hi - lo)) * 100 : 50;
+  const pos = hi > lo ? clamp(((val - lo) / (hi - lo)) * 100, 0, 100) : 50;
+  const ranked = m.dir && !rankNote; // rankNote: this hitter is shown beside the group, not ranked in it
   const better = (x) => (m.dir === -1 ? x < val : x > val);
-  const rank = m.dir ? pool.filter((x) => better(x.sum[m.k])).length + 1 : null;
-  const pct = m.dir ? Math.round(((pool.length - rank) / Math.max(1, pool.length - 1)) * 100) : null;
-  const c = m.dir ? (pct >= 75 ? T.green : pct >= 50 ? T.blue : pct >= 25 ? T.amber : T.orange) : T.blue;
+  const rank = ranked ? pool.filter((x) => better(x.sum[m.k])).length + 1 : null;
+  const pct = ranked ? Math.round(((pool.length - rank) / Math.max(1, pool.length - 1)) * 100) : null;
+  const c = ranked ? (pct >= 75 ? T.green : pct >= 50 ? T.blue : pct >= 25 ? T.amber : T.orange) : T.blue;
   const per = t.swings.map((s) => s[m.k]);
   return (
     <Card>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
         <span style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{m.title}</span>
-        {m.dir ? <span style={{ fontSize: 9, fontWeight: 700, color: c, background: c + "15", padding: "3px 10px", borderRadius: 10 }}>{ord(rank)} of {pool.length}</span>
-          : <span style={{ fontSize: 9, fontWeight: 700, color: T.muted, background: "rgba(255,255,255,0.05)", padding: "3px 10px", borderRadius: 10 }}>{m.tag || "SWING SHAPE"}</span>}
+        {ranked ? <span style={{ fontSize: 9, fontWeight: 700, color: c, background: c + "15", padding: "3px 10px", borderRadius: 10 }}>{ord(rank)} of {pool.length}</span>
+          : <span style={{ fontSize: 9, fontWeight: 700, color: T.muted, background: "rgba(255,255,255,0.05)", padding: "3px 10px", borderRadius: 10, whiteSpace: "nowrap" }}>{(m.dir && rankNote) || m.tag || "SWING SHAPE"}</span>}
       </div>
       <div style={{ fontSize: 11, color: T.dim, marginBottom: 12, lineHeight: 1.45 }}>{m.desc}</div>
       <div style={{ fontSize: 34, fontWeight: 700, color: T.white, lineHeight: 1, marginBottom: 16 }}>

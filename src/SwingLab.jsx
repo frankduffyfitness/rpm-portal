@@ -56,13 +56,18 @@ function summarize(t) {
 }
 // One entry per test day. A tester's default view, and his row in every group
 // comparison, is his latest session; the page can switch him to an earlier one.
+// Everyone swings the facility Baum unless the data says otherwise. A hitter on his own bat (Jace Congemi, 11/19/26:
+// a drop 5, not wood, so outside the wood-only fit) is shown beside the facility-bat group but is not ranked in it,
+// and never counts in anyone else's group.
+const FACILITY_BAT = { label: "Baum 33/30", own: false };
 function withSessions(t) {
   const dates = [...new Set(t.swings.map((s) => s.date))].sort();
-  const sessions = dates.map((date) => { const swings = t.swings.filter((s) => s.date === date); return { date, swings, sum: summarize({ swings }) }; });
+  const sessions = dates.map((date) => { const swings = t.swings.filter((s) => s.date === date); return { date, swings, sum: summarize({ swings }), bat: (t.ownBat && t.ownBat[date]) || FACILITY_BAT }; });
   return { ...t, sessions, ...sessions[sessions.length - 1] };
 }
 const TESTERS = SWING_DATA.testers.map(withSessions);
-const poolWith = (t) => TESTERS.map((x) => (x.name === t.name ? t : x)); // the group, with this hitter as currently shown
+const FACILITY = TESTERS.filter((x) => !x.bat.own);
+const poolWith = (t) => (t.bat.own ? FACILITY : FACILITY.map((x) => (x.name === t.name ? t : x))); // the group, with this hitter as currently shown
 
 
 // ─── Analysis graphics: shared scene plumbing ────────────────────────────────
@@ -74,7 +79,7 @@ const BAT_PROFILE = [[0, 0.085], [0.07, 0.085], [0.12, 0.045], [1.0, 0.05], [1.9
 const PLATE = [[-0.71, 0, -0.71], [-0.71, 0, 0.71], [0, 0, 0.71], [0.71, 0, 0], [0, 0, -0.71]]; // point toward the catcher
 const pts = (list) => list.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
 const signed = (x) => (Math.round(x) > 0 ? "+" : Math.round(x) < 0 ? "−" : "") + Math.abs(Math.round(x)); // +14, −31, 0
-const groupMean = (k) => mean(TESTERS.map((x) => x.sum[k]).filter((x) => x != null));
+const groupMean = (k) => mean(FACILITY.map((x) => x.sum[k]).filter((x) => x != null));
 const outward = (az, el) => [Math.cos(rad(el)) * Math.sin(rad(az)), Math.sin(rad(el)), Math.cos(rad(el)) * Math.cos(rad(az))]; // from the target toward the camera
 
 
@@ -618,7 +623,7 @@ function SwingPath({ t }) {
 
 // ─── Two routes: bat speed vs time to contact ───────────────────────────────
 function Routes({ t, onPick }) {
-  const pts = poolWith(t).filter((x) => x.sum.ttc != null);
+  const pts = (t.bat.own ? [...poolWith(t), t] : poolWith(t)).filter((x) => x.sum.ttc != null);
   if (t.sum.ttc == null) return null;
   const W = 520, H = 260, L = 44, B = 34, R = 14, TOP = 12;
   const xs = pts.map((x) => x.sum.ttc), ys = pts.map((x) => x.sum.bs);
@@ -723,7 +728,7 @@ function BlastTab({ name, setName }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 800, color: T.white, lineHeight: 1.15 }}>{t.name}</div>
-            <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>Bats {t.bats === "L" ? "left" : t.bats === "S" ? "switch" : "right"} {"·"} {d} {"·"} Baum 33/30</div>
+            <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>Bats {t.bats === "L" ? "left" : t.bats === "S" ? "switch" : "right"} {"·"} {d} {"·"} {t.bat.label}{t.bat.own ? " (own bat)" : ""}</div>
           </div>
           <div style={{ fontSize: 9, fontWeight: 700, color: gc, background: gc + "15", padding: "3px 10px", borderRadius: 10, whiteSpace: "nowrap" }}>{GROUP_LABEL[t.group].toUpperCase()}</div>
         </div>
@@ -751,13 +756,13 @@ function BlastTab({ name, setName }) {
       <TimeToDecide t={t} />
       <SwingPath t={t} />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", columnGap: 12, alignItems: "start" }}>
-        {METRICS.map((m) => <MetricCard key={m.k} m={m} t={t} pool={poolWith(t)} missing="Not captured: this session was before the six-tile Blast layout." />)}
+        {METRICS.map((m) => <MetricCard key={m.k} m={m} t={t} pool={poolWith(t)} rankNote={t.bat.own ? "OWN BAT, NOT RANKED" : null} missing="Not captured: this session was before the six-tile Blast layout." />)}
       </div>
       <Routes t={t} onPick={pick} />
 
       <div style={{ fontSize: 10, color: T.faint, lineHeight: 1.6, marginTop: 8 }}>
         Blast Motion, facility Baum 33/30, off a tee, cue "swing as hard as you can and hit it hard up the middle." Counted swings only; the first max swing is a settle swing.
-        Rankings are among the {TESTERS.length} people tested so far, including pitchers-only and staff. Time to decide uses a generic pitch (6 ft extension, ~9% speed loss to the plate)
+        Rankings are among the {FACILITY.length} people tested on the facility bat so far, including pitchers-only and staff. A hitter swinging his own bat is shown with that bat beside the group and is not ranked in it. Time to decide uses a generic pitch (6 ft extension, ~9% speed loss to the plate)
         and time to contact measured from the start of the downswing, so real decision time is a little shorter. None of these numbers have passed the reliability check yet. MLB lines are 2026 season averages from games against live pitching (Statcast, 209 qualified hitters) or Blast's published averages. Yours are off a tee, so read them as a reference, not a target.
       </div>
     </>
