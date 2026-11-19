@@ -60,6 +60,13 @@ const PEN_MIN = 20;
 const HOURS = { 1: ["15:00", "21:00"], 2: ["15:00", "21:00"], 3: ["15:00", "21:00"], 4: ["15:00", "21:00"], 5: ["15:00", "19:30"], 6: ["09:00", "13:00"] };
 const GROUPS = new Set(["high school", "position players", "college", "middle school", "pro", "remote", "men's league", "mens league", "youth"]);
 const MOUND = /bullpen|mound|slope|\blive\b/i;
+// Names the planner spells wrong -> the athlete's real name (Frank-confirmed). The row is
+// still found by what Hack typed; everything the board shows and stores uses the real name,
+// and it keeps working once the sheet is corrected.
+const PLANNER_ALIASES = {
+  "jose diaz": "Jesus Diaz",   // 2026-11-18: VALD, TrackMan and the training log all say Jesus
+};
+const realName = (n) => PLANNER_ALIASES[String(n).toLowerCase().replace(/\s+/g, " ").trim()] || n;
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const WIN = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -154,9 +161,9 @@ async function fetchPlanner(sheetId, monday) {
       if (/^remote$/i.test(name)) remote = true;
       continue;
     }
-    const pid = slug(name);
+    const shown = realName(name), pid = slug(shown);
     if (remote || !PID.test(pid)) continue;
-    const p = (by[pid] = by[pid] || { pid, name, group, pens: {} });
+    const p = (by[pid] = by[pid] || { pid, name: shown, group, pens: {}, ...(shown !== name ? { was: slug(name) } : {}) });
     row.slice(2, 9).forEach((c, i) => {
       const v = str(c, 60);
       if (!v || v[0] === "=" || !MOUND.test(v)) return;
@@ -312,6 +319,17 @@ async function week(monday, fresh) {
   const dates = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
   const [{ days, requests, ov }, [regRaw]] = await Promise.all([loadDays(dates), redis([["HGETALL", "bp:pitchers"]])]);
   const reg = Object.fromEntries(Object.entries(flat(regRaw)).map(([k, v]) => [k, parse(v)]).filter(([, v]) => v));
+  // A pitcher whose planner spelling was just corrected keeps the link he already has.
+  const moved = plan.pitchers.filter((p) => p.was && PID.test(p.was) && reg[p.was] && !reg[p.pid]);
+  if (moved.length) {
+    const cmds = [];
+    for (const p of moved) {
+      reg[p.pid] = { ...reg[p.was], name: p.name };
+      cmds.push(["HSET", "bp:pitchers", p.pid, JSON.stringify(reg[p.pid])], ["HSET", "bp:tokens", sha(reg[p.pid].token || ""), p.pid], ["HDEL", "bp:pitchers", p.was]);
+      delete reg[p.was];
+    }
+    await redis(cmds);
+  }
   // First time a pitcher has mound work on the planner, make his link.
   const fresh_ = plan.pitchers.filter((p) => Object.keys(p.pens).length && !reg[p.pid]);
   if (fresh_.length) {
@@ -430,7 +448,7 @@ async function write(body, who) {
   }
   if (op === "bpAdd" || op === "bpRemove") {
     let pid = PID.test(body.pid || "") ? body.pid : null;
-    const typed = op === "bpAdd" && !pid ? str(body.name, 60) : "";
+    const typed = op === "bpAdd" && !pid ? realName(str(body.name, 60)) : "";
     if (typed) pid = slug(typed);
     if (!pid || !PID.test(pid)) throw fail(400, op === "bpAdd" ? "Pick a pitcher or type his name." : "Bad pitcher");
     const plan = await planner(await config(), mondayOf(date));
