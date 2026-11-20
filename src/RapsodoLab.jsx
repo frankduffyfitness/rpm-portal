@@ -380,10 +380,10 @@ export function RapsodoTab({ name, setName }) {
       <Board t={t} onOpen={open} />
 
       <div style={{ fontSize: 10, color: T.faint, lineHeight: 1.6, marginTop: 8 }}>
-        Rapsodo hitting unit at RPM, off a tee, rounds from Nov 10, 2026 on. The bat was not recorded and misreads are left out.
+        Rapsodo hitting unit at RPM, off a tee, rounds from Nov 10, 2026 on. The bat was not recorded for most rounds and misreads are left out.
         Rankings are among the {HITTERS.length} hitters measured so far, of all ages, each on their latest round. Flight arcs are drawn from launch angle and
         Rapsodo's projected distance with no air drag, so read them as a picture of the round, not a measurement. MLB lines are league-wide Statcast figures from
-        games against live pitching. Blast Motion and Rapsodo have not been run on the same swings yet, so the two tabs stand alone for now.
+        games against live pitching. Only a few hitters have had Blast Motion and Rapsodo on the same swings so far, so the two tabs stand alone for now.
       </div>
     </>
   );
