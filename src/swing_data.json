@@ -1117,7 +1117,8 @@
    "ownBat": {
     "2026-11-20": {
      "label": "Rawlings Icon 31/26, drop 5",
-     "own": true
+     "own": true,
+     "whose": "shared bat"
     }
    },
    "date": "2026-11-20"
@@ -1221,7 +1222,8 @@
    "ownBat": {
     "2026-11-19": {
      "label": "Louisville 31/26, drop 5",
-     "own": true
+     "own": true,
+     "whose": "own bat"
     }
    },
    "date": "2026-11-19"
@@ -2483,7 +2485,8 @@
    "ownBat": {
     "2026-11-20": {
      "label": "Rawlings Icon 31/26, drop 5",
-     "own": true
+     "own": true,
+     "whose": "shared bat"
     }
    },
    "date": "2026-11-20"

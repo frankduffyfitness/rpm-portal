@@ -728,7 +728,7 @@ function BlastTab({ name, setName }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 800, color: T.white, lineHeight: 1.15 }}>{t.name}</div>
-            <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>Bats {t.bats === "L" ? "left" : t.bats === "S" ? "switch" : "right"} {"·"} {d} {"·"} {t.bat.label}{t.bat.own ? " (own bat)" : ""}</div>
+            <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>Bats {t.bats === "L" ? "left" : t.bats === "S" ? "switch" : "right"} {"·"} {d} {"·"} {t.bat.label}{t.bat.own ? ` (${t.bat.whose || "own bat"})` : ""}</div>
           </div>
           <div style={{ fontSize: 9, fontWeight: 700, color: gc, background: gc + "15", padding: "3px 10px", borderRadius: 10, whiteSpace: "nowrap" }}>{GROUP_LABEL[t.group].toUpperCase()}</div>
         </div>
@@ -756,13 +756,13 @@ function BlastTab({ name, setName }) {
       <TimeToDecide t={t} />
       <SwingPath t={t} />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", columnGap: 12, alignItems: "start" }}>
-        {METRICS.map((m) => <MetricCard key={m.k} m={m} t={t} pool={poolWith(t)} rankNote={t.bat.own ? "OWN BAT, NOT RANKED" : null} missing="Not captured: this session was before the six-tile Blast layout." />)}
+        {METRICS.map((m) => <MetricCard key={m.k} m={m} t={t} pool={poolWith(t)} rankNote={t.bat.own ? "OTHER BAT, NOT RANKED" : null} missing="Not captured: this session was before the six-tile Blast layout." />)}
       </div>
       <Routes t={t} onPick={pick} />
 
       <div style={{ fontSize: 10, color: T.faint, lineHeight: 1.6, marginTop: 8 }}>
         Blast Motion, facility Baum 33/30, off a tee, cue "swing as hard as you can and hit it hard up the middle." Counted swings only; the first max swing is a settle swing.
-        Rankings are among the {FACILITY.length} people tested on the facility bat so far, including pitchers-only and staff. A hitter swinging his own bat is shown with that bat beside the group and is not ranked in it. Time to decide uses a generic pitch (6 ft extension, ~9% speed loss to the plate)
+        Rankings are among the {FACILITY.length} people tested on the facility bat so far, including pitchers-only and staff. A hitter swinging any other bat is shown with that bat beside the group and is not ranked in it. Time to decide uses a generic pitch (6 ft extension, ~9% speed loss to the plate)
         and time to contact measured from the start of the downswing, so real decision time is a little shorter. None of these numbers have passed the reliability check yet. MLB lines are 2026 season averages from games against live pitching (Statcast, 209 qualified hitters) or Blast's published averages. Yours are off a tee, so read them as a reference, not a target.
       </div>
     </>
