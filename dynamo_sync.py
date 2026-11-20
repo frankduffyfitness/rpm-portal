@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-18 Charlie Delman grip re-pull (uploaded after first trigger)
+# sync-trigger: 2026-11-20 Noah Feit assessment
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
