@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-20 Noah Feit assessment
+# sync-trigger: 2026-11-21 Gabriel De La Rosa evaluation
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
