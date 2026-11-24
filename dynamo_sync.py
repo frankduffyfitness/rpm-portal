@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-21 Gabriel De La Rosa evaluation
+# sync-trigger: 2026-11-23 Pedro Peguero + Jeremy Lewis evaluations
 #!/usr/bin/env python3
 """
 VALD DynaMo → dynamo_portal.json  (staff-only shoulder-strength page)
