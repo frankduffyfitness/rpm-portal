@@ -4146,6 +4146,9 @@ function VmSandboxCard() {
     return [Math.max(rng[0] - span * frac, floor), rng[1] + span * frac];
   };
   const ciB = pad(VM_RANGE.ci, 0.15, 40), rsiB = pad(VM_RANGE.rsi, 0.15, 0.1), erB = pad(VM_RANGE.erRfd, 0.15, 10), gB = pad(VM_RANGE.grip, 0.15, 50);
+  // Eval-day grip slider always reaches 200 lbs (Frank 2026-11-24, after a 186 lb test):
+  // a prospect can out-squeeze the roster. Past the fitted range the extrapolation note shows.
+  gB[1] = Math.max(gB[1], 200 * VM_N_PER_LB);
   const med = (k, fb) => {
     const v = VM_ROWS.map(r => r[k]).filter(x => x != null).sort((a, b) => a - b);
     return v.length ? v[Math.floor(v.length / 2)] : fb;
