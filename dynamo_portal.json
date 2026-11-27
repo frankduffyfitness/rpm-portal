@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-11-27T16:44:02.587573+00:00",
+    "syncDate": "2026-11-27T17:31:56.069702+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 168
+    "totalAthletes": 169
   },
   "athletes": {
     "Joey Muzio": {
@@ -6597,6 +6597,42 @@
       "dob": "2010-10-30",
       "tests": [
         {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                362.2,
+                320.1
+              ],
+              "peakLbs": [
+                81.4,
+                72.0
+              ],
+              "asymPct": 11.6,
+              "asymNote": "left side stronger",
+              "rfd": [
+                1871,
+                1812
+              ],
+              "ttp": [
+                2.1,
+                2.07
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-08-10",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -9579,6 +9615,42 @@
       "group": "hs",
       "dob": "2011-08-24",
       "tests": [
+        {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                459.4,
+                435.1
+              ],
+              "peakLbs": [
+                103.3,
+                97.8
+              ],
+              "asymPct": 5.3,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2636,
+                2398
+              ],
+              "ttp": [
+                4.98,
+                4.29
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
         {
           "date": "2026-10-19",
           "type": "Shoulder Strength Baseline",
@@ -26395,6 +26467,72 @@
               "ttp": [
                 7.0,
                 1.17
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Sebastian Sanchez": {
+      "name": "Sebastian Sanchez",
+      "group": "col",
+      "dob": "2006-01-20",
+      "tests": [
+        {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                null,
+                525.8
+              ],
+              "peakLbs": [
+                null,
+                118.2
+              ],
+              "asymPct": null,
+              "asymNote": "",
+              "rfd": [
+                null,
+                3365
+              ],
+              "ttp": [
+                null,
+                0.72
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                469.1,
+                501.5
+              ],
+              "peakLbs": [
+                105.5,
+                112.7
+              ],
+              "asymPct": 6.5,
+              "asymNote": "Symmetric",
+              "rfd": [
+                3100,
+                3956
+              ],
+              "ttp": [
+                2.02,
+                0.3
               ]
             }
           ],
