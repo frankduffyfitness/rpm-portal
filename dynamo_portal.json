@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-11-27T17:31:56.069702+00:00",
+    "syncDate": "2026-11-27T23:20:10.443154+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 169
+    "totalAthletes": 170
   },
   "athletes": {
     "Joey Muzio": {
@@ -26533,6 +26533,72 @@
               "ttp": [
                 2.02,
                 0.3
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Matteo Cergol": {
+      "name": "Matteo Cergol",
+      "group": "hs",
+      "dob": "2011-09-21",
+      "tests": [
+        {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                497.7,
+                524.7
+              ],
+              "peakLbs": [
+                111.9,
+                118.0
+              ],
+              "asymPct": 5.1,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2758,
+                2858
+              ],
+              "ttp": [
+                4.82,
+                6.83
+              ]
+            },
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                455.1,
+                520.9
+              ],
+              "peakLbs": [
+                102.3,
+                117.1
+              ],
+              "asymPct": 12.6,
+              "asymNote": "right side stronger",
+              "rfd": [
+                3016,
+                2858
+              ],
+              "ttp": [
+                1.68,
+                1.42
               ]
             }
           ],
