@@ -1,8 +1,8 @@
 {
   "meta": {
-    "syncDate": "2026-11-27T16:20:20.837123+00:00",
+    "syncDate": "2026-11-27T16:44:02.587573+00:00",
     "source": "VALD DynaMo",
-    "totalAthletes": 166
+    "totalAthletes": 168
   },
   "athletes": {
     "Joey Muzio": {
@@ -21741,6 +21741,42 @@
       "dob": "2011-07-27",
       "tests": [
         {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Shoulder Flexion",
+              "discomfort": false,
+              "peakN": [
+                471.8,
+                451.8
+              ],
+              "peakLbs": [
+                106.1,
+                101.6
+              ],
+              "asymPct": 4.2,
+              "asymNote": "Symmetric",
+              "rfd": [
+                2572,
+                2334
+              ],
+              "ttp": [
+                3.58,
+                4.36
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        },
+        {
           "date": "2026-10-16",
           "type": "Shoulder Strength Baseline",
           "label": "Assessment",
@@ -26279,6 +26315,92 @@
           "erIr": {
             "left": null,
             "right": 1.21
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Charlie Bendenoun": {
+      "name": "Charlie Bendenoun",
+      "group": "hs",
+      "dob": "2011-12-13",
+      "tests": [
+        {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                478.3,
+                426.5
+              ],
+              "peakLbs": [
+                107.5,
+                95.9
+              ],
+              "asymPct": 10.8,
+              "asymNote": "left side stronger",
+              "rfd": [
+                2869,
+                2404
+              ],
+              "ttp": [
+                1.7,
+                1.91
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
+          },
+          "discomfortNote": "",
+          "planNote": ""
+        }
+      ]
+    },
+    "Miles Bohn": {
+      "name": "Miles Bohn",
+      "group": "ms",
+      "dob": "2014-07-29",
+      "tests": [
+        {
+          "date": "2026-11-27",
+          "type": "Shoulder Strength Baseline",
+          "label": "Assessment",
+          "movements": [
+            {
+              "name": "Grip Squeeze",
+              "position": "90\u00b0 Elbow Flexion",
+              "discomfort": false,
+              "peakN": [
+                302.8,
+                342.8
+              ],
+              "peakLbs": [
+                68.1,
+                77.1
+              ],
+              "asymPct": 11.7,
+              "asymNote": "right side stronger",
+              "rfd": [
+                1711,
+                2313
+              ],
+              "ttp": [
+                7.0,
+                1.17
+              ]
+            }
+          ],
+          "erIr": {
+            "left": null,
+            "right": null
           },
           "discomfortNote": "",
           "planNote": ""
