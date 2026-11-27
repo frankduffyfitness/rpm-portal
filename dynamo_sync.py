@@ -543,3 +543,4 @@ if __name__ == "__main__":
 # sync trigger 2026-11-24 (Mason Patience grip)
 # sync trigger 2026-11-27 (bat speed board grip refresh)
 # sync trigger 2026-11-27 b (grips uploaded by Frank)
+# sync trigger 2026-11-27 c (grips for today's bat speed testers)
