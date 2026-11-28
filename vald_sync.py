@@ -1,4 +1,4 @@
-# sync-trigger: 2026-11-23 Pedro Peguero + Jeremy Lewis evaluations
+# sync-trigger: 2026-11-28 Christian Trani + Justin Garcia assessments
 #!/usr/bin/env python3
 # Suppress blake2 hash warnings on macOS Python 3.14
 import warnings
